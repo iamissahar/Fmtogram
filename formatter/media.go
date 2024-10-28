@@ -32,7 +32,6 @@ func mediaGroup(msg *Message) error {
 		for i := 0; i < len(msg.fm.mh.storage); i++ {
 
 			if msg.fm.mh.storage[i] != nil {
-				fmt.Println(msg.fm.mh.storage[i])
 				group[i] = msg.fm.mh.storage[i]
 			}
 		}
@@ -51,6 +50,7 @@ func mediaGroup(msg *Message) error {
 			}
 		}
 		if err == nil {
+			fmt.Println(group)
 			err = putGroup(msg.fm.writer, group)
 		}
 		msg.fm.contentType = msg.fm.writer.FormDataContentType()

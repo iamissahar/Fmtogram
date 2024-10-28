@@ -4,21 +4,17 @@ import (
 	"log"
 
 	"github.com/l1qwie/Fmtogram/errors"
+	"github.com/l1qwie/Fmtogram/types"
 )
 
 type checking interface {
 	defaultString(string) bool
-	defaultArray([]interface{}) bool
 	defautBool(bool) bool
 	defaultInt(int) bool
 }
 
 func (ph *photo) defaultString(data string) bool {
 	return data == ""
-}
-
-func (ph *photo) defaultArray(data []interface{}) bool {
-	return len(data) == 0
 }
 
 func (ph *photo) defautBool(data bool) bool {
@@ -33,10 +29,6 @@ func (ph *video) defaultString(data string) bool {
 	return data == ""
 }
 
-func (ph *video) defaultArray(data []interface{}) bool {
-	return len(data) == 0
-}
-
 func (ph *video) defautBool(data bool) bool {
 	return !data
 }
@@ -49,10 +41,6 @@ func (ph *audio) defaultString(data string) bool {
 	return data == ""
 }
 
-func (ph *audio) defaultArray(data []interface{}) bool {
-	return len(data) == 0
-}
-
 func (ph *audio) defautBool(data bool) bool {
 	return !data
 }
@@ -63,10 +51,6 @@ func (ph *audio) defaultInt(data int) bool {
 
 func (ph *document) defaultString(data string) bool {
 	return data == ""
-}
-
-func (ph *document) defaultArray(data []interface{}) bool {
-	return len(data) == 0
 }
 
 func (ph *document) defautBool(data bool) bool {
@@ -84,9 +68,9 @@ func isItEmply(ch checking, work int, data interface{}) bool {
 		if work == checkString {
 			ok = ch.defaultString(d)
 		}
-	case []interface{}:
+	case []*types.MessageEntity:
 		if work == checkArray {
-			ok = ch.defaultArray(d)
+			ok = len(d) == 0
 		}
 	case bool:
 		if work == checkBool {
@@ -106,10 +90,7 @@ func isItEmply(ch checking, work int, data interface{}) bool {
 func requiredPhotoData(ph *photo, num int) error {
 	var err error
 	if ph.Photo == "" {
-		err = errors.MissedRequiredField(interfacePhoto, "Photo{ID/FilePath/URL}", num, true)
-	}
-	if err == nil && ph.GottenFrom == 0 {
-		err = errors.MissedRequiredField(interfacePhoto, "GottenFrom{media.TG, media.Storage, media.URL}", num, true)
+		err = errors.MissedRequiredField(interfacePhoto, "Write{Storage,Telgram,Internet}Photo{FilePath/ID/URL}", num, 0, true, false)
 	}
 	return err
 }
@@ -117,13 +98,7 @@ func requiredPhotoData(ph *photo, num int) error {
 func requiredVideoData(vd *video, num int) error {
 	var err error
 	if vd.Video == "" {
-		err = errors.MissedRequiredField(interfaceVideo, "Video{ID/FilePath/URL}", num, true)
-	}
-	if err == nil && vd.VideoGottenFrom == 0 {
-		err = errors.MissedRequiredField(interfaceVideo, "GottenFrom{media.Telegram, media.Storage, media.Internet}", num, true)
-	}
-	if err == nil && (vd.Thumbnail != "" && vd.ThumbnailGottenFrom == 0) {
-		err = errors.MissedRequiredField(interfaceVideo, "ThumbnailGottenFrom{media.Telegram, media.Storage, media.Internet}", num, true)
+		err = errors.MissedRequiredField(interfaceVideo, "Write{Storage,Telgram,Internet}Video{FilePath/ID/URL}", num, 0, true, false)
 	}
 	return err
 }
@@ -131,13 +106,7 @@ func requiredVideoData(vd *video, num int) error {
 func requiredAudioData(ad *audio, num int) error {
 	var err error
 	if ad.Audio == "" {
-		err = errors.MissedRequiredField(interfaceAudio, "Audio{ID/FilePath/URL}", num, true)
-	}
-	if err == nil && ad.AudioGottenFrom == 0 {
-		err = errors.MissedRequiredField(interfaceAudio, "GottenFrom{media.Telegram, media.Storage, media.Internet}", num, true)
-	}
-	if err == nil && (ad.Thumbnail != "" && ad.ThumbnailGottenFrom == 0) {
-		err = errors.MissedRequiredField(interfaceAudio, "ThumbnailGottenFrom{media.Telegram, media.Storage, media.Internet}", num, true)
+		err = errors.MissedRequiredField(interfaceAudio, "Write{Storage,Telgram,Internet}Audio{FilePath/ID/URL}", num, 0, true, false)
 	}
 	return err
 }
@@ -145,13 +114,7 @@ func requiredAudioData(ad *audio, num int) error {
 func requiredDocumentData(dc *document, num int) error {
 	var err error
 	if dc.Document == "" {
-		err = errors.MissedRequiredField(interfaceDocument, "Document{ID/FilePath/URL}", num, true)
-	}
-	if err == nil && dc.DocumentGottenFrom == 0 {
-		err = errors.MissedRequiredField(interfaceDocument, "GottenFrom{media.Telegram, media.Storage, media.Internet}", num, true)
-	}
-	if err == nil && (dc.Thumbnail != "" && dc.ThumbnailGottenFrom == 0) {
-		err = errors.MissedRequiredField(interfaceDocument, "ThumbnailGottenFrom{media.Telegram, media.Storage, media.Internet}", num, true)
+		err = errors.MissedRequiredField(interfaceDocument, "Write{Storage,Telgram,Internet}Document{FilePath/ID/URL}", num, 0, true, false)
 	}
 	return err
 }

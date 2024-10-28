@@ -94,13 +94,16 @@ func MustBe(objects, fields, funcnames []string) error {
 	return fmt.Errorf("[ERROR] Some data is missed! There's more info:\n %s", mesErr)
 }
 
-func MissedRequiredField(object, field string, objnum int, media bool) error {
+func MissedRequiredField(intrfc, f string, interfacenum, interfaceline int, media, kb bool) error {
 	var err error
 	if media {
-		err = fmt.Errorf("[ERROR] Field %s is required in object %s (the object was added as %dth)", field, object, objnum)
+		err = fmt.Errorf("[ERROR] Data from '%s' is required in interface {%s} (the interface was added as %d)", f, intrfc, interfacenum)
+	} else if kb {
+		err = fmt.Errorf("[ERROR] Data from '%s' is required in interface {%s} (the interface was added as %d in %d line)", f, intrfc, interfacenum, interfaceline)
 	} else {
-		err = fmt.Errorf("[ERROR] Field %s is required in object %s", field, object)
+		err = fmt.Errorf("[ERROR] Data from '%s' is required in interface {%s}", f, intrfc)
 	}
+
 	return err
 }
 
@@ -122,4 +125,16 @@ func CantUnmarshal(err error) error {
 
 func TelegramError(errcode int, discription string) error {
 	return fmt.Errorf("[ERROR] Code: %d | Discription: '%s'", errcode, discription)
+}
+
+func ImpossibleCombination(object1, object2 string) error {
+	return fmt.Errorf("[ERROR] Impossible combination. It isn't allowed to send '%s' and '%s' in one message", object1, object2)
+}
+
+func UnsupportedType(pos int) error {
+	return fmt.Errorf("[ERROR] The data type in slice messageIDs in position %d isn't allowed. Allowed types are int and string", pos)
+}
+
+func TooMuchData(interface1 string, num, line int) error {
+	return fmt.Errorf("[ERROR] You mentioned too much data. It is allowed to call only one function in interface {%s} except WriteString(). The interface where you gave this data is %d in the %d line", interface1, num, line)
 }

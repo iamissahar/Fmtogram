@@ -53,7 +53,7 @@ func (msg *Message) AddAudio(ad IAudio) {
 }
 
 // Added a message to the message you're building
-func (msg *Message) AddMessage(inf MSGInformation) {
+func (msg *Message) AddMessage(inf IMSGInformation) {
 	msg.fm.inf = inf.(*information)
 	logs.InterfaceSaved("Message")
 }
@@ -74,4 +74,10 @@ func (msg *Message) AddReplyKeyboard(kb IReply) {
 func (msg *Message) AddInlineKeyboard(kb IInline) {
 	msg.fm.kb = kb.(*inline)
 	logs.InterfaceSaved("Reply Keyboard")
+}
+
+func (msg *Message) AddMethod(method string) {
+	msg.fm.method = method
+	msg.fm.notchange = true
+	logs.MethodSaved(method)
 }

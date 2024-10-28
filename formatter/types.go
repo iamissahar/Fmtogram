@@ -20,6 +20,8 @@ type formatter struct {
 	writer      *multipart.Writer
 	mh          *mediaHolder
 	buf         *bytes.Buffer
+	method      string
+	notchange   bool
 }
 
 type Message struct {

@@ -6,7 +6,7 @@ type InaccessibleMessage struct {
 	Date      int   `json:"date"`
 }
 
-type MessageId struct {
+type MessageID struct {
 	MessageID int `json:"message_id"`
 }
 

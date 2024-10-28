@@ -469,3 +469,19 @@ type TelegramResponse struct {
 	ErrorCode   int            `json:"error_code,omitempty"`
 	Description string         `json:"description,omitempty"`
 }
+
+type TelegramMediaGroup struct {
+	Ok          bool           `json:"ok"`
+	Result      []*Message     `json:"result,omitempty"`
+	Error       *TelegramError `json:"error,omitempty"`
+	ErrorCode   int            `json:"error_code,omitempty"`
+	Description string         `json:"description,omitempty"`
+}
+
+type TelegramMessageIDs struct {
+	Ok          bool           `json:"ok"`
+	Result      []*MessageID   `json:"result,omitempty"`
+	Error       *TelegramError `json:"error,omitempty"`
+	ErrorCode   int            `json:"error_code,omitempty"`
+	Description string         `json:"description,omitempty"`
+}

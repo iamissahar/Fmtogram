@@ -26,12 +26,27 @@ const (
 	checkInt          int    = -4
 )
 
-func (ph *photo) WritePhoto(photo string) {
+func (ph *photo) writePhoto(photo, object string) {
 	if !isItEmply(ph, checkString, ph.Photo) {
 		logs.DataIsntEmply(interfacePhoto, "Photo", ph.Photo)
 	}
 	ph.Photo, ph.Media = photo, photo
-	logs.DataWrittenSuccessfully(interfacePhoto, "Photo")
+	logs.DataWrittenSuccessfully(interfacePhoto, object)
+}
+
+func (ph *photo) WritePhotoStorage(photo string) {
+	ph.GottenFrom = Storage
+	ph.writePhoto(photo, "Photo From Storage")
+}
+
+func (ph *photo) WritePhotoTelegram(photo string) {
+	ph.GottenFrom = Telegram
+	ph.writePhoto(photo, "Photo From Telegram")
+}
+
+func (ph *photo) WritePhotoInternet(photo string) {
+	ph.GottenFrom = Internet
+	ph.writePhoto(photo, "Photo From The Internet")
 }
 
 func (ph *photo) WriteCaption(caption string) {
@@ -74,37 +89,59 @@ func (ph *photo) WriteHasSpoiler() {
 	logs.SettedParam("Has Spoiler", interfacePhoto, ph.HasSpoiler)
 }
 
-func (ph *photo) WriteGottenFrom(gottenfrom int) {
-	if !isItEmply(ph, checkInt, ph.GottenFrom) {
-		logs.DataIsntEmply(interfacePhoto, "Gotten From", ph.GottenFrom)
-	}
-	ph.GottenFrom = gottenfrom
-	logs.DataWrittenSuccessfully(interfacePhoto, "Gotten From")
+func (ph *photo) GetResponse() [4]types.PhotoSize {
+	return ph.response
 }
 
-func (ph *photo) GetResponse() [4]*responseData {
-	return ph.ResponseData
-}
-
-func (vd *video) WriteVideo(video string) {
+func (vd *video) writeVideo(video, object string) {
 	if !isItEmply(vd, checkString, vd.Video) {
 		logs.DataIsntEmply(interfaceVideo, "Video", vd.Video)
 	}
 	vd.Video, vd.Media = video, video
-	logs.DataWrittenSuccessfully(interfaceVideo, "Video")
+	logs.DataWrittenSuccessfully(interfaceVideo, object)
 }
 
-func (vd *video) WriteThumbnail(thumbnail string) {
+func (vd *video) WriteVideoStorage(video string) {
+	vd.VideoGottenFrom = Storage
+	vd.writeVideo(video, "Video From Storage")
+}
+
+func (vd *video) WriteVideoTelegram(video string) {
+	vd.VideoGottenFrom = Storage
+	vd.writeVideo(video, "Video From Telegram")
+}
+
+func (vd *video) WriteVideoInternet(video string) {
+	vd.VideoGottenFrom = Storage
+	vd.writeVideo(video, "Video From the Internet")
+}
+
+func (vd *video) writeThumbnail(thumbnail, object string) {
 	if !isItEmply(vd, checkString, vd.Thumbnail) {
 		logs.DataIsntEmply("Video", "Thumbnail", vd.Thumbnail)
 	}
 	vd.Thumbnail = thumbnail
-	logs.DataWrittenSuccessfully(interfaceVideo, "Thumbnail")
+	logs.DataWrittenSuccessfully(interfaceVideo, object)
+}
+
+func (vd *video) WriteThumbnailStorage(thumbnail string) {
+	vd.ThumbnailGottenFrom = Storage
+	vd.writeThumbnail(thumbnail, "Thumbnail From Storage")
+}
+
+func (vd *video) WriteThumbnailTelegram(thumbnail string) {
+	vd.ThumbnailGottenFrom = Telegram
+	vd.writeThumbnail(thumbnail, "Thumbnail From Telegram")
+}
+
+func (vd *video) WriteThumbnailInternet(thumbnail string) {
+	vd.ThumbnailGottenFrom = Internet
+	vd.writeThumbnail(thumbnail, "Thumbnail From the Internet")
 }
 
 func (vd *video) WriteCaption(caption string) {
 	if !isItEmply(vd, checkString, vd.Caption) {
-		logs.DataIsntEmply("Video", "Caption", vd.Thumbnail)
+		logs.DataIsntEmply("Video", "Caption", vd.Caption)
 	}
 	vd.Caption = caption
 	logs.DataWrittenSuccessfully(interfaceVideo, "Caption")
@@ -112,7 +149,7 @@ func (vd *video) WriteCaption(caption string) {
 
 func (vd *video) WriteParseMode(parsemode string) {
 	if !isItEmply(vd, checkString, vd.ParseMode) {
-		logs.DataIsntEmply("Video", "Parse Mode", vd.Thumbnail)
+		logs.DataIsntEmply("Video", "Parse Mode", vd.ParseMode)
 	}
 	vd.ParseMode = parsemode
 	logs.DataWrittenSuccessfully(interfaceVideo, "Parse Mode")
@@ -120,7 +157,7 @@ func (vd *video) WriteParseMode(parsemode string) {
 
 func (vd *video) WriteCaptionEntities(captionEntities []*types.MessageEntity) {
 	if !isItEmply(vd, checkArray, vd.CaptionEntities) {
-		logs.DataIsntEmply("Video", "Caption Entities", vd.Thumbnail)
+		logs.DataIsntEmply("Video", "Caption Entities", vd.CaptionEntities)
 	}
 	vd.CaptionEntities = captionEntities
 	logs.DataWrittenSuccessfully(interfaceVideo, "Caption Entities")
@@ -174,40 +211,54 @@ func (vd *video) WriteHasSpoiler() {
 	logs.SettedParam("Has Spoiler", "Video", vd.SupportsStreaming)
 }
 
-func (vd *video) WriteGottenFrom(gottenfrom int) {
-	if !isItEmply(vd, checkInt, vd.VideoGottenFrom) {
-		logs.DataIsntEmply(interfaceVideo, "Gotten From", vd.VideoGottenFrom)
-	}
-	vd.VideoGottenFrom = gottenfrom
-	logs.DataWrittenSuccessfully(interfaceVideo, "Gotten From")
+func (vd *video) GetResponse() types.Video {
+	return vd.response
 }
 
-func (vd *video) WriteThumbnailGottenFrom(gottenfrom int) {
-	if !isItEmply(vd, checkInt, vd.ThumbnailGottenFrom) {
-		logs.DataIsntEmply(interfaceVideo, "Thumbnail Gotten From", vd.ThumbnailGottenFrom)
-	}
-	vd.ThumbnailGottenFrom = gottenfrom
-	logs.DataWrittenSuccessfully(interfaceVideo, "Thumbnail Gotten From")
-}
-
-func (vd *video) GetResponse() *types.Video {
-	return vd.ResponseData
-}
-
-func (ad *audio) WriteAudio(audio string) {
+func (ad *audio) writeAudio(audio, object string) {
 	if !isItEmply(ad, checkString, ad.Audio) {
 		logs.DataIsntEmply(interfaceAudio, "Audio", ad.Audio)
 	}
 	ad.Audio, ad.Media = audio, audio
-	logs.DataWrittenSuccessfully(interfaceAudio, "Audio")
+	logs.DataWrittenSuccessfully(interfaceAudio, object)
 }
 
-func (ad *audio) WriteThumbnail(thumbnail string) {
+func (ad *audio) WriteAudioStorage(audio string) {
+	ad.AudioGottenFrom = Storage
+	ad.writeAudio(audio, "Audio From Storage")
+}
+
+func (ad *audio) WriteAudioTelegram(audio string) {
+	ad.AudioGottenFrom = Telegram
+	ad.writeAudio(audio, "Audio From Telegram")
+}
+
+func (ad *audio) WriteAudioInternet(audio string) {
+	ad.AudioGottenFrom = Internet
+	ad.writeAudio(audio, "Audio From the Internet")
+}
+
+func (ad *audio) writeThumbnail(thumbnail, object string) {
 	if !isItEmply(ad, checkString, ad.Thumbnail) {
 		logs.DataIsntEmply("Audio", "Thumbnail", ad.Thumbnail)
 	}
 	ad.Thumbnail = thumbnail
-	logs.DataWrittenSuccessfully(interfaceAudio, "Thumbnail")
+	logs.DataWrittenSuccessfully(interfaceAudio, object)
+}
+
+func (ad *audio) WriteThumbnailStorage(thumbnail string) {
+	ad.ThumbnailGottenFrom = Storage
+	ad.writeThumbnail(thumbnail, "Thumbnail From Storage")
+}
+
+func (ad *audio) WriteThumbnailTelegram(thumbnail string) {
+	ad.ThumbnailGottenFrom = Telegram
+	ad.writeThumbnail(thumbnail, "Thumbnail From Telegram")
+}
+
+func (ad *audio) WriteThumbnailInternet(thumbnail string) {
+	ad.ThumbnailGottenFrom = Internet
+	ad.writeThumbnail(thumbnail, "Thumbnail From the Internet")
 }
 
 func (ad *audio) WriteCaption(caption string) {
@@ -258,40 +309,54 @@ func (ad *audio) WriteTitle(title string) {
 	logs.DataWrittenSuccessfully(interfaceAudio, "Title")
 }
 
-func (ad *audio) WriteGottenFrom(gottenfrom int) {
-	if !isItEmply(ad, checkInt, ad.AudioGottenFrom) {
-		logs.DataIsntEmply(interfaceAudio, "Gotten From", ad.AudioGottenFrom)
-	}
-	ad.AudioGottenFrom = gottenfrom
-	logs.DataWrittenSuccessfully(interfaceAudio, "Gotten From")
+func (ad *audio) GetResponse() types.Audio {
+	return ad.response
 }
 
-func (ad *audio) WriteThumbnailGottenFrom(gottenfrom int) {
-	if !isItEmply(ad, checkInt, ad.ThumbnailGottenFrom) {
-		logs.DataIsntEmply(interfaceAudio, "Thumbnail Gotten From", ad.ThumbnailGottenFrom)
-	}
-	ad.ThumbnailGottenFrom = gottenfrom
-	logs.DataWrittenSuccessfully(interfaceAudio, "Thumbnail Gotten From")
-}
-
-func (ad *audio) GetResponse() *types.Audio {
-	return ad.ResponseData
-}
-
-func (dc *document) WriteDocument(document string) {
+func (dc *document) writeDocument(document, object string) {
 	if !isItEmply(dc, checkString, dc.Document) {
 		logs.DataIsntEmply("Document", "Document", dc.Document)
 	}
 	dc.Document = document
-	logs.DataWrittenSuccessfully(interfaceDocument, "Document")
+	logs.DataWrittenSuccessfully(interfaceDocument, object)
 }
 
-func (dc *document) WriteThumbnail(thumbnail string) {
+func (dc *document) WriteDocumentStorage(document string) {
+	dc.DocumentGottenFrom = Storage
+	dc.writeDocument(document, "Document From Storage")
+}
+
+func (dc *document) WriteDocumentTelegram(document string) {
+	dc.DocumentGottenFrom = Telegram
+	dc.writeDocument(document, "Document From Telegram")
+}
+
+func (dc *document) WriteDocumentInternet(document string) {
+	dc.DocumentGottenFrom = Internet
+	dc.writeDocument(document, "Document From the Internet")
+}
+
+func (dc *document) writeThumbnail(thumbnail, object string) {
 	if !isItEmply(dc, checkString, dc.Thumbnail) {
 		logs.DataIsntEmply("Document", "Thumbnail", dc.Thumbnail)
 	}
 	dc.Thumbnail = thumbnail
-	logs.DataWrittenSuccessfully(interfaceDocument, "Thumbnail")
+	logs.DataWrittenSuccessfully(interfaceDocument, object)
+}
+
+func (dc *document) WriteThumbnailStorage(thumbnail string) {
+	dc.ThumbnailGottenFrom = Storage
+	dc.writeThumbnail(thumbnail, "Thumbnail From Storage")
+}
+
+func (dc *document) WriteThumbnailTelegram(thumbnail string) {
+	dc.ThumbnailGottenFrom = Telegram
+	dc.writeThumbnail(thumbnail, "Thumbnail From Telegram")
+}
+
+func (dc *document) WriteThumbnailInternet(thumbnail string) {
+	dc.ThumbnailGottenFrom = Internet
+	dc.writeThumbnail(thumbnail, "Thumbnail From the Internet")
 }
 
 func (dc *document) WriteCaption(caption string) {
@@ -342,8 +407,24 @@ func (dc *document) WriteThumbnailGottenFrom(gottenfrom int) {
 	logs.DataWrittenSuccessfully(interfaceDocument, "Thumbnail Gotten From")
 }
 
-func (dc *document) GetResponse() *types.Document {
-	return dc.ResponseData
+func (dc *document) GetResponse() types.Document {
+	return dc.response
+}
+
+func (an *animation) writeAnimation(animation, object string) {
+	if !isItEmply(an, checkString, an.Animation) {
+		logs.DataIsntEmply("WriteAnimation{Storage/Telegram/URL}()", "IAnimation", an.Animation)
+	}
+	an.Animation = animation
+	logs.DataWrittenSuccessfully(interfaceAnimation, object)
+}
+
+func (an *animation) WriteAnimationStorage(animation string) {
+	if !isItEmply(an, checkInt, an.Animation) {
+		logs.DataIsntEmply(interfaceDocument, "Animation", an.Animation)
+	}
+	an.AnimationGottenFrom = Storage
+	an.writeAnimation(animation, "Thumbnail From Storage")
 }
 
 func (inf *information) WriteString(text string) {
@@ -394,14 +475,6 @@ func (inf *information) WriteMessageEffectID(messageID string) {
 	logs.DataWrittenSuccessfully(interfaceInf, "Message Effect ID")
 }
 
-func (inf *information) WriteReplyParametrs(params *types.ReplyParameters) {
-	if inf.ReplyParameters != nil {
-		logs.DataIsntEmply(interfaceInf, "Reply Parametrs", inf.ReplyParameters)
-	}
-	inf.ReplyParameters = params
-	logs.DataWrittenSuccessfully(interfaceInf, "Reply Parametrs")
-}
-
 func (inf *information) WriteEntities(entities []*types.MessageEntity) {
 	if len(inf.Entities) != 0 {
 		logs.DataIsntEmply(interfaceInf, "Entities", inf.Entities)
@@ -418,35 +491,54 @@ func (inf *information) WriteLinkPreviewOptions(lpo *types.LinkPreviewOptions) {
 	logs.DataWrittenSuccessfully(interfaceInf, "Link Preview Options")
 }
 
-func checkReplyTypes(markup interface{}) bool {
-	var ok bool
-	switch markup.(type) {
-	case *types.InlineKeyboardMarkup:
-		ok = true
-	case *types.ReplyKeyboardMarkup:
-		ok = true
-	case *types.ReplyKeyboardRemove:
-		ok = true
-	case *types.ForceReply:
-		ok = true
+func (inf *information) WriteMessageID(messageID int) {
+	if inf.MessageID != 0 {
+		logs.DataIsntEmply(interfaceInf, "Message ID", inf.MessageID)
 	}
-
-	return ok
+	inf.MessageID = messageID
+	logs.DataWrittenSuccessfully(interfaceInf, "Message ID")
 }
 
-func (inf *information) WriteReplyMarkup(markup interface{}) error {
+func (inf *information) WriteMessageIDs(messageIDs []int) error {
 	var err error
-	ok := checkReplyTypes(markup)
-	if ok {
-		if inf.ReplyMarkup != nil {
-			logs.DataIsntEmply(interfaceInf, "Reply Markup", inf.ReplyMarkup)
-		}
-		inf.ReplyMarkup = markup
-		logs.DataWrittenSuccessfully(interfaceInf, "Reply Markup")
-	} else {
-		err = fmt.Errorf("WriteReplyMarkup is waiting an interface{}, but the exactly type of the interface{} must be *types.InlineKeyboardMarkup, *types.ReplyKeyboardMarkup, *types.ReplyKeyboardRemove or *types.ForceReply")
+	if inf.MessageIDs != nil {
+		logs.DataIsntEmply(interfaceInf, "Message IDs", inf.MessageIDs)
 	}
+	inf.MessageIDs = messageIDs
+	logs.DataWrittenSuccessfully(interfaceInf, "Message IDs")
 	return err
+}
+
+func (inf *information) WriteCaption(caption string) {
+	if inf.Caption != "" {
+		logs.DataIsntEmply(interfaceInf, "Caption", inf.Caption)
+	}
+	inf.Caption = caption
+	logs.DataWrittenSuccessfully(interfaceInf, "Caption")
+}
+
+func (inf *information) WriteShowCaptionAboveMedia() {
+	if inf.ShowCaptionAboveMedia {
+		logs.DataIsntEmply(interfaceInf, "Show Caption Above Media", inf.ShowCaptionAboveMedia)
+	}
+	inf.ShowCaptionAboveMedia = true
+	logs.DataWrittenSuccessfully(interfaceInf, "Show Caption Above Media")
+}
+
+func (inf *information) WriteReplyParameters(reply *types.ReplyParameters) {
+	if inf.ReplyParameters != nil {
+		logs.DataIsntEmply(interfaceInf, "Reply Parameters", inf.ReplyParameters)
+	}
+	inf.ReplyParameters = reply
+	logs.DataWrittenSuccessfully(interfaceInf, "Reply Parameters")
+}
+
+func (inf *information) GetResponse() types.User {
+	return inf.response
+}
+
+func (inf *information) GetMessageIDs() []int {
+	return inf.responseMessageIDs
 }
 
 func (ch *chat) WriteChatID(chatID int) {
@@ -465,14 +557,6 @@ func (ch *chat) WriteChatName(chatname string) {
 	logs.DataWrittenSuccessfully(interfaceChat, "Chat Name")
 }
 
-func (ch *chat) WriteChatURL(chatURL string) {
-	if ch.ID != nil {
-		logs.DataIsntEmply(interfaceChat, "Chat URL", ch.ID)
-	}
-	ch.ID = chatURL
-	logs.DataWrittenSuccessfully(interfaceChat, "Chat URL")
-}
-
 func (ch *chat) WriteBusinessConnectionID(connectionID string) {
 	if ch.BusinessConnectionID != "" {
 		logs.DataIsntEmply(interfaceChat, "Business Connection ID", ch.BusinessConnectionID)
@@ -481,12 +565,32 @@ func (ch *chat) WriteBusinessConnectionID(connectionID string) {
 	logs.DataWrittenSuccessfully(interfaceChat, "Business Connection ID")
 }
 
+func (ch *chat) WriteFromChatID(chatID int) {
+	if ch.FromChatID != nil {
+		logs.DataIsntEmply(interfaceChat, "From Chat ID", ch.FromChatID)
+	}
+	ch.FromChatID = chatID
+	logs.DataWrittenSuccessfully(interfaceChat, "From Chat ID")
+}
+
+func (ch *chat) WriteFromChatName(chatname string) {
+	if ch.FromChatID != nil {
+		logs.DataIsntEmply(interfaceChat, "From Chat ID", ch.FromChatID)
+	}
+	ch.FromChatID = fmt.Sprint("@", chatname)
+	logs.DataWrittenSuccessfully(interfaceChat, "From Chat ID")
+}
+
 func (in *inline) Set(plan []int) {
 	in.Keyboard = new(inlineKeyboard)
 	in.Keyboard.InlineKeyboard = make([][]*inlineKeyboardButton, len(plan))
 	for i := range in.Keyboard.InlineKeyboard {
 		in.Keyboard.InlineKeyboard[i] = make([]*inlineKeyboardButton, plan[i])
 	}
+}
+
+func (ch *chat) GetResponse() types.Chat {
+	return ch.response
 }
 
 func (in *inline) NewButton(line, pos int) (IInlineButton, error) {
@@ -524,8 +628,11 @@ func (inb *inlineKeyboardButton) WriteURL(url string) {
 	if inb.Url != "" {
 		logs.DataIsntEmply(inbtn, "URL", inb.Url)
 	}
-	inb.Url = url
-	logs.DataWrittenSuccessfully(inbtn, "URL")
+	if inb.One < 1 {
+		inb.Url = url
+		inb.One++
+		logs.DataWrittenSuccessfully(inbtn, "URL")
+	}
 }
 
 func (inb *inlineKeyboardButton) WriteCallbackData(text string) {
@@ -533,6 +640,7 @@ func (inb *inlineKeyboardButton) WriteCallbackData(text string) {
 		logs.DataIsntEmply(inbtn, "Callback Data", inb.CallbackData)
 	}
 	inb.CallbackData = text
+	inb.One++
 	logs.DataWrittenSuccessfully(inbtn, "Callback Data")
 }
 
@@ -541,6 +649,7 @@ func (inb *inlineKeyboardButton) WriteWebApp(wbapp *types.WebAppInfo) {
 		logs.DataIsntEmply(inbtn, "Web App", *inb.WebApp)
 	}
 	inb.WebApp = wbapp
+	inb.One++
 	logs.DataWrittenSuccessfully(inbtn, "Web App")
 }
 
@@ -549,6 +658,7 @@ func (inb *inlineKeyboardButton) WriteLoginUrl(logurl *types.LoginUrl) {
 		logs.DataIsntEmply(inbtn, "Login URL", *inb.LoginUrl)
 	}
 	inb.LoginUrl = logurl
+	inb.One++
 	logs.DataWrittenSuccessfully(inbtn, "Login URL")
 }
 
@@ -557,6 +667,7 @@ func (inb *inlineKeyboardButton) WriteSwitchInlineQuery(sw string) {
 		logs.DataIsntEmply(inbtn, "Switch Inline Query", inb.SwitchInlineQuery)
 	}
 	inb.SwitchInlineQuery = sw
+	inb.One++
 	logs.DataWrittenSuccessfully(inbtn, "Switch Inline Query")
 }
 
@@ -565,6 +676,7 @@ func (inb *inlineKeyboardButton) WriteSwitchInlineQueryCurrentChat(swcch string)
 		logs.DataIsntEmply(inbtn, "Switch Inline Query Current Chat", inb.SwitchInlineQueryCurrentChat)
 	}
 	inb.SwitchInlineQueryCurrentChat = swcch
+	inb.One++
 	logs.DataWrittenSuccessfully(inbtn, "Switch Inline Query Current Chat")
 }
 
@@ -573,6 +685,7 @@ func (inb *inlineKeyboardButton) WriteSwitchInlineQueryChosenChat(sw *types.Swit
 		logs.DataIsntEmply(inbtn, "Switch Inline Query Chosen Chat", inb.SwitchInlineQueryChosenChat)
 	}
 	inb.SwitchInlineQueryChosenChat = sw
+	inb.One++
 	logs.DataWrittenSuccessfully(inbtn, "Switch Inline Query Chosen Chat")
 }
 
@@ -581,6 +694,7 @@ func (inb *inlineKeyboardButton) WriteCallbackGame(game *types.CallbackGame) {
 		logs.DataIsntEmply(inbtn, "Callback Game", inb.CallbackGame)
 	}
 	inb.CallbackGame = game
+	inb.One++
 	logs.DataWrittenSuccessfully(inbtn, "Callback Game")
 }
 
@@ -589,6 +703,7 @@ func (inb *inlineKeyboardButton) WritePay() {
 		logs.DataIsntEmply(inbtn, "Pay", inb.Pay)
 	}
 	inb.Pay = true
+	inb.One++
 	logs.SettedParam("Pay", inbtn, true)
 }
 

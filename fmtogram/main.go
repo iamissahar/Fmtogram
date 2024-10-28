@@ -1,6 +1,7 @@
 package fmtogram
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/l1qwie/Fmtogram/errors"
@@ -25,18 +26,20 @@ func firstStep(offset *int) {
 	logs.GottenOffset()
 }
 
-func queue(reg *executer.RegTable, tg *types.Telegram, chatID, index int) {
-	if index != executer.None {
+func queue(reg *executer.RegTable, tg *types.Telegram, chatID int, index *int) {
+	if *index != executer.None {
 		logs.AlreadyInQueue()
 
-		reg.Reg[index].Chu <- tg
+		reg.Reg[*index].Chu <- tg
 	} else {
 		logs.FirstTimeUser()
 
-		index = reg.NewIndex()
-		reg.Reg[index].UserId = chatID
-		reg.Reg[index].Chu = make(chan *types.Telegram, 1)
-		reg.Reg[index].Chu <- tg
+		*index = reg.NewIndex()
+		reg.Reg[*index].UserId = chatID
+		reg.Reg[*index].Chu = make(chan *types.Telegram, 1)
+		reg.Reg[*index].Chu <- tg
+
+		fmt.Println(reg.Reg[*index])
 	}
 }
 
@@ -52,7 +55,7 @@ func pullResponse(reg *executer.RegTable) {
 			chatID := helper.GetUserID(tg)
 			index := reg.Seeker(chatID)
 
-			queue(reg, tg, chatID, index)
+			queue(reg, tg, chatID, &index)
 			go worker(reg.Reg[index].Chu, reg.Reg[index].Chb)
 
 			offset = offset + 1

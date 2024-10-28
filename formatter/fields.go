@@ -78,10 +78,18 @@ func (ph *photo) multipartFields(writer *multipart.Writer, group *[]interface{},
 	err := commonFields(writer, ph.CaptionEntities)
 	if err == nil {
 		if input {
-			err = writeFileToMultipart(writer, ph.Photo, ph.Photo)
-			ph.Media = fmt.Sprintf("attach://%s", ph.Photo)
+			if ph.GottenFrom != Storage {
+				ph.Media = ph.Photo
+			} else {
+				err = writeFileToMultipart(writer, ph.Photo, ph.Photo)
+				ph.Media = fmt.Sprintf("attach://%s", ph.Photo)
+			}
 		} else {
-			err = writeFileToMultipart(writer, "photo", ph.Photo)
+			if ph.GottenFrom != Storage {
+				err = writer.WriteField("photo", ph.Photo)
+			} else {
+				err = writeFileToMultipart(writer, "photo", ph.Photo)
+			}
 		}
 	}
 	if err == nil && input {
@@ -115,10 +123,18 @@ func (vd *video) multipartFields(writer *multipart.Writer, group *[]interface{},
 	err := commonFields(writer, vd.CaptionEntities)
 	if err == nil {
 		if input {
-			err = writeFileToMultipart(writer, vd.Video, vd.Video)
-			vd.Media = fmt.Sprintf("attach://%s", vd.Video)
+			if vd.VideoGottenFrom != Storage {
+				vd.Media = vd.Video
+			} else {
+				err = writeFileToMultipart(writer, vd.Video, vd.Video)
+				vd.Media = fmt.Sprintf("attach://%s", vd.Video)
+			}
 		} else {
-			err = writeFileToMultipart(writer, "video", vd.Video)
+			if vd.VideoGottenFrom != Storage {
+				err = writer.WriteField("video", vd.Video)
+			} else {
+				err = writeFileToMultipart(writer, "video", vd.Video)
+			}
 		}
 	}
 	if err == nil && input {
@@ -179,10 +195,18 @@ func (ad *audio) multipartFields(writer *multipart.Writer, group *[]interface{},
 	err := commonFields(writer, ad.CaptionEntities)
 	if err == nil {
 		if input {
-			err = writeFileToMultipart(writer, ad.Audio, ad.Audio)
-			ad.Media = fmt.Sprintf("attach://%s", ad.Audio)
+			if ad.AudioGottenFrom != Storage {
+				ad.Media = ad.Audio
+			} else {
+				err = writeFileToMultipart(writer, ad.Audio, ad.Audio)
+				ad.Media = fmt.Sprintf("attach://%s", ad.Audio)
+			}
 		} else {
-			err = writeFileToMultipart(writer, "audio", ad.Audio)
+			if ad.AudioGottenFrom != Storage {
+				err = writer.WriteField("audio", ad.Audio)
+			} else {
+				err = writeFileToMultipart(writer, "audio", ad.Audio)
+			}
 		}
 	}
 	if err == nil && input {
@@ -219,10 +243,18 @@ func (dc *document) multipartFields(writer *multipart.Writer, group *[]interface
 	err := commonFields(writer, dc.CaptionEntities)
 	if err == nil {
 		if input {
-			err = writeFileToMultipart(writer, dc.Document, dc.Document)
-			dc.Media = fmt.Sprintf("attach://%s", dc.Document)
+			if dc.DocumentGottenFrom != Storage {
+				dc.Media = dc.Document
+			} else {
+				err = writeFileToMultipart(writer, dc.Document, dc.Document)
+				dc.Media = fmt.Sprintf("attach://%s", dc.Document)
+			}
 		} else {
-			err = writeFileToMultipart(writer, "document", dc.Document)
+			if dc.DocumentGottenFrom != Storage {
+				err = writer.WriteField("document", dc.Document)
+			} else {
+				err = writeFileToMultipart(writer, "document", dc.Document)
+			}
 		}
 	}
 	if err == nil && input {
@@ -287,14 +319,6 @@ func (inf *information) multipartFields(writer *multipart.Writer) error {
 	if err == nil && inf.MessageEffectID != "" {
 		err = field(writer, "message_effect_id", inf.MessageEffectID)
 	}
-	if err == nil && inf.ReplyParameters != nil {
-		body, err1 := json.Marshal(inf.ReplyParameters)
-		if err1 == nil {
-			err = field(writer, "reply_parameters", string(body))
-		} else {
-			errors.CantMarshalJSON(err)
-		}
-	}
 	return err
 }
 
@@ -325,7 +349,7 @@ func (ch *chat) createJson() ([]byte, error) {
 }
 
 func (in *inline) MultipartFields(writer *multipart.Writer) error {
-	inbody, err := json.Marshal(in.Keyboard)
+	inbody, err := json.Marshal(in.Keyboard.InlineKeyboard)
 	if err == nil {
 		err = writer.WriteField("reply_markup", string(inbody))
 	}

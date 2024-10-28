@@ -99,9 +99,9 @@ func SettedParam(param, object string, turnOn bool) {
 	}
 }
 
-func NewObjectCreated(text string) {
+func NewInterfaceCreated(text string) {
 	if types.DEBUG {
-		log.Printf("[%s] %s object has successfuly created", Caption, text)
+		log.Printf("[%s] %s interface has successfuly created", Caption, text)
 	}
 }
 
@@ -113,7 +113,7 @@ func NewInterface(text string) {
 
 func DataIsntEmply(object, param string, data interface{}) {
 	if !types.NoWarningMessages {
-		log.Printf("[WARNING] '%s' in object {%s} hadn't been emply before you tried to add new data. Make sure that you've edited the right object. Fmtogram is anyway going to add this data to the object, but just to be sure the data before had been: '%v'. P.S. in case everything is OK, you can turn this message off. Just make types.NoWarningMessages true", param, object, data)
+		log.Printf("[WARNING] data that was gotten from '%s' in interface {%s} wasn't added to an empty field. Make sure that you've edited the right interface. Fmtogram is anyway going to add this data to the interface, but just to be sure the data before had been: '%v'. P.S. in case everything is OK, you can turn this message off. Just make types.NoWarningMessages true", param, object, data)
 	}
 }
 
@@ -129,8 +129,14 @@ func InterfaceSaved(interf string) {
 	}
 }
 
-func DataMightBeLost(object, field, data, object1, field1 string) {
+func DataMightBeLost(intrfc, function, data, intrfc1, function1 string) {
 	if !types.NoWarningMessages {
-		log.Printf("[WARNING] You might lose your data.  You put '%s' into field '%s' in {%s} object. Insted put it in {%s} object, field '%s'", data, field, object, object1, field1)
+		log.Printf("[WARNING] You might lose your data. You put '%s' in function %s in {%s} interface. Insted put it in {%s} interface, function %s", data, function, intrfc, intrfc1, function1)
+	}
+}
+
+func MethodSaved(method string) {
+	if types.DEBUG {
+		log.Printf("[%s] method '%s' has been saved as a prefered one", Caption, method)
 	}
 }

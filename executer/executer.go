@@ -79,10 +79,10 @@ func (reg *RegTable) NewIndex() (newIndex int) {
 
 func GetUpdates(tg *types.Telegram, offset *int) error {
 	url := fmt.Sprint(
-		types.TelegramAPI, "/",
+		types.TelegramAPI,
 		fmt.Sprintf("bot%s", types.BotID), "/",
-		"getUpdates", "?", "limit=1", fmt.Sprintf("offset=%d", *offset))
-	body, err := sendRequest(nil, url, "application/json", "GET")
+		"getUpdates", "?", "limit=1", "&", fmt.Sprintf("offset=%d", *offset))
+	body, err := sendRequest(bytes.NewBuffer(nil), url, "application/json", "GET")
 	if err == nil {
 		err = json.Unmarshal(body, tg)
 	}
@@ -92,10 +92,10 @@ func GetUpdates(tg *types.Telegram, offset *int) error {
 func GetOffset(offset *int) error {
 	tg := new(types.Telegram)
 	url := fmt.Sprint(
-		types.TelegramAPI, "/",
+		types.TelegramAPI,
 		fmt.Sprintf("bot%s", types.BotID), "/",
 		"getUpdates", "?", "limit=1")
-	body, err := sendRequest(nil, url, "application/json", "GET")
+	body, err := sendRequest(bytes.NewBuffer(nil), url, "application/json", "GET")
 	if err == nil {
 
 		err = json.Unmarshal(body, tg)
@@ -115,9 +115,9 @@ func GetOffset(offset *int) error {
 func GetMe() (*types.GetMe, error) {
 	getme := new(types.GetMe)
 	url := fmt.Sprint(
-		types.TelegramAPI, "/",
+		types.TelegramAPI,
 		fmt.Sprintf("bot%s", types.BotID), "/", "getMe")
-	body, err := sendRequest(nil, url, defaultType, "GET")
+	body, err := sendRequest(bytes.NewBuffer(nil), url, defaultType, "GET")
 	if err == nil {
 		err = json.Unmarshal(body, getme)
 	}

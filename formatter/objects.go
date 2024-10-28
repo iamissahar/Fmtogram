@@ -2,42 +2,26 @@ package formatter
 
 import "github.com/l1qwie/Fmtogram/types"
 
-type responseData struct {
-	FileID       string
-	FileUniqueID string
-	FileSize     int
-	Width        int
-	Height       int
-}
-
 type photo struct {
-	Type  string `json:"type,omitempty"`
-	Media string `json:"media,omitempty"`
-	Photo string `json:"photo,omitempty"`
-
-	// It's going to work only if you want to send more than 1 photo. Overwise use message object
-	Caption string `json:"caption,omitempty"`
-	// It's going to work only if you want to send more than 1 photo. Overwise use message object
-	ParseMode string `json:"parse_mode,omitempty"`
-
+	Type                  string                 `json:"type,omitempty"`
+	Media                 string                 `json:"media,omitempty"`
+	Photo                 string                 `json:"photo,omitempty"`
+	Caption               string                 `json:"caption,omitempty"`
+	ParseMode             string                 `json:"parse_mode,omitempty"`
 	CaptionEntities       []*types.MessageEntity `json:"caption_entities,omitempty"`
 	ShowCaptionAboveMedia bool                   `json:"show_caption_above_media,omitempty"`
 	HasSpoiler            bool                   `json:"has_spoiler,omitempty"`
 	GottenFrom            int
-	ResponseData          [4]*responseData
+	response              [4]types.PhotoSize
 }
 
 type video struct {
-	Type      string `json:"type,omitempty"`
-	Media     string `json:"media,omitempty"`
-	Video     string `json:"video,omitempty"`
-	Thumbnail string `json:"thumbnail,omitempty"`
-
-	// It's going to work only if you want to send more than 1 video. Overwise use message object
-	Caption string `json:"caption,omitempty"`
-	// It's going to work only if you want to send more than 1 video. Overwise use message object
-	ParseMode string `json:"parse_mode,omitempty"`
-
+	Type                  string                 `json:"type,omitempty"`
+	Media                 string                 `json:"media,omitempty"`
+	Video                 string                 `json:"video,omitempty"`
+	Thumbnail             string                 `json:"thumbnail,omitempty"`
+	Caption               string                 `json:"caption,omitempty"`
+	ParseMode             string                 `json:"parse_mode,omitempty"`
 	CaptionEntities       []*types.MessageEntity `json:"caption_entities,omitempty"`
 	ShowCaptionAboveMedia bool                   `json:"show_caption_above_media,omitempty"`
 	Width                 int                    `json:"width,omitempty"`
@@ -47,66 +31,78 @@ type video struct {
 	HasSpoiler            bool                   `json:"has_spoiler,omitempty"`
 	VideoGottenFrom       int
 	ThumbnailGottenFrom   int
-	ResponseData          *types.Video
+	response              types.Video
 }
 
 type audio struct {
-	Type      string `json:"type,omitempty"`
-	Media     string `json:"media,omitempty"`
-	Audio     string `json:"audio,omitempty"`
-	Thumbnail string `json:"thumbnail,omitempty"`
-
-	// It's going to work only if you want to send more than 1 audio. Overwise use message object
-	Caption string `json:"caption,omitempty"`
-	// It's going to work only if you want to send more than 1 audio. Overwise use message object
-	ParseMode string `json:"parse_mode,omitempty"`
-
+	Type                string                 `json:"type,omitempty"`
+	Media               string                 `json:"media,omitempty"`
+	Audio               string                 `json:"audio,omitempty"`
+	Thumbnail           string                 `json:"thumbnail,omitempty"`
+	Caption             string                 `json:"caption,omitempty"`
+	ParseMode           string                 `json:"parse_mode,omitempty"`
 	CaptionEntities     []*types.MessageEntity `json:"caption_entities,omitempty"`
 	Duration            int                    `json:"duration,omitempty"`
 	Performer           string                 `json:"performer,omitempty"`
 	Title               string                 `json:"title,omitempty"`
 	AudioGottenFrom     int
 	ThumbnailGottenFrom int
-	ResponseData        *types.Audio
+	response            types.Audio
 }
 
 type document struct {
-	Type      string `json:"type,omitempty"`
-	Media     string `json:"media,omitempty"`
-	Document  string `json:"document,omitempty"`
-	Thumbnail string `json:"thumbnail,omitempty"`
-
-	// It's going to work only if you want to send more than 1 document. Overwise use message object
-	Caption string `json:"caption,omitempty"`
-	// It's going to work only if you want to send more than 1 document. Overwise use message object
-	ParseMode string `json:"parse_mode,omitempty"`
-
+	Type                        string                 `json:"type,omitempty"`
+	Media                       string                 `json:"media,omitempty"`
+	Document                    string                 `json:"document,omitempty"`
+	Thumbnail                   string                 `json:"thumbnail,omitempty"`
+	Caption                     string                 `json:"caption,omitempty"`
+	ParseMode                   string                 `json:"parse_mode,omitempty"`
 	CaptionEntities             []*types.MessageEntity `json:"caption_entities,omitempty"`
 	DisableContentTypeDetection bool                   `json:"disable_content_type_detection,omitempty"`
 	DocumentGottenFrom          int
 	ThumbnailGottenFrom         int
-	ResponseData                *types.Document
+	response                    types.Document
+}
+
+type animation struct {
+	Type                string                 `json:"type,omitempty"`
+	Media               string                 `json:"media,omitempty"`
+	Animation           string                 `json:"animation,omitempty"`
+	Thumbnail           string                 `json:"thumbnail,omitempty"`
+	Width               int                    `json:"width,omitempty"`
+	Height              int                    `json:"height,omitempty"`
+	Duration            int                    `json:"duration,omitempty"`
+	Caption             string                 `json:"caption,omitempty"`
+	ParseMode           string                 `json:"parse_mode,omitempty"`
+	CaptionEntities     []*types.MessageEntity `json:"caption_entities,omitempty"`
+	AnimationGottenFrom int
+	ThumbnailGottenFrom int
+	response            types.Animation
 }
 
 type information struct {
-	Text      string `json:"text,omitempty"`
-	Caption   string `json:"caption,omitempty"`
-	ParseMode string `json:"parse_mode,omitempty"`
-	// ChatID               interface{}               `json:"chat_id,omitempty"`
-	// BusinessConnectionID string                    `json:"business_connection_id,omitempty"`
-	MessageThreadID     int                       `json:"message_thread_id,omitempty"`
-	Entities            []*types.MessageEntity    `json:"entities,omitempty"`
-	LinkPreviewOptions  *types.LinkPreviewOptions `json:"link_preview_options,omitempty"`
-	DisableNotification bool                      `json:"disable_notification,omitempty"`
-	ProtectContent      bool                      `json:"protect_content,omitempty"`
-	MessageEffectID     string                    `json:"message_effect_id,omitempty"`
-	ReplyParameters     *types.ReplyParameters    `json:"reply_parameters,omitempty"`
-	ReplyMarkup         interface{}               `json:"reply_markup,omitempty"`
+	MessageID             int                       `json:"message_id,omitempty"`
+	MessageIDs            []int                     `json:"message_ids,omitempty"`
+	Text                  string                    `json:"text,omitempty"`
+	Caption               string                    `json:"caption,omitempty"`
+	ParseMode             string                    `json:"parse_mode,omitempty"`
+	MessageThreadID       int                       `json:"message_thread_id,omitempty"`
+	Entities              []*types.MessageEntity    `json:"entities,omitempty"`
+	LinkPreviewOptions    *types.LinkPreviewOptions `json:"link_preview_options,omitempty"`
+	DisableNotification   bool                      `json:"disable_notification,omitempty"`
+	ProtectContent        bool                      `json:"protect_content,omitempty"`
+	MessageEffectID       string                    `json:"message_effect_id,omitempty"`
+	ShowCaptionAboveMedia bool                      `json:"show_caption_above_media,omitempty"`
+	ReplyParameters       *types.ReplyParameters    `json:"reply_parameters,omitempty"`
+	response              types.User
+	responseMessageIDs    []int
 }
 
 type chat struct {
+	FromChatID           interface{} `json:"from_chat_id,omitempty"`
 	ID                   interface{} `json:"chat_id,omitempty"`
 	BusinessConnectionID string      `json:"business_connection_id,omitempty"`
+	response             types.Chat
 }
 
 type inlineKeyboardButton struct {
@@ -120,6 +116,7 @@ type inlineKeyboardButton struct {
 	SwitchInlineQueryChosenChat  *types.SwitchInlineQueryChosenChat `json:"switch_inline_query_chosen_chat,omitempty"`
 	CallbackGame                 *types.CallbackGame                `json:"callback_game,omitempty"`
 	Pay                          bool                               `json:"pay,omitempty"`
+	One                          int
 }
 
 type inline struct {
@@ -151,8 +148,4 @@ type replyKeyboard struct {
 	OneTimeKeyboard       bool                     `json:"one_time_keyboard,omitempty"`
 	InputFieldPlaceholder string                   `json:"input_field_placeholder,omitempty"`
 	Selective             bool                     `json:"selective,omitempty"`
-}
-
-type MediaArray struct {
-	Media []interface{} `json:"media,omitempty"`
 }
