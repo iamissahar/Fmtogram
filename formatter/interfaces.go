@@ -9,6 +9,7 @@ import (
 type handlerMedia interface {
 	multipartFields(*multipart.Writer, *[]interface{}, int, bool) error
 	jsonFileds() ([]byte, error)
+	nameAndConst() (string, int)
 }
 
 type handlerKB interface {
@@ -173,20 +174,57 @@ type IAnimation interface {
 	// Receives an URL-link of an animation
 	WriteThumbnailInternet(string)
 
-	// Receives a string of animation caption, 0-1024 characters after entities parsing
-	WriteCaption(string)
-
-	// Receives spicific kind of string. Adds some opportunity to transform the text-message. There are 3 options: types.HTML, types.Markdown and...
-	WriteParseMode(string)
-
-	// A slice of special entities that appear in the caption, which can be specified instead of {IAnimation}.WriteParseMode()
-	WriteCaptionEntities([]*types.MessageEntity)
-
-	// Call it, if the caption must be shown above the message media (only if you copy a message that has Media Type). Ignored if a new caption isn't specified.
-	WriteShowCaptionAboveMedia()
-
 	// Doesn't recieve anything. If the function was called, the photo will be blured
 	WriteHasSpoiler()
+
+	// You can call this function after calling Send(). It returns you a structure with some data about the animation you just sent
+	GetResponse() types.Animation
+}
+
+type IVoice interface {
+	// Receives a path of a voice file in formats: .OGG encoded with OPUS, or in .MP3 format, or in .M4A format
+	WriteVoiceStorage(string)
+
+	// Receives a Telegram ID of a voice
+	WriteVoiceTelegram(string)
+
+	// Receives an URL-link of a voice
+	WriteVoiceInternet(string)
+
+	// Duration of sent voice in seconds
+	WriteDuration(int)
+
+	// You can call this function after calling Send(). It returns you a structure with some data about the voice you just sent
+	GetResponse() types.Voice
+}
+
+type IVideoNote interface {
+	// Receives a path of a voice-note file in formats: MPEG4 videos of up to 1 minute long
+	WriteVideoNoteStorage(string)
+
+	// Receives a Telegram ID of a voice-note
+	WriteVideoNoteTelegram(string)
+
+	// Receives an URL-link of a voice-note
+	WriteVideoNoteInternet(string)
+
+	// Duration of sent voice-note in seconds
+	WriteDuration(int)
+
+	// Video width and height, i.e. diameter of the voice-note
+	WriteLength(int)
+
+	// Receives a path of a thumbnail of voice-note
+	WriteThumbnailStorage(string)
+
+	// Receives a Telegram ID of a thumbnail
+	WriteThumbnailTelegram(string)
+
+	// Receives an URL-link of a thumbnail
+	WriteThumbnailInternet(string)
+
+	// You can call this function after calling Send(). It returns you a structure with some data about the video-note you just sent
+	GetResponse() types.VideoNote
 }
 
 type IMSGInformation interface {
@@ -228,6 +266,9 @@ type IMSGInformation interface {
 
 	// Recieves a structure that has description of the message to reply to
 	WriteReplyParameters(*types.ReplyParameters)
+
+	// Call it to allow up to 1000 messages per second, ignoring broadcasting limits for a fee of 0.1 Telegram Stars per message. The relevant Stars will be withdrawn from the bot's balance
+	WriteAllowPaidBroadcast()
 
 	// You can call this function after calling Send(). It returns you a structure with some data about the user you just sent a message to
 	GetResponse() types.User

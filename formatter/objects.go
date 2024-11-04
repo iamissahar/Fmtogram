@@ -65,19 +65,38 @@ type document struct {
 }
 
 type animation struct {
-	Type                string                 `json:"type,omitempty"`
-	Media               string                 `json:"media,omitempty"`
-	Animation           string                 `json:"animation,omitempty"`
-	Thumbnail           string                 `json:"thumbnail,omitempty"`
-	Width               int                    `json:"width,omitempty"`
-	Height              int                    `json:"height,omitempty"`
-	Duration            int                    `json:"duration,omitempty"`
-	Caption             string                 `json:"caption,omitempty"`
-	ParseMode           string                 `json:"parse_mode,omitempty"`
-	CaptionEntities     []*types.MessageEntity `json:"caption_entities,omitempty"`
+	Type                string `json:"type,omitempty"`
+	Media               string `json:"media,omitempty"`
+	Animation           string `json:"animation,omitempty"`
+	Thumbnail           string `json:"thumbnail,omitempty"`
+	Width               int    `json:"width,omitempty"`
+	Height              int    `json:"height,omitempty"`
+	Duration            int    `json:"duration,omitempty"`
+	HasSpoiler          bool   `json:"has_spoiler,omitempty"`
 	AnimationGottenFrom int
 	ThumbnailGottenFrom int
 	response            types.Animation
+}
+
+type voice struct {
+	Type       string `json:"type,omitempty"`
+	Media      string `json:"media,omitempty"`
+	Voice      string `json:"voice,omitempty"`
+	Duration   int    `json:"duration,omitempty"`
+	gottenFrom int
+	response   types.Voice
+}
+
+type videonote struct {
+	Type                string `json:"type,omitempty"`
+	Media               string `json:"media,omitempty"`
+	VideoNote           string `json:"video_note,omitempty"`
+	Duration            int    `json:"duration,omitempty"`
+	Length              int    `json:"length,omitempty"`
+	Thumbnail           string `json:"thumbnail,omitempty"`
+	videoGottenFrom     int
+	thumbnailGottenFrom int
+	response            types.VideoNote
 }
 
 type information struct {
@@ -88,12 +107,14 @@ type information struct {
 	ParseMode             string                    `json:"parse_mode,omitempty"`
 	MessageThreadID       int                       `json:"message_thread_id,omitempty"`
 	Entities              []*types.MessageEntity    `json:"entities,omitempty"`
+	CaptionEntities       []*types.MessageEntity    `json:"caption_entities,omitempty"`
 	LinkPreviewOptions    *types.LinkPreviewOptions `json:"link_preview_options,omitempty"`
 	DisableNotification   bool                      `json:"disable_notification,omitempty"`
 	ProtectContent        bool                      `json:"protect_content,omitempty"`
 	MessageEffectID       string                    `json:"message_effect_id,omitempty"`
 	ShowCaptionAboveMedia bool                      `json:"show_caption_above_media,omitempty"`
 	ReplyParameters       *types.ReplyParameters    `json:"reply_parameters,omitempty"`
+	AllowPaidBroadcast    bool                      `json:"allow_paid_broadcast,omitempty"`
 	response              types.User
 	responseMessageIDs    []int
 }

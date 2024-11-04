@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"mime/multipart"
 	"net/http"
 
@@ -33,10 +34,122 @@ func CreateEmpltyMessage() *Message {
 	return m
 }
 
+func buildConstRules() [7][7]int {
+	var matrix [7][7]int
+
+	matrix[constPhoto][constPhoto] = allowed
+	matrix[constPhoto][constVideo] = allowed
+	matrix[constAudio][constAudio] = allowed
+	matrix[constVideo][constPhoto] = allowed
+	matrix[constVideo][constVideo] = allowed
+	matrix[constDoc][constDoc] = allowed
+	return matrix
+}
+
+func compatibilityСheck(msg *Message, matrix [7][7]int, current int) error {
+	var err error
+
+	currentname, currentconst := msg.fm.mh.storage[current].nameAndConst()
+
+	for j := 0; j < current; j++ {
+
+		name, num := msg.fm.mh.storage[j].nameAndConst()
+		if matrix[currentconst][num] != allowed {
+			err = errors.ImpossibleCombination(currentname, name)
+		}
+
+	}
+	return err
+}
+
+func casePhoto(msg *Message, ph *photo, i int, matrix [7][7]int, object *string) error {
+	err := requiredPhotoData(ph, i)
+	if err == nil {
+		if !msg.fm.notchange {
+			msg.fm.method = methods.Photo
+		}
+		*object = interfacePhoto
+		err = compatibilityСheck(msg, matrix, i)
+	}
+	return err
+}
+
+func caseAudio(msg *Message, ad *audio, i int, matrix [7][7]int, object *string) error {
+	err := requiredAudioData(ad, i)
+	if err == nil {
+		if !msg.fm.notchange {
+			msg.fm.method = methods.Audio
+		}
+		*object = interfaceAudio
+		err = compatibilityСheck(msg, matrix, i)
+	}
+	return err
+}
+
+func caseVideo(msg *Message, vd *video, i int, matrix [7][7]int, object *string) error {
+	err := requiredVideoData(vd, i)
+	if err == nil {
+		if !msg.fm.notchange {
+			msg.fm.method = methods.Video
+		}
+		*object = interfaceVideo
+		err = compatibilityСheck(msg, matrix, i)
+	}
+	return err
+}
+
+func caseDocument(msg *Message, dc *document, i int, matrix [7][7]int, object *string) error {
+	err := requiredDocumentData(dc, i)
+	if err == nil {
+		if !msg.fm.notchange {
+			msg.fm.method = methods.Document
+		}
+		*object = interfaceDocument
+		err = compatibilityСheck(msg, matrix, i)
+	}
+	return err
+}
+
+func caseAnimation(msg *Message, an *animation, i int, matrix [7][7]int, object *string) error {
+	err := requiredAnimationData(an, i)
+	if err == nil {
+		if !msg.fm.notchange {
+			msg.fm.method = methods.Animation
+		}
+		*object = interfaceAnimation
+		err = compatibilityСheck(msg, matrix, i)
+	}
+	return err
+}
+
+func caseVoice(msg *Message, vc *voice, i int, matrix [7][7]int, object *string) error {
+	err := requiredVoiceData(vc, i)
+	if err == nil {
+		if !msg.fm.notchange {
+			msg.fm.method = methods.Voice
+		}
+		*object = interfaceVoice
+		err = compatibilityСheck(msg, matrix, i)
+	}
+	return err
+}
+
+func caseVideoNote(msg *Message, vdn *videonote, i int, matrix [7][7]int, object *string) error {
+	err := requiredVideoNoteData(vdn, i)
+	if err == nil {
+		if !msg.fm.notchange {
+			msg.fm.method = methods.VideoNote
+		}
+		*object = interfaceVideoNote
+		err = compatibilityСheck(msg, matrix, i)
+	}
+	return err
+}
+
 func requiredMedia(msg *Message, tgr *interface{}, object *string) error {
 	var err error
-	var storage [4]bool
-	var obj2 string
+
+	matrix := buildConstRules()
 
 	if msg.fm.ch.ID == 0 {
 		err = errors.MissedRequiredField("IChat", "WriteChat{ID/Name}()", 0, 0, false, false)
@@ -45,80 +158,30 @@ func requiredMedia(msg *Message, tgr *interface{}, object *string) error {
 		if msg.fm.mh.storage[i] != nil {
 			switch m := msg.fm.mh.storage[i].(type) {
 			case *photo:
-				requiredPhotoData(m, i)
-				if !msg.fm.notchange {
-					msg.fm.method = methods.Photo
-				}
-				*object = "IPhoto"
-				if storage[1] || storage[3] {
-					if storage[1] {
-						obj2 = "Audio"
-					} else {
-						obj2 = "Document"
-					}
-					err = errors.ImpossibleCombination("Photo", obj2)
-				} else {
-					storage[0] = true
-				}
+				err = casePhoto(msg, m, i, matrix, object)
 			case *audio:
-				requiredAudioData(m, i)
-				if !msg.fm.notchange {
-					msg.fm.method = methods.Audio
-				}
-				*object = "IAudio"
-				if storage[0] || storage[2] || storage[3] {
-					if storage[0] {
-						obj2 = "Photo"
-					} else if storage[2] {
-						obj2 = "Video"
-					} else {
-						obj2 = "Document"
-					}
-					err = errors.ImpossibleCombination("Audio", obj2)
-				} else {
-					storage[1] = true
-				}
+				err = caseAudio(msg, m, i, matrix, object)
 			case *video:
-				requiredVideoData(m, i)
-				if !msg.fm.notchange {
-					msg.fm.method = methods.Video
-				}
-				*object = "IVideo"
-				if storage[1] || storage[3] {
-					if storage[1] {
-						obj2 = "Audio"
-					} else {
-						obj2 = "Document"
-					}
-					err = errors.ImpossibleCombination("Video", obj2)
-				} else {
-					storage[2] = true
-				}
+				err = caseVideo(msg, m, i, matrix, object)
 			case *document:
-				requiredDocumentData(m, i)
-				if !msg.fm.notchange {
-					msg.fm.method = methods.Document
-				}
-				*object = "IDocument"
-				if storage[0] || storage[1] || storage[2] {
-					if storage[0] {
-						obj2 = "Photo"
-					} else if storage[1] {
-						obj2 = "Audio"
-					} else {
-						obj2 = "Video"
-					}
-					err = errors.ImpossibleCombination("Document", obj2)
-				} else {
-					storage[3] = true
-				}
+				err = caseDocument(msg, m, i, matrix, object)
+			case *animation:
+				err = caseAnimation(msg, m, i, matrix, object)
+			case *voice:
+				err = caseVoice(msg, m, i, matrix, object)
+			case *videonote:
+				err = caseVideoNote(msg, m, i, matrix, object)
 			}
 			if err == nil {
 				if j >= 1 {
 					if !msg.fm.notchange {
 						msg.fm.method = methods.MediaGroup
 					}
-					*object = "any of those you have mentioned (IPhoto/IVideo/IDocument/IAudio)"
+					*object = "any of those you have mentioned: "
+					for j := 0; j < i; j++ {
+						name, _ := msg.fm.mh.storage[j].nameAndConst()
+						*object = fmt.Sprintf("%s/%s", *object, name)
+					}
 					*tgr = new(types.TelegramMediaGroup)
 				} else {
 					*tgr = new(types.TelegramResponse)
@@ -140,7 +203,12 @@ func requiredMessage(msg *Message, tgr *interface{}, object string) error {
 		err = errors.MissedRequiredField("IMSGInformation", "WriteString()", 0, 0, false, false)
 	}
 	if _, ok := methods.Media[msg.fm.method]; (ok) && (msg.fm.inf.Text != "") {
-		logs.DataMightBeLost("IMSGInformation", "WriteString()", msg.fm.inf.Text, object, "WriteCaption()")
+		if msg.fm.mh.i > 1 {
+			logs.DataMightBeLost("IMSGInformation", "WriteString()", msg.fm.inf.Text, object, "WriteCaption()")
+		} else {
+			msg.fm.inf.Caption, msg.fm.inf.Text = msg.fm.inf.Text, ""
+			msg.fm.inf.CaptionEntities, msg.fm.inf.Entities = msg.fm.inf.Entities, nil
+		}
 	}
 	if msg.fm.method == "" {
 		msg.fm.method = methods.Message
@@ -256,33 +324,39 @@ func chatPart(msg *Message) error {
 	return err
 }
 
-// not a final result
 func uniteEverything(msg *Message) error {
-	decoder := json.NewDecoder(msg.fm.buf)
+	var err error
+	var mergedJSON []byte
 
+	decoder := json.NewDecoder(msg.fm.buf)
 	result := make(map[string]interface{})
 
-	for {
+	for err == nil {
 		var data map[string]interface{}
-		if err := decoder.Decode(&data); err == io.EOF {
-			break
-		} else if err != nil {
-			return fmt.Errorf("error decoding JSON: %s", err)
-		}
-
-		for k, v := range data {
-			result[k] = v
+		err = decoder.Decode(&data)
+		if err != io.EOF {
+			if err == nil {
+				for k, v := range data {
+					result[k] = v
+				}
+			} else {
+				err = fmt.Errorf("error decoding JSON: %s", err)
+			}
 		}
 	}
+	if err == io.EOF {
+		mergedJSON, err = json.Marshal(result)
+		if err != nil {
+			err = fmt.Errorf("error serializing merged JSON: %s", err)
+		}
 
-	mergedJSON, err := json.Marshal(result)
-	if err != nil {
-		return fmt.Errorf("error serializing merged JSON: %s", err)
+		msg.fm.buf = bytes.NewBuffer(nil)
+		msg.fm.buf.Write(mergedJSON)
 	}
-
-	msg.fm.buf = bytes.NewBuffer(nil)
-	msg.fm.buf.Write(mergedJSON)
-	return nil
+	if err == io.EOF {
+		err = nil
+	}
+	return err
 }
 
 func makeRequest(msg *Message, tgr *interface{}) error {
@@ -328,27 +402,28 @@ func distributorTelegram(msg *Message, t *types.TelegramMediaGroup) {
 		if msg.fm.mh.storage[i] != nil {
 			switch m := msg.fm.mh.storage[i].(type) {
 			case *photo:
-				for j := 0; j < len(t.Result[0].Photo); j++ {
+				for j := 0; j < len(t.Result[i].Photo); j++ {
 					m.response[j] = types.PhotoSize{
-						FileID:       t.Result[0].Photo[j].FileID,
-						FileSize:     t.Result[0].Photo[j].FileSize,
-						FileUniqueID: t.Result[0].Photo[j].FileUniqueID,
-						Width:        t.Result[0].Photo[j].Width,
-						Height:       t.Result[0].Photo[j].Height,
+						FileID:       t.Result[i].Photo[j].FileID,
+						FileSize:     t.Result[i].Photo[j].FileSize,
+						FileUniqueID: t.Result[i].Photo[j].FileUniqueID,
+						Width:        t.Result[i].Photo[j].Width,
+						Height:       t.Result[i].Photo[j].Height,
 					}
 				}
 			case *video:
-				m.response = *t.Result[0].Video
+				m.response = *t.Result[i].Video
 			case *audio:
-				m.response = *t.Result[0].Audio
+				m.response = *t.Result[i].Audio
 			case *document:
-				m.response = *t.Result[0].Document
+				m.response = *t.Result[i].Document
+			case *animation:
+				m.response = *t.Result[i].Animation
 			}
 		}
 	}
 	msg.fm.ch.response = *t.Result[0].Chat
 	msg.fm.inf.response = *t.Result[0].From
-
 }
 
 func distributorTelegramResponse(msg *Message, t *types.TelegramResponse) {
@@ -372,6 +447,10 @@ func distributorTelegramResponse(msg *Message, t *types.TelegramResponse) {
 				m.response = *t.Result.Audio
 			case *document:
 				m.response = *t.Result.Document
+			case *animation:
+				m.response = *t.Result.Animation
+			case *videonote:
+				m.response = *t.Result.VideoNote
 			}
 		}
 	}
@@ -417,7 +496,7 @@ func sendRequest(msg *Message, tgr interface{}) error {
 	var body []byte
 
 	// log.Print(msg.fm.buf.String())
-	// log.Print(msg.fm.method)
+	log.Print(msg.fm.method)
 	// log.Print(msg.fm.contentType)
 
 	url := fmt.Sprint(types.TelegramAPI, "bot", testbotdata.Token, "/", msg.fm.method)
@@ -444,7 +523,7 @@ func sendRequest(msg *Message, tgr interface{}) error {
 				err = errors.CantReadResponse(err)
 			} else {
 
-				// fmt.Println(string(body))
+				fmt.Println(string(body))
 
 				err = json.Unmarshal(body, tgr)
 				if err != nil {

@@ -9,10 +9,24 @@ const (
 	// Your audio must be in the .MP3 or .M4A format. On success, call GetResponse() in each interface you have
 	// created and gave to Message structure. Bots can currently send audio files of up to 50 MB in size,
 	// this limit may be changed in the future.
-	Audio      string = "sendAudio"
-	Document   string = "sendDocument"
-	Video      string = "sendVideo"
-	Animation  string = "sendAnimation"
+	Audio string = "sendAudio"
+
+	// Use this method to send general files.
+	// Bots can currently send files of any type of up to 50 MB in size, this limit may be changed in the future.
+	Document string = "sendDocument"
+
+	// Use this method to send video files, Telegram clients support MPEG4 videos (other formats may be sent as Document).
+	// Bots can currently send video files of up to 50 MB in size, this limit may be changed in the future.
+	Video string = "sendVideo"
+
+	// Use this method to send animation files (GIF or H.264/MPEG-4 AVC video without sound).
+	// Bots can currently send animation files of up to 50 MB in size, this limit may be changed in the future.
+	Animation string = "sendAnimation"
+
+	// Use this method to send audio files, if you want Telegram clients to display the file
+	// as a playable voice message. For this to work, your audio must be in an .OGG file encoded with OPUS,
+	// or in .MP3 format, or in .M4A format (other formats may be sent as Audio or Document).
+	// Bots can currently send voice messages of up to 50 MB in size, this limit may be changed in the future.
 	Voice      string = "sendVoice"
 	VideoNote  string = "sendVideoNote"
 	MediaGroup string = "sendMediaGroup"
@@ -55,4 +69,6 @@ func init() {
 	Media[Document] = empty{}
 	Media[Video] = empty{}
 	Media[MediaGroup] = empty{}
+	Media[Animation] = empty{}
+	Media[Voice] = empty{}
 }

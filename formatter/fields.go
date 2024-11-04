@@ -11,12 +11,6 @@ import (
 	"github.com/l1qwie/Fmtogram/types"
 )
 
-const (
-	Storage  int = 1
-	Telegram int = 2
-	Internet int = 3
-)
-
 func writeFileToMultipart(writer *multipart.Writer, fieldname, filename string) error {
 	var part io.Writer
 	file, err := os.Open(filename)
@@ -119,6 +113,10 @@ func (ph *photo) jsonFileds() ([]byte, error) {
 	return json.Marshal(ph)
 }
 
+func (ph *photo) nameAndConst() (string, int) {
+	return interfacePhoto, constPhoto
+}
+
 func (vd *video) multipartFields(writer *multipart.Writer, group *[]interface{}, i int, input bool) error {
 	err := commonFields(writer, vd.CaptionEntities)
 	if err == nil {
@@ -126,14 +124,18 @@ func (vd *video) multipartFields(writer *multipart.Writer, group *[]interface{},
 			if vd.VideoGottenFrom != Storage {
 				vd.Media = vd.Video
 			} else {
-				err = writeFileToMultipart(writer, vd.Video, vd.Video)
-				vd.Media = fmt.Sprintf("attach://%s", vd.Video)
+				if err = vd.checkTypeOfFile(); err == nil {
+					err = writeFileToMultipart(writer, vd.Video, vd.Video)
+					vd.Media = fmt.Sprintf("attach://%s", vd.Video)
+				}
 			}
 		} else {
 			if vd.VideoGottenFrom != Storage {
 				err = writer.WriteField("video", vd.Video)
 			} else {
-				err = writeFileToMultipart(writer, "video", vd.Video)
+				if err = vd.checkTypeOfFile(); err == nil {
+					err = writeFileToMultipart(writer, "video", vd.Video)
+				}
 			}
 		}
 	}
@@ -191,6 +193,10 @@ func (vd *video) jsonFileds() ([]byte, error) {
 	return json.Marshal(vd)
 }
 
+func (vd *video) nameAndConst() (string, int) {
+	return interfaceVideo, constVideo
+}
+
 func (ad *audio) multipartFields(writer *multipart.Writer, group *[]interface{}, i int, input bool) error {
 	err := commonFields(writer, ad.CaptionEntities)
 	if err == nil {
@@ -198,14 +204,18 @@ func (ad *audio) multipartFields(writer *multipart.Writer, group *[]interface{},
 			if ad.AudioGottenFrom != Storage {
 				ad.Media = ad.Audio
 			} else {
-				err = writeFileToMultipart(writer, ad.Audio, ad.Audio)
-				ad.Media = fmt.Sprintf("attach://%s", ad.Audio)
+				if err = ad.checkTypeOfFile(); err == nil {
+					err = writeFileToMultipart(writer, ad.Audio, ad.Audio)
+					ad.Media = fmt.Sprintf("attach://%s", ad.Audio)
+				}
 			}
 		} else {
 			if ad.AudioGottenFrom != Storage {
 				err = writer.WriteField("audio", ad.Audio)
 			} else {
-				err = writeFileToMultipart(writer, "audio", ad.Audio)
+				if err = ad.checkTypeOfFile(); err == nil {
+					err = writeFileToMultipart(writer, "audio", ad.Audio)
+				}
 			}
 		}
 	}
@@ -237,6 +247,10 @@ func (ad *audio) multipartFields(writer *multipart.Writer, group *[]interface{},
 
 func (ad *audio) jsonFileds() ([]byte, error) {
 	return json.Marshal(ad)
+}
+
+func (ad *audio) nameAndConst() (string, int) {
+	return interfaceAudio, constAudio
 }
 
 func (dc *document) multipartFields(writer *multipart.Writer, group *[]interface{}, i int, input bool) error {
@@ -278,6 +292,176 @@ func (dc *document) multipartFields(writer *multipart.Writer, group *[]interface
 
 func (dc *document) jsonFileds() ([]byte, error) {
 	return json.Marshal(dc)
+}
+
+func (dc *document) nameAndConst() (string, int) {
+	return interfaceDocument, constDoc
+}
+
+func (an *animation) multipartFields(writer *multipart.Writer, group *[]interface{}, i int, input bool) error {
+	var err error
+	if input {
+		if an.AnimationGottenFrom != Storage {
+			an.Media = an.Animation
+		} else {
+			if err = an.checkTypeOfFile(); err == nil {
+				err = writeFileToMultipart(writer, an.Animation, an.Animation)
+				an.Media = fmt.Sprintf("attach://%s", an.Animation)
+			}
+		}
+	} else {
+		if an.AnimationGottenFrom != Storage {
+			err = writer.WriteField("animation", an.Animation)
+		} else {
+			if err = an.checkTypeOfFile(); err == nil {
+				err = writeFileToMultipart(writer, "animation", an.Animation)
+			}
+		}
+	}
+	if err == nil && input {
+		err = writer.WriteField("type", "animation")
+	}
+	if err == nil && an.Duration != 0 {
+		err = writer.WriteField("duration", fmt.Sprintf("%d", an.Duration))
+
+		if err != nil {
+			errors.CantWriteField(err)
+		}
+	}
+	if err == nil && an.Width != 0 {
+		err = writer.WriteField("width", fmt.Sprintf("%d", an.Width))
+
+		if err != nil {
+			errors.CantWriteField(err)
+		}
+	}
+	if err == nil && an.Height != 0 {
+		err = writer.WriteField("height", fmt.Sprintf("%d", an.Height))
+
+		if err != nil {
+			errors.CantWriteField(err)
+		}
+	}
+	if err == nil && an.Thumbnail != "" {
+		err = addThumbnail(writer, an.Thumbnail, an.ThumbnailGottenFrom)
+	}
+	if err == nil && an.HasSpoiler {
+		err = writer.WriteField("has_spoiler", "True")
+
+		if err != nil {
+			errors.CantWriteField(err)
+		}
+	}
+	if group != nil {
+		(*group)[i] = an
+	}
+	return err
+}
+
+func (an *animation) jsonFileds() ([]byte, error) {
+	return json.Marshal(an)
+}
+
+func (an *animation) nameAndConst() (string, int) {
+	return interfaceAnimation, constAnim
+}
+
+func (vc *voice) multipartFields(writer *multipart.Writer, group *[]interface{}, i int, input bool) error {
+	var err error
+	if input {
+		if vc.gottenFrom != Storage {
+			vc.Media = vc.Voice
+		} else {
+			if err = vc.checkTypeOfFile(); err == nil {
+				err = writeFileToMultipart(writer, vc.Voice, vc.Voice)
+				vc.Media = fmt.Sprintf("attach://%s", vc.Voice)
+			}
+		}
+	} else {
+		if vc.gottenFrom != Storage {
+			err = writer.WriteField("voice", vc.Voice)
+		} else {
+			if err = vc.checkTypeOfFile(); err == nil {
+				err = writeFileToMultipart(writer, "voice", vc.Voice)
+			}
+		}
+	}
+	if err == nil && input {
+		err = writer.WriteField("type", "voice")
+	}
+	if err == nil && vc.Duration != 0 {
+		err = writer.WriteField("duration", fmt.Sprintf("%d", vc.Duration))
+
+		if err != nil {
+			errors.CantWriteField(err)
+		}
+	}
+	if group != nil {
+		(*group)[i] = vc
+	}
+	return err
+}
+
+func (vc *voice) jsonFileds() ([]byte, error) {
+	return json.Marshal(vc)
+}
+
+func (*voice) nameAndConst() (string, int) {
+	return interfaceVoice, constVoice
+}
+
+func (vdn *videonote) multipartFields(writer *multipart.Writer, group *[]interface{}, i int, input bool) error {
+	var err error
+	if input {
+		if vdn.videoGottenFrom != Storage {
+			vdn.Media = vdn.VideoNote
+		} else {
+			if err = vdn.checkTypeOfFile(); err == nil {
+				err = writeFileToMultipart(writer, vdn.VideoNote, vdn.VideoNote)
+				vdn.Media = fmt.Sprintf("attach://%s", vdn.VideoNote)
+			}
+		}
+	} else {
+		if vdn.videoGottenFrom != Storage {
+			err = writer.WriteField("video_note", vdn.VideoNote)
+		} else {
+			if err = vdn.checkTypeOfFile(); err == nil {
+				err = writeFileToMultipart(writer, "video_note", vdn.VideoNote)
+			}
+		}
+	}
+	if err == nil && input {
+		err = writer.WriteField("type", "video_note")
+	}
+	if err == nil && vdn.Duration != 0 {
+		err = writer.WriteField("duration", fmt.Sprintf("%d", vdn.Duration))
+
+		if err != nil {
+			errors.CantWriteField(err)
+		}
+	}
+	if err == nil && vdn.Length != 0 {
+		err = writer.WriteField("length", fmt.Sprintf("%d", vdn.Length))
+
+		if err != nil {
+			errors.CantWriteField(err)
+		}
+	}
+	if err == nil && vdn.Thumbnail != "" {
+		err = addThumbnail(writer, vdn.Thumbnail, vdn.thumbnailGottenFrom)
+	}
+	if group != nil {
+		(*group)[i] = vdn
+	}
+	return err
+}
+
+func (vc *videonote) jsonFileds() ([]byte, error) {
+	return json.Marshal(vc)
+}
+
+func (*videonote) nameAndConst() (string, int) {
+	return interfaceVideoNote, constVideoNote
 }
 
 func putGroup(writer *multipart.Writer, group []interface{}) error {

@@ -8,24 +8,6 @@ import (
 	"github.com/l1qwie/Fmtogram/types"
 )
 
-const (
-	interfacePhoto    string = "IPhoto"
-	interfaceVideo    string = "IVideo"
-	interfaceAudio    string = "IAudio"
-	interfaceDocument string = "IDocument"
-	interfaceInf      string = "MSG Information"
-	interfaceChat     string = "IChat"
-	inKB              string = "Inline Keyboard"
-	replyKB           string = "Reply Keyboard"
-	button            string = "Button"
-	inbtn             string = "Inline Button"
-	rpbtn             string = "Reply Button"
-	checkString       int    = -1
-	checkArray        int    = -2
-	checkBool         int    = -3
-	checkInt          int    = -4
-)
-
 func (ph *photo) writePhoto(photo, object string) {
 	if !isItEmply(ph, checkString, ph.Photo) {
 		logs.DataIsntEmply(interfacePhoto, "Photo", ph.Photo)
@@ -107,12 +89,12 @@ func (vd *video) WriteVideoStorage(video string) {
 }
 
 func (vd *video) WriteVideoTelegram(video string) {
-	vd.VideoGottenFrom = Storage
+	vd.VideoGottenFrom = Telegram
 	vd.writeVideo(video, "Video From Telegram")
 }
 
 func (vd *video) WriteVideoInternet(video string) {
-	vd.VideoGottenFrom = Storage
+	vd.VideoGottenFrom = Internet
 	vd.writeVideo(video, "Video From the Internet")
 }
 
@@ -413,18 +395,185 @@ func (dc *document) GetResponse() types.Document {
 
 func (an *animation) writeAnimation(animation, object string) {
 	if !isItEmply(an, checkString, an.Animation) {
-		logs.DataIsntEmply("WriteAnimation{Storage/Telegram/URL}()", "IAnimation", an.Animation)
+		logs.DataIsntEmply("WriteAnimation{Storage/Telegram/URL}()", interfaceAnimation, an.Animation)
 	}
 	an.Animation = animation
 	logs.DataWrittenSuccessfully(interfaceAnimation, object)
 }
 
 func (an *animation) WriteAnimationStorage(animation string) {
-	if !isItEmply(an, checkInt, an.Animation) {
-		logs.DataIsntEmply(interfaceDocument, "Animation", an.Animation)
-	}
 	an.AnimationGottenFrom = Storage
-	an.writeAnimation(animation, "Thumbnail From Storage")
+	an.writeAnimation(animation, "Animation From Storage")
+}
+
+func (an *animation) WriteAnimationTelegram(animation string) {
+	an.AnimationGottenFrom = Telegram
+	an.writeAnimation(animation, "Animation From Telegram")
+}
+
+func (an *animation) WriteAnimationInternet(animation string) {
+	an.AnimationGottenFrom = Internet
+	an.writeAnimation(animation, "Animation From Internet")
+}
+
+func (an *animation) WriteDuration(dur int) {
+	if !isItEmply(an, checkInt, an.Duration) {
+		logs.DataIsntEmply("WriteDuration()", interfaceAnimation, an.Duration)
+	}
+	an.Duration = dur
+	logs.DataWrittenSuccessfully(interfaceAnimation, "Duration")
+}
+
+func (an *animation) WriteWidth(width int) {
+	if !isItEmply(an, checkInt, an.Width) {
+		logs.DataIsntEmply("WriteWidth()", interfaceAnimation, an.Width)
+	}
+	an.Width = width
+	logs.DataWrittenSuccessfully(interfaceAnimation, "Width")
+}
+
+func (an *animation) WriteHeight(height int) {
+	if !isItEmply(an, checkInt, an.Height) {
+		logs.DataIsntEmply("WriteHeight()", interfaceAnimation, an.Height)
+	}
+	an.Height = height
+	logs.DataWrittenSuccessfully(interfaceAnimation, "Height")
+}
+
+func (an *animation) writeThumbnail(thumbnail, object string) {
+	if !isItEmply(an, checkString, an.Thumbnail) {
+		logs.DataIsntEmply("WriteThumbnail{Storage/Telegram/URL}()", interfaceAnimation, an.Thumbnail)
+	}
+	an.Thumbnail = thumbnail
+	logs.DataWrittenSuccessfully(interfaceAnimation, object)
+}
+
+func (an *animation) WriteThumbnailStorage(path string) {
+	an.ThumbnailGottenFrom = Storage
+	an.writeThumbnail(path, "Thumbnail From Storage")
+}
+
+func (an *animation) WriteThumbnailTelegram(path string) {
+	an.ThumbnailGottenFrom = Telegram
+	an.writeThumbnail(path, "Thumbnail From Telegram")
+}
+
+func (an *animation) WriteThumbnailInternet(path string) {
+	an.ThumbnailGottenFrom = Internet
+	an.writeThumbnail(path, "Thumbnail From Internet")
+}
+
+func (an *animation) WriteHasSpoiler() {
+	if !isItEmply(an, checkBool, an.HasSpoiler) {
+		logs.DataIsntEmply("WriteHasSpoiler()", interfaceAnimation, an.HasSpoiler)
+	}
+	an.HasSpoiler = true
+	logs.DataWrittenSuccessfully(interfaceAnimation, "Has Spoiler")
+}
+
+func (an *animation) GetResponse() types.Animation {
+	return an.response
+}
+
+func (vc *voice) writeVoice(voice, object string) {
+	if !isItEmply(vc, checkString, vc.Voice) {
+		logs.DataIsntEmply("WriteVoice{Storage/Telegram/URL}()", interfaceVoice, vc.Voice)
+	}
+	vc.Voice = voice
+	logs.DataWrittenSuccessfully(interfaceVoice, object)
+}
+
+func (vc *voice) WriteVoiceStorage(path string) {
+	vc.gottenFrom = Storage
+	vc.writeVoice(path, "Animation From Storage")
+}
+
+func (vc *voice) WriteVoiceTelegram(voiceID string) {
+	vc.gottenFrom = Telegram
+	vc.writeVoice(voiceID, "Animation From Telegram")
+}
+
+func (vc *voice) WriteVoiceInternet(URL string) {
+	vc.gottenFrom = Internet
+	vc.writeVoice(URL, "Animation From Internet")
+}
+
+func (vc *voice) WriteDuration(dur int) {
+	if !isItEmply(vc, checkInt, vc.Duration) {
+		logs.DataIsntEmply("WriteDuration()", interfaceVoice, vc.Duration)
+	}
+	vc.Duration = dur
+	logs.DataWrittenSuccessfully(interfaceVoice, "Duration")
+}
+
+func (vc *voice) GetResponse() types.Voice {
+	return vc.response
+}
+
+func (vdn *videonote) writeVideoNote(videonote, object string) {
+	if !isItEmply(vdn, checkString, vdn.VideoNote) {
+		logs.DataIsntEmply("WriteVideoNote{Storage/Telegram/URL}()", interfaceVideoNote, vdn.VideoNote)
+	}
+	vdn.VideoNote = videonote
+	logs.DataWrittenSuccessfully(interfaceVoice, object)
+}
+
+func (vdn *videonote) WriteVideoNoteStorage(path string) {
+	vdn.videoGottenFrom = Storage
+	vdn.writeVideoNote(path, "Video-Note From Storage")
+}
+
+func (vdn *videonote) WriteVideoNoteTelegram(path string) {
+	vdn.videoGottenFrom = Telegram
+	vdn.writeVideoNote(path, "Video-Note From Storage")
+}
+
+func (vdn *videonote) WriteVideoNoteInternet(path string) {
+	vdn.videoGottenFrom = Internet
+	vdn.writeVideoNote(path, "Video-Note From Storage")
+}
+
+func (vdn *videonote) WriteDuration(dur int) {
+	if !isItEmply(vdn, checkInt, vdn.Duration) {
+		logs.DataIsntEmply("WriteDuration()", interfaceVideoNote, vdn.Duration)
+	}
+	vdn.Duration = dur
+	logs.DataWrittenSuccessfully(interfaceVideoNote, "Duration")
+}
+
+func (vdn *videonote) WriteLength(length int) {
+	if !isItEmply(vdn, checkInt, vdn.Length) {
+		logs.DataIsntEmply("WriteLength()", interfaceVideoNote, vdn.Length)
+	}
+	vdn.Length = length
+	logs.DataWrittenSuccessfully(interfaceVideoNote, "Length")
+}
+
+func (vdn *videonote) writeThumbnail(thumb, object string) {
+	if !isItEmply(vdn, checkString, vdn.Thumbnail) {
+		logs.DataIsntEmply("WriteThumbnail{Storage/Telegram/URL}()", interfaceVideoNote, vdn.Thumbnail)
+	}
+	vdn.Thumbnail = thumb
+	logs.DataWrittenSuccessfully(interfaceVideoNote, object)
+}
+
+func (vdn *videonote) WriteThumbnailStorage(path string) {
+	vdn.thumbnailGottenFrom = Storage
+	vdn.writeThumbnail(path, "Thumbnail From Storage")
+}
+
+func (vdn *videonote) WriteThumbnailTelegram(ID string) {
+	vdn.thumbnailGottenFrom = Telegram
+	vdn.writeThumbnail(ID, "Thumbnail From Telegram")
+}
+
+func (vdn *videonote) WriteThumbnailInternet(URL string) {
+	vdn.thumbnailGottenFrom = Internet
+	vdn.writeThumbnail(URL, "Thumbnail From Internet")
+}
+
+func (vdn *videonote) GetResponse() types.VideoNote {
+	return vdn.response
 }
 
 func (inf *information) WriteString(text string) {
@@ -533,6 +682,14 @@ func (inf *information) WriteReplyParameters(reply *types.ReplyParameters) {
 	logs.DataWrittenSuccessfully(interfaceInf, "Reply Parameters")
 }
 
+func (inf *information) WriteAllowPaidBroadcast() {
+	if inf.AllowPaidBroadcast {
+		logs.DataIsntEmply(interfaceInf, "Allow Paid Broadcast", inf.AllowPaidBroadcast)
+	}
+	inf.AllowPaidBroadcast = true
+	logs.DataWrittenSuccessfully(interfaceInf, "Allow Paid Broadcast")
+}
+
 func (inf *information) GetResponse() types.User {
 	return inf.response
 }
@@ -599,7 +756,7 @@ func (in *inline) NewButton(line, pos int) (IInlineButton, error) {
 	if (line >= 0) && (pos >= 0) && len(in.Keyboard.InlineKeyboard) > line && len(in.Keyboard.InlineKeyboard[line]) > pos {
 
 		if in.Keyboard.InlineKeyboard[line][pos] != nil {
-			logs.DataIsntEmply(inKB, fmt.Sprintf("%s line: %d, position: %d", button, line, pos), in.Keyboard.InlineKeyboard[line][pos])
+			logs.DataIsntEmply(interfaceInKB, fmt.Sprintf("%s line: %d, position: %d", button, line, pos), in.Keyboard.InlineKeyboard[line][pos])
 		}
 		in.Keyboard.InlineKeyboard[line][pos] = new(inlineKeyboardButton)
 
@@ -721,7 +878,7 @@ func (rp *reply) NewButton(line, pos int) (IReplyButton, error) {
 	if (line >= 0) && (pos >= 0) && (len(rp.Keyboard.Keyboard) > line) && (len(rp.Keyboard.Keyboard[line]) > pos) {
 
 		if rp.Keyboard.Keyboard[line][pos] != nil {
-			logs.DataIsntEmply(replyKB, fmt.Sprintf("%s line: %d, position: %d", button, line, pos), rp.Keyboard.Keyboard[line][pos])
+			logs.DataIsntEmply(interfaceReplyKB, fmt.Sprintf("%s line: %d, position: %d", button, line, pos), rp.Keyboard.Keyboard[line][pos])
 		}
 		rp.Keyboard.Keyboard[line][pos] = new(replyKeyboardButton)
 

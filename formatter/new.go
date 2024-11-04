@@ -30,7 +30,17 @@ func (msg *Message) NewVideo() IVideo {
 
 func (msg *Message) NewAnimation() IAnimation {
 	logs.NewInterfaceCreated("Video")
-	return &animation{Type: "video"}
+	return &animation{Type: "animation"}
+}
+
+func (msg *Message) NewVoice() IVoice {
+	logs.NewInterfaceCreated(interfaceVoice)
+	return &voice{Type: "voice"}
+}
+
+func (msg *Message) NewVideoNote() IVideoNote {
+	logs.NewInterfaceCreated(interfaceVideoNote)
+	return &videonote{Type: "video_note"}
 }
 
 // Creates a new message(inf) stucture and returns an interface with connected functions. This is the only one way to add your data to an object

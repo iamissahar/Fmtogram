@@ -138,3 +138,11 @@ func UnsupportedType(pos int) error {
 func TooMuchData(interface1 string, num, line int) error {
 	return fmt.Errorf("[ERROR] You mentioned too much data. It is allowed to call only one function in interface {%s} except WriteString(). The interface where you gave this data is %d in the %d line", interface1, num, line)
 }
+
+func IlligalFields(interface1, f string, num int) error {
+	return fmt.Errorf("[ERROR] You call '%s' function and gave it some data (if it was required) in interface {%s} with the number in queue: %d. It is not allowed if you want to send not only this interface", f, interface1, num)
+}
+
+func UnsupportedTypeOfFile(typesoffiles string) error {
+	return fmt.Errorf("[ERROR] You want to send unnsported file type. The suported types: %s", typesoffiles)
+}
