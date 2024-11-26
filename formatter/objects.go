@@ -11,7 +11,7 @@ type photo struct {
 	CaptionEntities       []*types.MessageEntity `json:"caption_entities,omitempty"`
 	ShowCaptionAboveMedia bool                   `json:"show_caption_above_media,omitempty"`
 	HasSpoiler            bool                   `json:"has_spoiler,omitempty"`
-	GottenFrom            int
+	gottenFrom            int
 	response              [4]types.PhotoSize
 }
 
@@ -29,8 +29,8 @@ type video struct {
 	Duration              int                    `json:"duration,omitempty"`
 	SupportsStreaming     bool                   `json:"supports_streaming,omitempty"`
 	HasSpoiler            bool                   `json:"has_spoiler,omitempty"`
-	VideoGottenFrom       int
-	ThumbnailGottenFrom   int
+	videoGottenFrom       int
+	thumbnailGottenFrom   int
 	response              types.Video
 }
 
@@ -45,8 +45,8 @@ type audio struct {
 	Duration            int                    `json:"duration,omitempty"`
 	Performer           string                 `json:"performer,omitempty"`
 	Title               string                 `json:"title,omitempty"`
-	AudioGottenFrom     int
-	ThumbnailGottenFrom int
+	audioGottenFrom     int
+	thumbnailGottenFrom int
 	response            types.Audio
 }
 
@@ -59,8 +59,8 @@ type document struct {
 	ParseMode                   string                 `json:"parse_mode,omitempty"`
 	CaptionEntities             []*types.MessageEntity `json:"caption_entities,omitempty"`
 	DisableContentTypeDetection bool                   `json:"disable_content_type_detection,omitempty"`
-	DocumentGottenFrom          int
-	ThumbnailGottenFrom         int
+	documentGottenFrom          int
+	thumbnailGottenFrom         int
 	response                    types.Document
 }
 
@@ -73,8 +73,8 @@ type animation struct {
 	Height              int    `json:"height,omitempty"`
 	Duration            int    `json:"duration,omitempty"`
 	HasSpoiler          bool   `json:"has_spoiler,omitempty"`
-	AnimationGottenFrom int
-	ThumbnailGottenFrom int
+	animationGottenFrom int
+	thumbnailGottenFrom int
 	response            types.Animation
 }
 
@@ -115,6 +115,8 @@ type information struct {
 	ShowCaptionAboveMedia bool                      `json:"show_caption_above_media,omitempty"`
 	ReplyParameters       *types.ReplyParameters    `json:"reply_parameters,omitempty"`
 	AllowPaidBroadcast    bool                      `json:"allow_paid_broadcast,omitempty"`
+	StarCount             int                       `json:"star_count,omitempty"`
+	Payload               string                    `json:"payload,omitempty"`
 	response              types.User
 	responseMessageIDs    []int
 }
@@ -137,7 +139,7 @@ type inlineKeyboardButton struct {
 	SwitchInlineQueryChosenChat  *types.SwitchInlineQueryChosenChat `json:"switch_inline_query_chosen_chat,omitempty"`
 	CallbackGame                 *types.CallbackGame                `json:"callback_game,omitempty"`
 	Pay                          bool                               `json:"pay,omitempty"`
-	One                          int
+	storage                      [9]int
 }
 
 type inline struct {
@@ -156,6 +158,7 @@ type replyKeyboardButton struct {
 	RequestLocation bool                              `json:"request_location,omitempty"`
 	RequestPoll     *types.KeyboardButtonPollType     `json:"request_poll,omitempty"`
 	WebApp          *types.WebAppInfo                 `json:"web_app,omitempty"`
+	storage         [6]int
 }
 
 type reply struct {

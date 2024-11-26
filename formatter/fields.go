@@ -7,7 +7,7 @@ import (
 	"mime/multipart"
 	"os"
 
-	"github.com/l1qwie/Fmtogram/errors"
+	"github.com/l1qwie/Fmtogram/fmerrors"
 	"github.com/l1qwie/Fmtogram/types"
 )
 
@@ -22,13 +22,13 @@ func writeFileToMultipart(writer *multipart.Writer, fieldname, filename string) 
 		if err == nil {
 			_, err = io.Copy(part, file)
 			if err != nil {
-				errors.CantCopyFile(err)
+				fmerrors.CantCopyFile(err)
 			}
 		} else {
-			errors.CantCreateFormFile(err)
+			fmerrors.CantCreateFormFile(err)
 		}
 	} else {
-		errors.CantOpenFile(err)
+		fmerrors.CantOpenFile(err)
 	}
 	return err
 }
@@ -41,7 +41,7 @@ func addThumbnail(writer *multipart.Writer, thumbnail string, gottenfrom int) er
 		err = writer.WriteField("thumbnail", thumbnail)
 
 		if err != nil {
-			errors.CantWriteField(err)
+			fmerrors.CantWriteField(err)
 		}
 	}
 	return err
@@ -58,11 +58,11 @@ func commonFields(writer *multipart.Writer, captionEntities []*types.MessageEnti
 			err = writer.WriteField("caption_entities", string(body))
 
 			if err != nil {
-				errors.CantWriteField(err)
+				fmerrors.CantWriteField(err)
 			}
 
 		} else {
-			errors.CantMarshalJSON(err)
+			fmerrors.CantMarshalJSON(err)
 		}
 	}
 	return err
@@ -72,14 +72,14 @@ func (ph *photo) multipartFields(writer *multipart.Writer, group *[]interface{},
 	err := commonFields(writer, ph.CaptionEntities)
 	if err == nil {
 		if input {
-			if ph.GottenFrom != Storage {
+			if ph.gottenFrom != Storage {
 				ph.Media = ph.Photo
 			} else {
 				err = writeFileToMultipart(writer, ph.Photo, ph.Photo)
 				ph.Media = fmt.Sprintf("attach://%s", ph.Photo)
 			}
 		} else {
-			if ph.GottenFrom != Storage {
+			if ph.gottenFrom != Storage {
 				err = writer.WriteField("photo", ph.Photo)
 			} else {
 				err = writeFileToMultipart(writer, "photo", ph.Photo)
@@ -93,14 +93,14 @@ func (ph *photo) multipartFields(writer *multipart.Writer, group *[]interface{},
 		err = writer.WriteField("show_caption_above_media", "True")
 
 		if err != nil {
-			errors.CantWriteField(err)
+			fmerrors.CantWriteField(err)
 		}
 	}
 	if err == nil && ph.HasSpoiler {
 		err = writer.WriteField("has_spoiler", "True")
 
 		if err != nil {
-			errors.CantWriteField(err)
+			fmerrors.CantWriteField(err)
 		}
 	}
 	if group != nil {
@@ -121,21 +121,18 @@ func (vd *video) multipartFields(writer *multipart.Writer, group *[]interface{},
 	err := commonFields(writer, vd.CaptionEntities)
 	if err == nil {
 		if input {
-			if vd.VideoGottenFrom != Storage {
+			if vd.videoGottenFrom != Storage {
 				vd.Media = vd.Video
 			} else {
-				if err = vd.checkTypeOfFile(); err == nil {
-					err = writeFileToMultipart(writer, vd.Video, vd.Video)
-					vd.Media = fmt.Sprintf("attach://%s", vd.Video)
-				}
+				err = writeFileToMultipart(writer, vd.Video, vd.Video)
+				vd.Media = fmt.Sprintf("attach://%s", vd.Video)
+
 			}
 		} else {
-			if vd.VideoGottenFrom != Storage {
+			if vd.videoGottenFrom != Storage {
 				err = writer.WriteField("video", vd.Video)
 			} else {
-				if err = vd.checkTypeOfFile(); err == nil {
-					err = writeFileToMultipart(writer, "video", vd.Video)
-				}
+				err = writeFileToMultipart(writer, "video", vd.Video)
 			}
 		}
 	}
@@ -146,38 +143,38 @@ func (vd *video) multipartFields(writer *multipart.Writer, group *[]interface{},
 		err = writer.WriteField("duration", fmt.Sprintf("%d", vd.Duration))
 
 		if err != nil {
-			errors.CantWriteField(err)
+			fmerrors.CantWriteField(err)
 		}
 	}
 	if err == nil && vd.Width != 0 {
 		err = writer.WriteField("width", fmt.Sprintf("%d", vd.Width))
 
 		if err != nil {
-			errors.CantWriteField(err)
+			fmerrors.CantWriteField(err)
 		}
 	}
 	if err == nil && vd.Height != 0 {
 		err = writer.WriteField("height", fmt.Sprintf("%d", vd.Height))
 
 		if err != nil {
-			errors.CantWriteField(err)
+			fmerrors.CantWriteField(err)
 		}
 	}
 	if err == nil && vd.Thumbnail != "" {
-		err = addThumbnail(writer, vd.Thumbnail, vd.ThumbnailGottenFrom)
+		err = addThumbnail(writer, vd.Thumbnail, vd.thumbnailGottenFrom)
 	}
 	if err == nil && vd.ShowCaptionAboveMedia {
 		err = writer.WriteField("show_caption_above_media", "True")
 
 		if err != nil {
-			errors.CantWriteField(err)
+			fmerrors.CantWriteField(err)
 		}
 	}
 	if err == nil && vd.HasSpoiler {
 		err = writer.WriteField("has_spoiler", "True")
 
 		if err != nil {
-			errors.CantWriteField(err)
+			fmerrors.CantWriteField(err)
 		}
 	}
 	if err == nil && vd.SupportsStreaming {
@@ -201,21 +198,17 @@ func (ad *audio) multipartFields(writer *multipart.Writer, group *[]interface{},
 	err := commonFields(writer, ad.CaptionEntities)
 	if err == nil {
 		if input {
-			if ad.AudioGottenFrom != Storage {
+			if ad.audioGottenFrom != Storage {
 				ad.Media = ad.Audio
 			} else {
-				if err = ad.checkTypeOfFile(); err == nil {
-					err = writeFileToMultipart(writer, ad.Audio, ad.Audio)
-					ad.Media = fmt.Sprintf("attach://%s", ad.Audio)
-				}
+				err = writeFileToMultipart(writer, ad.Audio, ad.Audio)
+				ad.Media = fmt.Sprintf("attach://%s", ad.Audio)
 			}
 		} else {
-			if ad.AudioGottenFrom != Storage {
+			if ad.audioGottenFrom != Storage {
 				err = writer.WriteField("audio", ad.Audio)
 			} else {
-				if err = ad.checkTypeOfFile(); err == nil {
-					err = writeFileToMultipart(writer, "audio", ad.Audio)
-				}
+				err = writeFileToMultipart(writer, "audio", ad.Audio)
 			}
 		}
 	}
@@ -226,18 +219,18 @@ func (ad *audio) multipartFields(writer *multipart.Writer, group *[]interface{},
 		err = writer.WriteField("duration", fmt.Sprintf("%d", ad.Duration))
 
 		if err != nil {
-			errors.CantWriteField(err)
+			fmerrors.CantWriteField(err)
 		}
 	}
 	if err == nil && ad.Performer != "" {
 		err = writer.WriteField("performer", ad.Performer)
 
 		if err != nil {
-			errors.CantWriteField(err)
+			fmerrors.CantWriteField(err)
 		}
 	}
 	if err == nil && ad.Thumbnail != "" {
-		err = addThumbnail(writer, ad.Thumbnail, ad.ThumbnailGottenFrom)
+		err = addThumbnail(writer, ad.Thumbnail, ad.thumbnailGottenFrom)
 	}
 	if group != nil {
 		(*group)[i] = ad
@@ -257,14 +250,14 @@ func (dc *document) multipartFields(writer *multipart.Writer, group *[]interface
 	err := commonFields(writer, dc.CaptionEntities)
 	if err == nil {
 		if input {
-			if dc.DocumentGottenFrom != Storage {
+			if dc.documentGottenFrom != Storage {
 				dc.Media = dc.Document
 			} else {
 				err = writeFileToMultipart(writer, dc.Document, dc.Document)
 				dc.Media = fmt.Sprintf("attach://%s", dc.Document)
 			}
 		} else {
-			if dc.DocumentGottenFrom != Storage {
+			if dc.documentGottenFrom != Storage {
 				err = writer.WriteField("document", dc.Document)
 			} else {
 				err = writeFileToMultipart(writer, "document", dc.Document)
@@ -275,13 +268,13 @@ func (dc *document) multipartFields(writer *multipart.Writer, group *[]interface
 		err = writer.WriteField("type", "document")
 	}
 	if err == nil && dc.Thumbnail != "" {
-		err = addThumbnail(writer, dc.Thumbnail, dc.ThumbnailGottenFrom)
+		err = addThumbnail(writer, dc.Thumbnail, dc.thumbnailGottenFrom)
 	}
 	if err == nil && dc.DisableContentTypeDetection {
 		err = writer.WriteField("disable_content_type_detection", "True")
 
 		if err != nil {
-			errors.CantWriteField(err)
+			fmerrors.CantWriteField(err)
 		}
 	}
 	if group != nil {
@@ -301,21 +294,17 @@ func (dc *document) nameAndConst() (string, int) {
 func (an *animation) multipartFields(writer *multipart.Writer, group *[]interface{}, i int, input bool) error {
 	var err error
 	if input {
-		if an.AnimationGottenFrom != Storage {
+		if an.animationGottenFrom != Storage {
 			an.Media = an.Animation
 		} else {
-			if err = an.checkTypeOfFile(); err == nil {
-				err = writeFileToMultipart(writer, an.Animation, an.Animation)
-				an.Media = fmt.Sprintf("attach://%s", an.Animation)
-			}
+			err = writeFileToMultipart(writer, an.Animation, an.Animation)
+			an.Media = fmt.Sprintf("attach://%s", an.Animation)
 		}
 	} else {
-		if an.AnimationGottenFrom != Storage {
+		if an.animationGottenFrom != Storage {
 			err = writer.WriteField("animation", an.Animation)
 		} else {
-			if err = an.checkTypeOfFile(); err == nil {
-				err = writeFileToMultipart(writer, "animation", an.Animation)
-			}
+			err = writeFileToMultipart(writer, "animation", an.Animation)
 		}
 	}
 	if err == nil && input {
@@ -325,31 +314,31 @@ func (an *animation) multipartFields(writer *multipart.Writer, group *[]interfac
 		err = writer.WriteField("duration", fmt.Sprintf("%d", an.Duration))
 
 		if err != nil {
-			errors.CantWriteField(err)
+			fmerrors.CantWriteField(err)
 		}
 	}
 	if err == nil && an.Width != 0 {
 		err = writer.WriteField("width", fmt.Sprintf("%d", an.Width))
 
 		if err != nil {
-			errors.CantWriteField(err)
+			fmerrors.CantWriteField(err)
 		}
 	}
 	if err == nil && an.Height != 0 {
 		err = writer.WriteField("height", fmt.Sprintf("%d", an.Height))
 
 		if err != nil {
-			errors.CantWriteField(err)
+			fmerrors.CantWriteField(err)
 		}
 	}
 	if err == nil && an.Thumbnail != "" {
-		err = addThumbnail(writer, an.Thumbnail, an.ThumbnailGottenFrom)
+		err = addThumbnail(writer, an.Thumbnail, an.thumbnailGottenFrom)
 	}
 	if err == nil && an.HasSpoiler {
 		err = writer.WriteField("has_spoiler", "True")
 
 		if err != nil {
-			errors.CantWriteField(err)
+			fmerrors.CantWriteField(err)
 		}
 	}
 	if group != nil {
@@ -372,18 +361,14 @@ func (vc *voice) multipartFields(writer *multipart.Writer, group *[]interface{},
 		if vc.gottenFrom != Storage {
 			vc.Media = vc.Voice
 		} else {
-			if err = vc.checkTypeOfFile(); err == nil {
-				err = writeFileToMultipart(writer, vc.Voice, vc.Voice)
-				vc.Media = fmt.Sprintf("attach://%s", vc.Voice)
-			}
+			err = writeFileToMultipart(writer, vc.Voice, vc.Voice)
+			vc.Media = fmt.Sprintf("attach://%s", vc.Voice)
 		}
 	} else {
 		if vc.gottenFrom != Storage {
 			err = writer.WriteField("voice", vc.Voice)
 		} else {
-			if err = vc.checkTypeOfFile(); err == nil {
-				err = writeFileToMultipart(writer, "voice", vc.Voice)
-			}
+			err = writeFileToMultipart(writer, "voice", vc.Voice)
 		}
 	}
 	if err == nil && input {
@@ -393,7 +378,7 @@ func (vc *voice) multipartFields(writer *multipart.Writer, group *[]interface{},
 		err = writer.WriteField("duration", fmt.Sprintf("%d", vc.Duration))
 
 		if err != nil {
-			errors.CantWriteField(err)
+			fmerrors.CantWriteField(err)
 		}
 	}
 	if group != nil {
@@ -416,18 +401,14 @@ func (vdn *videonote) multipartFields(writer *multipart.Writer, group *[]interfa
 		if vdn.videoGottenFrom != Storage {
 			vdn.Media = vdn.VideoNote
 		} else {
-			if err = vdn.checkTypeOfFile(); err == nil {
-				err = writeFileToMultipart(writer, vdn.VideoNote, vdn.VideoNote)
-				vdn.Media = fmt.Sprintf("attach://%s", vdn.VideoNote)
-			}
+			err = writeFileToMultipart(writer, vdn.VideoNote, vdn.VideoNote)
+			vdn.Media = fmt.Sprintf("attach://%s", vdn.VideoNote)
 		}
 	} else {
 		if vdn.videoGottenFrom != Storage {
 			err = writer.WriteField("video_note", vdn.VideoNote)
 		} else {
-			if err = vdn.checkTypeOfFile(); err == nil {
-				err = writeFileToMultipart(writer, "video_note", vdn.VideoNote)
-			}
+			err = writeFileToMultipart(writer, "video_note", vdn.VideoNote)
 		}
 	}
 	if err == nil && input {
@@ -437,14 +418,14 @@ func (vdn *videonote) multipartFields(writer *multipart.Writer, group *[]interfa
 		err = writer.WriteField("duration", fmt.Sprintf("%d", vdn.Duration))
 
 		if err != nil {
-			errors.CantWriteField(err)
+			fmerrors.CantWriteField(err)
 		}
 	}
 	if err == nil && vdn.Length != 0 {
 		err = writer.WriteField("length", fmt.Sprintf("%d", vdn.Length))
 
 		if err != nil {
-			errors.CantWriteField(err)
+			fmerrors.CantWriteField(err)
 		}
 	}
 	if err == nil && vdn.Thumbnail != "" {
@@ -475,33 +456,79 @@ func putGroup(writer *multipart.Writer, group []interface{}) error {
 func field(w *multipart.Writer, fieldname, value string) error {
 	err := w.WriteField(fieldname, value)
 	if err != nil {
-		errors.CantWriteField(err)
+		fmerrors.CantWriteField(err)
 	}
 	return err
 }
 
 func (inf *information) multipartFields(writer *multipart.Writer) error {
 	var err error
-	if inf.Text != "" {
+	var js []byte
+	if len(inf.MessageIDs) != 0 {
+		js, err = json.Marshal(inf.MessageIDs)
+		if err == nil {
+			err = field(writer, "message_ids", string(js))
+		}
+	}
+	if (err == nil) && (inf.MessageID != 0) {
+		err = field(writer, "message_id", fmt.Sprint(inf.MessageID))
+	}
+	if (err == nil) && (len(inf.Entities) != 0) {
+		js, err = json.Marshal(inf.Entities)
+		if err == nil {
+			err = field(writer, "entities", string(js))
+		}
+	}
+	if (err == nil) && (len(inf.CaptionEntities) != 0) {
+		js, err = json.Marshal(inf.CaptionEntities)
+		if err == nil {
+			err = field(writer, "caption_entities", string(js))
+		}
+	}
+	if (err == nil) && (inf.LinkPreviewOptions != nil) {
+		js, err = json.Marshal(inf.LinkPreviewOptions)
+		if err == nil {
+			err = field(writer, "link_preview_options", string(js))
+		}
+	}
+	if (err == nil) && (inf.Text != "") {
 		err = field(writer, "text", inf.Text)
 	}
-	if err == nil && inf.Caption != "" {
+	if (err == nil) && (inf.Caption != "") {
 		err = field(writer, "caption", inf.Caption)
 	}
-	if err == nil && inf.ParseMode != "" {
+	if (err == nil) && (inf.ParseMode != "") {
 		err = field(writer, "parse_mode", inf.ParseMode)
 	}
-	if err == nil && inf.MessageThreadID != 0 {
+	if (err == nil) && (inf.MessageThreadID != 0) {
 		err = field(writer, "message_thread_id", fmt.Sprint(inf.MessageThreadID))
 	}
-	if err == nil && inf.DisableNotification {
+	if (err == nil) && (inf.DisableNotification) {
 		err = field(writer, "disable_notification", "True")
 	}
-	if err == nil && inf.ProtectContent {
+	if (err == nil) && (inf.ProtectContent) {
 		err = field(writer, "protect_content", "True")
 	}
-	if err == nil && inf.MessageEffectID != "" {
+	if (err == nil) && (inf.MessageEffectID != "") {
 		err = field(writer, "message_effect_id", inf.MessageEffectID)
+	}
+	if (err == nil) && (inf.ShowCaptionAboveMedia) {
+		err = field(writer, "show_caption_above_media", "True")
+	}
+	if (err == nil) && (inf.ReplyParameters != nil) {
+		js, err = json.Marshal(inf.ReplyParameters)
+		if err == nil {
+			err = field(writer, "reply_parameters", string(js))
+		}
+	}
+	if (err == nil) && (inf.AllowPaidBroadcast) {
+		err = field(writer, "allow_paid_broadcast", "True")
+	}
+	if (err == nil) && (inf.StarCount != 0) {
+		err = field(writer, "star_count", fmt.Sprint(inf.StarCount))
+	}
+	if (err == nil) && (inf.Payload != "") {
+		err = field(writer, "payload", fmt.Sprint(inf.Payload))
 	}
 	return err
 }
@@ -509,19 +536,13 @@ func (inf *information) multipartFields(writer *multipart.Writer) error {
 func (inf *information) createJSON() ([]byte, error) {
 	body, err := json.Marshal(inf)
 	if err != nil {
-		errors.CantMarshalJSON(err)
+		fmerrors.CantMarshalJSON(err)
 	}
 	return body, err
 }
 
 func (ch *chat) multipartFields(writer *multipart.Writer) error {
-	var err error
-	if ch.ID != nil {
-		err = field(writer, "chat_id", fmt.Sprint(ch.ID))
-
-	} else if ch.ID == nil {
-		err = errors.ChatIDIsMissed()
-	}
+	err := field(writer, "chat_id", fmt.Sprint(ch.ID))
 	if ch.BusinessConnectionID != "" {
 		err = field(writer, "business_connection_id", ch.BusinessConnectionID)
 	}
@@ -532,19 +553,19 @@ func (ch *chat) createJson() ([]byte, error) {
 	return json.Marshal(ch)
 }
 
-func (in *inline) MultipartFields(writer *multipart.Writer) error {
-	inbody, err := json.Marshal(in.Keyboard.InlineKeyboard)
+func (in *inline) multipartFields(writer *multipart.Writer) error {
+	inbody, err := json.Marshal(in.Keyboard)
 	if err == nil {
 		err = writer.WriteField("reply_markup", string(inbody))
 	}
 	return err
 }
 
-func (in *inline) JsonFields() ([]byte, error) {
+func (in *inline) jsonFields() ([]byte, error) {
 	return json.Marshal(in)
 }
 
-func (rp *reply) MultipartFields(writer *multipart.Writer) error {
+func (rp *reply) multipartFields(writer *multipart.Writer) error {
 	rpbody, err := json.Marshal(rp.Keyboard)
 	if err == nil {
 		err = writer.WriteField("reply_markup", string(rpbody))
@@ -552,6 +573,6 @@ func (rp *reply) MultipartFields(writer *multipart.Writer) error {
 	return err
 }
 
-func (rp *reply) JsonFields() ([]byte, error) {
+func (rp *reply) jsonFields() ([]byte, error) {
 	return json.Marshal(rp)
 }

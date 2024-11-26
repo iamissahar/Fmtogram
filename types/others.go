@@ -10,6 +10,7 @@ var (
 
 const (
 	Markdown    string = "Markdown"
+	MarkdownV2  string = "MarkdownV2"
 	HTML        string = "HTML"
 	TelegramAPI string = "https://api.telegram.org/"
 )

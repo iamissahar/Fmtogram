@@ -3,691 +3,1378 @@ package formatter
 import (
 	"fmt"
 
-	"github.com/l1qwie/Fmtogram/errors"
+	"github.com/l1qwie/Fmtogram/fmerrors"
 	"github.com/l1qwie/Fmtogram/logs"
 	"github.com/l1qwie/Fmtogram/types"
 )
 
-func (ph *photo) writePhoto(photo, object string) {
-	if !isItEmply(ph, checkString, ph.Photo) {
-		logs.DataIsntEmply(interfacePhoto, "Photo", ph.Photo)
+func code12() error {
+	err := new(fmerrors.FME)
+	err.Code = 12
+	err.String = "incorrect type of file"
+	return err
+}
+
+func code5() error {
+	err := new(fmerrors.FME)
+	err.Code = 5
+	err.String = "incorrect data in an input slice"
+	return err
+}
+
+func code10() error {
+	err := new(fmerrors.FME)
+	err.Code = 10
+	err.String = "the data is already present"
+	return err
+}
+
+func code20() error {
+	err := new(fmerrors.FME)
+	err.Code = 20
+	err.String = "incorrect input data"
+	return err
+}
+
+func code21() error {
+	err := new(fmerrors.FME)
+	err.Code = 21
+	err.String = "missed required data"
+	return err
+}
+
+func code25() error {
+	err := new(fmerrors.FME)
+	err.Code = 25
+	err.String = "incompatible data"
+	return err
+}
+
+func code999() error {
+	err := new(fmerrors.FME)
+	err.Code = 999
+	err.String = "incorrect input data type"
+	return err
+}
+
+func (ph *photo) writePhoto(photo, object string) error {
+	var err error
+	if ph.Photo == "" {
+		ph.Photo, ph.Media = photo, photo
+		logs.DataWrittenSuccessfully(interfacePhoto, object)
+	} else {
+		err = code10()
 	}
-	ph.Photo, ph.Media = photo, photo
-	logs.DataWrittenSuccessfully(interfacePhoto, object)
+	return err
 }
 
-func (ph *photo) WritePhotoStorage(photo string) {
-	ph.GottenFrom = Storage
-	ph.writePhoto(photo, "Photo From Storage")
-}
-
-func (ph *photo) WritePhotoTelegram(photo string) {
-	ph.GottenFrom = Telegram
-	ph.writePhoto(photo, "Photo From Telegram")
-}
-
-func (ph *photo) WritePhotoInternet(photo string) {
-	ph.GottenFrom = Internet
-	ph.writePhoto(photo, "Photo From The Internet")
-}
-
-func (ph *photo) WriteCaption(caption string) {
-	if !isItEmply(ph, checkString, ph.Caption) {
-		logs.DataIsntEmply(interfacePhoto, "Caption", ph.Caption)
+func (ph *photo) WritePhotoStorage(photo string) error {
+	var err error
+	if photo != "" {
+		if err = ph.isCorrectType(photo); err == nil {
+			ph.gottenFrom = Storage
+			err = ph.writePhoto(photo, "Photo From Storage")
+		}
+	} else {
+		err = code20()
 	}
-	ph.Caption = caption
-	logs.DataWrittenSuccessfully(interfacePhoto, "Caption")
+	return err
 }
 
-func (ph *photo) WriteParseMode(parsemode string) {
-	if !isItEmply(ph, checkString, ph.ParseMode) {
-		logs.DataIsntEmply(interfacePhoto, "Parse Mode", ph.ParseMode)
+func (ph *photo) WritePhotoTelegram(photo string) error {
+	var err error
+	if photo != "" {
+		ph.gottenFrom = Telegram
+		err = ph.writePhoto(photo, "Photo From Telegram")
+	} else {
+		err = code20()
 	}
-	ph.ParseMode = parsemode
-	logs.DataWrittenSuccessfully(interfacePhoto, "Parse Mode")
+	return err
 }
 
-func (ph *photo) WriteCaptionEntities(captionEntities []*types.MessageEntity) {
-	if !isItEmply(ph, checkArray, ph.CaptionEntities) {
-		logs.DataIsntEmply(interfacePhoto, "Caption Entities", ph.CaptionEntities)
+func (ph *photo) WritePhotoInternet(photo string) error {
+	var err error
+	if photo != "" {
+		ph.gottenFrom = Internet
+		err = ph.writePhoto(photo, "Photo From The Internet")
+	} else {
+		err = code20()
 	}
-	ph.CaptionEntities = captionEntities
-	logs.DataWrittenSuccessfully(interfacePhoto, "Caption Entities")
+	return err
 }
 
-func (ph *photo) WriteShowCaptionAboveMedia() {
-	if !isItEmply(ph, checkBool, ph.ShowCaptionAboveMedia) {
-		logs.DataIsntEmply(interfacePhoto, "Show Caption Above Media", ph.ShowCaptionAboveMedia)
+func (ph *photo) WriteCaption(caption string) error {
+	var err error
+	if caption != "" {
+		if ph.Caption != "" {
+			err = code10()
+		} else {
+			ph.Caption = caption
+			logs.DataWrittenSuccessfully(interfacePhoto, "Caption")
+		}
+	} else {
+		err = code20()
 	}
-	ph.ShowCaptionAboveMedia = true
-	logs.SettedParam("Show Caption Above Media", interfacePhoto, ph.ShowCaptionAboveMedia)
+	return err
 }
 
-func (ph *photo) WriteHasSpoiler() {
-	if !isItEmply(ph, checkBool, ph.HasSpoiler) {
-		logs.DataIsntEmply(interfacePhoto, "Has Spoiler", ph.HasSpoiler)
+func (ph *photo) WriteParseMode(parsemode string) error {
+	var err error
+	if parsemode != types.HTML && parsemode != types.Markdown && parsemode != types.MarkdownV2 {
+		err = code20()
+	} else {
+		if ph.ParseMode != "" {
+			err = code10()
+		} else {
+			ph.ParseMode = parsemode
+			logs.DataWrittenSuccessfully(interfacePhoto, "Parse Mode")
+		}
 	}
-	ph.HasSpoiler = true
-	logs.SettedParam("Has Spoiler", interfacePhoto, ph.HasSpoiler)
+	return err
+}
+
+func (ph *photo) WriteCaptionEntities(captionEntities []*types.MessageEntity) error {
+	var err error
+	if len(captionEntities) != 0 {
+
+		for i := 0; (i < len(captionEntities)) && (err == nil); i++ {
+			if captionEntities[i] == nil {
+				err = code5()
+			}
+		}
+
+		if err == nil {
+			if len(ph.CaptionEntities) == 0 {
+				ph.CaptionEntities = captionEntities
+				logs.DataWrittenSuccessfully(interfacePhoto, "Caption Entities")
+			} else {
+				err = code10()
+			}
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (ph *photo) WriteShowCaptionAboveMedia() error {
+	var err error
+	if ph.ShowCaptionAboveMedia {
+		err = code10()
+	} else {
+		ph.ShowCaptionAboveMedia = true
+		logs.SettedParam("Show Caption Above Media", interfacePhoto, ph.ShowCaptionAboveMedia)
+	}
+	return err
+}
+
+func (ph *photo) WriteHasSpoiler() error {
+	var err error
+	if ph.HasSpoiler {
+		err = code10()
+	} else {
+		ph.HasSpoiler = true
+		logs.SettedParam("Has Spoiler", interfacePhoto, ph.HasSpoiler)
+	}
+	return err
 }
 
 func (ph *photo) GetResponse() [4]types.PhotoSize {
 	return ph.response
 }
 
-func (vd *video) writeVideo(video, object string) {
-	if !isItEmply(vd, checkString, vd.Video) {
-		logs.DataIsntEmply(interfaceVideo, "Video", vd.Video)
+func (vd *video) writeVideo(video, object string) error {
+	var err error
+	if vd.Video == "" {
+		vd.Video, vd.Media = video, video
+		logs.DataWrittenSuccessfully(interfaceVideo, object)
+	} else {
+		err = code10()
 	}
-	vd.Video, vd.Media = video, video
-	logs.DataWrittenSuccessfully(interfaceVideo, object)
+	return err
 }
 
-func (vd *video) WriteVideoStorage(video string) {
-	vd.VideoGottenFrom = Storage
-	vd.writeVideo(video, "Video From Storage")
-}
-
-func (vd *video) WriteVideoTelegram(video string) {
-	vd.VideoGottenFrom = Telegram
-	vd.writeVideo(video, "Video From Telegram")
-}
-
-func (vd *video) WriteVideoInternet(video string) {
-	vd.VideoGottenFrom = Internet
-	vd.writeVideo(video, "Video From the Internet")
-}
-
-func (vd *video) writeThumbnail(thumbnail, object string) {
-	if !isItEmply(vd, checkString, vd.Thumbnail) {
-		logs.DataIsntEmply("Video", "Thumbnail", vd.Thumbnail)
+func (vd *video) WriteVideoStorage(video string) error {
+	var err error
+	if video != "" {
+		if err = vd.isCorrectType(video); err == nil {
+			vd.videoGottenFrom = Storage
+			err = vd.writeVideo(video, "Video From Storage")
+		}
+	} else {
+		err = code20()
 	}
-	vd.Thumbnail = thumbnail
-	logs.DataWrittenSuccessfully(interfaceVideo, object)
+	return err
 }
 
-func (vd *video) WriteThumbnailStorage(thumbnail string) {
-	vd.ThumbnailGottenFrom = Storage
-	vd.writeThumbnail(thumbnail, "Thumbnail From Storage")
-}
-
-func (vd *video) WriteThumbnailTelegram(thumbnail string) {
-	vd.ThumbnailGottenFrom = Telegram
-	vd.writeThumbnail(thumbnail, "Thumbnail From Telegram")
-}
-
-func (vd *video) WriteThumbnailInternet(thumbnail string) {
-	vd.ThumbnailGottenFrom = Internet
-	vd.writeThumbnail(thumbnail, "Thumbnail From the Internet")
-}
-
-func (vd *video) WriteCaption(caption string) {
-	if !isItEmply(vd, checkString, vd.Caption) {
-		logs.DataIsntEmply("Video", "Caption", vd.Caption)
+func (vd *video) WriteVideoTelegram(video string) error {
+	var err error
+	if video != "" {
+		vd.videoGottenFrom = Telegram
+		err = vd.writeVideo(video, "Video From Telegram")
+	} else {
+		err = code20()
 	}
-	vd.Caption = caption
-	logs.DataWrittenSuccessfully(interfaceVideo, "Caption")
+	return err
 }
 
-func (vd *video) WriteParseMode(parsemode string) {
-	if !isItEmply(vd, checkString, vd.ParseMode) {
-		logs.DataIsntEmply("Video", "Parse Mode", vd.ParseMode)
+func (vd *video) WriteVideoInternet(video string) error {
+	var err error
+	if video != "" {
+		vd.videoGottenFrom = Internet
+		err = vd.writeVideo(video, "Video From the Internet")
+	} else {
+		err = code20()
 	}
-	vd.ParseMode = parsemode
-	logs.DataWrittenSuccessfully(interfaceVideo, "Parse Mode")
+	return err
 }
 
-func (vd *video) WriteCaptionEntities(captionEntities []*types.MessageEntity) {
-	if !isItEmply(vd, checkArray, vd.CaptionEntities) {
-		logs.DataIsntEmply("Video", "Caption Entities", vd.CaptionEntities)
+func (vd *video) writeThumbnail(thumbnail, object string) error {
+	var err error
+	if vd.Thumbnail == "" {
+		vd.Thumbnail = thumbnail
+		logs.DataWrittenSuccessfully(interfaceVideo, object)
+	} else {
+		err = code10()
 	}
-	vd.CaptionEntities = captionEntities
-	logs.DataWrittenSuccessfully(interfaceVideo, "Caption Entities")
+	return err
 }
 
-func (vd *video) WriteShowCaptionAboveMedia() {
-	if !isItEmply(vd, checkBool, vd.ShowCaptionAboveMedia) {
-		logs.DataIsntEmply("Video", "Show Caption Above Media", vd.ShowCaptionAboveMedia)
+func (vd *video) WriteThumbnailStorage(thumbnail string) error {
+	var err error
+	if thumbnail != "" {
+		if err = isThumbnailCorrectType(thumbnail); err == nil {
+			vd.thumbnailGottenFrom = Storage
+			err = vd.writeThumbnail(thumbnail, "Thumbnail From Storage")
+		}
+	} else {
+		err = code20()
 	}
-	vd.ShowCaptionAboveMedia = true
-	logs.SettedParam("Show Caption Above Media", "Video", vd.ShowCaptionAboveMedia)
+	return err
 }
 
-func (vd *video) WriteWidth(width int) {
-	if !isItEmply(vd, checkInt, vd.Width) {
-		logs.DataIsntEmply("Video", "Width", vd.Width)
+func (vd *video) WriteThumbnailTelegram(thumbnail string) error {
+	var err error
+	if thumbnail != "" {
+		vd.thumbnailGottenFrom = Telegram
+		err = vd.writeThumbnail(thumbnail, "Thumbnail From Telegram")
+	} else {
+		err = code20()
 	}
-	vd.Width = width
-	logs.DataWrittenSuccessfully(interfaceVideo, "Width")
+	return err
 }
 
-func (vd *video) WriteHeight(height int) {
-	if !isItEmply(vd, checkInt, vd.Height) {
-		logs.DataIsntEmply("Video", "Height", vd.Height)
+func (vd *video) WriteThumbnailInternet(thumbnail string) error {
+	var err error
+	if thumbnail != "" {
+		vd.thumbnailGottenFrom = Internet
+		err = vd.writeThumbnail(thumbnail, "Thumbnail From the Internet")
+	} else {
+		err = code20()
 	}
-	vd.Height = height
-	logs.DataWrittenSuccessfully(interfaceVideo, "Height")
+	return err
 }
 
-func (vd *video) WriteDuration(duration int) {
-	if !isItEmply(vd, checkInt, vd.Duration) {
-		logs.DataIsntEmply("Video", "Duration", vd.Duration)
+func (vd *video) WriteCaption(caption string) error {
+	var err error
+	if caption != "" {
+		if vd.Caption == "" {
+			vd.Caption = caption
+			logs.DataWrittenSuccessfully(interfaceVideo, "Caption")
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
 	}
-	vd.Duration = duration
-	logs.DataWrittenSuccessfully(interfaceVideo, "Duration")
+	return err
 }
 
-func (vd *video) WriteSupportsStreaming() {
-	if !isItEmply(vd, checkBool, vd.SupportsStreaming) {
-		logs.DataIsntEmply("Video", "Supports Streaming", vd.SupportsStreaming)
+func (vd *video) WriteParseMode(parsemode string) error {
+	var err error
+	if parsemode != types.HTML && parsemode != types.Markdown && parsemode != types.MarkdownV2 {
+		err = code20()
+	} else {
+		if vd.ParseMode == "" {
+			vd.ParseMode = parsemode
+			logs.DataWrittenSuccessfully(interfaceVideo, "Parse Mode")
+		} else {
+			err = code10()
+		}
 	}
-	vd.SupportsStreaming = true
-	logs.SettedParam("Supports Streaming", "Video", vd.SupportsStreaming)
+	return err
 }
 
-func (vd *video) WriteHasSpoiler() {
-	if !isItEmply(vd, checkBool, vd.HasSpoiler) {
-		logs.DataIsntEmply("Video", "Has Spoiler", vd.HasSpoiler)
+func (vd *video) WriteCaptionEntities(captionEntities []*types.MessageEntity) error {
+	var err error
+	if len(captionEntities) != 0 {
+
+		for i := 0; (i < len(captionEntities)) && (err == nil); i++ {
+			if captionEntities[i] == nil {
+				err = code5()
+			}
+		}
+
+		if err == nil {
+			if len(vd.CaptionEntities) == 0 {
+				vd.CaptionEntities = captionEntities
+				logs.DataWrittenSuccessfully(interfaceVideo, "Caption Entities")
+			} else {
+				err = code10()
+			}
+		}
+	} else {
+		err = code20()
 	}
-	vd.HasSpoiler = true
-	logs.SettedParam("Has Spoiler", "Video", vd.SupportsStreaming)
+	return err
+}
+
+func (vd *video) WriteShowCaptionAboveMedia() error {
+	var err error
+	if !vd.ShowCaptionAboveMedia {
+		vd.ShowCaptionAboveMedia = true
+		logs.SettedParam("Show Caption Above Media", "Video", vd.ShowCaptionAboveMedia)
+	} else {
+		err = code10()
+	}
+	return err
+}
+
+func (vd *video) WriteWidth(width int) error {
+	var err error
+	if width > 0 {
+		if vd.Width == 0 {
+			vd.Width = width
+			logs.DataWrittenSuccessfully(interfaceVideo, "Width")
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (vd *video) WriteHeight(height int) error {
+	var err error
+	if height > 0 {
+		if vd.Height == 0 {
+			vd.Height = height
+			logs.DataWrittenSuccessfully(interfaceVideo, "Height")
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (vd *video) WriteDuration(duration int) error {
+	var err error
+	if duration > 0 {
+		if vd.Duration == 0 {
+			vd.Duration = duration
+			logs.DataWrittenSuccessfully(interfaceVideo, "Duration")
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (vd *video) WriteSupportsStreaming() error {
+	var err error
+	if !vd.SupportsStreaming {
+		vd.SupportsStreaming = true
+		logs.SettedParam("Supports Streaming", "Video", vd.SupportsStreaming)
+	} else {
+		err = code10()
+	}
+	return err
+}
+
+func (vd *video) WriteHasSpoiler() error {
+	var err error
+	if !vd.HasSpoiler {
+		vd.HasSpoiler = true
+		logs.SettedParam("Has Spoiler", "Video", vd.SupportsStreaming)
+	} else {
+		err = code10()
+	}
+	return err
 }
 
 func (vd *video) GetResponse() types.Video {
 	return vd.response
 }
 
-func (ad *audio) writeAudio(audio, object string) {
-	if !isItEmply(ad, checkString, ad.Audio) {
-		logs.DataIsntEmply(interfaceAudio, "Audio", ad.Audio)
+func (ad *audio) writeAudio(audio, object string) error {
+	var err error
+	if ad.Audio == "" {
+		ad.Audio, ad.Media = audio, audio
+		logs.DataWrittenSuccessfully(interfaceAudio, object)
+	} else {
+		err = code10()
 	}
-	ad.Audio, ad.Media = audio, audio
-	logs.DataWrittenSuccessfully(interfaceAudio, object)
+	return err
 }
 
-func (ad *audio) WriteAudioStorage(audio string) {
-	ad.AudioGottenFrom = Storage
-	ad.writeAudio(audio, "Audio From Storage")
-}
-
-func (ad *audio) WriteAudioTelegram(audio string) {
-	ad.AudioGottenFrom = Telegram
-	ad.writeAudio(audio, "Audio From Telegram")
-}
-
-func (ad *audio) WriteAudioInternet(audio string) {
-	ad.AudioGottenFrom = Internet
-	ad.writeAudio(audio, "Audio From the Internet")
-}
-
-func (ad *audio) writeThumbnail(thumbnail, object string) {
-	if !isItEmply(ad, checkString, ad.Thumbnail) {
-		logs.DataIsntEmply("Audio", "Thumbnail", ad.Thumbnail)
+func (ad *audio) WriteAudioStorage(audio string) error {
+	var err error
+	if audio != "" {
+		if err = ad.isCorrectType(audio); err == nil {
+			ad.audioGottenFrom = Storage
+			err = ad.writeAudio(audio, "Audio From Storage")
+		}
+	} else {
+		err = code20()
 	}
-	ad.Thumbnail = thumbnail
-	logs.DataWrittenSuccessfully(interfaceAudio, object)
+	return err
 }
 
-func (ad *audio) WriteThumbnailStorage(thumbnail string) {
-	ad.ThumbnailGottenFrom = Storage
-	ad.writeThumbnail(thumbnail, "Thumbnail From Storage")
-}
-
-func (ad *audio) WriteThumbnailTelegram(thumbnail string) {
-	ad.ThumbnailGottenFrom = Telegram
-	ad.writeThumbnail(thumbnail, "Thumbnail From Telegram")
-}
-
-func (ad *audio) WriteThumbnailInternet(thumbnail string) {
-	ad.ThumbnailGottenFrom = Internet
-	ad.writeThumbnail(thumbnail, "Thumbnail From the Internet")
-}
-
-func (ad *audio) WriteCaption(caption string) {
-	if !isItEmply(ad, checkString, ad.Caption) {
-		logs.DataIsntEmply("Audio", "Caption", ad.Caption)
+func (ad *audio) WriteAudioTelegram(audio string) error {
+	var err error
+	if audio != "" {
+		ad.audioGottenFrom = Telegram
+		err = ad.writeAudio(audio, "Audio From Telegram")
+	} else {
+		err = code20()
 	}
-	ad.Caption = caption
-	logs.DataWrittenSuccessfully(interfaceAudio, "Caption")
+	return err
 }
 
-func (ad *audio) WriteParseMode(parsemode string) {
-	if !isItEmply(ad, checkString, ad.ParseMode) {
-		logs.DataIsntEmply("Audio", "Parse Mode", ad.ParseMode)
+func (ad *audio) WriteAudioInternet(audio string) error {
+	var err error
+	if audio != "" {
+		ad.audioGottenFrom = Internet
+		err = ad.writeAudio(audio, "Audio From the Internet")
+	} else {
+		err = code20()
 	}
-	ad.ParseMode = parsemode
-	logs.DataWrittenSuccessfully(interfaceAudio, "Parse Mode")
+	return err
 }
 
-func (ad *audio) WriteCaptionEntities(captionEntities []*types.MessageEntity) {
-	if !isItEmply(ad, checkArray, ad.CaptionEntities) {
-		logs.DataIsntEmply("Audio", "Caption Entities", ad.CaptionEntities)
+func (ad *audio) writeThumbnail(thumbnail, object string) error {
+	var err error
+	if ad.Thumbnail == "" {
+		ad.Thumbnail = thumbnail
+		logs.DataWrittenSuccessfully(interfaceAudio, object)
+	} else {
+		err = code10()
 	}
-	ad.CaptionEntities = captionEntities
-	logs.DataWrittenSuccessfully(interfaceAudio, "Caption Entities")
+	return err
 }
 
-func (ad *audio) WriteDuration(duration int) {
-	if !isItEmply(ad, checkInt, ad.Duration) {
-		logs.DataIsntEmply("Audio", "Duration", ad.Duration)
+func (ad *audio) WriteThumbnailStorage(thumbnail string) error {
+	var err error
+	if thumbnail != "" {
+		if err = isThumbnailCorrectType(thumbnail); err == nil {
+			ad.thumbnailGottenFrom = Storage
+			err = ad.writeThumbnail(thumbnail, "Thumbnail From Storage")
+		}
+	} else {
+		err = code20()
 	}
-	ad.Duration = duration
-	logs.DataWrittenSuccessfully(interfaceAudio, "Duration")
+	return err
 }
 
-func (ad *audio) WritePerformer(performer string) {
-	if !isItEmply(ad, checkString, ad.Performer) {
-		logs.DataIsntEmply("Audio", "Performer", ad.Performer)
+func (ad *audio) WriteThumbnailTelegram(thumbnail string) error {
+	var err error
+	if thumbnail != "" {
+		ad.thumbnailGottenFrom = Telegram
+		err = ad.writeThumbnail(thumbnail, "Thumbnail From Telegram")
+	} else {
+		err = code20()
 	}
-	ad.Performer = performer
-	logs.DataWrittenSuccessfully(interfaceAudio, "Performer")
+	return err
 }
 
-func (ad *audio) WriteTitle(title string) {
-	if !isItEmply(ad, checkString, ad.Title) {
-		logs.DataIsntEmply("Audio", "Title", ad.Title)
+func (ad *audio) WriteThumbnailInternet(thumbnail string) error {
+	var err error
+	if thumbnail != "" {
+		ad.thumbnailGottenFrom = Internet
+		err = ad.writeThumbnail(thumbnail, "Thumbnail From the Internet")
+	} else {
+		err = code20()
 	}
-	ad.Title = title
-	logs.DataWrittenSuccessfully(interfaceAudio, "Title")
+	return err
+}
+
+func (ad *audio) WriteCaption(caption string) error {
+	var err error
+	if caption != "" {
+		if ad.Caption == "" {
+			ad.Caption = caption
+			logs.DataWrittenSuccessfully(interfaceAudio, "Caption")
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (ad *audio) WriteParseMode(parsemode string) error {
+	var err error
+	if (parsemode != types.HTML) && (parsemode != types.Markdown) && (parsemode != types.MarkdownV2) {
+		err = code20()
+	} else {
+		if ad.ParseMode == "" {
+			ad.ParseMode = parsemode
+			logs.DataWrittenSuccessfully(interfaceAudio, "Parse Mode")
+		} else {
+			err = code10()
+		}
+	}
+	return err
+}
+
+func (ad *audio) WriteCaptionEntities(captionEntities []*types.MessageEntity) error {
+	var err error
+	if len(captionEntities) != 0 {
+
+		for i := 0; (i < len(captionEntities)) && (err == nil); i++ {
+			if captionEntities[i] == nil {
+				err = code5()
+			}
+		}
+
+		if err == nil {
+			if len(ad.CaptionEntities) == 0 {
+				ad.CaptionEntities = captionEntities
+				logs.DataWrittenSuccessfully(interfaceAudio, "Caption Entities")
+			} else {
+				err = code10()
+			}
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (ad *audio) WriteDuration(duration int) error {
+	var err error
+	if duration != 0 {
+		if ad.Duration == 0 {
+			ad.Duration = duration
+			logs.DataWrittenSuccessfully(interfaceAudio, "Duration")
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (ad *audio) WritePerformer(performer string) error {
+	var err error
+	if performer != "" {
+		if ad.Performer == "" {
+			ad.Performer = performer
+			logs.DataWrittenSuccessfully(interfaceAudio, "Performer")
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (ad *audio) WriteTitle(title string) error {
+	var err error
+	if title != "" {
+		if ad.Title == "" {
+			ad.Title = title
+			logs.DataWrittenSuccessfully(interfaceAudio, "Title")
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
+	}
+	return err
 }
 
 func (ad *audio) GetResponse() types.Audio {
 	return ad.response
 }
 
-func (dc *document) writeDocument(document, object string) {
-	if !isItEmply(dc, checkString, dc.Document) {
-		logs.DataIsntEmply("Document", "Document", dc.Document)
+func (dc *document) writeDocument(document, object string) error {
+	var err error
+	if dc.Document == "" {
+		dc.Document = document
+		logs.DataWrittenSuccessfully(interfaceDocument, object)
+	} else {
+		err = code10()
 	}
-	dc.Document = document
-	logs.DataWrittenSuccessfully(interfaceDocument, object)
+	return err
 }
 
-func (dc *document) WriteDocumentStorage(document string) {
-	dc.DocumentGottenFrom = Storage
-	dc.writeDocument(document, "Document From Storage")
-}
-
-func (dc *document) WriteDocumentTelegram(document string) {
-	dc.DocumentGottenFrom = Telegram
-	dc.writeDocument(document, "Document From Telegram")
-}
-
-func (dc *document) WriteDocumentInternet(document string) {
-	dc.DocumentGottenFrom = Internet
-	dc.writeDocument(document, "Document From the Internet")
-}
-
-func (dc *document) writeThumbnail(thumbnail, object string) {
-	if !isItEmply(dc, checkString, dc.Thumbnail) {
-		logs.DataIsntEmply("Document", "Thumbnail", dc.Thumbnail)
+func (dc *document) WriteDocumentStorage(document string) error {
+	var err error
+	if document != "" {
+		dc.documentGottenFrom = Storage
+		err = dc.writeDocument(document, "Document From Storage")
+	} else {
+		err = code20()
 	}
-	dc.Thumbnail = thumbnail
-	logs.DataWrittenSuccessfully(interfaceDocument, object)
+	return err
 }
 
-func (dc *document) WriteThumbnailStorage(thumbnail string) {
-	dc.ThumbnailGottenFrom = Storage
-	dc.writeThumbnail(thumbnail, "Thumbnail From Storage")
-}
-
-func (dc *document) WriteThumbnailTelegram(thumbnail string) {
-	dc.ThumbnailGottenFrom = Telegram
-	dc.writeThumbnail(thumbnail, "Thumbnail From Telegram")
-}
-
-func (dc *document) WriteThumbnailInternet(thumbnail string) {
-	dc.ThumbnailGottenFrom = Internet
-	dc.writeThumbnail(thumbnail, "Thumbnail From the Internet")
-}
-
-func (dc *document) WriteCaption(caption string) {
-	if !isItEmply(dc, checkString, dc.Caption) {
-		logs.DataIsntEmply("Document", "Caption", dc.Caption)
+func (dc *document) WriteDocumentTelegram(document string) error {
+	var err error
+	if document != "" {
+		dc.documentGottenFrom = Telegram
+		err = dc.writeDocument(document, "Document From Telegram")
+	} else {
+		err = code20()
 	}
-	dc.Caption = caption
-	logs.DataWrittenSuccessfully(interfaceDocument, "Caption")
+	return err
 }
 
-func (dc *document) WriteParseMode(parsemode string) {
-	if !isItEmply(dc, checkString, dc.ParseMode) {
-		logs.DataIsntEmply("Document", "Parse Mode", dc.ParseMode)
+func (dc *document) WriteDocumentInternet(document string) error {
+	var err error
+	if document != "" {
+		dc.documentGottenFrom = Internet
+		err = dc.writeDocument(document, "Document From the Internet")
+	} else {
+		err = code20()
 	}
-	dc.ParseMode = parsemode
-	logs.DataWrittenSuccessfully(interfaceDocument, "Parse Mode")
+	return err
 }
 
-func (dc *document) WriteCaptionEntities(captionEntities []*types.MessageEntity) {
-	if !isItEmply(dc, checkArray, dc.CaptionEntities) {
-		logs.DataIsntEmply("Document", "Caption Entities", dc.CaptionEntities)
+func (dc *document) writeThumbnail(thumbnail, object string) error {
+	var err error
+	if dc.Thumbnail == "" {
+		dc.Thumbnail = thumbnail
+		logs.DataWrittenSuccessfully(interfaceDocument, object)
+	} else {
+		err = code10()
 	}
-	dc.CaptionEntities = captionEntities
-	logs.DataWrittenSuccessfully(interfaceDocument, "Caption Entities")
+	return err
 }
 
-func (dc *document) WriteDisableContentTypeDetection() {
-	if !isItEmply(dc, checkArray, dc.DisableContentTypeDetection) {
-		logs.DataIsntEmply("Document", "Disable Content Type Detection", dc.DisableContentTypeDetection)
+func (dc *document) WriteThumbnailStorage(thumbnail string) error {
+	var err error
+	if thumbnail != "" {
+		if err = isThumbnailCorrectType(thumbnail); err == nil {
+			dc.thumbnailGottenFrom = Storage
+			err = dc.writeThumbnail(thumbnail, "Thumbnail From Storage")
+		}
+	} else {
+		err = code20()
 	}
-	dc.DisableContentTypeDetection = true
-	logs.SettedParam("Disable Content Type Detection", "Document", dc.DisableContentTypeDetection)
+	return err
 }
 
-func (dc *document) WriteGottenFrom(gottenfrom int) {
-	if !isItEmply(dc, checkInt, dc.DocumentGottenFrom) {
-		logs.DataIsntEmply(interfaceDocument, "Gotten From", dc.DocumentGottenFrom)
+func (dc *document) WriteThumbnailTelegram(thumbnail string) error {
+	var err error
+	if thumbnail != "" {
+		dc.thumbnailGottenFrom = Telegram
+		err = dc.writeThumbnail(thumbnail, "Thumbnail From Telegram")
+	} else {
+		err = code20()
 	}
-	dc.DocumentGottenFrom = gottenfrom
-	logs.DataWrittenSuccessfully(interfaceDocument, "Gotten From")
+	return err
 }
 
-func (dc *document) WriteThumbnailGottenFrom(gottenfrom int) {
-	if !isItEmply(dc, checkInt, dc.ThumbnailGottenFrom) {
-		logs.DataIsntEmply(interfaceDocument, "Thumbnail Gotten From", dc.ThumbnailGottenFrom)
+func (dc *document) WriteThumbnailInternet(thumbnail string) error {
+	var err error
+	if thumbnail != "" {
+		dc.thumbnailGottenFrom = Internet
+		err = dc.writeThumbnail(thumbnail, "Thumbnail From the Internet")
+	} else {
+		err = code20()
 	}
-	dc.ThumbnailGottenFrom = gottenfrom
-	logs.DataWrittenSuccessfully(interfaceDocument, "Thumbnail Gotten From")
+	return err
+}
+
+func (dc *document) WriteCaption(caption string) error {
+	var err error
+	if caption != "" {
+		if dc.Caption == "" {
+			dc.Caption = caption
+			logs.DataWrittenSuccessfully(interfaceDocument, "Caption")
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (dc *document) WriteParseMode(parsemode string) error {
+	var err error
+	if (parsemode != types.HTML) && (parsemode != types.Markdown) && (parsemode != types.MarkdownV2) {
+		err = code20()
+	} else {
+		if dc.ParseMode == "" {
+			dc.ParseMode = parsemode
+			logs.DataWrittenSuccessfully(interfaceDocument, "Parse Mode")
+		} else {
+			err = code10()
+		}
+	}
+	return err
+}
+
+func (dc *document) WriteCaptionEntities(captionEntities []*types.MessageEntity) error {
+	var err error
+	if len(captionEntities) != 0 {
+
+		for i := 0; (i < len(captionEntities)) && (err == nil); i++ {
+			if captionEntities[i] == nil {
+				err = code5()
+			}
+		}
+
+		if err == nil {
+			if len(dc.CaptionEntities) == 0 {
+				dc.CaptionEntities = captionEntities
+				logs.DataWrittenSuccessfully(interfaceDocument, "Caption Entities")
+			} else {
+				err = code10()
+			}
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (dc *document) WriteDisableContentTypeDetection() error {
+	var err error
+	if !dc.DisableContentTypeDetection {
+		dc.DisableContentTypeDetection = true
+		logs.SettedParam("Disable Content Type Detection", interfaceDocument, dc.DisableContentTypeDetection)
+	} else {
+		err = code10()
+	}
+	return err
 }
 
 func (dc *document) GetResponse() types.Document {
 	return dc.response
 }
 
-func (an *animation) writeAnimation(animation, object string) {
-	if !isItEmply(an, checkString, an.Animation) {
-		logs.DataIsntEmply("WriteAnimation{Storage/Telegram/URL}()", interfaceAnimation, an.Animation)
+func (an *animation) writeAnimation(animation, object string) error {
+	var err error
+	if an.Animation == "" {
+		an.Animation = animation
+		logs.DataWrittenSuccessfully(interfaceAnimation, object)
+	} else {
+		err = code10()
 	}
-	an.Animation = animation
-	logs.DataWrittenSuccessfully(interfaceAnimation, object)
+	return err
 }
 
-func (an *animation) WriteAnimationStorage(animation string) {
-	an.AnimationGottenFrom = Storage
-	an.writeAnimation(animation, "Animation From Storage")
-}
-
-func (an *animation) WriteAnimationTelegram(animation string) {
-	an.AnimationGottenFrom = Telegram
-	an.writeAnimation(animation, "Animation From Telegram")
-}
-
-func (an *animation) WriteAnimationInternet(animation string) {
-	an.AnimationGottenFrom = Internet
-	an.writeAnimation(animation, "Animation From Internet")
-}
-
-func (an *animation) WriteDuration(dur int) {
-	if !isItEmply(an, checkInt, an.Duration) {
-		logs.DataIsntEmply("WriteDuration()", interfaceAnimation, an.Duration)
+func (an *animation) WriteAnimationStorage(animation string) error {
+	var err error
+	if animation != "" {
+		if err = an.isCorrectType(animation); err == nil {
+			an.animationGottenFrom = Storage
+			err = an.writeAnimation(animation, "Animation From Storage")
+		}
+	} else {
+		err = code20()
 	}
-	an.Duration = dur
-	logs.DataWrittenSuccessfully(interfaceAnimation, "Duration")
+	return err
 }
 
-func (an *animation) WriteWidth(width int) {
-	if !isItEmply(an, checkInt, an.Width) {
-		logs.DataIsntEmply("WriteWidth()", interfaceAnimation, an.Width)
+func (an *animation) WriteAnimationTelegram(animation string) error {
+	var err error
+	if animation != "" {
+		an.animationGottenFrom = Telegram
+		err = an.writeAnimation(animation, "Animation From Telegram")
+	} else {
+		err = code20()
 	}
-	an.Width = width
-	logs.DataWrittenSuccessfully(interfaceAnimation, "Width")
+	return err
 }
 
-func (an *animation) WriteHeight(height int) {
-	if !isItEmply(an, checkInt, an.Height) {
-		logs.DataIsntEmply("WriteHeight()", interfaceAnimation, an.Height)
+func (an *animation) WriteAnimationInternet(animation string) error {
+	var err error
+	if animation != "" {
+		an.animationGottenFrom = Internet
+		err = an.writeAnimation(animation, "Animation From Internet")
+	} else {
+		err = code20()
 	}
-	an.Height = height
-	logs.DataWrittenSuccessfully(interfaceAnimation, "Height")
+	return err
 }
 
-func (an *animation) writeThumbnail(thumbnail, object string) {
-	if !isItEmply(an, checkString, an.Thumbnail) {
-		logs.DataIsntEmply("WriteThumbnail{Storage/Telegram/URL}()", interfaceAnimation, an.Thumbnail)
+func (an *animation) WriteDuration(duration int) error {
+	var err error
+	if duration > 0 {
+		if an.Duration == 0 {
+			an.Duration = duration
+			logs.DataWrittenSuccessfully(interfaceAnimation, "Duration")
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
 	}
-	an.Thumbnail = thumbnail
-	logs.DataWrittenSuccessfully(interfaceAnimation, object)
+	return err
 }
 
-func (an *animation) WriteThumbnailStorage(path string) {
-	an.ThumbnailGottenFrom = Storage
-	an.writeThumbnail(path, "Thumbnail From Storage")
-}
-
-func (an *animation) WriteThumbnailTelegram(path string) {
-	an.ThumbnailGottenFrom = Telegram
-	an.writeThumbnail(path, "Thumbnail From Telegram")
-}
-
-func (an *animation) WriteThumbnailInternet(path string) {
-	an.ThumbnailGottenFrom = Internet
-	an.writeThumbnail(path, "Thumbnail From Internet")
-}
-
-func (an *animation) WriteHasSpoiler() {
-	if !isItEmply(an, checkBool, an.HasSpoiler) {
-		logs.DataIsntEmply("WriteHasSpoiler()", interfaceAnimation, an.HasSpoiler)
+func (an *animation) WriteWidth(width int) error {
+	var err error
+	if width > 0 {
+		if an.Width == 0 {
+			an.Width = width
+			logs.DataWrittenSuccessfully(interfaceAnimation, "Width")
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
 	}
-	an.HasSpoiler = true
-	logs.DataWrittenSuccessfully(interfaceAnimation, "Has Spoiler")
+	return err
+}
+
+func (an *animation) WriteHeight(height int) error {
+	var err error
+	if height > 0 {
+		if an.Height == 0 {
+			an.Height = height
+			logs.DataWrittenSuccessfully(interfaceAnimation, "Height")
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (an *animation) writeThumbnail(thumbnail, object string) error {
+	var err error
+	if an.Thumbnail == "" {
+		an.Thumbnail = thumbnail
+		logs.DataWrittenSuccessfully(interfaceAnimation, object)
+	} else {
+		err = code10()
+	}
+	return err
+}
+
+func (an *animation) WriteThumbnailStorage(thumbnail string) error {
+	var err error
+	if thumbnail != "" {
+		if err = isThumbnailCorrectType(thumbnail); err == nil {
+			an.thumbnailGottenFrom = Storage
+			err = an.writeThumbnail(thumbnail, "Thumbnail From Storage")
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (an *animation) WriteThumbnailTelegram(thumbnail string) error {
+	var err error
+	if thumbnail != "" {
+		an.thumbnailGottenFrom = Telegram
+		err = an.writeThumbnail(thumbnail, "Thumbnail From Telegram")
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (an *animation) WriteThumbnailInternet(thumbnail string) error {
+	var err error
+	if thumbnail != "" {
+		an.thumbnailGottenFrom = Internet
+		err = an.writeThumbnail(thumbnail, "Thumbnail From Internet")
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (an *animation) WriteHasSpoiler() error {
+	var err error
+	if !an.HasSpoiler {
+		an.HasSpoiler = true
+		logs.DataWrittenSuccessfully(interfaceAnimation, "Has Spoiler")
+	} else {
+		err = code10()
+	}
+	return err
 }
 
 func (an *animation) GetResponse() types.Animation {
 	return an.response
 }
 
-func (vc *voice) writeVoice(voice, object string) {
-	if !isItEmply(vc, checkString, vc.Voice) {
-		logs.DataIsntEmply("WriteVoice{Storage/Telegram/URL}()", interfaceVoice, vc.Voice)
+func (vc *voice) writeVoice(voice, object string) error {
+	var err error
+	if vc.Voice == "" {
+		vc.Voice = voice
+		logs.DataWrittenSuccessfully(interfaceVoice, object)
+	} else {
+		err = code10()
 	}
-	vc.Voice = voice
-	logs.DataWrittenSuccessfully(interfaceVoice, object)
+	return err
 }
 
-func (vc *voice) WriteVoiceStorage(path string) {
-	vc.gottenFrom = Storage
-	vc.writeVoice(path, "Animation From Storage")
-}
-
-func (vc *voice) WriteVoiceTelegram(voiceID string) {
-	vc.gottenFrom = Telegram
-	vc.writeVoice(voiceID, "Animation From Telegram")
-}
-
-func (vc *voice) WriteVoiceInternet(URL string) {
-	vc.gottenFrom = Internet
-	vc.writeVoice(URL, "Animation From Internet")
-}
-
-func (vc *voice) WriteDuration(dur int) {
-	if !isItEmply(vc, checkInt, vc.Duration) {
-		logs.DataIsntEmply("WriteDuration()", interfaceVoice, vc.Duration)
+func (vc *voice) WriteVoiceStorage(voice string) error {
+	var err error
+	if voice != "" {
+		if err = vc.isCorrectType(voice); err == nil {
+			vc.gottenFrom = Storage
+			err = vc.writeVoice(voice, "Animation From Storage")
+		}
+	} else {
+		err = code20()
 	}
-	vc.Duration = dur
-	logs.DataWrittenSuccessfully(interfaceVoice, "Duration")
+	return err
+}
+
+func (vc *voice) WriteVoiceTelegram(voiceID string) error {
+	var err error
+	if voiceID != "" {
+		vc.gottenFrom = Telegram
+		err = vc.writeVoice(voiceID, "Animation From Telegram")
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (vc *voice) WriteVoiceInternet(URL string) error {
+	var err error
+	if URL != "" {
+		vc.gottenFrom = Internet
+		err = vc.writeVoice(URL, "Animation From Internet")
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (vc *voice) WriteDuration(duration int) error {
+	var err error
+	if duration > 0 {
+		if vc.Duration == 0 {
+			vc.Duration = duration
+			logs.DataWrittenSuccessfully(interfaceVoice, "Duration")
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
+	}
+	return err
 }
 
 func (vc *voice) GetResponse() types.Voice {
 	return vc.response
 }
 
-func (vdn *videonote) writeVideoNote(videonote, object string) {
-	if !isItEmply(vdn, checkString, vdn.VideoNote) {
-		logs.DataIsntEmply("WriteVideoNote{Storage/Telegram/URL}()", interfaceVideoNote, vdn.VideoNote)
+func (vdn *videonote) writeVideoNote(videonote, object string) error {
+	var err error
+	if vdn.VideoNote == "" {
+		vdn.VideoNote = videonote
+		logs.DataWrittenSuccessfully(interfaceVoice, object)
+	} else {
+		err = code10()
 	}
-	vdn.VideoNote = videonote
-	logs.DataWrittenSuccessfully(interfaceVoice, object)
+	return err
 }
 
-func (vdn *videonote) WriteVideoNoteStorage(path string) {
-	vdn.videoGottenFrom = Storage
-	vdn.writeVideoNote(path, "Video-Note From Storage")
-}
-
-func (vdn *videonote) WriteVideoNoteTelegram(path string) {
-	vdn.videoGottenFrom = Telegram
-	vdn.writeVideoNote(path, "Video-Note From Storage")
-}
-
-func (vdn *videonote) WriteVideoNoteInternet(path string) {
-	vdn.videoGottenFrom = Internet
-	vdn.writeVideoNote(path, "Video-Note From Storage")
-}
-
-func (vdn *videonote) WriteDuration(dur int) {
-	if !isItEmply(vdn, checkInt, vdn.Duration) {
-		logs.DataIsntEmply("WriteDuration()", interfaceVideoNote, vdn.Duration)
+func (vdn *videonote) WriteVideoNoteStorage(videonote string) error {
+	var err error
+	if videonote != "" {
+		if err = vdn.isCorrectType(videonote); err == nil {
+			vdn.videoGottenFrom = Storage
+			err = vdn.writeVideoNote(videonote, "Video-Note From Storage")
+		}
+	} else {
+		err = code20()
 	}
-	vdn.Duration = dur
-	logs.DataWrittenSuccessfully(interfaceVideoNote, "Duration")
+	return err
 }
 
-func (vdn *videonote) WriteLength(length int) {
-	if !isItEmply(vdn, checkInt, vdn.Length) {
-		logs.DataIsntEmply("WriteLength()", interfaceVideoNote, vdn.Length)
+func (vdn *videonote) WriteVideoNoteTelegram(vdnID string) error {
+	var err error
+	if vdnID != "" {
+		vdn.videoGottenFrom = Telegram
+		err = vdn.writeVideoNote(vdnID, "Video-Note From Telegram")
+	} else {
+		err = code20()
 	}
-	vdn.Length = length
-	logs.DataWrittenSuccessfully(interfaceVideoNote, "Length")
+	return err
 }
 
-func (vdn *videonote) writeThumbnail(thumb, object string) {
-	if !isItEmply(vdn, checkString, vdn.Thumbnail) {
-		logs.DataIsntEmply("WriteThumbnail{Storage/Telegram/URL}()", interfaceVideoNote, vdn.Thumbnail)
+func (vdn *videonote) WriteVideoNoteInternet(URL string) error {
+	var err error
+	if URL != "" {
+		vdn.videoGottenFrom = Internet
+		err = vdn.writeVideoNote(URL, "Video-Note From Internet")
+	} else {
+		err = code20()
 	}
-	vdn.Thumbnail = thumb
-	logs.DataWrittenSuccessfully(interfaceVideoNote, object)
+	return err
 }
 
-func (vdn *videonote) WriteThumbnailStorage(path string) {
-	vdn.thumbnailGottenFrom = Storage
-	vdn.writeThumbnail(path, "Thumbnail From Storage")
+func (vdn *videonote) WriteDuration(duration int) error {
+	var err error
+	if duration > 0 {
+		if vdn.Duration == 0 {
+			vdn.Duration = duration
+			logs.DataWrittenSuccessfully(interfaceVideoNote, "Duration")
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
+	}
+	return err
 }
 
-func (vdn *videonote) WriteThumbnailTelegram(ID string) {
-	vdn.thumbnailGottenFrom = Telegram
-	vdn.writeThumbnail(ID, "Thumbnail From Telegram")
+func (vdn *videonote) WriteLength(length int) error {
+	var err error
+	if length > 0 {
+		if vdn.Length == 0 {
+			vdn.Length = length
+			logs.DataWrittenSuccessfully(interfaceVideoNote, "Length")
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
+	}
+	return err
 }
 
-func (vdn *videonote) WriteThumbnailInternet(URL string) {
-	vdn.thumbnailGottenFrom = Internet
-	vdn.writeThumbnail(URL, "Thumbnail From Internet")
+func (vdn *videonote) writeThumbnail(thumb, object string) error {
+	var err error
+	if vdn.Thumbnail == "" {
+		vdn.Thumbnail = thumb
+		logs.DataWrittenSuccessfully(interfaceVideoNote, object)
+	} else {
+		err = code10()
+	}
+	return err
+}
+
+func (vdn *videonote) WriteThumbnailStorage(thumbnail string) error {
+	var err error
+	if thumbnail != "" {
+		if err = isThumbnailCorrectType(thumbnail); err == nil {
+			vdn.thumbnailGottenFrom = Storage
+			err = vdn.writeThumbnail(thumbnail, "Thumbnail From Storage")
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (vdn *videonote) WriteThumbnailTelegram(thumbnailID string) error {
+	var err error
+	if thumbnailID != "" {
+		vdn.thumbnailGottenFrom = Telegram
+		err = vdn.writeThumbnail(thumbnailID, "Thumbnail From Telegram")
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (vdn *videonote) WriteThumbnailInternet(URL string) error {
+	var err error
+	if URL != "" {
+		vdn.thumbnailGottenFrom = Internet
+		err = vdn.writeThumbnail(URL, "Thumbnail From Internet")
+	} else {
+		err = code20()
+	}
+	return err
 }
 
 func (vdn *videonote) GetResponse() types.VideoNote {
 	return vdn.response
 }
 
-func (inf *information) WriteString(text string) {
-	if inf.Text != "" {
-		logs.DataIsntEmply(interfaceInf, "Text", inf.Text)
+func (inf *information) WriteString(text string) error {
+	var err error
+	if text != "" {
+		if inf.Text == "" {
+			inf.Text = text
+			logs.DataWrittenSuccessfully(interfaceInf, "Text")
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
 	}
-	inf.Text = text
-	logs.DataWrittenSuccessfully(interfaceInf, "Text")
+	return err
 }
 
-func (inf *information) WriteParseMode(parsemode string) {
-	if inf.ParseMode != "" {
-		logs.DataIsntEmply(interfaceInf, "Parse Mode", inf.ParseMode)
+func (inf *information) WriteParseMode(parsemode string) error {
+	var err error
+	if (parsemode != types.HTML) && (parsemode != types.Markdown) && (parsemode != types.MarkdownV2) {
+		err = code20()
+	} else {
+		if inf.ParseMode == "" {
+			inf.ParseMode = parsemode
+			logs.DataWrittenSuccessfully(interfaceInf, "Parse Mode")
+		} else {
+			err = code10()
+		}
 	}
-	inf.ParseMode = parsemode
-	logs.DataWrittenSuccessfully(interfaceInf, "Parse Mode")
+	return err
 }
 
-func (inf *information) WriteMessageThreadID(messageID int) {
-	if inf.MessageThreadID != 0 {
-		logs.DataIsntEmply(interfaceInf, "Message Thread ID", inf.MessageThreadID)
+func (inf *information) WriteMessageThreadID(messageID int) error {
+	var err error
+	if messageID > 0 {
+		if inf.MessageID == 0 {
+			inf.MessageThreadID = messageID
+			logs.DataWrittenSuccessfully(interfaceInf, "Message Thread ID")
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
 	}
-	inf.MessageThreadID = messageID
-	logs.DataWrittenSuccessfully(interfaceInf, "Message Thread ID")
+	return err
 }
 
-func (inf *information) WriteDisableNotification() {
-	if inf.DisableNotification {
-		logs.DataIsntEmply(interfaceInf, "Disable Notification", inf.DisableNotification)
+func (inf *information) WriteDisableNotification() error {
+	var err error
+	if !inf.DisableNotification {
+		inf.DisableNotification = true
+		logs.SettedParam("Disable Notification", interfaceInf, inf.DisableNotification)
+	} else {
+		err = code10()
 	}
-	inf.DisableNotification = true
-	logs.SettedParam("Disable Notification", interfaceInf, inf.DisableNotification)
+	return err
 }
 
-func (inf *information) WriteProtectContent() {
-	if inf.ProtectContent {
-		logs.DataIsntEmply(interfaceInf, "Protect Content", inf.ProtectContent)
+func (inf *information) WriteProtectContent() error {
+	var err error
+	if !inf.ProtectContent {
+		inf.ProtectContent = true
+		logs.SettedParam("Protect Content", interfaceInf, inf.ProtectContent)
+	} else {
+		err = code10()
 	}
-	inf.ProtectContent = true
-	logs.SettedParam("Protect Content", interfaceInf, inf.ProtectContent)
+	return err
 }
 
-func (inf *information) WriteMessageEffectID(messageID string) {
-	if inf.MessageEffectID != "" {
-		logs.DataIsntEmply(interfaceInf, "Message Effect ID", inf.MessageEffectID)
+func (inf *information) WriteMessageEffectID(messageID string) error {
+	var err error
+	if messageID != "" {
+		if inf.MessageEffectID == "" {
+			inf.MessageEffectID = messageID
+			logs.DataWrittenSuccessfully(interfaceInf, "Message Effect ID")
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
 	}
-	inf.MessageEffectID = messageID
-	logs.DataWrittenSuccessfully(interfaceInf, "Message Effect ID")
+	return err
 }
 
-func (inf *information) WriteEntities(entities []*types.MessageEntity) {
-	if len(inf.Entities) != 0 {
-		logs.DataIsntEmply(interfaceInf, "Entities", inf.Entities)
+func (inf *information) WriteEntities(entities []*types.MessageEntity) error {
+	var err error
+	if len(entities) != 0 {
+
+		for i := 0; (i < len(entities)) && (err == nil); i++ {
+			if entities[i] == nil {
+				err = code5()
+			}
+		}
+
+		if err == nil {
+			if len(inf.Entities) == 0 {
+				inf.Entities = entities
+				logs.DataWrittenSuccessfully(interfaceInf, "Entities")
+			} else {
+				err = code10()
+			}
+		}
+	} else {
+		err = code20()
 	}
-	inf.Entities = entities
-	logs.DataWrittenSuccessfully(interfaceInf, "Entities")
+	return err
 }
 
-func (inf *information) WriteLinkPreviewOptions(lpo *types.LinkPreviewOptions) {
-	if inf.LinkPreviewOptions != nil {
-		logs.DataIsntEmply(interfaceInf, "Link Preview Options", inf.LinkPreviewOptions)
+func (inf *information) WriteLinkPreviewOptions(lpo *types.LinkPreviewOptions) error {
+	var err error
+	if lpo != nil {
+		if inf.LinkPreviewOptions == nil {
+			inf.LinkPreviewOptions = lpo
+			logs.DataWrittenSuccessfully(interfaceInf, "Link Preview Options")
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
 	}
-	inf.LinkPreviewOptions = lpo
-	logs.DataWrittenSuccessfully(interfaceInf, "Link Preview Options")
+	return err
 }
 
-func (inf *information) WriteMessageID(messageID int) {
-	if inf.MessageID != 0 {
-		logs.DataIsntEmply(interfaceInf, "Message ID", inf.MessageID)
+func (inf *information) WriteMessageID(messageID int) error {
+	var err error
+	if messageID > 0 {
+		if inf.MessageID == 0 {
+			inf.MessageID = messageID
+			logs.DataWrittenSuccessfully(interfaceInf, "Message ID")
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
 	}
-	inf.MessageID = messageID
-	logs.DataWrittenSuccessfully(interfaceInf, "Message ID")
+	return err
 }
 
 func (inf *information) WriteMessageIDs(messageIDs []int) error {
 	var err error
-	if inf.MessageIDs != nil {
-		logs.DataIsntEmply(interfaceInf, "Message IDs", inf.MessageIDs)
+	if len(messageIDs) > 0 {
+
+		for i := 0; (i < len(messageIDs)) && (err == nil); i++ {
+			if messageIDs[i] == 0 {
+				err = code5()
+			}
+		}
+
+		if err == nil {
+			if len(inf.MessageIDs) == 0 {
+				inf.MessageIDs = messageIDs
+				logs.DataWrittenSuccessfully(interfaceInf, "Message IDs")
+			} else {
+				err = code10()
+			}
+		}
+	} else {
+		err = code20()
 	}
-	inf.MessageIDs = messageIDs
-	logs.DataWrittenSuccessfully(interfaceInf, "Message IDs")
 	return err
 }
 
-func (inf *information) WriteCaption(caption string) {
-	if inf.Caption != "" {
-		logs.DataIsntEmply(interfaceInf, "Caption", inf.Caption)
+func (inf *information) WriteCaption(caption string) error {
+	var err error
+	if caption != "" {
+		if inf.Caption == "" {
+			inf.Caption = caption
+			logs.DataWrittenSuccessfully(interfaceInf, "Caption")
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
 	}
-	inf.Caption = caption
-	logs.DataWrittenSuccessfully(interfaceInf, "Caption")
+	return err
 }
 
-func (inf *information) WriteShowCaptionAboveMedia() {
-	if inf.ShowCaptionAboveMedia {
-		logs.DataIsntEmply(interfaceInf, "Show Caption Above Media", inf.ShowCaptionAboveMedia)
+func (inf *information) WriteShowCaptionAboveMedia() error {
+	var err error
+	if !inf.ShowCaptionAboveMedia {
+		inf.ShowCaptionAboveMedia = true
+		logs.DataWrittenSuccessfully(interfaceInf, "Show Caption Above Media")
+	} else {
+		err = code10()
 	}
-	inf.ShowCaptionAboveMedia = true
-	logs.DataWrittenSuccessfully(interfaceInf, "Show Caption Above Media")
+	return err
 }
 
-func (inf *information) WriteReplyParameters(reply *types.ReplyParameters) {
-	if inf.ReplyParameters != nil {
-		logs.DataIsntEmply(interfaceInf, "Reply Parameters", inf.ReplyParameters)
+func (inf *information) WriteReplyParameters(reply *types.ReplyParameters) error {
+	var err error
+	if reply != nil {
+
+		if len(reply.QuoteEntities) > 0 {
+			for i := 0; (i < len(reply.QuoteEntities)) && (err == nil); i++ {
+				if reply.QuoteEntities[i] == nil {
+					err = code5()
+				}
+			}
+		}
+
+		if err == nil {
+			switch ch := reply.ChatID.(type) {
+			case int:
+				if ch <= 0 {
+					err = code20()
+				}
+			case string:
+				if ch == "" {
+					err = code20()
+				}
+			default:
+				err = code999()
+			}
+
+			if err == nil {
+				if inf.ReplyParameters == nil {
+					inf.ReplyParameters = reply
+					logs.DataWrittenSuccessfully(interfaceInf, "Reply Parameters")
+				} else {
+					err = code10()
+				}
+			}
+		}
+
+	} else {
+		err = code20()
 	}
-	inf.ReplyParameters = reply
-	logs.DataWrittenSuccessfully(interfaceInf, "Reply Parameters")
+	return err
 }
 
-func (inf *information) WriteAllowPaidBroadcast() {
-	if inf.AllowPaidBroadcast {
-		logs.DataIsntEmply(interfaceInf, "Allow Paid Broadcast", inf.AllowPaidBroadcast)
+func (inf *information) WriteAllowPaidBroadcast() error {
+	var err error
+	if !inf.AllowPaidBroadcast {
+		inf.AllowPaidBroadcast = true
+		logs.DataWrittenSuccessfully(interfaceInf, "Allow Paid Broadcast")
+	} else {
+		err = code10()
 	}
-	inf.AllowPaidBroadcast = true
-	logs.DataWrittenSuccessfully(interfaceInf, "Allow Paid Broadcast")
+	return err
+}
+
+func (inf *information) WriteStarCount(amount int) error {
+	var err error
+	if amount > 0 {
+		if inf.StarCount == 0 {
+			inf.StarCount = amount
+			logs.DataWrittenSuccessfully(interfaceInf, "Star Count")
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (inf *information) WritePayload(payload string) error {
+	var err error
+	if payload != "" {
+		if inf.Payload == "" {
+			inf.Payload = payload
+			logs.DataWrittenSuccessfully(interfaceInf, "Payload")
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
+	}
+	return err
 }
 
 func (inf *information) GetResponse() types.User {
@@ -698,52 +1385,93 @@ func (inf *information) GetMessageIDs() []int {
 	return inf.responseMessageIDs
 }
 
-func (ch *chat) WriteChatID(chatID int) {
-	if ch.ID != nil {
-		logs.DataIsntEmply(interfaceChat, "Chat ID", ch.ID)
+func (ch *chat) WriteChatID(chatID int) error {
+	var err error
+	if chatID > 0 {
+		if ch.ID == nil {
+			ch.ID = chatID
+			logs.DataWrittenSuccessfully(interfaceChat, "Chat ID")
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
 	}
-	ch.ID = chatID
-	logs.DataWrittenSuccessfully(interfaceChat, "Chat ID")
+	return err
 }
 
-func (ch *chat) WriteChatName(chatname string) {
-	if ch.ID != nil {
-		logs.DataIsntEmply(interfaceChat, "Chat Name", ch.ID)
+func (ch *chat) WriteChatName(chatname string) error {
+	var err error
+	if chatname != "" {
+		if ch.ID == nil {
+			ch.ID = fmt.Sprint("@", chatname)
+			logs.DataWrittenSuccessfully(interfaceChat, "Chat Name")
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
 	}
-	ch.ID = fmt.Sprint("@", chatname)
-	logs.DataWrittenSuccessfully(interfaceChat, "Chat Name")
+	return err
 }
 
-func (ch *chat) WriteBusinessConnectionID(connectionID string) {
-	if ch.BusinessConnectionID != "" {
-		logs.DataIsntEmply(interfaceChat, "Business Connection ID", ch.BusinessConnectionID)
+func (ch *chat) WriteBusinessConnectionID(connectionID string) error {
+	var err error
+	if connectionID != "" {
+		if ch.BusinessConnectionID == "" {
+			ch.BusinessConnectionID = connectionID
+			logs.DataWrittenSuccessfully(interfaceChat, "Business Connection ID")
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
 	}
-	ch.BusinessConnectionID = connectionID
-	logs.DataWrittenSuccessfully(interfaceChat, "Business Connection ID")
+	return err
 }
 
-func (ch *chat) WriteFromChatID(chatID int) {
-	if ch.FromChatID != nil {
-		logs.DataIsntEmply(interfaceChat, "From Chat ID", ch.FromChatID)
+func (ch *chat) WriteFromChatID(chatID int) error {
+	var err error
+	if chatID > 0 {
+		if ch.FromChatID == nil {
+			ch.FromChatID = chatID
+			logs.DataWrittenSuccessfully(interfaceChat, "From Chat ID")
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
 	}
-	ch.FromChatID = chatID
-	logs.DataWrittenSuccessfully(interfaceChat, "From Chat ID")
+	return err
 }
 
-func (ch *chat) WriteFromChatName(chatname string) {
-	if ch.FromChatID != nil {
-		logs.DataIsntEmply(interfaceChat, "From Chat ID", ch.FromChatID)
+func (ch *chat) WriteFromChatName(chatname string) error {
+	var err error
+	if chatname != "" {
+		if ch.FromChatID == nil {
+			ch.FromChatID = fmt.Sprint("@", chatname)
+			logs.DataWrittenSuccessfully(interfaceChat, "From Chat ID")
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
 	}
-	ch.FromChatID = fmt.Sprint("@", chatname)
-	logs.DataWrittenSuccessfully(interfaceChat, "From Chat ID")
+	return err
 }
 
-func (in *inline) Set(plan []int) {
-	in.Keyboard = new(inlineKeyboard)
-	in.Keyboard.InlineKeyboard = make([][]*inlineKeyboardButton, len(plan))
-	for i := range in.Keyboard.InlineKeyboard {
-		in.Keyboard.InlineKeyboard[i] = make([]*inlineKeyboardButton, plan[i])
+func (in *inline) Set(plan []int) error {
+	var err error
+	if len(plan) > 0 {
+		in.Keyboard = new(inlineKeyboard)
+		in.Keyboard.InlineKeyboard = make([][]*inlineKeyboardButton, len(plan))
+		for i := range in.Keyboard.InlineKeyboard {
+			in.Keyboard.InlineKeyboard[i] = make([]*inlineKeyboardButton, plan[i])
+		}
+	} else {
+		err = code20()
 	}
+	return err
 }
 
 func (ch *chat) GetResponse() types.Chat {
@@ -752,200 +1480,423 @@ func (ch *chat) GetResponse() types.Chat {
 
 func (in *inline) NewButton(line, pos int) (IInlineButton, error) {
 	var err error
+	but := new(inlineKeyboardButton)
 
 	if (line >= 0) && (pos >= 0) && len(in.Keyboard.InlineKeyboard) > line && len(in.Keyboard.InlineKeyboard[line]) > pos {
 
-		if in.Keyboard.InlineKeyboard[line][pos] != nil {
-			logs.DataIsntEmply(interfaceInKB, fmt.Sprintf("%s line: %d, position: %d", button, line, pos), in.Keyboard.InlineKeyboard[line][pos])
+		if in.Keyboard.InlineKeyboard[line][pos] == nil {
+			in.Keyboard.InlineKeyboard[line][pos] = new(inlineKeyboardButton)
+			but = in.Keyboard.InlineKeyboard[line][pos]
+		} else {
+			err = code10()
 		}
-		in.Keyboard.InlineKeyboard[line][pos] = new(inlineKeyboardButton)
-
-		return in.Keyboard.InlineKeyboard[line][pos], nil
-
 	} else {
+		err = code20()
+	}
+	return but, err
+}
 
-		if len(in.Keyboard.InlineKeyboard) > line {
-			err = errors.ButtosDoesntFit("line", line)
-		} else if len(in.Keyboard.InlineKeyboard[line]) > pos {
-			err = errors.ButtosDoesntFit("pos", pos)
+func (inb *inlineKeyboardButton) WriteString(text string) error {
+	var err error
+	if text != "" {
+		if inb.Text == "" {
+			inb.Text = text
+			logs.DataWrittenSuccessfully(inbtn, "Text")
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (inb *inlineKeyboardButton) checkOthers() error {
+	var err error
+	for i := 0; (i < len(inb.storage)) && (err == nil); i++ {
+		if inb.storage[i] == added {
+			err = code25()
 		}
 	}
-	return nil, err
+	return err
 }
 
-func (inb *inlineKeyboardButton) WriteString(text string) {
-	if inb.Text != "" {
-		logs.DataIsntEmply(inbtn, "Text", inb.Text)
+func (inb *inlineKeyboardButton) WriteURL(url string) error {
+	var err error
+	if url != "" {
+		if inb.Url == "" {
+			err = inb.checkOthers()
+			if err == nil {
+				inb.storage[wURL] = added
+				inb.Url = url
+				logs.DataWrittenSuccessfully(inbtn, "URL")
+			}
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
 	}
-	inb.Text = text
-	logs.DataWrittenSuccessfully(inbtn, "Text")
+	return err
 }
 
-func (inb *inlineKeyboardButton) WriteURL(url string) {
-	if inb.Url != "" {
-		logs.DataIsntEmply(inbtn, "URL", inb.Url)
+func (inb *inlineKeyboardButton) WriteCallbackData(text string) error {
+	var err error
+	if text != "" {
+		if inb.CallbackData == "" {
+			err = inb.checkOthers()
+			if err == nil {
+				inb.storage[wCallback] = added
+				inb.CallbackData = text
+				logs.DataWrittenSuccessfully(inbtn, "Callback Data")
+			}
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
 	}
-	if inb.One < 1 {
-		inb.Url = url
-		inb.One++
-		logs.DataWrittenSuccessfully(inbtn, "URL")
-	}
+	return err
 }
 
-func (inb *inlineKeyboardButton) WriteCallbackData(text string) {
-	if inb.CallbackData != "" {
-		logs.DataIsntEmply(inbtn, "Callback Data", inb.CallbackData)
+func (inb *inlineKeyboardButton) WriteWebApp(wbapp *types.WebAppInfo) error {
+	var err error
+	if wbapp != nil && wbapp.Url != "" {
+		if inb.WebApp == nil {
+			err = inb.checkOthers()
+			if err == nil {
+				inb.storage[wWebApp] = added
+				inb.WebApp = wbapp
+				logs.DataWrittenSuccessfully(inbtn, "Web App")
+			}
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
 	}
-	inb.CallbackData = text
-	inb.One++
-	logs.DataWrittenSuccessfully(inbtn, "Callback Data")
+	return err
 }
 
-func (inb *inlineKeyboardButton) WriteWebApp(wbapp *types.WebAppInfo) {
-	if inb.WebApp != nil {
-		logs.DataIsntEmply(inbtn, "Web App", *inb.WebApp)
+func (inb *inlineKeyboardButton) WriteLoginUrl(logurl *types.LoginUrl) error {
+	var err error
+	if logurl != nil {
+		if inb.LoginUrl == nil {
+			err = inb.checkOthers()
+			if err == nil {
+				inb.storage[wLoginUrl] = added
+				inb.LoginUrl = logurl
+				logs.DataWrittenSuccessfully(inbtn, "Login URL")
+			}
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
 	}
-	inb.WebApp = wbapp
-	inb.One++
-	logs.DataWrittenSuccessfully(inbtn, "Web App")
+	return err
 }
 
-func (inb *inlineKeyboardButton) WriteLoginUrl(logurl *types.LoginUrl) {
-	if inb.LoginUrl != nil {
-		logs.DataIsntEmply(inbtn, "Login URL", *inb.LoginUrl)
+func (inb *inlineKeyboardButton) WriteSwitchInlineQuery(sw string) error {
+	var err error
+	if sw != "" {
+		if inb.SwitchInlineQuery == "" {
+			err = inb.checkOthers()
+			if err == nil {
+				inb.storage[wSwitchIn] = added
+				inb.SwitchInlineQuery = sw
+				logs.DataWrittenSuccessfully(inbtn, "Switch Inline Query")
+			}
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
 	}
-	inb.LoginUrl = logurl
-	inb.One++
-	logs.DataWrittenSuccessfully(inbtn, "Login URL")
+	return err
 }
 
-func (inb *inlineKeyboardButton) WriteSwitchInlineQuery(sw string) {
-	if inb.SwitchInlineQuery != "" {
-		logs.DataIsntEmply(inbtn, "Switch Inline Query", inb.SwitchInlineQuery)
+func (inb *inlineKeyboardButton) WriteSwitchInlineQueryCurrentChat(swcch string) error {
+	var err error
+	if swcch != "" {
+		if inb.SwitchInlineQueryCurrentChat == "" {
+			err = inb.checkOthers()
+			if err == nil {
+				inb.storage[wSwitchInQuery] = added
+				inb.SwitchInlineQueryCurrentChat = swcch
+				logs.DataWrittenSuccessfully(inbtn, "Switch Inline Query Current Chat")
+			}
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
 	}
-	inb.SwitchInlineQuery = sw
-	inb.One++
-	logs.DataWrittenSuccessfully(inbtn, "Switch Inline Query")
+	return err
 }
 
-func (inb *inlineKeyboardButton) WriteSwitchInlineQueryCurrentChat(swcch string) {
-	if inb.SwitchInlineQueryCurrentChat != "" {
-		logs.DataIsntEmply(inbtn, "Switch Inline Query Current Chat", inb.SwitchInlineQueryCurrentChat)
+func (inb *inlineKeyboardButton) WriteSwitchInlineQueryChosenChat(sw *types.SwitchInlineQueryChosenChat) error {
+	var err error
+	if sw != nil {
+		if inb.SwitchInlineQueryChosenChat == nil {
+			err = inb.checkOthers()
+			if err == nil {
+				inb.storage[wSwitchInQueryCh] = added
+				inb.SwitchInlineQueryChosenChat = sw
+				logs.DataWrittenSuccessfully(inbtn, "Switch Inline Query Chosen Chat")
+			}
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
 	}
-	inb.SwitchInlineQueryCurrentChat = swcch
-	inb.One++
-	logs.DataWrittenSuccessfully(inbtn, "Switch Inline Query Current Chat")
+	return err
 }
 
-func (inb *inlineKeyboardButton) WriteSwitchInlineQueryChosenChat(sw *types.SwitchInlineQueryChosenChat) {
-	if inb.SwitchInlineQueryChosenChat != nil {
-		logs.DataIsntEmply(inbtn, "Switch Inline Query Chosen Chat", inb.SwitchInlineQueryChosenChat)
+func (inb *inlineKeyboardButton) WriteCallbackGame(game *types.CallbackGame) error {
+	var err error
+	if inb.CallbackGame == nil {
+		err = inb.checkOthers()
+		if err == nil {
+			inb.storage[wGame] = added
+			inb.CallbackGame = game
+			logs.DataWrittenSuccessfully(inbtn, "Callback Game")
+		}
+	} else {
+		err = code10()
 	}
-	inb.SwitchInlineQueryChosenChat = sw
-	inb.One++
-	logs.DataWrittenSuccessfully(inbtn, "Switch Inline Query Chosen Chat")
+	return err
 }
 
-func (inb *inlineKeyboardButton) WriteCallbackGame(game *types.CallbackGame) {
-	if inb.CallbackGame != nil {
-		logs.DataIsntEmply(inbtn, "Callback Game", inb.CallbackGame)
+func (inb *inlineKeyboardButton) WritePay() error {
+	var err error
+	if !inb.Pay {
+		err = inb.checkOthers()
+		if err == nil {
+			inb.storage[wPay] = added
+			inb.Pay = true
+			logs.SettedParam("Pay", inbtn, true)
+		}
+	} else {
+		err = code10()
 	}
-	inb.CallbackGame = game
-	inb.One++
-	logs.DataWrittenSuccessfully(inbtn, "Callback Game")
+	return err
 }
 
-func (inb *inlineKeyboardButton) WritePay() {
-	if inb.Pay {
-		logs.DataIsntEmply(inbtn, "Pay", inb.Pay)
+func (rp *reply) Set(plan []int) error {
+	var err error
+	if len(plan) > 0 {
+		rp.Keyboard = new(replyKeyboard)
+		rp.Keyboard.Keyboard = make([][]*replyKeyboardButton, len(plan))
+		for i := range rp.Keyboard.Keyboard {
+			rp.Keyboard.Keyboard[i] = make([]*replyKeyboardButton, plan[i])
+		}
+	} else {
+		err = code20()
 	}
-	inb.Pay = true
-	inb.One++
-	logs.SettedParam("Pay", inbtn, true)
+	return err
 }
 
-func (rp *reply) Set(plan []int) {
-	rp.Keyboard = new(replyKeyboard)
-	rp.Keyboard.Keyboard = make([][]*replyKeyboardButton, len(plan))
-	for i := range rp.Keyboard.Keyboard {
-		rp.Keyboard.Keyboard[i] = make([]*replyKeyboardButton, plan[i])
+func (rp *reply) WriteIsPersistent() error {
+	var err error
+	if !rp.Keyboard.IsPersistent {
+		rp.Keyboard.IsPersistent = true
+		logs.SettedParam("Is Persistent", interfaceReplyKB, true)
+	} else {
+		err = code10()
 	}
+	return err
+}
+
+func (rp *reply) WriteResizeKeyboard() error {
+	var err error
+	if !rp.Keyboard.ResizeKeyboard {
+		rp.Keyboard.ResizeKeyboard = true
+		logs.SettedParam("Resize Keyboard", interfaceReplyKB, true)
+	} else {
+		err = code10()
+	}
+	return err
+}
+
+func (rp *reply) WriteOneTimeKeyboard() error {
+	var err error
+	if !rp.Keyboard.OneTimeKeyboard {
+		rp.Keyboard.OneTimeKeyboard = true
+		logs.SettedParam("One Time Keyboard", interfaceReplyKB, true)
+	} else {
+		err = code10()
+	}
+	return err
+}
+
+func (rp *reply) WriteInputFieldPlaceholder(placeholder string) error {
+	var err error
+	if placeholder != "" {
+		if rp.Keyboard.InputFieldPlaceholder == "" {
+			rp.Keyboard.InputFieldPlaceholder = placeholder
+			logs.DataWrittenSuccessfully(interfaceReplyKB, "Input Field Placeholder")
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (rp *reply) WriteSelective() error {
+	var err error
+	if !rp.Keyboard.Selective {
+		rp.Keyboard.Selective = true
+		logs.SettedParam("Selective", interfaceReplyKB, true)
+	} else {
+		err = code10()
+	}
+	return err
 }
 
 func (rp *reply) NewButton(line, pos int) (IReplyButton, error) {
 	var err error
+	but := new(replyKeyboardButton)
 
 	if (line >= 0) && (pos >= 0) && (len(rp.Keyboard.Keyboard) > line) && (len(rp.Keyboard.Keyboard[line]) > pos) {
 
-		if rp.Keyboard.Keyboard[line][pos] != nil {
-			logs.DataIsntEmply(interfaceReplyKB, fmt.Sprintf("%s line: %d, position: %d", button, line, pos), rp.Keyboard.Keyboard[line][pos])
+		if rp.Keyboard.Keyboard[line][pos] == nil {
+			rp.Keyboard.Keyboard[line][pos] = new(replyKeyboardButton)
+			but = rp.Keyboard.Keyboard[line][pos]
+		} else {
+			err = code10()
 		}
-		rp.Keyboard.Keyboard[line][pos] = new(replyKeyboardButton)
-
-		return rp.Keyboard.Keyboard[line][pos], nil
-
 	} else {
-		if len(rp.Keyboard.Keyboard) > line {
-			err = errors.ButtosDoesntFit("line", line)
-		} else if len(rp.Keyboard.Keyboard[line]) > pos {
-			err = errors.ButtosDoesntFit("pos", pos)
+		err = code20()
+	}
+	return but, err
+}
+
+func (rpb *replyKeyboardButton) checkOthers() error {
+	var err error
+	for i := 0; (i < len(rpb.storage)) && (err == nil); i++ {
+		if rpb.storage[i] == added {
+			err = code25()
 		}
 	}
-	return nil, err
+	return err
 }
 
-func (rpb *replyKeyboardButton) WriteString(text string) {
-	if rpb.Text != "" {
-		logs.DataIsntEmply(rpbtn, "Text", rpb.Text)
+func (rpb *replyKeyboardButton) WriteString(text string) error {
+	var err error
+	if text != "" {
+		if rpb.Text == "" {
+			rpb.Text = text
+			logs.DataWrittenSuccessfully(rpbtn, "Text")
+
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
 	}
-	rpb.Text = text
-	logs.DataWrittenSuccessfully(rpbtn, "Text")
+	return err
 }
 
-func (rpb *replyKeyboardButton) WriteRequestUsers(requs *types.KeyboardButtonRequestUsers) {
-	if rpb.RequestUsers != nil {
-		logs.DataIsntEmply(rpbtn, "Request Users", rpb.RequestUsers)
+func (rpb *replyKeyboardButton) WriteRequestUsers(requs *types.KeyboardButtonRequestUsers) error {
+	var err error
+	if requs != nil {
+		if rpb.RequestUsers == nil {
+			if err = rpb.checkOthers(); err == nil {
+				rpb.storage[wReqUsers] = added
+				rpb.RequestUsers = requs
+				logs.DataWrittenSuccessfully(rpbtn, "Request Users")
+			}
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
 	}
-	rpb.RequestUsers = requs
-	logs.DataWrittenSuccessfully(rpbtn, "Request Users")
+	return err
 }
 
-func (rpb *replyKeyboardButton) WriteRequestChat(reqch *types.KeyboardButtonRequestChat) {
-	if rpb.RequestChat != nil {
-		logs.DataIsntEmply(rpbtn, "Request Chat", rpb.RequestChat)
+func (rpb *replyKeyboardButton) WriteRequestChat(reqch *types.KeyboardButtonRequestChat) error {
+	var err error
+	if reqch != nil {
+		if rpb.RequestChat == nil {
+			if err = rpb.checkOthers(); err == nil {
+				rpb.storage[wReqChat] = added
+				rpb.RequestChat = reqch
+				logs.DataWrittenSuccessfully(rpbtn, "Request Chat")
+			}
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
 	}
-	rpb.RequestChat = reqch
-	logs.DataWrittenSuccessfully(rpbtn, "Request Chat")
+	return err
 }
 
-func (rpb *replyKeyboardButton) WriteRequestContact() {
-	if rpb.RequestContact {
-		logs.DataIsntEmply(rpbtn, "Request Contact", rpb.RequestContact)
+func (rpb *replyKeyboardButton) WriteRequestContact() error {
+	var err error
+	if !rpb.RequestContact {
+		if err = rpb.checkOthers(); err == nil {
+			rpb.storage[wReqContact] = added
+			rpb.RequestContact = true
+			logs.SettedParam("Request Contact", rpbtn, rpb.RequestContact)
+		}
+	} else {
+		err = code10()
 	}
-	rpb.RequestContact = true
-	logs.SettedParam("Request Contact", rpbtn, true)
+	return err
 }
 
-func (rpb *replyKeyboardButton) WriteRequestLocation() {
-	if rpb.RequestLocation {
-		logs.DataIsntEmply(rpbtn, "Request Location", rpb.RequestLocation)
+func (rpb *replyKeyboardButton) WriteRequestLocation() error {
+	var err error
+	if !rpb.RequestLocation {
+		if err = rpb.checkOthers(); err == nil {
+			rpb.storage[wReqLocation] = added
+			rpb.RequestLocation = true
+			logs.SettedParam("Request Location", rpbtn, rpb.RequestLocation)
+		}
+	} else {
+		err = code10()
 	}
-	rpb.RequestLocation = true
-	logs.SettedParam("Request Location", rpbtn, true)
+	return err
 }
 
-func (rpb *replyKeyboardButton) WriteRequestPoll(poll *types.KeyboardButtonPollType) {
-	if rpb.RequestPoll != nil {
-		logs.DataIsntEmply(rpbtn, "Request Poll", rpb.RequestPoll)
+func (rpb *replyKeyboardButton) WriteRequestPoll(poll *types.KeyboardButtonPollType) error {
+	var err error
+	if (poll != nil) && (poll.Type != "") {
+		if rpb.RequestPoll == nil {
+			if err = rpb.checkOthers(); err == nil {
+				rpb.storage[wReqPoll] = added
+				rpb.RequestPoll = poll
+				logs.DataWrittenSuccessfully(rpbtn, "Request Poll")
+			}
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
 	}
-	rpb.RequestPoll = poll
-	logs.DataWrittenSuccessfully(rpbtn, "Request Poll")
+	return err
 }
 
-func (rpb *replyKeyboardButton) WriteWebApp(webapp *types.WebAppInfo) {
-	if rpb.WebApp != nil {
-		logs.DataIsntEmply(rpbtn, "Web App", rpb.WebApp)
+func (rpb *replyKeyboardButton) WriteWebApp(webapp *types.WebAppInfo) error {
+	var err error
+	if (webapp != nil) && (webapp.Url != "") {
+		if rpb.WebApp == nil {
+			if err = rpb.checkOthers(); err == nil {
+				rpb.storage[wReqWebApp] = added
+				rpb.WebApp = webapp
+				logs.DataWrittenSuccessfully(rpbtn, "Web App")
+			}
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
 	}
-	rpb.WebApp = webapp
-	logs.DataWrittenSuccessfully(rpbtn, "Web App")
+	return err
 }

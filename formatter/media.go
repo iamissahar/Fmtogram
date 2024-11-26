@@ -8,10 +8,12 @@ import (
 func uniqueMedia(msg *Message) error {
 	var err error
 	var mediajson []byte
+
 	if msg.fm.mh.atLeastOnce {
 		err = msg.fm.mh.storage[msg.fm.mh.i-1].multipartFields(msg.fm.writer, nil, 0, false)
 		msg.fm.contentType = msg.fm.writer.FormDataContentType()
 	} else {
+
 		mediajson, err = msg.fm.mh.storage[msg.fm.mh.i-1].jsonFileds()
 		if err == nil {
 			msg.fm.buf.Write(mediajson)
@@ -50,7 +52,7 @@ func mediaGroup(msg *Message) error {
 			}
 		}
 		if err == nil {
-			fmt.Println(group)
+			fmt.Println("group: ", group[0])
 			err = putGroup(msg.fm.writer, group)
 		}
 		msg.fm.contentType = msg.fm.writer.FormDataContentType()

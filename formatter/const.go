@@ -30,4 +30,20 @@ const (
 	checkArray         int    = -2
 	checkBool          int    = -3
 	checkInt           int    = -4
+	wURL               int    = 0
+	wCallback          int    = 1
+	wWebApp            int    = 2
+	wLoginUrl          int    = 3
+	wSwitchIn          int    = 4
+	wSwitchInQuery     int    = 5
+	wSwitchInQueryCh   int    = 6
+	wGame              int    = 7
+	wPay               int    = 8
+	wReqUsers          int    = 0
+	wReqChat           int    = 1
+	wReqContact        int    = 2
+	wReqLocation       int    = 3
+	wReqPoll           int    = 4
+	wReqWebApp         int    = 5
+	added              int    = 1
 )

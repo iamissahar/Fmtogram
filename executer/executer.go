@@ -7,7 +7,7 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/l1qwie/Fmtogram/errors"
+	"github.com/l1qwie/Fmtogram/fmerrors"
 	"github.com/l1qwie/Fmtogram/types"
 )
 
@@ -50,7 +50,7 @@ func Send(buf *bytes.Buffer, function, contenttype string, unmarshal bool) *type
 		err = json.Unmarshal(body, tg)
 	}
 	if err != nil {
-		errors.RequestError(err)
+		fmerrors.RequestError(err)
 	}
 	return tg
 }
@@ -81,9 +81,10 @@ func GetUpdates(tg *types.Telegram, offset *int) error {
 	url := fmt.Sprint(
 		types.TelegramAPI,
 		fmt.Sprintf("bot%s", types.BotID), "/",
-		"getUpdates", "?", "limit=1", "&", fmt.Sprintf("offset=%d", *offset))
+		"getUpdates", "?", "limit=1", "&", fmt.Sprintf("offset=%d", *offset-1))
 	body, err := sendRequest(bytes.NewBuffer(nil), url, "application/json", "GET")
 	if err == nil {
+		fmt.Println(string(body))
 		err = json.Unmarshal(body, tg)
 	}
 	return err
@@ -104,7 +105,7 @@ func GetOffset(offset *int) error {
 			if len(tg.Result) > 0 {
 				*offset = tg.Result[0].UpdateID
 			} else {
-				err = errors.UpdatesMisstakes("Telegram returned an empty data")
+				err = fmerrors.UpdatesMisstakes("Telegram returned an empty data")
 			}
 
 		}

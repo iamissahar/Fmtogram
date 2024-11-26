@@ -67,27 +67,13 @@ type VideoNote struct {
 	FileSize     int        `json:"file_size,omitempty"`
 }
 
-type PaidMediaPreview struct {
-	Type     string `json:"type"`
-	Width    int    `json:"width,omitempty"`
-	Height   int    `json:"height,omitempty"`
-	Duration int    `json:"duration,omitempty"`
-}
-
-type PaidMediaPhoto struct {
-	Type  string       `json:"type"`
-	Photo []*PhotoSize `json:"photo"`
-}
-
-type PaidMediaVideo struct {
-	Type  string `json:"type"`
-	Video *Video `json:"video"`
-}
-
 type PaidMedia struct {
-	PaidMediaPreview *PaidMediaPreview
-	PaidMediaPhoto   *PaidMediaPhoto
-	PaidMediaVideo   *PaidMediaVideo
+	Type     string       `json:"type"`
+	Width    int          `json:"width,omitempty"`
+	Height   int          `json:"height,omitempty"`
+	Duration int          `json:"duration,omitempty"`
+	Photo    []*PhotoSize `json:"photo"`
+	Video    *Video       `json:"video"`
 }
 
 type PaidMediaInfo struct {

@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/l1qwie/Fmtogram/errors"
 	"github.com/l1qwie/Fmtogram/executer"
+	"github.com/l1qwie/Fmtogram/fmerrors"
 	"github.com/l1qwie/Fmtogram/formatter"
 	"github.com/l1qwie/Fmtogram/helper"
 	"github.com/l1qwie/Fmtogram/logs"
@@ -60,7 +60,7 @@ func pullResponse(reg *executer.RegTable) {
 
 			offset = offset + 1
 		} else if err != nil {
-			errors.ErrorInUserData(err)
+			fmerrors.ErrorInUserData(err)
 		}
 		time.Sleep(time.Second / 10)
 	}

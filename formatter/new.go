@@ -44,7 +44,7 @@ func (msg *Message) NewVideoNote() IVideoNote {
 }
 
 // Creates a new message(inf) stucture and returns an interface with connected functions. This is the only one way to add your data to an object
-func (msg *Message) NewMessage() IMSGInformation {
+func (msg *Message) NewMessage() IParameters {
 	logs.NewInterfaceCreated("Message")
 	return &information{}
 }

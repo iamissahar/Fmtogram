@@ -1,18 +1,71 @@
 package formatter_test
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/l1qwie/Fmtogram/executer"
+	"github.com/l1qwie/Fmtogram/fmerrors"
 	"github.com/l1qwie/Fmtogram/formatter"
 	"github.com/l1qwie/Fmtogram/formatter/methods"
 	"github.com/l1qwie/Fmtogram/testbotdata"
 	"github.com/l1qwie/Fmtogram/types"
 )
 
+func createReplyKeyboard(msg *formatter.Message, t *testing.T) {
+	kb := msg.NewReplyKeyboard()
+	if err := kb.Set([]int{1, 2}); err != nil {
+		t.Fatal(err)
+	}
+	if err := kb.WriteInputFieldPlaceholder("ALO?"); err != nil {
+		t.Fatal(err)
+	}
+	if err := kb.WriteIsPersistent(); err != nil {
+		t.Fatal(err)
+	}
+	if err := kb.WriteOneTimeKeyboard(); err != nil {
+		t.Fatal(err)
+	}
+	if err := kb.WriteResizeKeyboard(); err != nil {
+		t.Fatal(err)
+	}
+	if err := kb.WriteSelective(); err != nil {
+		t.Fatal(err)
+	}
+
+	button00, err := kb.NewButton(0, 0)
+	if err != nil {
+		t.Fatal(err)
+	}
+	button10, err := kb.NewButton(1, 0)
+	if err != nil {
+		t.Fatal(err)
+	}
+	button11, err := kb.NewButton(1, 1)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if err := button00.WriteString("⭐"); err != nil {
+		t.Fatal(err)
+	}
+	if err := button10.WriteString("Hello"); err != nil {
+		t.Fatal(err)
+	}
+	if err := button11.WriteString("Sheesh"); err != nil {
+		t.Fatal(err)
+	}
+
+	if err := msg.AddReplyKeyboard(kb); err != nil {
+		t.Fatal(err)
+	}
+}
+
 func createInlineKeyboard(msg *formatter.Message, t *testing.T) {
 	kb := msg.NewInlineKeyboard()
-	kb.Set([]int{1, 2})
+	if err := kb.Set([]int{1, 2}); err != nil {
+		t.Fatal(err)
+	}
 	button00, err := kb.NewButton(0, 0)
 	if err != nil {
 		t.Fatal(err)
@@ -26,22 +79,40 @@ func createInlineKeyboard(msg *formatter.Message, t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	button00.WriteString("⭐")
-	button00.WriteURL("https://www.youtube.com/watch?v=xsjfuPlrjT0")
+	if err = button00.WriteString("⭐"); err != nil {
+		t.Fatal(err)
+	}
+	if err := button00.WriteURL("https://www.youtube.com/watch?v=xsjfuPlrjT0"); err != nil {
+		t.Fatal(err)
+	}
 
-	button10.WriteString("Hello!")
-	button10.WriteCallbackData("Hello X2")
+	if err := button10.WriteString("Hello!"); err != nil {
+		t.Fatal(err)
+	}
+	if err := button10.WriteCallbackData("Hello X2"); err != nil {
+		t.Fatal(err)
+	}
 
-	button11.WriteString("Sheesh")
-	button11.WriteCallbackData("TAMAM")
+	if err := button11.WriteString("Sheesh"); err != nil {
+		t.Fatal(err)
+	}
+	if err := button11.WriteCallbackData("TAMAM"); err != nil {
+		t.Fatal(err)
+	}
 
-	msg.AddInlineKeyboard(kb)
+	if err := msg.AddInlineKeyboard(kb); err != nil {
+		t.Fatal(err)
+	}
 }
 
-func createChat(msg *formatter.Message) formatter.IChat {
+func createChat(msg *formatter.Message, t *testing.T) formatter.IChat {
 	chat := msg.NewChat()
-	chat.WriteChatID(738070596)
-	msg.AddChat(chat)
+	if err := chat.WriteChatID(738070596); err != nil {
+		t.Fatal(err)
+	}
+	if err := msg.AddChat(chat); err != nil {
+		t.Fatal(err)
+	}
 	return chat
 }
 
@@ -80,6 +151,8 @@ func TestGetUpdates(t *testing.T) {
 		t.Log("No new messages")
 	}
 
+	t.Log(tg)
+
 	t.Log(tg.Result[0].Message.Text)
 	t.Log(tg.Result[0].Message.MessageID)
 	t.Log(tg.Result[0].Message.From)
@@ -87,466 +160,259 @@ func TestGetUpdates(t *testing.T) {
 
 }
 
+func msgAndChatID(t *testing.T) {
+	msg := formatter.CreateEmpltyMessage()
+	inf := msg.NewMessage()
+	inf.WriteString("Shalom")
+
+	ch := createChat(msg, t)
+
+	msg.AddParameters(inf)
+
+	_, err := msg.Send()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	t.Log(inf.GetResponse())
+	t.Log(ch.GetResponse())
+}
+
+func msgChatIDInline(t *testing.T) {
+	msg := formatter.CreateEmpltyMessage()
+	inf := msg.NewMessage()
+	inf.WriteString("<b>SHALOM</b> TO Y'<b>ALL</b>")
+	inf.WriteParseMode(types.HTML)
+
+	ch := createChat(msg, t)
+
+	createInlineKeyboard(msg, t)
+
+	msg.AddParameters(inf)
+
+	_, err := msg.Send()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	t.Log(inf.GetResponse())
+	t.Log(ch.GetResponse())
+}
+
 func TestSendMessage(t *testing.T) {
-	t.Run("IMSGInformation IChat", func(t *testing.T) {
-		msg := formatter.CreateEmpltyMessage()
-		inf := msg.NewMessage()
-		inf.WriteString("Shalom")
+	t.Run("IMSGInformation IChat", msgAndChatID)
+	t.Run("IMSGInformation IChat IInline", msgChatIDInline)
+}
 
-		ch := createChat(msg)
+func forwardReq(t *testing.T) {
+	msg := formatter.CreateEmpltyMessage()
 
-		msg.AddMessage(inf)
+	ch := createChat(msg, t)
+	ch.WriteFromChatID(1051812255)
 
-		_, err := msg.Send()
-		if err != nil {
-			t.Fatal(err)
-		}
+	inf := msg.NewMessage()
+	inf.WriteMessageID(501)
 
-		t.Log(inf.GetResponse())
-		t.Log(ch.GetResponse())
-	})
-	t.Run("IMSGInformation IChat IInline", func(t *testing.T) {
-		msg := formatter.CreateEmpltyMessage()
-		inf := msg.NewMessage()
-		inf.WriteString("<b>SHALOM</b> TO Y'<b>ALL</b>")
-		inf.WriteParseMode(types.HTML)
+	msg.AddMethod(methods.ForwardMessage)
+	msg.AddParameters(inf)
 
-		ch := createChat(msg)
+	_, err := msg.Send()
+	if err != nil {
+		t.Fatal(err)
+	}
 
-		createInlineKeyboard(msg, t)
+	t.Log(inf.GetResponse())
+	t.Log(ch.GetResponse())
+}
 
-		msg.AddMessage(inf)
+func forwardUnreq(t *testing.T) {
+	msg := formatter.CreateEmpltyMessage()
 
-		_, err := msg.Send()
-		if err != nil {
-			t.Fatal(err)
-		}
+	ch := createChat(msg, t)
+	ch.WriteFromChatID(1051812255)
 
-		t.Log(inf.GetResponse())
-		t.Log(ch.GetResponse())
-	})
+	inf := msg.NewMessage()
+	inf.WriteMessageID(501)
+	inf.WriteDisableNotification()
+	inf.WriteProtectContent()
+
+	msg.AddMethod(methods.ForwardMessage)
+	msg.AddParameters(inf)
+
+	_, err := msg.Send()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	t.Log(inf.GetResponse())
+	t.Log(ch.GetResponse())
 }
 
 func TestForwardMessage(t *testing.T) {
-	t.Run("Required fields", func(t *testing.T) {
-		msg := formatter.CreateEmpltyMessage()
+	t.Run("Required fields", forwardReq)
+	t.Run("Required and unrequired fields", forwardUnreq)
+}
 
-		ch := createChat(msg)
-		ch.WriteFromChatID(1051812255)
+func forwardMsgsReq(t *testing.T) {
+	msg := formatter.CreateEmpltyMessage()
 
-		inf := msg.NewMessage()
-		inf.WriteMessageID(501)
+	ch := createChat(msg, t)
+	ch.WriteFromChatID(1051812255)
 
-		msg.AddMethod(methods.ForwardMessage)
-		msg.AddMessage(inf)
+	inf := msg.NewMessage()
+	inf.WriteMessageIDs([]int{501, 507, 508, 509})
 
-		_, err := msg.Send()
-		if err != nil {
-			t.Fatal(err)
-		}
+	msg.AddMethod(methods.ForwardMessages)
+	msg.AddParameters(inf)
 
-		t.Log(inf.GetResponse())
-		t.Log(ch.GetResponse())
-	})
-	t.Run("Required and unrequired fields", func(t *testing.T) {
-		msg := formatter.CreateEmpltyMessage()
+	_, err := msg.Send()
+	if err != nil {
+		t.Fatal(err)
+	}
 
-		ch := createChat(msg)
-		ch.WriteFromChatID(1051812255)
+	t.Log(ch.GetResponse())
+	t.Log(inf.GetMessageIDs())
+}
 
-		inf := msg.NewMessage()
-		inf.WriteMessageID(501)
-		inf.WriteDisableNotification()
-		inf.WriteProtectContent()
+func forwardMsgsUnreq(t *testing.T) {
+	msg := formatter.CreateEmpltyMessage()
 
-		msg.AddMethod(methods.ForwardMessage)
-		msg.AddMessage(inf)
+	ch := createChat(msg, t)
+	ch.WriteFromChatID(1051812255)
 
-		_, err := msg.Send()
-		if err != nil {
-			t.Fatal(err)
-		}
+	inf := msg.NewMessage()
+	inf.WriteMessageIDs([]int{501, 507, 508, 509})
+	inf.WriteDisableNotification()
+	inf.WriteProtectContent()
 
-		t.Log(inf.GetResponse())
-		t.Log(ch.GetResponse())
-	})
+	msg.AddMethod(methods.ForwardMessages)
+	msg.AddParameters(inf)
+
+	_, err := msg.Send()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	t.Log(ch.GetResponse())
+	t.Log(inf.GetMessageIDs())
 }
 
 func TestForwardMessages(t *testing.T) {
-	t.Run("Required fields", func(t *testing.T) {
-		msg := formatter.CreateEmpltyMessage()
+	t.Run("Required fields", forwardMsgsReq)
+	t.Run("Required and unrequired fields", forwardMsgsUnreq)
+}
 
-		ch := createChat(msg)
-		ch.WriteFromChatID(1051812255)
+func copyReq(t *testing.T) {
+	msg := formatter.CreateEmpltyMessage()
 
-		inf := msg.NewMessage()
-		inf.WriteMessageIDs([]int{501, 507, 508, 509})
+	ch := createChat(msg, t)
+	ch.WriteFromChatID(1051812255)
 
-		msg.AddMethod(methods.ForwardMessages)
-		msg.AddMessage(inf)
+	inf := msg.NewMessage()
+	inf.WriteMessageID(507)
 
-		_, err := msg.Send()
-		if err != nil {
-			t.Fatal(err)
-		}
+	msg.AddMethod(methods.CopyMessage)
+	msg.AddParameters(inf)
 
-		t.Log(ch.GetResponse())
-		t.Log(inf.GetMessageIDs())
-	})
-	t.Run("Required and unrequired fields", func(t *testing.T) {
-		msg := formatter.CreateEmpltyMessage()
+	_, err := msg.Send()
+	if err != nil {
+		t.Fatal(err)
+	}
 
-		ch := createChat(msg)
-		ch.WriteFromChatID(1051812255)
+	t.Log(ch.GetResponse())
+	t.Log(inf.GetMessageIDs())
+}
 
-		inf := msg.NewMessage()
-		inf.WriteMessageIDs([]int{501, 507, 508, 509})
-		inf.WriteDisableNotification()
-		inf.WriteProtectContent()
+func copyUnreq(t *testing.T) {
+	msg := formatter.CreateEmpltyMessage()
 
-		msg.AddMethod(methods.ForwardMessages)
-		msg.AddMessage(inf)
+	ch := createChat(msg, t)
+	ch.WriteFromChatID(1051812255)
 
-		_, err := msg.Send()
-		if err != nil {
-			t.Fatal(err)
-		}
+	inf := msg.NewMessage()
+	inf.WriteMessageID(507)
+	inf.WriteCaption("<b>SHALOM</b> Y'ALL!!")
+	inf.WriteParseMode(types.HTML)
+	f := make([]*types.MessageEntity, 1)
+	f[0] = &types.MessageEntity{Type: "/start@jobs_bot"}
+	inf.WriteEntities(f)
+	inf.WriteDisableNotification()
+	inf.WriteProtectContent()
+	inf.WriteReplyParameters(&types.ReplyParameters{MessageID: 532, ChatID: 738070596})
 
-		t.Log(ch.GetResponse())
-		t.Log(inf.GetMessageIDs())
-	})
+	createInlineKeyboard(msg, t)
+
+	msg.AddMethod(methods.CopyMessage)
+	msg.AddParameters(inf)
+
+	_, err := msg.Send()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	t.Log(ch.GetResponse())
+	t.Log(inf.GetMessageIDs())
 }
 
 func TestCopyMessage(t *testing.T) {
-	t.Run("Required fields", func(t *testing.T) {
-		msg := formatter.CreateEmpltyMessage()
+	t.Run("Required fields", copyReq)
+	t.Run("Required and unrequired fields", copyUnreq)
+}
 
-		ch := createChat(msg)
-		ch.WriteFromChatID(1051812255)
+func copyMsgsReq(t *testing.T) {
+	msg := formatter.CreateEmpltyMessage()
 
-		inf := msg.NewMessage()
-		inf.WriteMessageID(507)
+	ch := createChat(msg, t)
+	ch.WriteFromChatID(1051812255)
 
-		msg.AddMethod(methods.CopyMessage)
-		msg.AddMessage(inf)
+	inf := msg.NewMessage()
+	inf.WriteMessageIDs([]int{501, 507, 508, 509})
 
-		_, err := msg.Send()
-		if err != nil {
-			t.Fatal(err)
-		}
+	msg.AddMethod(methods.CopyMessages)
+	msg.AddParameters(inf)
 
-		t.Log(ch.GetResponse())
-		t.Log(inf.GetMessageIDs())
-	})
-	t.Run("Required and unrequired fields", func(t *testing.T) {
-		msg := formatter.CreateEmpltyMessage()
+	_, err := msg.Send()
+	if err != nil {
+		panic(err)
+	}
 
-		ch := createChat(msg)
-		ch.WriteFromChatID(1051812255)
+	t.Log(ch.GetResponse())
+	t.Log(inf.GetMessageIDs())
+}
 
-		inf := msg.NewMessage()
-		inf.WriteMessageID(507)
-		inf.WriteCaption("<b>SHALOM</b> Y'ALL!!")
-		inf.WriteParseMode(types.HTML)
-		f := make([]*types.MessageEntity, 1)
-		f[0] = &types.MessageEntity{Type: "/start@jobs_bot"}
-		inf.WriteEntities(f)
-		inf.WriteDisableNotification()
-		inf.WriteProtectContent()
-		inf.WriteReplyParameters(&types.ReplyParameters{MessageID: 532, ChatID: 738070596})
+func copyMsgsUnreq(t *testing.T) {
+	msg := formatter.CreateEmpltyMessage()
 
-		createInlineKeyboard(msg, t)
+	ch := createChat(msg, t)
+	ch.WriteFromChatID(1051812255)
 
-		msg.AddMethod(methods.CopyMessage)
-		msg.AddMessage(inf)
+	inf := msg.NewMessage()
+	inf.WriteMessageIDs([]int{501, 507, 508, 509})
+	inf.WriteDisableNotification()
+	inf.WriteProtectContent()
 
-		_, err := msg.Send()
-		if err != nil {
-			t.Fatal(err)
-		}
+	msg.AddMethod(methods.CopyMessages)
+	msg.AddParameters(inf)
 
-		t.Log(ch.GetResponse())
-		t.Log(inf.GetMessageIDs())
-	})
+	_, err := msg.Send()
+	if err != nil {
+		panic(err)
+	}
+
+	t.Log(ch.GetResponse())
+	t.Log(inf.GetMessageIDs())
 }
 
 func TestCopyMessages(t *testing.T) {
-	t.Run("Required fields", func(t *testing.T) {
-		msg := formatter.CreateEmpltyMessage()
-
-		ch := createChat(msg)
-		ch.WriteFromChatID(1051812255)
-
-		inf := msg.NewMessage()
-		inf.WriteMessageIDs([]int{501, 507, 508, 509})
-
-		msg.AddMethod(methods.CopyMessages)
-		msg.AddMessage(inf)
-
-		_, err := msg.Send()
-		if err != nil {
-			panic(err)
-		}
-
-		t.Log(ch.GetResponse())
-		t.Log(inf.GetMessageIDs())
-	})
-	t.Run("Required and unrequired fields", func(t *testing.T) {
-		msg := formatter.CreateEmpltyMessage()
-
-		ch := createChat(msg)
-		ch.WriteFromChatID(1051812255)
-
-		inf := msg.NewMessage()
-		inf.WriteMessageIDs([]int{501, 507, 508, 509})
-		inf.WriteDisableNotification()
-		inf.WriteProtectContent()
-
-		msg.AddMethod(methods.CopyMessages)
-		msg.AddMessage(inf)
-
-		_, err := msg.Send()
-		if err != nil {
-			panic(err)
-		}
-
-		t.Log(ch.GetResponse())
-		t.Log(inf.GetMessageIDs())
-	})
-}
-
-func TestSendPhoto(t *testing.T) {
-	t.Run("Required fields, without naming method and photo from storage", func(t *testing.T) {
-		msg := formatter.CreateEmpltyMessage()
-
-		ch := createChat(msg)
-
-		ph := msg.NewPhoto()
-		ph.WritePhotoStorage("media_test/photo1.jpg")
-
-		msg.AddPhoto(ph)
-
-		_, err := msg.Send()
-		if err != nil {
-			panic(err)
-		}
-
-		t.Log(ph.GetResponse())
-		t.Log(ch.GetResponse())
-	})
-	t.Run("Required fields with naming method and photo from storage", func(t *testing.T) {
-		msg := formatter.CreateEmpltyMessage()
-
-		ch := createChat(msg)
-
-		ph := msg.NewPhoto()
-		ph.WritePhotoStorage("media_test/photo1.jpg")
-
-		msg.AddMethod(methods.Photo)
-		msg.AddPhoto(ph)
-
-		_, err := msg.Send()
-		if err != nil {
-			panic(err)
-		}
-
-		t.Log(ph.GetResponse())
-		t.Log(ch.GetResponse())
-	})
-	t.Run("Required and unrequired fields without naming method and photo from telegram", func(t *testing.T) {
-		msg := formatter.CreateEmpltyMessage()
-
-		ch := createChat(msg)
-
-		ph := msg.NewPhoto()
-		ph.WritePhotoTelegram("AgACAgIAAxkDAAICJGcf5rBCBtGmJm-IRRgrYK2XeIjqAAJn7jEbe80AAUmH5LwgebRpFwEAAwIAA3MAAzYE")
-		ph.WriteCaption("<b>SHALOM!</b> Y'ALL!")
-		ph.WriteParseMode(types.HTML)
-		f := make([]*types.MessageEntity, 1)
-		f[0] = &types.MessageEntity{Type: "/start@jobs_bot"}
-		ph.WriteCaptionEntities(f)
-		ph.WriteShowCaptionAboveMedia()
-		ph.WriteHasSpoiler()
-
-		inf := msg.NewMessage()
-		inf.WriteDisableNotification()
-		inf.WriteProtectContent()
-		inf.WriteReplyParameters(&types.ReplyParameters{MessageID: 532, ChatID: 738070596})
-
-		createInlineKeyboard(msg, t)
-
-		msg.AddMessage(inf)
-		msg.AddPhoto(ph)
-
-		_, err := msg.Send()
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		t.Log(ch.GetResponse())
-		t.Log(inf.GetResponse())
-		t.Log(ph.GetResponse())
-	})
-}
-
-func TestSendAudio(t *testing.T) {
-	t.Run("Required fields without naming method and audio from storage", func(t *testing.T) {
-		msg := formatter.CreateEmpltyMessage()
-
-		ch := createChat(msg)
-
-		ad := msg.NewAudio()
-		ad.WriteAudioStorage("media_test/sound.mp3")
-
-		msg.AddAudio(ad)
-
-		_, err := msg.Send()
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		t.Log(ch.GetResponse())
-		t.Log(ad.GetResponse())
-	})
-	t.Run("Required fields with naming method and audio from storage", func(t *testing.T) {
-		msg := formatter.CreateEmpltyMessage()
-
-		ch := createChat(msg)
-
-		ad := msg.NewAudio()
-		ad.WriteAudioStorage("media_test/sound.mp3")
-
-		msg.AddMethod(methods.Audio)
-		msg.AddAudio(ad)
-
-		_, err := msg.Send()
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		t.Log(ch.GetResponse())
-		t.Log(ad.GetResponse())
-	})
-	t.Run("Required and unrequired fields without naming method and audio from telegram", func(t *testing.T) {
-		msg := formatter.CreateEmpltyMessage()
-
-		ch := createChat(msg)
-
-		ad := msg.NewAudio()
-		ad.WriteAudioTelegram("CQACAgIAAxkDAAICOGcf7hnLD4tEsb5uMKPBcxZywiG3AAImeQACe80AAUnK0NGMf0Nv2zYE")
-		ad.WriteCaption("<b>SELAM</b> ALEYKUM!")
-		ad.WriteParseMode(types.HTML)
-		f := make([]*types.MessageEntity, 1)
-		f[0] = &types.MessageEntity{Type: "/start@jobs_bot"}
-		ad.WriteCaptionEntities(f)
-		ad.WriteDuration(3)
-		ad.WritePerformer("?")
-		ad.WriteTitle("A SOUND")
-
-		inf := msg.NewMessage()
-		inf.WriteDisableNotification()
-		inf.WriteProtectContent()
-		inf.WriteReplyParameters(&types.ReplyParameters{MessageID: 532, ChatID: 738070596})
-
-		createInlineKeyboard(msg, t)
-
-		msg.AddAudio(ad)
-		msg.AddMessage(inf)
-
-		_, err := msg.Send()
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		t.Log(ch.GetResponse())
-		t.Log(inf.GetResponse())
-		t.Log(ad.GetResponse())
-	})
-}
-
-func TestSendVideo(t *testing.T) {
-	t.Run("Required fields without naming method and video from storage", func(t *testing.T) {
-		msg := formatter.CreateEmpltyMessage()
-
-		ch := createChat(msg)
-
-		vd := msg.NewVideo()
-		vd.WriteVideoStorage("media_test/musk.mp4")
-
-		msg.AddVideo(vd)
-
-		_, err := msg.Send()
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		t.Log(ch.GetResponse())
-		t.Log(vd.GetResponse())
-	})
-	t.Run("Required fields with naming method and video from storage", func(t *testing.T) {
-		msg := formatter.CreateEmpltyMessage()
-
-		ch := createChat(msg)
-
-		vd := msg.NewVideo()
-		vd.WriteVideoStorage("media_test/musk.mp4")
-
-		msg.AddVideo(vd)
-		msg.AddMethod(methods.Video)
-
-		_, err := msg.Send()
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		t.Log(ch.GetResponse())
-		t.Log(vd.GetResponse())
-	})
-	t.Run("Required and unrequired fields without naming method and video from telegram", func(t *testing.T) {
-		msg := formatter.CreateEmpltyMessage()
-
-		ch := createChat(msg)
-
-		vd := msg.NewVideo()
-
-		vd.WriteVideoTelegram("BAACAgIAAxkDAAICW2cmSEhOkyaHOAABq1xHkIJ4eRwwxwAC1FsAAlq0MUlyV6gDqCe2NjYE")
-		vd.WriteCaption("<b>SELAM</b> ALEYKUM!")
-		vd.WriteParseMode(types.HTML)
-		f := make([]*types.MessageEntity, 1)
-		f[0] = &types.MessageEntity{Type: "/start@jobs_bot"}
-		vd.WriteCaptionEntities(f)
-		vd.WriteDuration(3)
-		vd.WriteHeight(490)
-		vd.WriteWidth(886)
-		vd.WriteSupportsStreaming()
-		vd.WriteHasSpoiler()
-
-		inf := msg.NewMessage()
-		inf.WriteDisableNotification()
-		inf.WriteProtectContent()
-		inf.WriteReplyParameters(&types.ReplyParameters{MessageID: 532, ChatID: 738070596})
-
-		createInlineKeyboard(msg, t)
-
-		msg.AddMessage(inf)
-		msg.AddVideo(vd)
-
-		_, err := msg.Send()
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		t.Log(ch.GetResponse())
-		t.Log(inf.GetResponse())
-		t.Log(vd.GetResponse())
-	})
+	t.Run("Required fields", copyMsgsReq)
+	t.Run("Required and unrequired fields", copyMsgsUnreq)
 }
 
 func TestSendDocument(t *testing.T) {
 	t.Run("Required fields without naming method and document from storage", func(t *testing.T) {
 		msg := formatter.CreateEmpltyMessage()
 
-		ch := createChat(msg)
+		ch := createChat(msg, t)
 
 		dc := msg.NewDocument()
 		dc.WriteDocumentStorage("media_test/Resume.pdf")
@@ -564,7 +430,7 @@ func TestSendDocument(t *testing.T) {
 	t.Run("Required fields with naming method and document from storage", func(t *testing.T) {
 		msg := formatter.CreateEmpltyMessage()
 
-		ch := createChat(msg)
+		ch := createChat(msg, t)
 
 		dc := msg.NewDocument()
 		dc.WriteDocumentStorage("media_test/Resume.pdf")
@@ -583,7 +449,7 @@ func TestSendDocument(t *testing.T) {
 	t.Run("Required and unrequired fields without naming method and document from telegram", func(t *testing.T) {
 		msg := formatter.CreateEmpltyMessage()
 
-		ch := createChat(msg)
+		ch := createChat(msg, t)
 
 		dc := msg.NewDocument()
 
@@ -602,7 +468,7 @@ func TestSendDocument(t *testing.T) {
 
 		createInlineKeyboard(msg, t)
 
-		msg.AddMessage(inf)
+		msg.AddParameters(inf)
 		msg.AddDocument(dc)
 
 		_, err := msg.Send()
@@ -620,7 +486,7 @@ func TestSendMediaGroup(t *testing.T) {
 	t.Run("Required fields without naming method and 1 photo and 1 video from storage", func(t *testing.T) {
 		msg := formatter.CreateEmpltyMessage()
 
-		ch := createChat(msg)
+		ch := createChat(msg, t)
 
 		ph := msg.NewPhoto()
 		ph.WritePhotoStorage("media_test/photo1.jpg")
@@ -643,7 +509,7 @@ func TestSendMediaGroup(t *testing.T) {
 	t.Run("Required fields without naming method and 3 audio (1xstorage, 2xtelegram)", func(t *testing.T) {
 		msg := formatter.CreateEmpltyMessage()
 
-		ch := createChat(msg)
+		ch := createChat(msg, t)
 
 		ad := msg.NewAudio()
 		ad1 := msg.NewAudio()
@@ -670,7 +536,7 @@ func TestSendMediaGroup(t *testing.T) {
 	t.Run("Required fields without naming method and 3 audio (1xstorage, 2xtelegram)", func(t *testing.T) {
 		msg := formatter.CreateEmpltyMessage()
 
-		ch := createChat(msg)
+		ch := createChat(msg, t)
 
 		ad := msg.NewAudio()
 		ad1 := msg.NewAudio()
@@ -697,7 +563,7 @@ func TestSendMediaGroup(t *testing.T) {
 	t.Run("Required fields without naming method and 3 document (1xstorage, 2xtelegram)", func(t *testing.T) {
 		msg := formatter.CreateEmpltyMessage()
 
-		ch := createChat(msg)
+		ch := createChat(msg, t)
 
 		dc := msg.NewDocument()
 		dc1 := msg.NewDocument()
@@ -724,7 +590,7 @@ func TestSendMediaGroup(t *testing.T) {
 	t.Run("Required fields without naming method and 10 photos (2xstorage, 8xtelegram)", func(t *testing.T) {
 		msg := formatter.CreateEmpltyMessage()
 
-		ch := createChat(msg)
+		ch := createChat(msg, t)
 
 		ph := msg.NewPhoto()
 		ph1 := msg.NewPhoto()
@@ -780,7 +646,7 @@ func TestSendMediaGroup(t *testing.T) {
 	t.Run("Required fields without naming method and 10 videos (2xstorage 8xtelegram)", func(t *testing.T) {
 		msg := formatter.CreateEmpltyMessage()
 
-		ch := createChat(msg)
+		ch := createChat(msg, t)
 
 		vd := msg.NewVideo()
 		vd1 := msg.NewVideo()
@@ -838,7 +704,7 @@ func TestSendAnimation(t *testing.T) {
 	t.Run("Required fields without naming method and animation from storage", func(t *testing.T) {
 		msg := formatter.CreateEmpltyMessage()
 
-		ch := createChat(msg)
+		ch := createChat(msg, t)
 
 		an := msg.NewAnimation()
 		an.WriteAnimationStorage("media_test/prichinatryski.mp4")
@@ -856,7 +722,7 @@ func TestSendAnimation(t *testing.T) {
 	t.Run("Required fields with naming method and animation from storage", func(t *testing.T) {
 		msg := formatter.CreateEmpltyMessage()
 
-		ch := createChat(msg)
+		ch := createChat(msg, t)
 
 		an := msg.NewAnimation()
 		an.WriteAnimationStorage("media_test/prichinatryski.mp4")
@@ -875,7 +741,7 @@ func TestSendAnimation(t *testing.T) {
 	t.Run("Required and unrequired fields without naming method and animation from telegram", func(t *testing.T) {
 		msg := formatter.CreateEmpltyMessage()
 
-		ch := createChat(msg)
+		ch := createChat(msg, t)
 
 		an := msg.NewAnimation()
 
@@ -895,7 +761,7 @@ func TestSendAnimation(t *testing.T) {
 
 		createInlineKeyboard(msg, t)
 
-		msg.AddMessage(inf)
+		msg.AddParameters(inf)
 		msg.AddAnimation(an)
 
 		_, err := msg.Send()
@@ -913,7 +779,7 @@ func TestSendVoice(t *testing.T) {
 	t.Run("Required fields without naming method and Voice from storage", func(t *testing.T) {
 		msg := formatter.CreateEmpltyMessage()
 
-		ch := createChat(msg)
+		ch := createChat(msg, t)
 
 		an := msg.NewVoice()
 		an.WriteVoiceStorage("media_test/dimaJOSKAproNATO.ogg")
@@ -931,7 +797,7 @@ func TestSendVoice(t *testing.T) {
 	t.Run("Required fields with naming method and Voice from storage", func(t *testing.T) {
 		msg := formatter.CreateEmpltyMessage()
 
-		ch := createChat(msg)
+		ch := createChat(msg, t)
 
 		an := msg.NewVoice()
 		an.WriteVoiceStorage("media_test/dimaJOSKAproNATO.ogg")
@@ -950,7 +816,7 @@ func TestSendVoice(t *testing.T) {
 	t.Run("Required and unrequired fields without naming method and Voice from telegram", func(t *testing.T) {
 		msg := formatter.CreateEmpltyMessage()
 
-		ch := createChat(msg)
+		ch := createChat(msg, t)
 
 		vc := msg.NewVoice()
 
@@ -968,7 +834,7 @@ func TestSendVoice(t *testing.T) {
 
 		createInlineKeyboard(msg, t)
 
-		msg.AddMessage(inf)
+		msg.AddParameters(inf)
 		msg.AddVoice(vc)
 
 		_, err := msg.Send()
@@ -986,7 +852,7 @@ func TestSendVideoNote(t *testing.T) {
 	t.Run("Required fields without naming method and voice-note from storage", func(t *testing.T) {
 		msg := formatter.CreateEmpltyMessage()
 
-		ch := createChat(msg)
+		ch := createChat(msg, t)
 
 		vdn := msg.NewVideoNote()
 		vdn.WriteVideoNoteStorage("media_test/black.mp4")
@@ -1004,7 +870,7 @@ func TestSendVideoNote(t *testing.T) {
 	t.Run("Required fields with naming method and voice-note from storage", func(t *testing.T) {
 		msg := formatter.CreateEmpltyMessage()
 
-		ch := createChat(msg)
+		ch := createChat(msg, t)
 
 		vdn := msg.NewVideoNote()
 		vdn.WriteVideoNoteStorage("media_test/black.mp4")
@@ -1024,7 +890,7 @@ func TestSendVideoNote(t *testing.T) {
 	t.Run("Required and unrequired fields without naming method and voice-note from telegram", func(t *testing.T) {
 		msg := formatter.CreateEmpltyMessage()
 
-		ch := createChat(msg)
+		ch := createChat(msg, t)
 
 		vdn := msg.NewVideoNote()
 
@@ -1041,7 +907,7 @@ func TestSendVideoNote(t *testing.T) {
 
 		createInlineKeyboard(msg, t)
 
-		msg.AddMessage(inf)
+		msg.AddParameters(inf)
 		msg.AddVideoNote(vdn)
 
 		_, err := msg.Send()
@@ -1053,6 +919,262 @@ func TestSendVideoNote(t *testing.T) {
 		t.Log(inf.GetResponse())
 		t.Log(vdn.GetResponse())
 	})
+}
+
+func TestSendPaidMedia(t *testing.T) {
+	// t.Run("Required fields without naming method and paid media video from storage", func(t *testing.T) {
+	// 	msg := formatter.CreateEmpltyMessage()
+
+	// 	ch := createChat(msg, t)
+
+	// 	vd := msg.NewVideo()
+	// 	vd.WriteVideoTelegram("BAACAgIAAxkDAAICW2cmSEhOkyaHOAABq1xHkIJ4eRwwxwAC1FsAAlq0MUlyV6gDqCe2NjYE")
+
+	// 	inf := msg.NewMessage()
+	// 	inf.WriteStarCount(4)
+
+	// 	msg.AddVideo(vd)
+	// 	msg.AddParameters(inf)
+
+	// 	_, err := msg.Send()
+	// 	if err != nil {
+	// 		t.Fatal(err)
+	// 		panic("#")
+	// 	}
+
+	// 	t.Log(ch.GetResponse())
+	// 	t.Log(vd.GetResponse())
+	// })
+	t.Run("Required fields with naming method and paid media video from storage", func(t *testing.T) {
+		msg := formatter.CreateEmpltyMessage()
+
+		ch := createChat(msg, t)
+
+		// vd := msg.NewVideo()
+		// vd.WriteVideoStorage("media_test/musk.mp4")
+
+		ph := msg.NewPhoto()
+		ph.WritePhotoStorage("media_test/photo1.jpg")
+
+		inf := msg.NewMessage()
+		inf.WriteStarCount(4)
+
+		msg.AddParameters(inf)
+		// msg.AddVideo(vd)
+		msg.AddPhoto(ph)
+		msg.AddMethod(methods.PaidMedia)
+
+		_, err := msg.Send()
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		t.Log(ch.GetResponse())
+		t.Log(ph.GetResponse())
+		// t.Log(vd.GetResponse())
+	})
+	// t.Run("Required fields without naming method and paid media photo from storage", func(t *testing.T) {
+	// 	msg := formatter.CreateEmpltyMessage()
+
+	// 	ch := createChat(msg, t)
+
+	// 	ph := msg.NewPhoto()
+	// 	ph.WritePhotoStorage("media_test/photo1.jpg")
+
+	// 	inf := msg.NewMessage()
+	// 	inf.WriteStarCount(4)
+
+	// 	msg.AddParameters(inf)
+	// 	msg.AddPhoto(ph)
+
+	// 	_, err := msg.Send()
+	// 	if err != nil {
+	// 		t.Fatal(err)
+	// 	}
+
+	// 	t.Log(ch.GetResponse())
+	// 	t.Log(ph.GetResponse())
+	// })
+	// t.Run("Required fields with naming method and paid media photo from storage", func(t *testing.T) {
+	// 	msg := formatter.CreateEmpltyMessage()
+
+	// 	ch := createChat(msg, t)
+
+	// 	ph := msg.NewPhoto()
+	// 	ph.WritePhotoStorage("media_test/photo1.jpg")
+
+	// 	inf := msg.NewMessage()
+	// 	inf.WriteStarCount(4)
+
+	// 	msg.AddParameters(inf)
+	// 	msg.AddPhoto(ph)
+	// 	msg.AddMethod(methods.PaidMedia)
+
+	// 	_, err := msg.Send()
+	// 	if err != nil {
+	// 		t.Fatal(err)
+	// 	}
+
+	// 	t.Log(ch.GetResponse())
+	// 	t.Log(ph.GetResponse())
+	// })
+	// t.Run("Required and unrequired fields with naming method and paid media photo from telegram", func(t *testing.T) {
+	// 	msg := formatter.CreateEmpltyMessage()
+
+	// 	ch := createChat(msg, t)
+
+	// 	ph := msg.NewPhoto()
+	// 	ph.WritePhotoTelegram("AgACAgIAAxkDAAICJGcf5rBCBtGmJm-IRRgrYK2XeIjqAAJn7jEbe80AAUmH5LwgebRpFwEAAwIAA3MAAzYE")
+
+	// 	inf := msg.NewMessage()
+	// 	inf.WriteStarCount(4)
+	// 	inf.WritePayload("123")
+	// 	inf.WriteString("SHALOM! <b>Y'ALL</b>")
+	// 	inf.WriteParseMode(types.HTML)
+	// 	inf.WriteShowCaptionAboveMedia()
+	// 	inf.WriteDisableNotification()
+	// 	inf.WriteProtectContent()
+	// 	inf.WriteAllowPaidBroadcast()
+	// 	inf.WriteReplyParameters(&types.ReplyParameters{MessageID: 532, ChatID: 738070596})
+
+	// 	createInlineKeyboard(msg, t)
+
+	// 	msg.AddParameters(inf)
+	// 	msg.AddPhoto(ph)
+	// 	msg.AddMethod(methods.PaidMedia)
+
+	// 	_, err := msg.Send()
+	// 	if err != nil {
+	// 		t.Fatal(err)
+	// 	}
+
+	// 	t.Log(ch.GetResponse())
+	// 	t.Log(inf.GetResponse())
+	// 	t.Log(ph.GetResponse())
+	// })
+	// t.Run("Required and unrequired fields with naming method and paid media video from telegram", func(t *testing.T) {
+	// 	msg := formatter.CreateEmpltyMessage()
+
+	// 	ch := createChat(msg, t)
+
+	// 	vd := msg.NewVideo()
+	// 	vd.WriteVideoTelegram("BAACAgIAAxkDAAICW2cmSEhOkyaHOAABq1xHkIJ4eRwwxwAC1FsAAlq0MUlyV6gDqCe2NjYE")
+
+	// 	inf := msg.NewMessage()
+	// 	inf.WriteStarCount(9)
+	// 	inf.WritePayload("123")
+	// 	inf.WriteString("SHALOM! <b>Y'ALL</b>")
+	// 	inf.WriteParseMode(types.HTML)
+	// 	inf.WriteShowCaptionAboveMedia()
+	// 	inf.WriteDisableNotification()
+	// 	inf.WriteProtectContent()
+	// 	inf.WriteAllowPaidBroadcast()
+	// 	inf.WriteReplyParameters(&types.ReplyParameters{MessageID: 532, ChatID: 738070596})
+
+	// 	createInlineKeyboard(msg, t)
+
+	// 	msg.AddParameters(inf)
+	// 	msg.AddVideo(vd)
+	// 	msg.AddMethod(methods.PaidMedia)
+
+	// 	_, err := msg.Send()
+	// 	if err != nil {
+	// 		t.Fatal(err)
+	// 	}
+
+	// 	t.Log(ch.GetResponse())
+	// 	t.Log(inf.GetResponse())
+	// 	t.Log(vd.GetResponse())
+	// })
+	// t.Run("Required and unrequired fields with naming method and 3 paid media video from telegram", func(t *testing.T) {
+	// 	msg := formatter.CreateEmpltyMessage()
+
+	// 	ch := createChat(msg, t)
+
+	// 	vd := msg.NewVideo()
+	// 	vd1 := msg.NewVideo()
+	// 	vd2 := msg.NewVideo()
+
+	// 	vd.WriteVideoTelegram("BAACAgIAAxkDAAICW2cmSEhOkyaHOAABq1xHkIJ4eRwwxwAC1FsAAlq0MUlyV6gDqCe2NjYE")
+	// 	vd.WriteVideoTelegram("BAACAgIAAxkDAAICW2cmSEhOkyaHOAABq1xHkIJ4eRwwxwAC1FsAAlq0MUlyV6gDqCe2NjYE")
+	// 	vd.WriteVideoTelegram("BAACAgIAAxkDAAICW2cmSEhOkyaHOAABq1xHkIJ4eRwwxwAC1FsAAlq0MUlyV6gDqCe2NjYE")
+
+	// 	inf := msg.NewMessage()
+	// 	inf.WriteStarCount(9)
+	// 	inf.WritePayload("123")
+	// 	inf.WriteString("SHALOM! <b>Y'ALL</b>")
+	// 	inf.WriteParseMode(types.HTML)
+	// 	inf.WriteShowCaptionAboveMedia()
+	// 	inf.WriteDisableNotification()
+	// 	inf.WriteProtectContent()
+	// 	inf.WriteAllowPaidBroadcast()
+	// 	inf.WriteReplyParameters(&types.ReplyParameters{MessageID: 532, ChatID: 738070596})
+
+	// 	createInlineKeyboard(msg, t)
+
+	// 	msg.AddParameters(inf)
+	// 	msg.AddVideo(vd)
+	// 	msg.AddVideo(vd1)
+	// 	msg.AddVideo(vd2)
+	// 	msg.AddMethod(methods.PaidMedia)
+
+	// 	_, err := msg.Send()
+	// 	if err != nil {
+	// 		t.Fatal(err)
+	// 	}
+
+	// 	t.Log(ch.GetResponse())
+	// 	t.Log(inf.GetResponse())
+	// 	t.Log(vd.GetResponse())
+	// 	t.Log(vd1.GetResponse())
+	// 	t.Log(vd2.GetResponse())
+	// })
+	// t.Run("Required fields with naming method and 3 paid media photo from telegram", func(t *testing.T) {
+	// 	msg := formatter.CreateEmpltyMessage()
+
+	// 	ch := createChat(msg, t)
+
+	// 	ph := msg.NewPhoto()
+	// 	ph1 := msg.NewPhoto()
+	// 	ph2 := msg.NewPhoto()
+
+	// 	ph.WritePhotoTelegram("AgACAgIAAxkDAAICJGcf5rBCBtGmJm-IRRgrYK2XeIjqAAJn7jEbe80AAUmH5LwgebRpFwEAAwIAA3MAAzYE")
+	// 	ph1.WritePhotoTelegram("AgACAgIAAxkDAAICJGcf5rBCBtGmJm-IRRgrYK2XeIjqAAJn7jEbe80AAUmH5LwgebRpFwEAAwIAA3MAAzYE")
+	// 	ph2.WritePhotoTelegram("AgACAgIAAxkDAAICJGcf5rBCBtGmJm-IRRgrYK2XeIjqAAJn7jEbe80AAUmH5LwgebRpFwEAAwIAA3MAAzYE")
+
+	// 	inf := msg.NewMessage()
+	// 	inf.WriteStarCount(9)
+
+	// 	msg.AddParameters(inf)
+	// 	msg.AddPhoto(ph)
+	// 	msg.AddPhoto(ph1)
+	// 	msg.AddPhoto(ph2)
+	// 	msg.AddMethod(methods.PaidMedia)
+
+	// 	_, err := msg.Send()
+	// 	if err != nil {
+	// 		t.Fatal(err)
+	// 	}
+
+	// 	t.Log(ch.GetResponse())
+	// 	t.Log(inf.GetResponse())
+	// 	t.Log(ph.GetResponse())
+	// 	t.Log(ph1.GetResponse())
+	// 	t.Log(ph2.GetResponse())
+	// })
+}
+func f() string {
+	return "Hello, World"
+}
+
+func TestError(t *testing.T) {
+	err := new(fmerrors.FME)
+	s := f()
+	if s != "Hi, World!" {
+		err.Code = 20
+		err.String = "string isn't that one that was expected"
+		fmt.Println(err.Error())
+	}
 }
 
 func init() {

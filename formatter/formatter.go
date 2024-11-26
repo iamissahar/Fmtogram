@@ -9,7 +9,7 @@ import (
 	"mime/multipart"
 	"net/http"
 
-	"github.com/l1qwie/Fmtogram/errors"
+	"github.com/l1qwie/Fmtogram/fmerrors"
 	"github.com/l1qwie/Fmtogram/formatter/methods"
 	"github.com/l1qwie/Fmtogram/logs"
 	"github.com/l1qwie/Fmtogram/testbotdata"
@@ -54,10 +54,9 @@ func compatibilityСheck(msg *Message, matrix [7][7]int, current int) error {
 	for j := 0; j < current; j++ {
 
 		name, num := msg.fm.mh.storage[j].nameAndConst()
-		if matrix[currentconst][num] != allowed {
-			err = errors.ImpossibleCombination(currentname, name)
+		if (matrix[currentconst][num] != allowed) || (msg.fm.method == methods.PaidMedia) {
+			err = fmerrors.ImpossibleCombination(currentname, name, msg.fm.method)
 		}
-
 	}
 	return err
 }
@@ -150,10 +149,6 @@ func requiredMedia(msg *Message, tgr *interface{}, object *string) error {
 	var err error
 
 	matrix := buildConstRules()
-
-	if msg.fm.ch.ID == 0 {
-		err = errors.MissedRequiredField("IChat", "WriteChat{ID/Name}()", 0, 0, false, false)
-	}
 	for i, j := 0, 0; (i < len(msg.fm.mh.storage)) && (err == nil); i++ {
 		if msg.fm.mh.storage[i] != nil {
 			switch m := msg.fm.mh.storage[i].(type) {
@@ -196,11 +191,8 @@ func requiredMedia(msg *Message, tgr *interface{}, object *string) error {
 func requiredMessage(msg *Message, tgr *interface{}, object string) error {
 	var err error
 
-	if msg.fm.ch.ID == 0 {
-		err = errors.MissedRequiredField("IChat", "WriteChat{ID/Name}()", 0, 0, false, false)
-	}
 	if (msg.fm.method == "") && (msg.fm.inf.Text == "") {
-		err = errors.MissedRequiredField("IMSGInformation", "WriteString()", 0, 0, false, false)
+		err = fmerrors.MissedRequiredField("IMSGInformation", "WriteString()", 0, 0, false, false)
 	}
 	if _, ok := methods.Media[msg.fm.method]; (ok) && (msg.fm.inf.Text != "") {
 		if msg.fm.mh.i > 1 {
@@ -210,19 +202,20 @@ func requiredMessage(msg *Message, tgr *interface{}, object string) error {
 			msg.fm.inf.CaptionEntities, msg.fm.inf.Entities = msg.fm.inf.Entities, nil
 		}
 	}
+	fmt.Println("METHOD: ", msg.fm.method, msg.fm.inf.StarCount)
 	if msg.fm.method == "" {
 		msg.fm.method = methods.Message
 		msg.fm.contentType = "application/json"
 		*tgr = new(types.TelegramResponse)
 	} else if (msg.fm.method == methods.ForwardMessage) || (msg.fm.method == methods.ForwardMessages) || (msg.fm.method == methods.CopyMessage) || (msg.fm.method == methods.CopyMessages) {
 		if msg.fm.ch.FromChatID == nil {
-			err = errors.MissedRequiredField("IChat", "WriteFromChat{ID/Name}()", 0, 0, false, false)
+			err = fmerrors.MissedRequiredField("IChat", "WriteFromChat{ID/Name}()", 0, 0, false, false)
 		}
 		if (msg.fm.inf.MessageID == 0) && ((msg.fm.method == methods.ForwardMessage) || (msg.fm.method == methods.CopyMessage)) {
-			err = errors.MissedRequiredField("IMSGInformation", "WriteMessageID()", 0, 0, false, false)
+			err = fmerrors.MissedRequiredField("IMSGInformation", "WriteMessageID()", 0, 0, false, false)
 		}
 		if (msg.fm.inf.MessageIDs == nil) && ((msg.fm.method == methods.ForwardMessages) || (msg.fm.method == methods.CopyMessages)) {
-			err = errors.MissedRequiredField("IMSGInformation", "WriteMessageIDs()", 0, 0, false, false)
+			err = fmerrors.MissedRequiredField("IMSGInformation", "WriteMessageIDs()", 0, 0, false, false)
 		}
 		msg.fm.contentType = "application/json"
 		if (msg.fm.method == methods.ForwardMessage) || (msg.fm.method == methods.CopyMessage) {
@@ -230,6 +223,10 @@ func requiredMessage(msg *Message, tgr *interface{}, object string) error {
 		} else {
 			*tgr = new(types.TelegramMessageIDs)
 		}
+	} else if (msg.fm.method == methods.PaidMedia) && (msg.fm.inf.StarCount == 0) {
+		err = fmerrors.MissedRequiredField("IMSGInformation", "WriteStarCount()", 0, 0, false, false)
+	} else if ((msg.fm.method == methods.Video) || (msg.fm.method == methods.Photo)) && (msg.fm.inf.StarCount != 0) {
+		msg.fm.method = methods.PaidMedia
 	}
 	return err
 }
@@ -242,16 +239,18 @@ func requiredKeyboard(msg *Message) error {
 			for i := 0; i < len(kb.Keyboard.InlineKeyboard) && err == nil; i++ {
 				for j := 0; j < len(kb.Keyboard.InlineKeyboard[i]) && err == nil; j++ {
 					if kb.Keyboard.InlineKeyboard[i][j].Text == "" {
-						err = errors.MissedRequiredField("IInlineButton", "WriteString()", j, i, false, true)
-					}
-					if kb.Keyboard.InlineKeyboard[i][j].One > 1 {
-						err = errors.TooMuchData("IInlineButton", j, i)
+						err = fmerrors.MissedRequiredField("IInlineButton", "WriteString()", j, i, false, true)
 					}
 				}
 			}
 		case *reply:
-			//
-			//
+			for i := 0; i < len(kb.Keyboard.Keyboard) && err == nil; i++ {
+				for j := 0; j < len(kb.Keyboard.Keyboard[i]) && err == nil; j++ {
+					if kb.Keyboard.Keyboard[i][j].Text == "" {
+						err = fmerrors.MissedRequiredField("IReplyButton", "WriteString()", j, i, false, true)
+					}
+				}
+			}
 		}
 	}
 	return err
@@ -260,7 +259,7 @@ func requiredKeyboard(msg *Message) error {
 func mediaPart(msg *Message) error {
 	var err error
 
-	if msg.fm.mh.amount == 1 {
+	if (msg.fm.mh.amount == 1) && (msg.fm.method != methods.PaidMedia) {
 		err = uniqueMedia(msg)
 	} else {
 		err = mediaGroup(msg)
@@ -292,10 +291,10 @@ func keyboardPart(msg *Message) error {
 	if msg.fm.kb != nil {
 
 		if msg.fm.mh.atLeastOnce {
-			err = msg.fm.kb.MultipartFields(msg.fm.writer)
+			err = msg.fm.kb.multipartFields(msg.fm.writer)
 		} else {
 
-			bytes, err = msg.fm.kb.JsonFields()
+			bytes, err = msg.fm.kb.jsonFields()
 
 			if err == nil {
 				msg.fm.buf.Write(bytes)
@@ -310,14 +309,18 @@ func chatPart(msg *Message) error {
 	var err error
 	var bytes []byte
 
-	if msg.fm.mh.atLeastOnce {
-		err = msg.fm.ch.multipartFields(msg.fm.writer)
+	if msg.fm.ch.ID == nil {
+		err = fmerrors.ChatIDIsMissed()
 	} else {
+		if msg.fm.mh.atLeastOnce {
+			err = msg.fm.ch.multipartFields(msg.fm.writer)
+		} else {
 
-		bytes, err = msg.fm.ch.createJson()
+			bytes, err = msg.fm.ch.createJson()
 
-		if err == nil {
-			msg.fm.buf.Write(bytes)
+			if err == nil {
+				msg.fm.buf.Write(bytes)
+			}
 		}
 	}
 
@@ -349,12 +352,27 @@ func uniteEverything(msg *Message) error {
 		if err != nil {
 			err = fmt.Errorf("error serializing merged JSON: %s", err)
 		}
-
 		msg.fm.buf = bytes.NewBuffer(nil)
 		msg.fm.buf.Write(mergedJSON)
 	}
 	if err == io.EOF {
 		err = nil
+	}
+	return err
+}
+
+func preMediaCheck(msg *Message) error {
+	var found bool
+	var err error
+	if _, ok := methods.Media[msg.fm.method]; ok {
+		for i := 0; i < len(msg.fm.mh.storage) && !found; i++ {
+			if msg.fm.mh.storage[i] != nil {
+				found = true
+			}
+		}
+		if !found {
+			err = fmerrors.MisMedia()
+		}
 	}
 	return err
 }
@@ -370,17 +388,18 @@ func makeRequest(msg *Message, tgr *interface{}) error {
 	msg.fm.buf = bytes.NewBuffer(nil)
 	msg.fm.writer = multipart.NewWriter(msg.fm.buf)
 
-	if msg.fm.mh.amount > 0 {
-		err = requiredMedia(msg, tgr, &object)
-	} else {
-		shouldSkip[0] = true
-	}
+	if err = preMediaCheck(msg); err == nil {
+		if msg.fm.mh.amount > 0 {
+			err = requiredMedia(msg, tgr, &object)
+		} else {
+			shouldSkip[0] = true
+		}
 
-	if err == nil {
-		err = requiredMessage(msg, tgr, object)
-	}
-	if err == nil {
-		err = requiredKeyboard(msg)
+		if err == nil {
+			if err = requiredMessage(msg, tgr, object); err == nil {
+				err = requiredKeyboard(msg)
+			}
+		}
 	}
 
 	for i := 0; (i < len(doPlan)) && (err == nil); i++ {
@@ -388,10 +407,13 @@ func makeRequest(msg *Message, tgr *interface{}) error {
 			err = doPlan[i](msg)
 		}
 	}
-	if err == nil && !msg.fm.mh.atLeastOnce {
-		err = uniteEverything(msg)
-	} else if err == nil && msg.fm.mh.atLeastOnce {
-		err = msg.fm.writer.Close()
+
+	if err == nil {
+		if !msg.fm.mh.atLeastOnce {
+			err = uniteEverything(msg)
+		} else {
+			err = msg.fm.writer.Close()
+		}
 	}
 	return err
 }
@@ -433,16 +455,30 @@ func distributorTelegramResponse(msg *Message, t *types.TelegramResponse) {
 			switch m := msg.fm.mh.storage[i].(type) {
 			case *photo:
 				for j := 0; j < len(t.Result.Photo); j++ {
-					m.response[j] = types.PhotoSize{
-						FileID:       t.Result.Photo[j].FileID,
-						FileSize:     t.Result.Photo[j].FileSize,
-						FileUniqueID: t.Result.Photo[j].FileUniqueID,
-						Width:        t.Result.Photo[j].Width,
-						Height:       t.Result.Photo[j].Height,
+					if msg.fm.method == methods.PaidMedia {
+						m.response[j] = types.PhotoSize{
+							FileID:       t.Result.PaidMedia.PaidMedia[i].Photo[j].FileID,
+							FileSize:     t.Result.PaidMedia.PaidMedia[i].Photo[j].FileSize,
+							FileUniqueID: t.Result.PaidMedia.PaidMedia[i].Photo[j].FileUniqueID,
+							Width:        t.Result.PaidMedia.PaidMedia[i].Photo[j].Width,
+							Height:       t.Result.PaidMedia.PaidMedia[i].Photo[j].Height,
+						}
+					} else {
+						m.response[j] = types.PhotoSize{
+							FileID:       t.Result.Photo[j].FileID,
+							FileSize:     t.Result.Photo[j].FileSize,
+							FileUniqueID: t.Result.Photo[j].FileUniqueID,
+							Width:        t.Result.Photo[j].Width,
+							Height:       t.Result.Photo[j].Height,
+						}
 					}
 				}
 			case *video:
-				m.response = *t.Result.Video
+				if msg.fm.method == methods.PaidMedia {
+					m.response = *t.Result.PaidMedia.PaidMedia[i].Video
+				} else {
+					m.response = *t.Result.Video
+				}
 			case *audio:
 				m.response = *t.Result.Audio
 			case *document:
@@ -468,19 +504,19 @@ func responseDecoder(msg *Message, tgr interface{}) error {
 	switch t := tgr.(type) {
 	case *types.TelegramMediaGroup:
 		if t.ErrorCode != 0 {
-			err = errors.TelegramError(t.ErrorCode, t.Description)
+			err = fmerrors.TelegramError(t.ErrorCode, t.Description)
 		} else {
 			distributorTelegram(msg, t)
 		}
 	case *types.TelegramResponse:
 		if t.ErrorCode != 0 {
-			err = errors.TelegramError(t.ErrorCode, t.Description)
+			err = fmerrors.TelegramError(t.ErrorCode, t.Description)
 		} else {
 			distributorTelegramResponse(msg, t)
 		}
 	case *types.TelegramMessageIDs:
 		if t.ErrorCode != 0 {
-			err = errors.TelegramError(t.ErrorCode, t.Description)
+			err = fmerrors.TelegramError(t.ErrorCode, t.Description)
 		} else {
 			msg.fm.inf.responseMessageIDs = make([]int, len(t.Result))
 			for i, v := range t.Result {
@@ -501,33 +537,31 @@ func sendRequest(msg *Message, tgr interface{}) error {
 
 	url := fmt.Sprint(types.TelegramAPI, "bot", testbotdata.Token, "/", msg.fm.method)
 
-	// log.Print(url)
-
 	req, err := http.NewRequest("POST", url, msg.fm.buf)
 	req.Header.Set("Content-Type", msg.fm.contentType)
 
 	if err != nil {
-		err = errors.CantMakeRequest(err)
+		err = fmerrors.CantMakeRequest(err)
 	} else {
 
 		client := http.Client{}
 		resp, err = client.Do(req)
 
 		if err != nil {
-			err = errors.CantGetResponse(err)
+			err = fmerrors.CantGetResponse(err)
 		} else {
 
 			defer resp.Body.Close()
 			body, err = io.ReadAll(resp.Body)
 			if err != nil {
-				err = errors.CantReadResponse(err)
+				err = fmerrors.CantReadResponse(err)
 			} else {
 
 				fmt.Println(string(body))
 
 				err = json.Unmarshal(body, tgr)
 				if err != nil {
-					err = errors.CantUnmarshal(err)
+					err = fmerrors.CantUnmarshal(err)
 				} else {
 					err = responseDecoder(msg, tgr)
 				}

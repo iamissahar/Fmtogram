@@ -55,20 +55,23 @@ const (
 	// they are skipped. Service messages, paid media messages, giveaway messages, giveaway winners messages,
 	// and invoice messages can't be copied.
 	CopyMessages string = "copyMessages"
+
+	// Use this method to send paid media. Paid media can be only IPhoto or IVideo. Also, the fields of methods.Photo
+	// and methds.PaidMedia are diffirent. So, please make sure because all data that you might mention may be ignored
+	// because it isn't allowed to send this with this method
+	PaidMedia string = "sendPaidMedia"
 )
 
-type empty struct{}
-
-var Media map[string]empty
+var Media map[string]struct{}
 
 func init() {
-	Media = make(map[string]empty)
+	Media = make(map[string]struct{})
 
-	Media[Photo] = empty{}
-	Media[Audio] = empty{}
-	Media[Document] = empty{}
-	Media[Video] = empty{}
-	Media[MediaGroup] = empty{}
-	Media[Animation] = empty{}
-	Media[Voice] = empty{}
+	Media[Photo] = struct{}{}
+	Media[Audio] = struct{}{}
+	Media[Document] = struct{}{}
+	Media[Video] = struct{}{}
+	Media[MediaGroup] = struct{}{}
+	Media[Animation] = struct{}{}
+	Media[Voice] = struct{}{}
 }
