@@ -4,8 +4,10 @@ import (
 	"bytes"
 	"os"
 
-	"github.com/l1qwie/Fmtogram/fmerrors"
+	"github.com/l1qwie/Fmtogram/formatter/methods"
 )
+
+var matrix [7][7]int
 
 func mpeg4(buf []byte) bool {
 	return len(buf) >= 8 && bytes.HasPrefix(buf[4:], []byte("ftyp"))
@@ -42,7 +44,7 @@ func h264(buf []byte) bool {
 }
 
 func oggWithOpus(buf []byte) bool {
-	return (len(buf) >= 8 && bytes.HasPrefix(buf, []byte("OggS"))) && (bytes.HasPrefix(buf[4:], []byte("OpusHead")))
+	return len(buf) >= 36 && bytes.HasPrefix(buf, []byte("OggS")) && bytes.HasPrefix(buf[28:], []byte("OpusHead"))
 }
 
 func headerGiver(header *[]byte, path string) error {
@@ -113,7 +115,7 @@ func (an *animation) isCorrectType(path string) error {
 
 func (vc *voice) isCorrectType(path string) error {
 	var err error
-	buf := make([]byte, 12)
+	buf := make([]byte, 64)
 	if err = headerGiver(&buf, path); err == nil {
 		if !oggWithOpus(buf) && !mp3(buf) && !m4a(buf) {
 			err = code12()
@@ -133,58 +135,92 @@ func (vdn *videonote) isCorrectType(path string) error {
 	return err
 }
 
-func requiredPhotoData(ph *photo, num int) error {
-	var err error
-	if ph.Photo == "" {
-		err = fmerrors.MissedRequiredField(interfacePhoto, "Write{Storage,Telgram,Internet}Photo{FilePath/ID/URL}", num, 0, true, false)
-	}
-	return err
+func init() {
+	matrix[constPhoto][constPhoto] = allowed
+	matrix[constPhoto][constVideo] = allowed
+	matrix[constAudio][constAudio] = allowed
+	matrix[constVideo][constPhoto] = allowed
+	matrix[constVideo][constVideo] = allowed
+	matrix[constDoc][constDoc] = allowed
 }
 
-func requiredVideoData(vd *video, num int) error {
-	var err error
-	if vd.Video == "" {
-		err = fmerrors.MissedRequiredField(interfaceVideo, "Write{Storage,Telgram,Internet}Video{FilePath/ID/URL}", num, 0, true, false)
+func compatibilityCheck(msg *Message, mediaID int) bool {
+	res := true
+	for j := 0; j < msg.fm.mh.i; j++ {
+		othersID := msg.fm.mh.storage[j].uniqueConst()
+		if (matrix[mediaID][othersID] != allowed) || (msg.fm.method == methods.PaidMedia) {
+			res = false
+		}
 	}
-	return err
+	return res
 }
 
-func requiredAudioData(ad *audio, num int) error {
-	var err error
-	if ad.Audio == "" {
-		err = fmerrors.MissedRequiredField(interfaceAudio, "Write{Storage,Telgram,Internet}Audio{FilePath/ID/URL}", num, 0, true, false)
+func isDefaultChat(ch *chat) bool {
+	res := true
+	if ch.FromChatID != nil {
+		res = false
 	}
-	return err
+	if ch.ID != nil {
+		res = false
+	}
+	if ch.BusinessConnectionID != "" {
+		res = false
+	}
+	return res
 }
 
-func requiredDocumentData(dc *document, num int) error {
-	var err error
-	if dc.Document == "" {
-		err = fmerrors.MissedRequiredField(interfaceDocument, "Write{Storage,Telgram,Internet}Document{FilePath/ID/URL}", num, 0, true, false)
+func isDefaultParams(pr *information) bool {
+	res := true
+	if pr.MessageID != 0 {
+		res = false
 	}
-	return err
-}
-
-func requiredAnimationData(an *animation, num int) error {
-	var err error
-	if an.Animation == "" {
-		err = fmerrors.MissedRequiredField(interfaceAnimation, "Write{Storage,Telgram,Internet}Animation{FilePath/ID/URL}", num, 0, true, false)
+	if pr.MessageIDs != nil {
+		res = false
 	}
-	return err
-}
-
-func requiredVoiceData(vc *voice, num int) error {
-	var err error
-	if vc.Voice == "" {
-		err = fmerrors.MissedRequiredField(interfaceVoice, "Write{Storage,Telgram,Internet}Voice{FilePath/ID/URL}", num, 0, true, false)
+	if pr.Text != "" {
+		res = false
 	}
-	return err
-}
-
-func requiredVideoNoteData(vdn *videonote, num int) error {
-	var err error
-	if vdn.VideoNote == "" {
-		err = fmerrors.MissedRequiredField(interfaceVideoNote, "Write{Storage,Telgram,Internet}VideoNote{FilePath/ID/URL}", num, 0, true, false)
+	if pr.Caption != "" {
+		res = false
 	}
-	return err
+	if pr.ParseMode != "" {
+		res = false
+	}
+	if pr.MessageThreadID != 0 {
+		res = false
+	}
+	if pr.Entities != nil {
+		res = false
+	}
+	if pr.CaptionEntities != nil {
+		res = false
+	}
+	if pr.LinkPreviewOptions != nil {
+		res = false
+	}
+	if pr.DisableNotification {
+		res = false
+	}
+	if pr.ProtectContent {
+		res = false
+	}
+	if pr.MessageEffectID != "" {
+		res = false
+	}
+	if pr.ShowCaptionAboveMedia {
+		res = false
+	}
+	if pr.ReplyParameters != nil {
+		res = false
+	}
+	if pr.AllowPaidBroadcast {
+		res = false
+	}
+	if pr.StarCount != 0 {
+		res = false
+	}
+	if pr.Payload != "" {
+		res = false
+	}
+	return res
 }

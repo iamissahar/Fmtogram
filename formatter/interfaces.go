@@ -9,7 +9,7 @@ import (
 type handlerMedia interface {
 	multipartFields(writer *multipart.Writer, group *[]interface{}, id int, input bool) error
 	jsonFileds() (jsbody []byte, err error)
-	nameAndConst() (name string, constID int)
+	uniqueConst() (constID int)
 }
 
 type handlerKB interface {
@@ -128,14 +128,6 @@ type IAudio interface {
 }
 
 type IDocument interface {
-	// Receives a string that will be a caption of the document. If you're going to send
-	// one document and you want to send a text-message you have to use it insted of WriteString(string)
-	// in MSGInformation interface
-	WriteCaption(caption string) error
-
-	WriteCaptionEntities(entities []*types.MessageEntity) error
-	WriteDisableContentTypeDetection() error
-
 	// Receives a path of an audio
 	WriteDocumentStorage(path string) error
 
@@ -144,6 +136,14 @@ type IDocument interface {
 
 	// Recueves an URL-link of an audio
 	WriteDocumentInternet(URL string) error
+
+	// Receives a string that will be a caption of the document. If you're going to send
+	// one document and you want to send a text-message you have to use it insted of WriteString(string)
+	// in MSGInformation interface
+	WriteCaption(caption string) error
+
+	WriteCaptionEntities(entities []*types.MessageEntity) error
+	WriteDisableContentTypeDetection() error
 
 	// Receives spicific kind of string. Adds some opportunity to transform the text-message. There are 3 options: types.HTML, types.Markdown and...
 	WriteParseMode(parsemode string) error

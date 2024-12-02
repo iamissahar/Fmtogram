@@ -113,8 +113,8 @@ func (ph *photo) jsonFileds() ([]byte, error) {
 	return json.Marshal(ph)
 }
 
-func (ph *photo) nameAndConst() (string, int) {
-	return interfacePhoto, constPhoto
+func (ph *photo) uniqueConst() int {
+	return constPhoto
 }
 
 func (vd *video) multipartFields(writer *multipart.Writer, group *[]interface{}, i int, input bool) error {
@@ -190,8 +190,8 @@ func (vd *video) jsonFileds() ([]byte, error) {
 	return json.Marshal(vd)
 }
 
-func (vd *video) nameAndConst() (string, int) {
-	return interfaceVideo, constVideo
+func (vd *video) uniqueConst() int {
+	return constVideo
 }
 
 func (ad *audio) multipartFields(writer *multipart.Writer, group *[]interface{}, i int, input bool) error {
@@ -242,8 +242,8 @@ func (ad *audio) jsonFileds() ([]byte, error) {
 	return json.Marshal(ad)
 }
 
-func (ad *audio) nameAndConst() (string, int) {
-	return interfaceAudio, constAudio
+func (ad *audio) uniqueConst() int {
+	return constAudio
 }
 
 func (dc *document) multipartFields(writer *multipart.Writer, group *[]interface{}, i int, input bool) error {
@@ -287,8 +287,8 @@ func (dc *document) jsonFileds() ([]byte, error) {
 	return json.Marshal(dc)
 }
 
-func (dc *document) nameAndConst() (string, int) {
-	return interfaceDocument, constDoc
+func (dc *document) uniqueConst() int {
+	return constDoc
 }
 
 func (an *animation) multipartFields(writer *multipart.Writer, group *[]interface{}, i int, input bool) error {
@@ -351,8 +351,8 @@ func (an *animation) jsonFileds() ([]byte, error) {
 	return json.Marshal(an)
 }
 
-func (an *animation) nameAndConst() (string, int) {
-	return interfaceAnimation, constAnim
+func (an *animation) uniqueConst() int {
+	return constAnim
 }
 
 func (vc *voice) multipartFields(writer *multipart.Writer, group *[]interface{}, i int, input bool) error {
@@ -391,8 +391,8 @@ func (vc *voice) jsonFileds() ([]byte, error) {
 	return json.Marshal(vc)
 }
 
-func (*voice) nameAndConst() (string, int) {
-	return interfaceVoice, constVoice
+func (*voice) uniqueConst() int {
+	return constVoice
 }
 
 func (vdn *videonote) multipartFields(writer *multipart.Writer, group *[]interface{}, i int, input bool) error {
@@ -441,8 +441,8 @@ func (vc *videonote) jsonFileds() ([]byte, error) {
 	return json.Marshal(vc)
 }
 
-func (*videonote) nameAndConst() (string, int) {
-	return interfaceVideoNote, constVideoNote
+func (*videonote) uniqueConst() int {
+	return constVideoNote
 }
 
 func putGroup(writer *multipart.Writer, group []interface{}) error {

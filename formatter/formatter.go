@@ -34,158 +34,162 @@ func CreateEmpltyMessage() *Message {
 	return m
 }
 
-func buildConstRules() [7][7]int {
-	var matrix [7][7]int
+// func casePhoto(msg *Message, ph *photo, i int, matrix [7][7]int, object *string) error {
+// 	err := requiredPhotoData(ph, i)
+// 	if err == nil {
+// 		if !msg.fm.notchange {
+// 			msg.fm.method = methods.Photo
+// 		}
+// 		*object = interfacePhoto
+// 		err = compatibilityСheck(msg, matrix, i)
+// 	}
+// 	return err
+// }
 
-	matrix[constPhoto][constPhoto] = allowed
-	matrix[constPhoto][constVideo] = allowed
-	matrix[constAudio][constAudio] = allowed
-	matrix[constVideo][constPhoto] = allowed
-	matrix[constVideo][constVideo] = allowed
-	matrix[constDoc][constDoc] = allowed
-	return matrix
-}
+// func caseAudio(msg *Message, ad *audio, i int, matrix [7][7]int, object *string) error {
+// 	err := requiredAudioData(ad, i)
+// 	if err == nil {
+// 		if !msg.fm.notchange {
+// 			msg.fm.method = methods.Audio
+// 		}
+// 		*object = interfaceAudio
+// 		err = compatibilityСheck(msg, matrix, i)
+// 	}
+// 	return err
+// }
 
-func compatibilityСheck(msg *Message, matrix [7][7]int, current int) error {
-	var err error
+// func caseVideo(msg *Message, vd *video, i int, matrix [7][7]int, object *string) error {
+// 	err := requiredVideoData(vd, i)
+// 	if err == nil {
+// 		if !msg.fm.notchange {
+// 			msg.fm.method = methods.Video
+// 		}
+// 		*object = interfaceVideo
+// 		err = compatibilityСheck(msg, matrix, i)
+// 	}
+// 	return err
+// }
 
-	currentname, currentconst := msg.fm.mh.storage[current].nameAndConst()
+// func caseDocument(msg *Message, dc *document, i int, matrix [7][7]int, object *string) error {
+// 	err := requiredDocumentData(dc, i)
+// 	if err == nil {
+// 		if !msg.fm.notchange {
+// 			msg.fm.method = methods.Document
+// 		}
+// 		*object = interfaceDocument
+// 		err = compatibilityСheck(msg, matrix, i)
+// 	}
+// 	return err
+// }
 
-	for j := 0; j < current; j++ {
+// func caseAnimation(msg *Message, an *animation, i int, matrix [7][7]int, object *string) error {
+// 	err := requiredAnimationData(an, i)
+// 	if err == nil {
+// 		if !msg.fm.notchange {
+// 			msg.fm.method = methods.Animation
+// 		}
+// 		*object = interfaceAnimation
+// 		err = compatibilityСheck(msg, matrix, i)
+// 	}
+// 	return err
+// }
 
-		name, num := msg.fm.mh.storage[j].nameAndConst()
-		if (matrix[currentconst][num] != allowed) || (msg.fm.method == methods.PaidMedia) {
-			err = fmerrors.ImpossibleCombination(currentname, name, msg.fm.method)
-		}
-	}
-	return err
-}
+// func caseVoice(msg *Message, vc *voice, i int, matrix [7][7]int, object *string) error {
+// 	err := requiredVoiceData(vc, i)
+// 	if err == nil {
+// 		if !msg.fm.notchange {
+// 			msg.fm.method = methods.Voice
+// 		}
+// 		*object = interfaceVoice
+// 		err = compatibilityСheck(msg, matrix, i)
+// 	}
+// 	return err
+// }
 
-func casePhoto(msg *Message, ph *photo, i int, matrix [7][7]int, object *string) error {
-	err := requiredPhotoData(ph, i)
-	if err == nil {
-		if !msg.fm.notchange {
-			msg.fm.method = methods.Photo
-		}
-		*object = interfacePhoto
-		err = compatibilityСheck(msg, matrix, i)
-	}
-	return err
-}
+// func caseVideoNote(msg *Message, vdn *videonote, i int, matrix [7][7]int, object *string) error {
+// 	err := requiredVideoNoteData(vdn, i)
+// 	if err == nil {
+// 		if !msg.fm.notchange {
+// 			msg.fm.method = methods.VideoNote
+// 		}
+// 		*object = interfaceVideoNote
+// 		err = compatibilityСheck(msg, matrix, i)
+// 	}
+// 	return err
+// }
 
-func caseAudio(msg *Message, ad *audio, i int, matrix [7][7]int, object *string) error {
-	err := requiredAudioData(ad, i)
-	if err == nil {
-		if !msg.fm.notchange {
-			msg.fm.method = methods.Audio
-		}
-		*object = interfaceAudio
-		err = compatibilityСheck(msg, matrix, i)
-	}
-	return err
-}
+// func requiredMedia(msg *Message, tgr *interface{}, object *string) error {
+// 	var err error
 
-func caseVideo(msg *Message, vd *video, i int, matrix [7][7]int, object *string) error {
-	err := requiredVideoData(vd, i)
-	if err == nil {
-		if !msg.fm.notchange {
-			msg.fm.method = methods.Video
-		}
-		*object = interfaceVideo
-		err = compatibilityСheck(msg, matrix, i)
-	}
-	return err
-}
+// 	for i, j := 0, 0; (i < len(msg.fm.mh.storage)) && (err == nil); i++ {
+// 		if msg.fm.mh.storage[i] != nil {
+// 			switch m := msg.fm.mh.storage[i].(type) {
+// 			case *photo:
+// 				err = casePhoto(msg, m, i, matrix, object)
+// 			case *audio:
+// 				err = caseAudio(msg, m, i, matrix, object)
+// 			case *video:
+// 				err = caseVideo(msg, m, i, matrix, object)
+// 			case *document:
+// 				err = caseDocument(msg, m, i, matrix, object)
+// 			case *animation:
+// 				err = caseAnimation(msg, m, i, matrix, object)
+// 			case *voice:
+// 				err = caseVoice(msg, m, i, matrix, object)
+// 			case *videonote:
+// 				err = caseVideoNote(msg, m, i, matrix, object)
+// 			}
+// 			if err == nil {
+// 				if j >= 1 {
+// 					if !msg.fm.notchange {
+// 						msg.fm.method = methods.MediaGroup
+// 					}
+// 					*object = "any of those you have mentioned: "
+// 					for j := 0; j < i; j++ {
+// 						name, _ := msg.fm.mh.storage[j].nameAndConst()
+// 						*object = fmt.Sprintf("%s/%s", *object, name)
+// 					}
+// 					*tgr = new(types.TelegramMediaGroup)
+// 				} else {
+// 					*tgr = new(types.TelegramResponse)
+// 				}
+// 				j++
+// 			}
+// 		}
+// 	}
+// 	return err
+// }
 
-func caseDocument(msg *Message, dc *document, i int, matrix [7][7]int, object *string) error {
-	err := requiredDocumentData(dc, i)
-	if err == nil {
-		if !msg.fm.notchange {
-			msg.fm.method = methods.Document
-		}
-		*object = interfaceDocument
-		err = compatibilityСheck(msg, matrix, i)
-	}
-	return err
-}
-
-func caseAnimation(msg *Message, an *animation, i int, matrix [7][7]int, object *string) error {
-	err := requiredAnimationData(an, i)
-	if err == nil {
-		if !msg.fm.notchange {
-			msg.fm.method = methods.Animation
-		}
-		*object = interfaceAnimation
-		err = compatibilityСheck(msg, matrix, i)
-	}
-	return err
-}
-
-func caseVoice(msg *Message, vc *voice, i int, matrix [7][7]int, object *string) error {
-	err := requiredVoiceData(vc, i)
-	if err == nil {
-		if !msg.fm.notchange {
-			msg.fm.method = methods.Voice
-		}
-		*object = interfaceVoice
-		err = compatibilityСheck(msg, matrix, i)
-	}
-	return err
-}
-
-func caseVideoNote(msg *Message, vdn *videonote, i int, matrix [7][7]int, object *string) error {
-	err := requiredVideoNoteData(vdn, i)
-	if err == nil {
-		if !msg.fm.notchange {
-			msg.fm.method = methods.VideoNote
-		}
-		*object = interfaceVideoNote
-		err = compatibilityСheck(msg, matrix, i)
-	}
-	return err
-}
-
-func requiredMedia(msg *Message, tgr *interface{}, object *string) error {
-	var err error
-
-	matrix := buildConstRules()
-	for i, j := 0, 0; (i < len(msg.fm.mh.storage)) && (err == nil); i++ {
+func mediaMethod(msg *Message, tgr *interface{}) {
+	for i, j := 0, 0; i < len(msg.fm.mh.storage); i++ {
 		if msg.fm.mh.storage[i] != nil {
-			switch m := msg.fm.mh.storage[i].(type) {
+			switch msg.fm.mh.storage[i].(type) {
 			case *photo:
-				err = casePhoto(msg, m, i, matrix, object)
+				msg.fm.method = methods.Photo
 			case *audio:
-				err = caseAudio(msg, m, i, matrix, object)
+				msg.fm.method = methods.Audio
 			case *video:
-				err = caseVideo(msg, m, i, matrix, object)
+				msg.fm.method = methods.Video
 			case *document:
-				err = caseDocument(msg, m, i, matrix, object)
+				msg.fm.method = methods.Document
 			case *animation:
-				err = caseAnimation(msg, m, i, matrix, object)
+				msg.fm.method = methods.Animation
 			case *voice:
-				err = caseVoice(msg, m, i, matrix, object)
+				msg.fm.method = methods.Voice
 			case *videonote:
-				err = caseVideoNote(msg, m, i, matrix, object)
+				msg.fm.method = methods.VideoNote
 			}
-			if err == nil {
-				if j >= 1 {
-					if !msg.fm.notchange {
-						msg.fm.method = methods.MediaGroup
-					}
-					*object = "any of those you have mentioned: "
-					for j := 0; j < i; j++ {
-						name, _ := msg.fm.mh.storage[j].nameAndConst()
-						*object = fmt.Sprintf("%s/%s", *object, name)
-					}
-					*tgr = new(types.TelegramMediaGroup)
-				} else {
-					*tgr = new(types.TelegramResponse)
-				}
-				j++
+
+			if j >= 1 {
+				msg.fm.method = methods.MediaGroup
+				*tgr = new(types.TelegramMediaGroup)
+			} else {
+				*tgr = new(types.TelegramResponse)
 			}
+			j++
+
 		}
 	}
-	return err
 }
 
 func requiredMessage(msg *Message, tgr *interface{}, object string) error {
@@ -371,7 +375,7 @@ func preMediaCheck(msg *Message) error {
 			}
 		}
 		if !found {
-			err = fmerrors.MisMedia()
+			err = code14()
 		}
 	}
 	return err
@@ -390,16 +394,14 @@ func makeRequest(msg *Message, tgr *interface{}) error {
 
 	if err = preMediaCheck(msg); err == nil {
 		if msg.fm.mh.amount > 0 {
-			err = requiredMedia(msg, tgr, &object)
+			mediaMethod(msg, tgr)
 		} else {
 			shouldSkip[0] = true
 		}
-
-		if err == nil {
-			if err = requiredMessage(msg, tgr, object); err == nil {
-				err = requiredKeyboard(msg)
-			}
+		if err = requiredMessage(msg, tgr, object); err == nil {
+			err = requiredKeyboard(msg)
 		}
+
 	}
 
 	for i := 0; (i < len(doPlan)) && (err == nil); i++ {
@@ -486,7 +488,19 @@ func distributorTelegramResponse(msg *Message, t *types.TelegramResponse) {
 			case *animation:
 				m.response = *t.Result.Animation
 			case *videonote:
-				m.response = *t.Result.VideoNote
+				if t.Result.VideoNote != nil {
+					m.response = *t.Result.VideoNote
+				} else {
+					m.response = types.VideoNote{
+						FileID:       t.Result.Video.FileID,
+						FileUniqueID: t.Result.Video.FileUniqueID,
+						Duration:     t.Result.Video.Duration,
+						Thumbnail:    t.Result.Video.Thumbnail,
+						FileSize:     t.Result.Video.FileSize,
+					}
+				}
+			case *voice:
+				m.response = *t.Result.Voice
 			}
 		}
 	}

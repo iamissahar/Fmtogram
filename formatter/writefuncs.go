@@ -8,10 +8,10 @@ import (
 	"github.com/l1qwie/Fmtogram/types"
 )
 
-func code12() error {
+func code3() error {
 	err := new(fmerrors.FME)
-	err.Code = 12
-	err.String = "incorrect type of file"
+	err.Code = 3
+	err.String = "media holder is full"
 	return err
 }
 
@@ -26,6 +26,20 @@ func code10() error {
 	err := new(fmerrors.FME)
 	err.Code = 10
 	err.String = "the data is already present"
+	return err
+}
+
+func code12() error {
+	err := new(fmerrors.FME)
+	err.Code = 12
+	err.String = "incorrect type of file"
+	return err
+}
+
+func code14() error {
+	err := new(fmerrors.FME)
+	err.Code = 14
+	err.String = "media method is specified, media data isn't"
 	return err
 }
 
@@ -47,6 +61,13 @@ func code25() error {
 	err := new(fmerrors.FME)
 	err.Code = 25
 	err.String = "incompatible data"
+	return err
+}
+
+func code54() error {
+	err := new(fmerrors.FME)
+	err.Code = 54
+	err.String = "isn't allowed to be united with others"
 	return err
 }
 
@@ -609,7 +630,7 @@ func (ad *audio) GetResponse() types.Audio {
 func (dc *document) writeDocument(document, object string) error {
 	var err error
 	if dc.Document == "" {
-		dc.Document = document
+		dc.Document, dc.Media = document, document
 		logs.DataWrittenSuccessfully(interfaceDocument, object)
 	} else {
 		err = code10()
