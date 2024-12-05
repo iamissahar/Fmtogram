@@ -163,21 +163,23 @@ func CreateEmpltyMessage() *Message {
 func mediaMethod(msg *Message, tgr *interface{}) {
 	for i, j := 0, 0; i < len(msg.fm.mh.storage); i++ {
 		if msg.fm.mh.storage[i] != nil {
-			switch msg.fm.mh.storage[i].(type) {
-			case *photo:
-				msg.fm.method = methods.Photo
-			case *audio:
-				msg.fm.method = methods.Audio
-			case *video:
-				msg.fm.method = methods.Video
-			case *document:
-				msg.fm.method = methods.Document
-			case *animation:
-				msg.fm.method = methods.Animation
-			case *voice:
-				msg.fm.method = methods.Voice
-			case *videonote:
-				msg.fm.method = methods.VideoNote
+			if !msg.fm.notchange {
+				switch msg.fm.mh.storage[i].(type) {
+				case *photo:
+					msg.fm.method = methods.Photo
+				case *audio:
+					msg.fm.method = methods.Audio
+				case *video:
+					msg.fm.method = methods.Video
+				case *document:
+					msg.fm.method = methods.Document
+				case *animation:
+					msg.fm.method = methods.Animation
+				case *voice:
+					msg.fm.method = methods.Voice
+				case *videonote:
+					msg.fm.method = methods.VideoNote
+				}
 			}
 
 			if j >= 1 {
@@ -194,7 +196,6 @@ func mediaMethod(msg *Message, tgr *interface{}) {
 
 func requiredMessage(msg *Message, tgr *interface{}, object string) error {
 	var err error
-
 	if (msg.fm.method == "") && (msg.fm.inf.Text == "") {
 		err = fmerrors.MissedRequiredField("IMSGInformation", "WriteString()", 0, 0, false, false)
 	}
@@ -206,7 +207,6 @@ func requiredMessage(msg *Message, tgr *interface{}, object string) error {
 			msg.fm.inf.CaptionEntities, msg.fm.inf.Entities = msg.fm.inf.Entities, nil
 		}
 	}
-	fmt.Println("METHOD: ", msg.fm.method, msg.fm.inf.StarCount)
 	if msg.fm.method == "" {
 		msg.fm.method = methods.Message
 		msg.fm.contentType = "application/json"
