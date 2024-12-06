@@ -207,6 +207,45 @@ func (msg *Message) AddVideoNote(vdn IVideoNote) error {
 	return err
 }
 
+// Added a location interface to the message you're building
+func (msg *Message) AddLocation(loc ILocation) error {
+	var err error
+	if l, ok := loc.(*location); ok {
+		if msg.fm.loc == nil {
+			if (l.Latitude != 0) && (l.Longitude) != 0 {
+				msg.fm.loc = l
+				logs.InterfaceSaved(interfaceLocation)
+			} else {
+				err = code21()
+			}
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (msg *Message) AddContact(con IContact) error {
+	var err error
+	if c, ok := con.(*contact); ok {
+		if msg.fm.con == nil {
+			if (c.PhoneNumber != "") && (c.FirstName != "") {
+				msg.fm.con = c
+				logs.InterfaceSaved(interfaceLocation)
+			} else {
+				err = code21()
+			}
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
 // Added a message interface to the message you're building
 func (msg *Message) AddParameters(param IParameters) error {
 	var err error

@@ -27,8 +27,13 @@ const (
 	// as a playable voice message. For this to work, your audio must be in an .OGG file encoded with OPUS,
 	// or in .MP3 format, or in .M4A format (other formats may be sent as Audio or Document).
 	// Bots can currently send voice messages of up to 50 MB in size, this limit may be changed in the future.
-	Voice      string = "sendVoice"
-	VideoNote  string = "sendVideoNote"
+	Voice string = "sendVoice"
+
+	// Telegram clients support rounded square MPEG4 videos of up to 1 minute long. Use this method to send video messages.
+	VideoNote string = "sendVideoNote"
+
+	// Use this method to send a group of photos, videos, documents or audios as an album.
+	// Documents and audio files can be only grouped in an album with messages of the same type.
 	MediaGroup string = "sendMediaGroup"
 	Message    string = "sendMessage"
 
@@ -60,6 +65,21 @@ const (
 	// and methds.PaidMedia are diffirent. So, please make sure because all data that you might mention may be ignored
 	// because it isn't allowed to send this with this method
 	PaidMedia string = "sendPaidMedia"
+
+	// Use this method to send static .WEBP, animated .TGS, or video .WEBM stickers.
+	Sticker string = "sendSticker"
+
+	// Use this method to send point on the map
+	Location string = "sendLocation"
+
+	// Use this method to send information about a venue.
+	Venue string = "sendVenue"
+
+	// Use this method to send phone contacts.
+	Contact string = "sendContact"
+
+	// Use this method to send a native poll.
+	Poll string = "sendPoll"
 )
 
 var Media map[string]struct{}

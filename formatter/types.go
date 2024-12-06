@@ -16,6 +16,8 @@ type formatter struct {
 	inf         *information
 	ch          *chat
 	kb          handlerKB
+	loc         *location
+	con         *contact
 	contentType string
 	writer      *multipart.Writer
 	mh          *mediaHolder

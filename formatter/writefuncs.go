@@ -1129,6 +1129,500 @@ func (vdn *videonote) GetResponse() types.VideoNote {
 	return vdn.response
 }
 
+func (loc *location) WriteLatitude(lat float64) error {
+	var err error
+	if (lat >= -90) && (lat <= 90) {
+		if loc.Latitude == 0 {
+			loc.Latitude = lat
+			logs.DataWrittenSuccessfully(interfaceLocation, "Latitude")
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (loc *location) WriteLongitude(long float64) error {
+	var err error
+	if (long >= -180) && (long <= 180) {
+		if loc.Longitude == 0 {
+			loc.Longitude = long
+			logs.DataWrittenSuccessfully(interfaceLocation, "Longitude")
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (loc *location) WriteHorizontalAccuracy(horacc float64) error {
+	var err error
+	if (horacc >= 0) && (horacc <= 1500) {
+		if loc.HorizontalAccuracy == 0 {
+			loc.HorizontalAccuracy = horacc
+			logs.DataWrittenSuccessfully(interfaceLocation, "Horizontal Accuracy")
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (loc *location) WriteLivePeriod(period int) error {
+	var err error
+	if ((period >= 60) && (period <= 86400)) || (period == 0x7FFFFFFF) {
+		if loc.LivePeriod == 0 {
+			loc.LivePeriod = period
+			logs.DataWrittenSuccessfully(interfaceLocation, "Live Period")
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (loc *location) WriteHeading(heading int) error {
+	var err error
+	if (heading >= 1) && (heading <= 360) {
+		if loc.Heading == 0 {
+			loc.Heading = heading
+			logs.DataWrittenSuccessfully(interfaceLocation, "Heading")
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (loc *location) WriteProximityAlertRadius(proxalrad int) error {
+	var err error
+	if (proxalrad >= 1) && (proxalrad <= 100000) {
+		if loc.ProximityAlertRadius == 0 {
+			loc.ProximityAlertRadius = proxalrad
+			logs.DataWrittenSuccessfully(interfaceLocation, "Proximity Alert Radius")
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (loc *location) WriteTitle(title string) error {
+	var err error
+	if title != "" {
+		if loc.Title == "" {
+			loc.Title = title
+			logs.DataWrittenSuccessfully(interfaceLocation, "Title")
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (loc *location) WriteAddress(address string) error {
+	var err error
+	if address != "" {
+		if loc.Address == "" {
+			loc.Address = address
+			logs.DataWrittenSuccessfully(interfaceLocation, "Address")
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (loc *location) WriteFoursquareID(foursquareID string) error {
+	var err error
+	if foursquareID != "" {
+		if loc.FoursquareID == "" {
+			loc.FoursquareID = foursquareID
+			logs.DataWrittenSuccessfully(interfaceLocation, "Foursquare ID")
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (loc *location) WriteFoursquareType(foursquareType string) error {
+	var err error
+	if foursquareType != "" {
+		if loc.FoursquareType == "" {
+			loc.FoursquareType = foursquareType
+			logs.DataWrittenSuccessfully(interfaceLocation, "Foursquare Type")
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (loc *location) WriteGooglePlaceID(googlePlaceID string) error {
+	var err error
+	if googlePlaceID != "" {
+		if loc.GooglePlaceID == "" {
+			loc.GooglePlaceID = googlePlaceID
+			logs.DataWrittenSuccessfully(interfaceLocation, "Google Place ID")
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (loc *location) WriteGooglePlaceType(googlePlaceType string) error {
+	var err error
+	if googlePlaceType != "" {
+		if loc.GooglePlaceType == "" {
+			loc.GooglePlaceType = googlePlaceType
+			logs.DataWrittenSuccessfully(interfaceLocation, "Google Place Type")
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (loc *location) GetResponse() types.Venue {
+	return loc.response
+}
+
+func (c *contact) WritePhoneNumber(phone string) error {
+	var err error
+	if phone != "" {
+		if c.PhoneNumber == "" {
+			c.PhoneNumber = phone
+			logs.DataWrittenSuccessfully(interfaceContact, "Phone Number")
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (c *contact) WriteFirstName(fname string) error {
+	var err error
+	if fname != "" {
+		if c.FirstName == "" {
+			c.FirstName = fname
+			logs.DataWrittenSuccessfully(interfaceContact, "First Name")
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (c *contact) WriteLastName(lname string) error {
+	var err error
+	if lname != "" {
+		if c.LastName == "" {
+			c.LastName = lname
+			logs.DataWrittenSuccessfully(interfaceContact, "Last Name")
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (c *contact) WriteVCard(vcard string) error {
+	var err error
+	if vcard != "" {
+		if c.Vcard == "" {
+			c.Vcard = vcard
+			logs.DataWrittenSuccessfully(interfaceContact, "vCard")
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (c *contact) GetResponse() types.Contact {
+	return c.response
+}
+
+func (p *poll) WriteQuestion(question string) error {
+	var err error
+	q := len([]rune(question))
+	if (q >= 1) && (q <= 300) {
+		if p.Question == "" {
+			p.Question = question
+			logs.DataWrittenSuccessfully(interfacePoll, "Question")
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (p *poll) WriteQuestionParseMode(parsemode string) error {
+	var err error
+	if (parsemode == types.HTML) || (parsemode == types.Markdown) || (parsemode == types.MarkdownV2) {
+		if p.QuestionParsemode == "" {
+			p.QuestionParsemode = parsemode
+			logs.DataWrittenSuccessfully(interfacePoll, "Question Parse Mode")
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (p *poll) WriteQuestionEntities(entities []*types.MessageEntity) error {
+	var err error
+	if len(entities) != 0 {
+
+		for i := 0; (i < len(entities)) && (err == nil); i++ {
+			if entities[i] == nil {
+				err = code5()
+			}
+		}
+
+		if err == nil {
+			if len(p.QuestionEntities) == 0 {
+				p.QuestionEntities = entities
+				logs.DataWrittenSuccessfully(interfacePoll, "Question Entities")
+			} else {
+				err = code10()
+			}
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (p *poll) WriteOptions(options []*types.PollOption) error {
+	var err error
+	if len(options) != 0 {
+
+		for i := 0; (i < len(options)) && (err == nil); i++ {
+			if options[i] == nil {
+				err = code5()
+			}
+		}
+
+		if err == nil {
+			if len(p.Options) == 0 {
+				p.Options = options
+				logs.DataWrittenSuccessfully(interfacePoll, "Options")
+			} else {
+				err = code10()
+			}
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (p *poll) WriteAnonymous() error {
+	var err error
+	if !p.IsAnonymous {
+		p.IsAnonymous = true
+		logs.SettedParam("Anonymous", interfacePoll, true)
+	} else {
+		err = code10()
+	}
+	return err
+}
+
+func (p *poll) WriteType(polltype string) error {
+	var err error
+	if (polltype == "quiz") || (polltype == "regular") {
+		if p.Type == "" {
+			p.Type = polltype
+			logs.DataWrittenSuccessfully(interfacePoll, "Type")
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (p *poll) WriteAllowMultipleAnswers() error {
+	var err error
+	if !p.AllowMultipleAnswers {
+		p.AllowMultipleAnswers = true
+		logs.SettedParam("Allow Multiple Answers", interfacePoll, true)
+	} else {
+		err = code10()
+	}
+	return err
+}
+
+func (p *poll) WriteCorrectOptionID(optID string) error {
+	var err error
+	if optID != "" {
+		r := []rune(optID)
+		if r[0] == '0' {
+			if p.CorrectOptionID == "" {
+				p.CorrectOptionID = optID
+				logs.DataWrittenSuccessfully(interfacePoll, "Correct Option ID")
+			} else {
+				err = code10()
+			}
+		} else {
+			err = code20()
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (p *poll) WriteExplanation(explanation string) error {
+	var err error
+	if explanation != "" {
+		exp := []rune(explanation)
+		if len(exp) >= 1 && len(exp) <= 200 {
+			if p.Explanation == "" {
+				p.Explanation = explanation
+				logs.DataWrittenSuccessfully(interfacePoll, "Explanation")
+			} else {
+				err = code10()
+			}
+		} else {
+			err = code20()
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (p *poll) WriteExplanationParseMode(parsemode string) error {
+	var err error
+	if (parsemode == types.HTML) || (parsemode == types.Markdown) || (parsemode == types.MarkdownV2) {
+		if p.ExplanationParsemode == "" {
+			p.ExplanationParsemode = parsemode
+			logs.DataWrittenSuccessfully(interfacePoll, "Explanation Parse Mode")
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (p *poll) WriteExplanationEntities(entities []*types.MessageEntity) error {
+	var err error
+	if len(entities) != 0 {
+
+		for i := 0; (i < len(entities)) && (err == nil); i++ {
+			if entities[i] == nil {
+				err = code5()
+			}
+		}
+
+		if err == nil {
+			if len(p.ExplanationEntities) == 0 {
+				p.ExplanationEntities = entities
+				logs.DataWrittenSuccessfully(interfacePoll, "Explanation Entities")
+			} else {
+				err = code10()
+			}
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (p *poll) WriteOpenPeriod(period int) error {
+	var err error
+	if p.CloseDate == 0 {
+		if (period >= 5) && (period <= 600) {
+			if p.OpenPeriod == 0 {
+				p.OpenPeriod = period
+				logs.DataWrittenSuccessfully(interfacePoll, "Open Period")
+			} else {
+				err = code10()
+			}
+		} else {
+			err = code20()
+		}
+	} else {
+		err = code25()
+	}
+	return err
+}
+
+func (p *poll) WriteCloseDate(time int) error {
+	var err error
+	if p.OpenPeriod == 0 {
+		if (time >= 5) && (time <= 600) {
+			if p.CloseDate == 0 {
+				p.CloseDate = time
+				logs.DataWrittenSuccessfully(interfacePoll, "Close Date")
+			} else {
+				err = code10()
+			}
+		}
+	} else {
+		err = code25()
+	}
+	return err
+}
+
+func (p *poll) WriteClosed() error {
+	var err error
+	if !p.IsClosed {
+		p.IsClosed = true
+		logs.SettedParam("Closed", interfacePoll, true)
+	} else {
+		err = code10()
+	}
+	return err
+}
+
+func (p *poll) GetResponse() types.Poll {
+	return p.response
+}
+
 func (inf *information) WriteString(text string) error {
 	var err error
 	if text != "" {

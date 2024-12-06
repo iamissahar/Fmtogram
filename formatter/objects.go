@@ -99,6 +99,58 @@ type videonote struct {
 	response            types.VideoNote
 }
 
+type location struct {
+	Latitude             float64 `json:"latitude,omitempty"`
+	Longitude            float64 `json:"longitude,omitempty"`
+	HorizontalAccuracy   float64 `json:"horizontal_accuracy,omitempty"`
+	LivePeriod           int     `json:"live_period,omitempty"`
+	Heading              int     `json:"heading,omitempty"`
+	ProximityAlertRadius int     `json:"proximity_alert_radius,omitempty"`
+	Title                string  `json:"title,omitempty"`
+	Address              string  `json:"address,omitempty"`
+	FoursquareID         string  `json:"foursquare_id,omitempty"`
+	FoursquareType       string  `json:"foursquare_type,omitempty"`
+	GooglePlaceID        string  `json:"google_place_id,omitempty"`
+	GooglePlaceType      string  `json:"google_place_type,omitempty"`
+	response             types.Venue
+}
+
+type contact struct {
+	PhoneNumber string `json:"phone_number,omitempty"`
+	FirstName   string `json:"first_name,omitempty"`
+	LastName    string `json:"last_name,omitempty"`
+	UserID      int    `json:"user_id,omitempty"`
+	Vcard       string `json:"vcard,omitempty"`
+	response    types.Contact
+}
+
+type poll struct {
+	Question             string                 `json:"question,omitempty"`
+	QuestionParsemode    string                 `json:"question_parse_mode,omitempty"`
+	QuestionEntities     []*types.MessageEntity `json:"question_entities,omitempty"`
+	Options              []*types.PollOption    `json:"options,omitempty"`
+	IsAnonymous          bool                   `json:"is_anonymous,omitempty"`
+	Type                 string                 `json:"type,omitempty"`
+	AllowMultipleAnswers bool                   `json:"allows_multiple_answers,omitempty"`
+	CorrectOptionID      string                 `json:"correct_option_id,omitempty"`
+	Explanation          string                 `json:"explanation,omitempty"`
+	ExplanationParsemode string                 `json:"explanation_parse_mode,omitempty"`
+	ExplanationEntities  []*types.MessageEntity `json:"explanation_entities,omitempty"`
+	OpenPeriod           int                    `json:"open_period,omitempty"`
+	CloseDate            int                    `json:"close_date,omitempty"`
+	IsClosed             bool                   `json:"is_closed,omitempty"`
+	response             types.Poll
+}
+
+// type sticker struct {
+// 	Type       string `json:"type,omitempty"`
+// 	Media      string `json:"media,omitepty"`
+// 	Sticker    string `json:"sticker,omitempty"`
+// 	Emoji      string `json:"emoji,omitempty"`
+// 	gottenFrom int
+// 	response   types.Sticker
+// }
+
 type information struct {
 	MessageID             int                       `json:"message_id,omitempty"`
 	MessageIDs            []int                     `json:"message_ids,omitempty"`

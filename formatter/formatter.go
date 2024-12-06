@@ -194,6 +194,30 @@ func mediaMethod(msg *Message, tgr *interface{}) {
 	}
 }
 
+// NOT A FINAL RESULT
+func guessMethod(msg *Message, tgr *interface{}) error {
+	var err error
+	if msg.fm.loc != nil {
+		if msg.fm.method == "" {
+			if msg.fm.loc.Title == "" {
+				msg.fm.method = methods.Location
+			} else {
+				msg.fm.method = methods.Venue
+			}
+		}
+		*tgr = new(types.TelegramResponse)
+		msg.fm.contentType = "application/json"
+	}
+	if msg.fm.con != nil {
+		if msg.fm.method == "" {
+			msg.fm.method = methods.Contact
+		}
+		*tgr = new(types.TelegramResponse)
+		msg.fm.contentType = "application/json"
+	}
+	return err
+}
+
 func requiredMessage(msg *Message, tgr *interface{}, object string) error {
 	var err error
 	if (msg.fm.method == "") && (msg.fm.inf.Text == "") {
@@ -331,6 +355,26 @@ func chatPart(msg *Message) error {
 	return err
 }
 
+func writeToBuf(msg *Message, structer interface{}) error {
+	var err error
+	var body []byte
+	if body, err = json.Marshal(structer); err == nil {
+		msg.fm.buf.Write(body)
+	}
+	return err
+}
+
+func othersPart(msg *Message) error {
+	var err error
+	if msg.fm.loc != nil {
+		err = writeToBuf(msg, msg.fm.loc)
+	}
+	if msg.fm.con != nil {
+		err = writeToBuf(msg, msg.fm.con)
+	}
+	return err
+}
+
 func uniteEverything(msg *Message) error {
 	var err error
 	var mergedJSON []byte
@@ -384,10 +428,10 @@ func preMediaCheck(msg *Message) error {
 func makeRequest(msg *Message, tgr *interface{}) error {
 	var err error
 	var object string
-	var shouldSkip [4]bool
+	var shouldSkip [5]bool
 	// chat part must be skipped by default
 	// it isn't skipped now, because of tests
-	doPlan := [4]func(*Message) error{mediaPart, messagePart, keyboardPart, chatPart}
+	doPlan := [5]func(*Message) error{mediaPart, messagePart, keyboardPart, chatPart, othersPart}
 
 	msg.fm.buf = bytes.NewBuffer(nil)
 	msg.fm.writer = multipart.NewWriter(msg.fm.buf)
@@ -398,8 +442,10 @@ func makeRequest(msg *Message, tgr *interface{}) error {
 		} else {
 			shouldSkip[0] = true
 		}
-		if err = requiredMessage(msg, tgr, object); err == nil {
-			err = requiredKeyboard(msg)
+		if err = guessMethod(msg, tgr); err == nil {
+			if err = requiredMessage(msg, tgr, object); err == nil {
+				err = requiredKeyboard(msg)
+			}
 		}
 
 	}
@@ -510,6 +556,18 @@ func distributorTelegramResponse(msg *Message, t *types.TelegramResponse) {
 	if t.Result.From != nil {
 		msg.fm.inf.response = *t.Result.From
 	}
+	if msg.fm.loc != nil {
+		if t.Result.Venue != nil {
+			msg.fm.loc.response = *t.Result.Venue
+		} else if t.Result.Location != nil {
+			msg.fm.loc.response = types.Venue{Location: t.Result.Location}
+		}
+	}
+	if msg.fm.con != nil {
+		if t.Result.Contact != nil {
+			msg.fm.con.response = *t.Result.Contact
+		}
+	}
 	msg.fm.inf.responseMessageIDs = append(msg.fm.inf.responseMessageIDs, t.Result.MessageID)
 }
 
@@ -545,7 +603,7 @@ func sendRequest(msg *Message, tgr interface{}) error {
 	var resp *http.Response
 	var body []byte
 
-	// log.Print(msg.fm.buf.String())
+	log.Print(msg.fm.buf.String())
 	log.Print(msg.fm.method)
 	// log.Print(msg.fm.contentType)
 

@@ -43,6 +43,16 @@ func (msg *Message) NewVideoNote() IVideoNote {
 	return &videonote{Type: "video_note"}
 }
 
+func (msg *Message) NewLocation() ILocation {
+	logs.NewInterfaceCreated(interfaceLocation)
+	return &location{}
+}
+
+func (msg *Message) NewContact() IContact {
+	logs.NewInterfaceCreated(interfaceContact)
+	return &contact{}
+}
+
 // Creates a new message(inf) stucture and returns an interface with connected functions. This is the only one way to add your data to an object
 func (msg *Message) NewMessage() IParameters {
 	logs.NewInterfaceCreated("Message")

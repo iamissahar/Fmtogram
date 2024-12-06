@@ -237,6 +237,121 @@ type IVideoNote interface {
 	GetResponse() types.VideoNote
 }
 
+type ILocation interface {
+	// Latitude of the location
+	WriteLatitude(lat float64) error
+
+	// Longitude of the location
+	WriteLongitude(long float64) error
+
+	// The radius of uncertainty for the location, measured in meters; 0-1500
+	WriteHorizontalAccuracy(horacc float64) error
+
+	// Period in seconds during which the location will be updated (see https://telegram.org/blog/live-locations,
+	// should be between 60 and 86400, or 0x7FFFFFFF for live locations that can be edited indefinitely.
+	WriteLivePeriod(period int) error
+
+	// For live locations, a direction in which the user is moving, in degrees. Must be between 1 and 360 if specified.
+	WriteHeading(heading int) error
+
+	// For live locations, a maximum distance for proximity alerts about approaching another chat member,
+	// in meters. Must be between 1 and 100000 if specified.
+	WriteProximityAlertRadius(proxalrad int) error
+
+	// Name of the venue
+	WriteTitle(title string) error
+
+	// Address of the venue
+	WriteAddress(address string) error
+
+	// Foursquare identifier of the venue
+	WriteFoursquareID(foursquareID string) error
+
+	// Foursquare type of the venue, if known. (For example, “arts_entertainment/default”, “arts_entertainment/aquarium” or “food/icecream”)
+	WriteFoursquareType(foursquareType string) error
+
+	// Google Places identifier of the venue
+	WriteGooglePlaceID(googlePlaceID string) error
+
+	// Google Places type of the venue. (See https://developers.google.com/maps/documentation/places/web-service/supported_types)
+	WriteGooglePlaceType(googlePlaceType string) error
+
+	GetResponse() types.Venue
+}
+
+type IContact interface {
+	// Receives the contact's phone number
+	WritePhoneNumber(phone string) error
+
+	// Receives the contact's first name
+	WriteFirstName(fname string) error
+
+	// Receives the contact's last name
+	WriteLastName(lname string) error
+
+	// Recieves additional data about the contact in the form of a vCard, 0-2048 bytes. What vCard is: https://en.wikipedia.org/wiki/VCard
+	WriteVCard(vcard string) error
+
+	GetResponse() types.Contact
+}
+
+type IPoll interface {
+	// Receives a string that will be the question of a poll, 1-300 characters
+	WriteQuestion(question string) error
+
+	WriteQuestionParseMode(parseode string) error
+
+	WriteQuestionEntities(entities []*types.MessageEntity) error
+
+	// Receives a slice of 2-10 answer options
+	WriteOptions(options []*types.PollOption) error
+
+	// Call it only if the poll needs to be anonymous
+	WriteAnonymous() error
+
+	// Receives a poll type, “quiz” or “regular”
+	WriteType(polltype string) error
+
+	//  Call it only if the poll needs to allow multiple answers, ignored for polls in quiz mode
+	WriteAllowMultipleAnswers() error
+
+	// 0-based identifier of the correct answer option, required for polls in quiz mode
+	WriteCorrectOptionID(optID int) error
+
+	// Text that is shown when a user chooses an incorrect answer or taps on the lamp icon in a quiz-style poll,
+	// 1-200 characters with at most 2 line feeds after entities parsing
+	WriteExplanation(explanation string) error
+
+	WriteExplanationParseMode(parsemode string) error
+
+	WriteExplanationEntities(entities []*types.MessageEntity) error
+
+	// Amount of time in seconds the poll will be active after creation, 5-600. Can't be used together with (formatter.IPoll).WriteCloseDate
+	WriteOpenPeriod(period int) error
+
+	// Point in time (Unix timestamp) when the poll will be automatically closed. Must be at least 5 and no more than 600 seconds in the future. Can't be used together with (formatter.IPoll).WriteOpenPeriod
+	WriteCloseDate(time int) error
+
+	// Call it only if the poll needs to be immediately closed. This can be useful for poll preview.
+	WriteClosed() error
+
+	GetResponse() types.Poll
+}
+
+// type ISticker interface {
+// 	// Receives a path of a sticker file in formats: static .WEBP, animated .TGS or video .WEBM
+// 	WriteStickerStorage(path string) error
+
+// 	// Receives a Telegram ID of a sticker
+// 	WriteStickerTelegram(stickerID string) error
+
+// 	// Receives an URL-link of a sticker
+// 	WriteStickerInternet(URL string) error
+
+// 	// 	Emoji associated with the sticker; only for just uploaded stickers
+// 	WriteEmoji(emoji string) error
+// }
+
 type IParameters interface {
 	// Doesn't revieve anything. If the function was called, the message you send to a client will be gotten without a notification
 	WriteDisableNotification() error
