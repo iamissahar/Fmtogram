@@ -406,7 +406,7 @@ func (vd *video) WriteDuration(duration int) error {
 	return err
 }
 
-func (vd *video) WriteSupportsStreaming() error {
+func (vd *video) WriteSupportStreaming() error {
 	var err error
 	if !vd.SupportsStreaming {
 		vd.SupportsStreaming = true
@@ -526,7 +526,8 @@ func (ad *audio) WriteThumbnailInternet(thumbnail string) error {
 
 func (ad *audio) WriteCaption(caption string) error {
 	var err error
-	if caption != "" {
+	cap := len([]rune(caption))
+	if (cap > 0) && (cap <= 1024) {
 		if ad.Caption == "" {
 			ad.Caption = caption
 			logs.DataWrittenSuccessfully(interfaceAudio, "Caption")

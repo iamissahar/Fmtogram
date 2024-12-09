@@ -84,7 +84,7 @@ type IVideo interface {
 
 	// Call it, if the caption must be shown above the message media (only if you copy a message that has Media Type). Ignored if a new caption isn't specified.
 	WriteShowCaptionAboveMedia() error
-	WriteSupportsStreaming() error
+	WriteSupportStreaming() error
 	WriteThumbnailStorage(path string) error
 	WriteThumbnailTelegram(thumbnailID string) error
 	WriteThumbnailInternet(URL string) error
@@ -104,9 +104,7 @@ type IAudio interface {
 	// Recueves an URL-link of an audio
 	WriteAudioInternet(URL string) error
 
-	// Receives a string that will be a caption of the audio. If you're going to send
-	// one audio and you want to send a text-message you have to use it insted of WriteString(string)
-	// in MSGInformation interface
+	// Receives a string that will be a caption of the audio
 	WriteCaption(caption string) error
 
 	WriteCaptionEntities(entities []*types.MessageEntity) error

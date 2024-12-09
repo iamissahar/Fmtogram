@@ -27,7 +27,7 @@ func paidVideoMax(vd formatter.IVideo, t *testing.T) {
 	if err := vd.WriteDuration(55); err != nil {
 		t.Fatal(err)
 	}
-	if err := vd.WriteSupportsStreaming(); err != nil {
+	if err := vd.WriteSupportStreaming(); err != nil {
 		t.Fatal(err)
 	}
 }
