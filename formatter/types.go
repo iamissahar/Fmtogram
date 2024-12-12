@@ -18,6 +18,7 @@ type formatter struct {
 	kb          handlerKB
 	loc         *location
 	con         *contact
+	poll        *poll
 	contentType string
 	writer      *multipart.Writer
 	mh          *mediaHolder

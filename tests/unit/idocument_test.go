@@ -1,7 +1,6 @@
 package unit
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/l1qwie/Fmtogram/formatter"
@@ -11,7 +10,6 @@ import (
 type documentT struct {
 	name          string
 	str           string
-	integer       int
 	array         []*types.MessageEntity
 	testedFunc    interface{}
 	isExpectedErr bool
@@ -29,43 +27,43 @@ type docTestContainer struct {
 }
 
 func putWriteDocumentStorage(doctc docTestContainer, doc formatter.IDocument, i int) *documentT {
-	return &documentT{doctc.name, doctc.inputStr[i], 0, nil, doc.WriteDocumentStorage, doctc.isExpectedErr[i], doctc.codeErr[i]}
+	return &documentT{doctc.name, doctc.inputStr[i], nil, doc.WriteDocumentStorage, doctc.isExpectedErr[i], doctc.codeErr[i]}
 }
 
 func putWriteDocumentTelegram(doctc docTestContainer, doc formatter.IDocument, i int) *documentT {
-	return &documentT{doctc.name, doctc.inputStr[i], 0, nil, doc.WriteDocumentTelegram, doctc.isExpectedErr[i], doctc.codeErr[i]}
+	return &documentT{doctc.name, doctc.inputStr[i], nil, doc.WriteDocumentTelegram, doctc.isExpectedErr[i], doctc.codeErr[i]}
 }
 
 func putWriteDocumentInternet(doctc docTestContainer, doc formatter.IDocument, i int) *documentT {
-	return &documentT{doctc.name, doctc.inputStr[i], 0, nil, doc.WriteDocumentInternet, doctc.isExpectedErr[i], doctc.codeErr[i]}
+	return &documentT{doctc.name, doctc.inputStr[i], nil, doc.WriteDocumentInternet, doctc.isExpectedErr[i], doctc.codeErr[i]}
 }
 
 func putWriteDocumentCaption(doctc docTestContainer, doc formatter.IDocument, i int) *documentT {
-	return &documentT{doctc.name, doctc.inputStr[i], 0, nil, doc.WriteCaption, doctc.isExpectedErr[i], doctc.codeErr[i]}
+	return &documentT{doctc.name, doctc.inputStr[i], nil, doc.WriteCaption, doctc.isExpectedErr[i], doctc.codeErr[i]}
 }
 
 func putWriteDocumentCaptionEntities(doctc docTestContainer, doc formatter.IDocument, i int) *documentT {
-	return &documentT{doctc.name, "", 0, doctc.inputArr[i], doc.WriteCaptionEntities, doctc.isExpectedErr[i], doctc.codeErr[i]}
+	return &documentT{doctc.name, "", doctc.inputArr[i], doc.WriteCaptionEntities, doctc.isExpectedErr[i], doctc.codeErr[i]}
 }
 
 func putWriteDocumentDisableContentTypeDetection(doctc docTestContainer, doc formatter.IDocument, i int) *documentT {
-	return &documentT{doctc.name, "", 0, nil, doc.WriteDisableContentTypeDetection, doctc.isExpectedErr[i], doctc.codeErr[i]}
+	return &documentT{doctc.name, "", nil, doc.WriteDisableContentTypeDetection, doctc.isExpectedErr[i], doctc.codeErr[i]}
 }
 
 func putWriteDocumentParseMode(doctc docTestContainer, doc formatter.IDocument, i int) *documentT {
-	return &documentT{doctc.name, doctc.inputStr[i], 0, nil, doc.WriteParseMode, doctc.isExpectedErr[i], doctc.codeErr[i]}
+	return &documentT{doctc.name, doctc.inputStr[i], nil, doc.WriteParseMode, doctc.isExpectedErr[i], doctc.codeErr[i]}
 }
 
 func putWriteDocumentThumbnailStorage(doctc docTestContainer, doc formatter.IDocument, i int) *documentT {
-	return &documentT{doctc.name, doctc.inputStr[i], 0, nil, doc.WriteThumbnailStorage, doctc.isExpectedErr[i], doctc.codeErr[i]}
+	return &documentT{doctc.name, doctc.inputStr[i], nil, doc.WriteThumbnailStorage, doctc.isExpectedErr[i], doctc.codeErr[i]}
 }
 
 func putWriteDocumentThumbnailTelegram(doctc docTestContainer, doc formatter.IDocument, i int) *documentT {
-	return &documentT{doctc.name, doctc.inputStr[i], 0, nil, doc.WriteThumbnailTelegram, doctc.isExpectedErr[i], doctc.codeErr[i]}
+	return &documentT{doctc.name, doctc.inputStr[i], nil, doc.WriteThumbnailTelegram, doctc.isExpectedErr[i], doctc.codeErr[i]}
 }
 
 func putWriteDocumentThumbnailInternet(doctc docTestContainer, doc formatter.IDocument, i int) *documentT {
-	return &documentT{doctc.name, doctc.inputStr[i], 0, nil, doc.WriteThumbnailInternet, doctc.isExpectedErr[i], doctc.codeErr[i]}
+	return &documentT{doctc.name, doctc.inputStr[i], nil, doc.WriteThumbnailInternet, doctc.isExpectedErr[i], doctc.codeErr[i]}
 }
 
 func (doctc *docTestContainer) writeDocumentStorage() {
@@ -198,13 +196,15 @@ func (doc *documentT) callBoolF(testedF func() error, t *testing.T) {
 }
 
 func (doc *documentT) startTest(part string, i int, t *testing.T) {
-	t.Logf(part, fmt.Sprintf(logMsg, doc.name, doc.isExpectedErr, doc.codeErr, i))
 	switch f := doc.testedFunc.(type) {
 	case func(string) error:
+		printTestLog(part, doc.name, doc.codeErr, doc.str, doc.isExpectedErr, i)
 		doc.callStrF(f, t)
 	case func([]*types.MessageEntity) error:
+		printTestLog(part, doc.name, doc.codeErr, doc.array, doc.isExpectedErr, i)
 		doc.callSliceF(f, t)
 	case func() error:
+		printTestLog(part, doc.name, doc.codeErr, true, doc.isExpectedErr, i)
 		doc.callBoolF(f, t)
 	default:
 		t.Fatal("unexpected type of tested function")

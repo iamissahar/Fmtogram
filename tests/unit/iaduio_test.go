@@ -1,7 +1,6 @@
 package unit
 
 import (
-	"fmt"
 	"strings"
 	"testing"
 
@@ -11,7 +10,7 @@ import (
 
 const (
 	errMsg string = "unexpected error: %s"
-	logMsg string = "Test: %s\nHaving error: %v\nError code: %s\nIndex in an array: %d"
+	logMsg string = "\tFunction under test: %s\n\tInput: %v (%T)\n\tHaving error: %v\n\tError code: %s\n\tIndex in an array: %d"
 )
 
 type audio struct {
@@ -195,51 +194,53 @@ func (t *audiotest) writeTitle() {
 	t.buildF = putWriteTitle
 }
 
-func (ad *audio) callStrF(testedFunc func(string) error, data string, t *testing.T) {
+func (ad *audio) callStrF(testedFunc func(string) error, t *testing.T) {
 	if !ad.isExpectedErr {
-		if err := testedFunc(data); err != nil {
+		if err := testedFunc(ad.str); err != nil {
 			t.Fatalf(errMsg, err)
 		}
 	} else {
-		if err := testedFunc(data); err.Error() != ad.codeErr {
+		if err := testedFunc(ad.str); err.Error() != ad.codeErr {
 			t.Fatalf(errMsg, err)
 		}
 	}
 }
 
-func (ad *audio) callIntF(testedFunc func(int) error, data int, t *testing.T) {
+func (ad *audio) callIntF(testedFunc func(int) error, t *testing.T) {
 	if !ad.isExpectedErr {
-		if err := testedFunc(data); err != nil {
+		if err := testedFunc(ad.integer); err != nil {
 			t.Fatalf(errMsg, err)
 		}
 	} else {
-		if err := testedFunc(data); err.Error() != ad.codeErr {
+		if err := testedFunc(ad.integer); err.Error() != ad.codeErr {
 			t.Fatalf(errMsg, err)
 		}
 	}
 }
 
-func (ad *audio) callSliceF(testedFunc func([]*types.MessageEntity) error, data []*types.MessageEntity, t *testing.T) {
+func (ad *audio) callSliceF(testedFunc func([]*types.MessageEntity) error, t *testing.T) {
 	if !ad.isExpectedErr {
-		if err := testedFunc(data); err != nil {
+		if err := testedFunc(ad.array); err != nil {
 			t.Fatalf(errMsg, err)
 		}
 	} else {
-		if err := testedFunc(data); err.Error() != ad.codeErr {
+		if err := testedFunc(ad.array); err.Error() != ad.codeErr {
 			t.Fatalf(errMsg, err)
 		}
 	}
 }
 
 func (ad *audio) startTest(part string, i int, t *testing.T) {
-	t.Logf(part, fmt.Sprintf(logMsg, ad.name, ad.isExpectedErr, ad.codeErr, i))
 	switch f := ad.testedFunc.(type) {
 	case func(string) error:
-		ad.callStrF(f, ad.str, t)
+		printTestLog(part, ad.name, ad.codeErr, ad.str, ad.isExpectedErr, i)
+		ad.callStrF(f, t)
 	case func(int) error:
-		ad.callIntF(f, ad.integer, t)
+		printTestLog(part, ad.name, ad.codeErr, ad.integer, ad.isExpectedErr, i)
+		ad.callIntF(f, t)
 	case func([]*types.MessageEntity) error:
-		ad.callSliceF(f, ad.array, t)
+		printTestLog(part, ad.name, ad.codeErr, ad.array, ad.isExpectedErr, i)
+		ad.callSliceF(f, t)
 	default:
 		t.Fatal("unexpected type of tested function")
 	}

@@ -1,6 +1,8 @@
 package unit
 
 import (
+	"fmt"
+	"log"
 	"testing"
 )
 
@@ -23,4 +25,8 @@ func doubleCheck(container []UnitTest, t *testing.T) {
 		container[i].startTest("The Second Part:\n%s", i, t)
 		container[j].startTest("The Second Part:\n%s", j, t)
 	}
+}
+
+func printTestLog(part string, name, codeErr string, data interface{}, isExpectedErr bool, i int) {
+	log.Printf(part, fmt.Sprintf(logMsg, name, data, data, isExpectedErr, codeErr, i))
 }

@@ -1,7 +1,6 @@
 package unit
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/l1qwie/Fmtogram/formatter"
@@ -170,13 +169,15 @@ func (ph *photoT) callSliceF(testedFunc func([]*types.MessageEntity) error, data
 }
 
 func (ph *photoT) startTest(part string, i int, t *testing.T) {
-	t.Logf(part, fmt.Sprintf(logMsg, ph.name, ph.isExpectedErr, ph.codeErr, i))
 	switch f := ph.testedFunc.(type) {
 	case func(string) error:
+		printTestLog(part, ph.name, ph.codeErr, ph.str, ph.isExpectedErr, i)
 		ph.callStrF(f, ph.str, t)
 	case func([]*types.MessageEntity) error:
+		printTestLog(part, ph.name, ph.codeErr, ph.array, ph.isExpectedErr, i)
 		ph.callSliceF(f, ph.array, t)
 	case func() error:
+		printTestLog(part, ph.name, ph.codeErr, true, ph.isExpectedErr, i)
 		ph.callBoolF(f, t)
 	default:
 		t.Fatal("unexpected type of tested function")

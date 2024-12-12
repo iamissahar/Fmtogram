@@ -233,7 +233,26 @@ func (msg *Message) AddContact(con IContact) error {
 		if msg.fm.con == nil {
 			if (c.PhoneNumber != "") && (c.FirstName != "") {
 				msg.fm.con = c
-				logs.InterfaceSaved(interfaceLocation)
+				logs.InterfaceSaved(interfaceContact)
+			} else {
+				err = code21()
+			}
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (msg *Message) AddPoll(p IPoll) error {
+	var err error
+	if pp, ok := p.(*poll); ok {
+		if msg.fm.poll == nil {
+			if (pp.Question != "") && (pp.Options != nil) {
+				msg.fm.poll = pp
+				logs.InterfaceSaved(interfacePoll)
 			} else {
 				err = code21()
 			}

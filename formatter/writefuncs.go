@@ -1602,6 +1602,8 @@ func (p *poll) WriteCloseDate(time int) error {
 			} else {
 				err = code10()
 			}
+		} else {
+			err = code20()
 		}
 	} else {
 		err = code25()

@@ -53,6 +53,11 @@ func (msg *Message) NewContact() IContact {
 	return &contact{}
 }
 
+func (msg *Message) NewPoll() IPoll {
+	logs.NewInterfaceCreated(interfaceContact)
+	return &poll{}
+}
+
 // Creates a new message(inf) stucture and returns an interface with connected functions. This is the only one way to add your data to an object
 func (msg *Message) NewMessage() IParameters {
 	logs.NewInterfaceCreated("Message")

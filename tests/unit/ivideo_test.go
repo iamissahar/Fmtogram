@@ -1,7 +1,6 @@
 package unit
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/l1qwie/Fmtogram/formatter"
@@ -274,15 +273,18 @@ func (vd *videoT) callBoolF(testedF func() error, t *testing.T) {
 }
 
 func (vd *videoT) startTest(part string, i int, t *testing.T) {
-	t.Logf(part, fmt.Sprintf(logMsg, vd.name, vd.isExpectedErr, vd.codeErr, i))
 	switch f := vd.testedFunc.(type) {
 	case func(string) error:
+		printTestLog(part, vd.name, vd.codeErr, vd.str, vd.isExpectedErr, i)
 		vd.callStrF(f, t)
 	case func(int) error:
+		printTestLog(part, vd.name, vd.codeErr, vd.integer, vd.isExpectedErr, i)
 		vd.callIntF(f, t)
 	case func([]*types.MessageEntity) error:
+		printTestLog(part, vd.name, vd.codeErr, vd.array, vd.isExpectedErr, i)
 		vd.callSliceF(f, t)
 	case func() error:
+		printTestLog(part, vd.name, vd.codeErr, true, vd.isExpectedErr, i)
 		vd.callBoolF(f, t)
 	default:
 		t.Fatal("unexpected type of tested function")

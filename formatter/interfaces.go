@@ -249,11 +249,11 @@ type ILocation interface {
 	// should be between 60 and 86400, or 0x7FFFFFFF for live locations that can be edited indefinitely.
 	WriteLivePeriod(period int) error
 
-	// For live locations, a direction in which the user is moving, in degrees. Must be between 1 and 360 if specified.
+	// For live locations, a direction in which the user is moving, in degrees. Must be between 1 and 360
 	WriteHeading(heading int) error
 
 	// For live locations, a maximum distance for proximity alerts about approaching another chat member,
-	// in meters. Must be between 1 and 100000 if specified.
+	// in meters. Must be between 1 and 100000
 	WriteProximityAlertRadius(proxalrad int) error
 
 	// Name of the venue
@@ -307,14 +307,14 @@ type IPoll interface {
 	// Call it only if the poll needs to be anonymous
 	WriteAnonymous() error
 
-	// Receives a poll type, “quiz” or “regular”
+	// Receives a poll type, "quiz" or "regular"
 	WriteType(polltype string) error
 
 	//  Call it only if the poll needs to allow multiple answers, ignored for polls in quiz mode
 	WriteAllowMultipleAnswers() error
 
 	// 0-based identifier of the correct answer option, required for polls in quiz mode
-	WriteCorrectOptionID(optID int) error
+	WriteCorrectOptionID(optID string) error
 
 	// Text that is shown when a user chooses an incorrect answer or taps on the lamp icon in a quiz-style poll,
 	// 1-200 characters with at most 2 line feeds after entities parsing
