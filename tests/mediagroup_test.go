@@ -307,7 +307,7 @@ func photoSt2xReq(t *testing.T) {
 func photoSt2xUnreq(t *testing.T) {
 	msg := formatter.CreateEmpltyMessage()
 	ch := createChat(msg, t)
-	pr := msg.NewMessage()
+	pr := msg.NewParameters()
 	holder := []interface{}{msg.NewPhoto(), msg.NewPhoto()}
 	writeAndAddMediaMaxSt(msg, holder, t)
 	writeAllMsgParams(pr, t)
@@ -343,7 +343,7 @@ func photoSt10xReq(t *testing.T) {
 func photoSt10xUnreq(t *testing.T) {
 	msg := formatter.CreateEmpltyMessage()
 	ch := createChat(msg, t)
-	pr := msg.NewMessage()
+	pr := msg.NewParameters()
 	holder := []interface{}{msg.NewPhoto(), msg.NewPhoto(),
 		msg.NewPhoto(), msg.NewPhoto(),
 		msg.NewPhoto(), msg.NewPhoto(),
@@ -379,7 +379,7 @@ func photoTg2xReq(t *testing.T) {
 func photoTg2xUnreq(t *testing.T) {
 	msg := formatter.CreateEmpltyMessage()
 	ch := createChat(msg, t)
-	pr := msg.NewMessage()
+	pr := msg.NewParameters()
 	holder := []interface{}{msg.NewPhoto(), msg.NewPhoto()}
 	writeAndAddMediaMaxTg(msg, holder, t)
 	writeAllMsgParams(pr, t)
@@ -415,7 +415,7 @@ func photoTg10xReq(t *testing.T) {
 func photoTg10xUnreq(t *testing.T) {
 	msg := formatter.CreateEmpltyMessage()
 	ch := createChat(msg, t)
-	pr := msg.NewMessage()
+	pr := msg.NewParameters()
 	holder := []interface{}{msg.NewPhoto(), msg.NewPhoto(),
 		msg.NewPhoto(), msg.NewPhoto(),
 		msg.NewPhoto(), msg.NewPhoto(),
@@ -454,7 +454,7 @@ func photoStAndTg2xReq(t *testing.T) {
 func photoStAndTg2xUnreq(t *testing.T) {
 	msg := formatter.CreateEmpltyMessage()
 	ch := createChat(msg, t)
-	pr := msg.NewMessage()
+	pr := msg.NewParameters()
 	holder1 := []interface{}{msg.NewPhoto()}
 	holder2 := []interface{}{msg.NewPhoto()}
 	writeAndAddMediaMaxTg(msg, holder1, t)
@@ -492,7 +492,7 @@ func photoStAndTg10xReq(t *testing.T) {
 func photoStAndTg10xUnreq(t *testing.T) {
 	msg := formatter.CreateEmpltyMessage()
 	ch := createChat(msg, t)
-	pr := msg.NewMessage()
+	pr := msg.NewParameters()
 	holder1 := []interface{}{msg.NewPhoto(), msg.NewPhoto(), msg.NewPhoto(), msg.NewPhoto(), msg.NewPhoto()}
 	holder2 := []interface{}{msg.NewPhoto(), msg.NewPhoto(), msg.NewPhoto(), msg.NewPhoto(), msg.NewPhoto()}
 	writeAndAddMediaMaxTg(msg, holder1, t)
@@ -528,7 +528,7 @@ func videoSt2xReq(t *testing.T) {
 func videoSt2xUnreq(t *testing.T) {
 	msg := formatter.CreateEmpltyMessage()
 	ch := createChat(msg, t)
-	pr := msg.NewMessage()
+	pr := msg.NewParameters()
 	holder := []interface{}{msg.NewVideo(), msg.NewVideo()}
 	writeAndAddMediaMaxSt(msg, holder, t)
 	writeAllMsgParams(pr, t)
@@ -564,7 +564,7 @@ func videoSt10xReq(t *testing.T) {
 func videoSt10xUnreq(t *testing.T) {
 	msg := formatter.CreateEmpltyMessage()
 	ch := createChat(msg, t)
-	pr := msg.NewMessage()
+	pr := msg.NewParameters()
 	holder := []interface{}{msg.NewVideo(), msg.NewVideo(),
 		msg.NewVideo(), msg.NewVideo(),
 		msg.NewVideo(), msg.NewVideo(),
@@ -600,7 +600,7 @@ func videoTg2xReq(t *testing.T) {
 func videoTg2xUnreq(t *testing.T) {
 	msg := formatter.CreateEmpltyMessage()
 	ch := createChat(msg, t)
-	pr := msg.NewMessage()
+	pr := msg.NewParameters()
 	holder := []interface{}{msg.NewVideo(), msg.NewVideo()}
 	writeAndAddMediaMaxTg(msg, holder, t)
 	writeAllMsgParams(pr, t)
@@ -636,7 +636,7 @@ func videoTg10xReq(t *testing.T) {
 func videoTg10xUnreq(t *testing.T) {
 	msg := formatter.CreateEmpltyMessage()
 	ch := createChat(msg, t)
-	pr := msg.NewMessage()
+	pr := msg.NewParameters()
 	holder := []interface{}{msg.NewVideo(), msg.NewVideo(),
 		msg.NewVideo(), msg.NewVideo(),
 		msg.NewVideo(), msg.NewVideo(),
@@ -679,7 +679,7 @@ func videoStAndTg2xReq(t *testing.T) {
 func videoStAndTg2xUnreq(t *testing.T) {
 	msg := formatter.CreateEmpltyMessage()
 	ch := createChat(msg, t)
-	pr := msg.NewMessage()
+	pr := msg.NewParameters()
 	holder1 := []interface{}{msg.NewVideo(),
 		msg.NewVideo(), msg.NewVideo(),
 		msg.NewVideo(), msg.NewVideo()}
@@ -725,7 +725,7 @@ func videoStAndTg10xReq(t *testing.T) {
 func videoStAndTg10xUnreq(t *testing.T) {
 	msg := formatter.CreateEmpltyMessage()
 	ch := createChat(msg, t)
-	pr := msg.NewMessage()
+	pr := msg.NewParameters()
 	holder1 := []interface{}{msg.NewVideo(),
 		msg.NewVideo(), msg.NewVideo(),
 		msg.NewVideo(), msg.NewVideo()}
@@ -764,7 +764,7 @@ func videoAndPhotoSt2xReq(t *testing.T) {
 func videoAndPhotoSt2xUnreq(t *testing.T) {
 	msg := formatter.CreateEmpltyMessage()
 	ch := createChat(msg, t)
-	pr := msg.NewMessage()
+	pr := msg.NewParameters()
 	holder := []interface{}{msg.NewVideo(), msg.NewPhoto()}
 	writeAndAddMediaMaxSt(msg, holder, t)
 	writeAllMsgParams(pr, t)
@@ -799,7 +799,7 @@ func videoAndPhotoSt10xReq(t *testing.T) {
 func videoAndPhotoSt10xUnreq(t *testing.T) {
 	msg := formatter.CreateEmpltyMessage()
 	ch := createChat(msg, t)
-	pr := msg.NewMessage()
+	pr := msg.NewParameters()
 	holder := []interface{}{msg.NewVideo(), msg.NewVideo(),
 		msg.NewVideo(), msg.NewVideo(), msg.NewVideo(),
 		msg.NewPhoto(), msg.NewPhoto(), msg.NewPhoto(),
@@ -834,7 +834,7 @@ func videoAndPhotoTg2xReq(t *testing.T) {
 func videoAndPhotoTg2xUnreq(t *testing.T) {
 	msg := formatter.CreateEmpltyMessage()
 	ch := createChat(msg, t)
-	pr := msg.NewMessage()
+	pr := msg.NewParameters()
 	holder := []interface{}{msg.NewVideo(), msg.NewPhoto()}
 	writeAndAddMediaMaxTg(msg, holder, t)
 	writeAllMsgParams(pr, t)
@@ -869,7 +869,7 @@ func videoAndPhotoTg10xReq(t *testing.T) {
 func videoAndPhotoTg10xUnreq(t *testing.T) {
 	msg := formatter.CreateEmpltyMessage()
 	ch := createChat(msg, t)
-	pr := msg.NewMessage()
+	pr := msg.NewParameters()
 	holder := []interface{}{msg.NewVideo(), msg.NewVideo(),
 		msg.NewVideo(), msg.NewVideo(), msg.NewVideo(),
 		msg.NewPhoto(), msg.NewPhoto(), msg.NewPhoto(),
@@ -907,7 +907,7 @@ func videoAndPhotoStAndTg2xReq(t *testing.T) {
 func videoAndPhotoStAndTg2xUnreq(t *testing.T) {
 	msg := formatter.CreateEmpltyMessage()
 	ch := createChat(msg, t)
-	pr := msg.NewMessage()
+	pr := msg.NewParameters()
 	holder1 := []interface{}{msg.NewVideo()}
 	holder2 := []interface{}{msg.NewPhoto()}
 	writeAndAddMediaMaxSt(msg, holder1, t)
@@ -945,7 +945,7 @@ func videoAndPhotoStAndTg10xReq(t *testing.T) {
 func videoAndPhotoStAndTg10xUnreq(t *testing.T) {
 	msg := formatter.CreateEmpltyMessage()
 	ch := createChat(msg, t)
-	pr := msg.NewMessage()
+	pr := msg.NewParameters()
 	holder1 := []interface{}{msg.NewVideo(), msg.NewPhoto(), msg.NewVideo(), msg.NewPhoto(), msg.NewPhoto()}
 	holder2 := []interface{}{msg.NewVideo(), msg.NewPhoto(), msg.NewVideo(), msg.NewPhoto(), msg.NewVideo()}
 	writeAndAddMediaMaxSt(msg, holder1, t)
@@ -980,7 +980,7 @@ func audioSt2xReq(t *testing.T) {
 
 func audioSt2xUnreq(t *testing.T) {
 	msg := formatter.CreateEmpltyMessage()
-	pr := msg.NewMessage()
+	pr := msg.NewParameters()
 	ch := createChat(msg, t)
 	holder := []interface{}{msg.NewAudio(), msg.NewAudio()}
 	writeAndAddMediaMaxSt(msg, holder, t)
@@ -1016,7 +1016,7 @@ func audioSt10xReq(t *testing.T) {
 
 func audioSt10xUnreq(t *testing.T) {
 	msg := formatter.CreateEmpltyMessage()
-	pr := msg.NewMessage()
+	pr := msg.NewParameters()
 	ch := createChat(msg, t)
 	holder := []interface{}{msg.NewAudio(), msg.NewAudio(),
 		msg.NewAudio(), msg.NewAudio(),
@@ -1052,7 +1052,7 @@ func audioTg2xReq(t *testing.T) {
 
 func audioTg2xUnreq(t *testing.T) {
 	msg := formatter.CreateEmpltyMessage()
-	pr := msg.NewMessage()
+	pr := msg.NewParameters()
 	ch := createChat(msg, t)
 	holder := []interface{}{msg.NewAudio(), msg.NewAudio()}
 	writeAndAddMediaMaxTg(msg, holder, t)
@@ -1088,7 +1088,7 @@ func audioTg10xReq(t *testing.T) {
 
 func audioTg10xUnreq(t *testing.T) {
 	msg := formatter.CreateEmpltyMessage()
-	pr := msg.NewMessage()
+	pr := msg.NewParameters()
 	ch := createChat(msg, t)
 	holder := []interface{}{msg.NewAudio(), msg.NewAudio(),
 		msg.NewAudio(), msg.NewAudio(),
@@ -1127,7 +1127,7 @@ func audioStAndTg2xReq(t *testing.T) {
 
 func audioStAndTg2xUnreq(t *testing.T) {
 	msg := formatter.CreateEmpltyMessage()
-	pr := msg.NewMessage()
+	pr := msg.NewParameters()
 	ch := createChat(msg, t)
 	holder1 := []interface{}{msg.NewAudio()}
 	holder2 := []interface{}{msg.NewAudio()}
@@ -1166,7 +1166,7 @@ func audioStAndTg10xReq(t *testing.T) {
 
 func audioStAndTg10xUnreq(t *testing.T) {
 	msg := formatter.CreateEmpltyMessage()
-	pr := msg.NewMessage()
+	pr := msg.NewParameters()
 	ch := createChat(msg, t)
 	holder1 := []interface{}{msg.NewAudio(), msg.NewAudio(),
 		msg.NewAudio(), msg.NewAudio(), msg.NewAudio()}
@@ -1204,7 +1204,7 @@ func documentSt2xReq(t *testing.T) {
 
 func documentSt2xUnreq(t *testing.T) {
 	msg := formatter.CreateEmpltyMessage()
-	pr := msg.NewMessage()
+	pr := msg.NewParameters()
 	ch := createChat(msg, t)
 	holder := []interface{}{msg.NewDocument(), msg.NewDocument()}
 	writeAndAddMediaMaxSt(msg, holder, t)
@@ -1240,7 +1240,7 @@ func documentSt10xReq(t *testing.T) {
 
 func documentSt10xUnreq(t *testing.T) {
 	msg := formatter.CreateEmpltyMessage()
-	pr := msg.NewMessage()
+	pr := msg.NewParameters()
 	ch := createChat(msg, t)
 	holder := []interface{}{msg.NewDocument(), msg.NewDocument(),
 		msg.NewDocument(), msg.NewDocument(),
@@ -1276,7 +1276,7 @@ func documentTg2xReq(t *testing.T) {
 
 func documentTg2xUnreq(t *testing.T) {
 	msg := formatter.CreateEmpltyMessage()
-	pr := msg.NewMessage()
+	pr := msg.NewParameters()
 	ch := createChat(msg, t)
 	holder := []interface{}{msg.NewDocument(), msg.NewDocument()}
 	writeAndAddMediaMaxTg(msg, holder, t)
@@ -1312,7 +1312,7 @@ func documentTg10xReq(t *testing.T) {
 
 func documentTg10xUnreq(t *testing.T) {
 	msg := formatter.CreateEmpltyMessage()
-	pr := msg.NewMessage()
+	pr := msg.NewParameters()
 	ch := createChat(msg, t)
 	holder := []interface{}{msg.NewDocument(), msg.NewDocument(),
 		msg.NewDocument(), msg.NewDocument(),
@@ -1351,7 +1351,7 @@ func documentStAndTg2xReq(t *testing.T) {
 
 func documentStAndTg2xUnreq(t *testing.T) {
 	msg := formatter.CreateEmpltyMessage()
-	pr := msg.NewMessage()
+	pr := msg.NewParameters()
 	ch := createChat(msg, t)
 	holder1 := []interface{}{msg.NewDocument()}
 	holder2 := []interface{}{msg.NewDocument()}
@@ -1389,7 +1389,7 @@ func documentStAndTg10xReq(t *testing.T) {
 
 func documentStAndTg10xUnreq(t *testing.T) {
 	msg := formatter.CreateEmpltyMessage()
-	pr := msg.NewMessage()
+	pr := msg.NewParameters()
 	ch := createChat(msg, t)
 	holder1 := []interface{}{msg.NewDocument(), msg.NewDocument(), msg.NewDocument(), msg.NewDocument(), msg.NewDocument()}
 	holder2 := []interface{}{msg.NewDocument(), msg.NewDocument(), msg.NewDocument(), msg.NewDocument(), msg.NewDocument()}

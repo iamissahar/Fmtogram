@@ -71,109 +71,131 @@ func code54() error {
 	return err
 }
 
-func code999() error {
-	err := new(fmerrors.FME)
-	err.Code = 999
-	err.String = "incorrect input data type"
+func checkCaption(caption, cell string) error {
+	var err error
+	cap := len([]rune(caption))
+	if (cap > 0) && (cap <= 1024) {
+		if cell != "" {
+			err = code10()
+		}
+	} else {
+		err = code20()
+	}
 	return err
 }
 
-func (ph *photo) writePhoto(photo, object string) error {
+func checkParseMode(parsemode, cell string) error {
 	var err error
-	if ph.Photo == "" {
-		ph.Photo, ph.Media = photo, photo
-		logs.DataWrittenSuccessfully(interfacePhoto, object)
+	if (parsemode != types.HTML) && (parsemode != types.Markdown) && (parsemode != types.MarkdownV2) {
+		err = code20()
 	} else {
-		err = code10()
+		if cell != "" {
+			err = code10()
+		}
+	}
+	return err
+}
+
+func checkEntities(entities, cell []*types.MessageEntity) error {
+	var err error
+	if len(entities) != 0 {
+		for i := 0; (i < len(entities)) && (err == nil); i++ {
+			if entities[i] == nil {
+				err = code5()
+			}
+		}
+		if err == nil {
+			if len(cell) != 0 {
+				err = code10()
+			}
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func checkStringValue(val, cell string) error {
+	var err error
+	if val != "" {
+		if cell != "" {
+			err = code10()
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func checkIntegerValue(val, cell int) error {
+	var err error
+	if val > 0 {
+		if cell != 0 {
+			err = code10()
+		}
+	} else {
+		err = code20()
 	}
 	return err
 }
 
 func (ph *photo) WritePhotoStorage(photo string) error {
 	var err error
-	if photo != "" {
+	if err = checkStringValue(photo, ph.Photo); err == nil {
 		if err = ph.isCorrectType(photo); err == nil {
 			ph.gottenFrom = Storage
-			err = ph.writePhoto(photo, "Photo From Storage")
+			ph.Photo, ph.Media = photo, photo
+			logs.DataWrittenSuccessfully(interfacePhoto, "Photo From Storage")
 		}
-	} else {
-		err = code20()
 	}
 	return err
 }
 
 func (ph *photo) WritePhotoTelegram(photo string) error {
 	var err error
-	if photo != "" {
+	if err = checkStringValue(photo, ph.Photo); err == nil {
 		ph.gottenFrom = Telegram
-		err = ph.writePhoto(photo, "Photo From Telegram")
-	} else {
-		err = code20()
+		ph.Photo, ph.Media = photo, photo
+		logs.DataWrittenSuccessfully(interfacePhoto, "Photo From Telegram")
+
 	}
 	return err
 }
 
 func (ph *photo) WritePhotoInternet(photo string) error {
 	var err error
-	if photo != "" {
+	if err = checkStringValue(photo, ph.Photo); err == nil {
 		ph.gottenFrom = Internet
-		err = ph.writePhoto(photo, "Photo From The Internet")
-	} else {
-		err = code20()
+		ph.Photo, ph.Media = photo, photo
+		logs.DataWrittenSuccessfully(interfacePhoto, "Photo From Internet")
+
 	}
 	return err
 }
 
 func (ph *photo) WriteCaption(caption string) error {
 	var err error
-	if caption != "" {
-		if ph.Caption != "" {
-			err = code10()
-		} else {
-			ph.Caption = caption
-			logs.DataWrittenSuccessfully(interfacePhoto, "Caption")
-		}
-	} else {
-		err = code20()
+	if err = checkCaption(caption, ph.Caption); err == nil {
+		ph.Caption = caption
+		logs.DataWrittenSuccessfully(interfacePhoto, "Caption")
 	}
 	return err
 }
 
 func (ph *photo) WriteParseMode(parsemode string) error {
 	var err error
-	if parsemode != types.HTML && parsemode != types.Markdown && parsemode != types.MarkdownV2 {
-		err = code20()
-	} else {
-		if ph.ParseMode != "" {
-			err = code10()
-		} else {
-			ph.ParseMode = parsemode
-			logs.DataWrittenSuccessfully(interfacePhoto, "Parse Mode")
-		}
+	if err = checkParseMode(parsemode, ph.ParseMode); err == nil {
+		ph.ParseMode = parsemode
+		logs.DataWrittenSuccessfully(interfacePhoto, "Parse Mode")
 	}
 	return err
 }
 
 func (ph *photo) WriteCaptionEntities(captionEntities []*types.MessageEntity) error {
 	var err error
-	if len(captionEntities) != 0 {
-
-		for i := 0; (i < len(captionEntities)) && (err == nil); i++ {
-			if captionEntities[i] == nil {
-				err = code5()
-			}
-		}
-
-		if err == nil {
-			if len(ph.CaptionEntities) == 0 {
-				ph.CaptionEntities = captionEntities
-				logs.DataWrittenSuccessfully(interfacePhoto, "Caption Entities")
-			} else {
-				err = code10()
-			}
-		}
-	} else {
-		err = code20()
+	if err = checkEntities(captionEntities, ph.CaptionEntities); err == nil {
+		ph.CaptionEntities = captionEntities
+		logs.DataWrittenSuccessfully(interfacePhoto, "Caption Entities")
 	}
 	return err
 }
@@ -204,148 +226,95 @@ func (ph *photo) GetResponse() [4]types.PhotoSize {
 	return ph.response
 }
 
-func (vd *video) writeVideo(video, object string) error {
-	var err error
-	if vd.Video == "" {
-		vd.Video, vd.Media = video, video
-		logs.DataWrittenSuccessfully(interfaceVideo, object)
-	} else {
-		err = code10()
-	}
-	return err
-}
-
 func (vd *video) WriteVideoStorage(video string) error {
 	var err error
-	if video != "" {
+	if err = checkStringValue(video, vd.Video); err == nil {
 		if err = vd.isCorrectType(video); err == nil {
 			vd.videoGottenFrom = Storage
-			err = vd.writeVideo(video, "Video From Storage")
+			vd.Video, vd.Media = video, video
+			logs.DataWrittenSuccessfully(interfaceVideo, "Photo From Storage")
 		}
-	} else {
-		err = code20()
 	}
 	return err
 }
 
 func (vd *video) WriteVideoTelegram(video string) error {
 	var err error
-	if video != "" {
+	if err = checkStringValue(video, vd.Video); err == nil {
 		vd.videoGottenFrom = Telegram
-		err = vd.writeVideo(video, "Video From Telegram")
-	} else {
-		err = code20()
+		vd.Video, vd.Media = video, video
+		logs.DataWrittenSuccessfully(interfaceVideo, "Photo From Telegram")
 	}
 	return err
 }
 
 func (vd *video) WriteVideoInternet(video string) error {
 	var err error
-	if video != "" {
+	if err = checkStringValue(video, vd.Video); err == nil {
 		vd.videoGottenFrom = Internet
-		err = vd.writeVideo(video, "Video From the Internet")
-	} else {
-		err = code20()
-	}
-	return err
-}
-
-func (vd *video) writeThumbnail(thumbnail, object string) error {
-	var err error
-	if vd.Thumbnail == "" {
-		vd.Thumbnail = thumbnail
-		logs.DataWrittenSuccessfully(interfaceVideo, object)
-	} else {
-		err = code10()
+		vd.Video, vd.Media = video, video
+		logs.DataWrittenSuccessfully(interfaceVideo, "Photo From Internet")
 	}
 	return err
 }
 
 func (vd *video) WriteThumbnailStorage(thumbnail string) error {
 	var err error
-	if thumbnail != "" {
+	if err = checkStringValue(thumbnail, vd.Thumbnail); err == nil {
 		if err = isThumbnailCorrectType(thumbnail); err == nil {
 			vd.thumbnailGottenFrom = Storage
-			err = vd.writeThumbnail(thumbnail, "Thumbnail From Storage")
+			vd.Thumbnail = thumbnail
+			logs.DataWrittenSuccessfully(interfaceVideo, "Thumbnail From Storage")
 		}
-	} else {
-		err = code20()
 	}
 	return err
 }
 
 func (vd *video) WriteThumbnailTelegram(thumbnail string) error {
 	var err error
-	if thumbnail != "" {
+	if err = checkStringValue(thumbnail, vd.Thumbnail); err == nil {
 		vd.thumbnailGottenFrom = Telegram
-		err = vd.writeThumbnail(thumbnail, "Thumbnail From Telegram")
-	} else {
-		err = code20()
+		vd.Thumbnail = thumbnail
+		logs.DataWrittenSuccessfully(interfaceVideo, "Thumbnail From Telegram")
+
 	}
 	return err
 }
 
 func (vd *video) WriteThumbnailInternet(thumbnail string) error {
 	var err error
-	if thumbnail != "" {
+	if err = checkStringValue(thumbnail, vd.Thumbnail); err == nil {
 		vd.thumbnailGottenFrom = Internet
-		err = vd.writeThumbnail(thumbnail, "Thumbnail From the Internet")
-	} else {
-		err = code20()
+		vd.Thumbnail = thumbnail
+		logs.DataWrittenSuccessfully(interfaceVideo, "Thumbnail From Internet")
+
 	}
 	return err
 }
 
 func (vd *video) WriteCaption(caption string) error {
 	var err error
-	if caption != "" {
-		if vd.Caption == "" {
-			vd.Caption = caption
-			logs.DataWrittenSuccessfully(interfaceVideo, "Caption")
-		} else {
-			err = code10()
-		}
-	} else {
-		err = code20()
+	if err = checkCaption(caption, vd.Caption); err == nil {
+		vd.Caption = caption
+		logs.DataWrittenSuccessfully(interfaceVideo, "Caption")
 	}
 	return err
 }
 
 func (vd *video) WriteParseMode(parsemode string) error {
 	var err error
-	if parsemode != types.HTML && parsemode != types.Markdown && parsemode != types.MarkdownV2 {
-		err = code20()
-	} else {
-		if vd.ParseMode == "" {
-			vd.ParseMode = parsemode
-			logs.DataWrittenSuccessfully(interfaceVideo, "Parse Mode")
-		} else {
-			err = code10()
-		}
+	if err = checkParseMode(parsemode, vd.ParseMode); err == nil {
+		vd.ParseMode = parsemode
+		logs.DataWrittenSuccessfully(interfaceVideo, "Parse Mode")
 	}
 	return err
 }
 
 func (vd *video) WriteCaptionEntities(captionEntities []*types.MessageEntity) error {
 	var err error
-	if len(captionEntities) != 0 {
-
-		for i := 0; (i < len(captionEntities)) && (err == nil); i++ {
-			if captionEntities[i] == nil {
-				err = code5()
-			}
-		}
-
-		if err == nil {
-			if len(vd.CaptionEntities) == 0 {
-				vd.CaptionEntities = captionEntities
-				logs.DataWrittenSuccessfully(interfaceVideo, "Caption Entities")
-			} else {
-				err = code10()
-			}
-		}
-	} else {
-		err = code20()
+	if err = checkEntities(captionEntities, vd.CaptionEntities); err == nil {
+		vd.CaptionEntities = captionEntities
+		logs.DataWrittenSuccessfully(interfaceVideo, "Caption Entities")
 	}
 	return err
 }
@@ -363,45 +332,27 @@ func (vd *video) WriteShowCaptionAboveMedia() error {
 
 func (vd *video) WriteWidth(width int) error {
 	var err error
-	if width > 0 {
-		if vd.Width == 0 {
-			vd.Width = width
-			logs.DataWrittenSuccessfully(interfaceVideo, "Width")
-		} else {
-			err = code10()
-		}
-	} else {
-		err = code20()
+	if err = checkIntegerValue(width, vd.Width); err == nil {
+		vd.Width = width
+		logs.DataWrittenSuccessfully(interfaceVideo, "Width")
 	}
 	return err
 }
 
 func (vd *video) WriteHeight(height int) error {
 	var err error
-	if height > 0 {
-		if vd.Height == 0 {
-			vd.Height = height
-			logs.DataWrittenSuccessfully(interfaceVideo, "Height")
-		} else {
-			err = code10()
-		}
-	} else {
-		err = code20()
+	if err = checkIntegerValue(height, vd.Height); err == nil {
+		vd.Height = height
+		logs.DataWrittenSuccessfully(interfaceVideo, "Height")
 	}
 	return err
 }
 
 func (vd *video) WriteDuration(duration int) error {
 	var err error
-	if duration > 0 {
-		if vd.Duration == 0 {
-			vd.Duration = duration
-			logs.DataWrittenSuccessfully(interfaceVideo, "Duration")
-		} else {
-			err = code10()
-		}
-	} else {
-		err = code20()
+	if err = checkIntegerValue(duration, vd.Duration); err == nil {
+		vd.Duration = duration
+		logs.DataWrittenSuccessfully(interfaceVideo, "Duration")
 	}
 	return err
 }
@@ -432,194 +383,120 @@ func (vd *video) GetResponse() types.Video {
 	return vd.response
 }
 
-func (ad *audio) writeAudio(audio, object string) error {
-	var err error
-	if ad.Audio == "" {
-		ad.Audio, ad.Media = audio, audio
-		logs.DataWrittenSuccessfully(interfaceAudio, object)
-	} else {
-		err = code10()
-	}
-	return err
-}
-
 func (ad *audio) WriteAudioStorage(audio string) error {
 	var err error
-	if audio != "" {
+	if err = checkStringValue(audio, ad.Audio); err == nil {
 		if err = ad.isCorrectType(audio); err == nil {
 			ad.audioGottenFrom = Storage
-			err = ad.writeAudio(audio, "Audio From Storage")
+			ad.Audio, ad.Media = audio, audio
+			logs.DataWrittenSuccessfully(interfaceAudio, "Audio From Storage")
 		}
-	} else {
-		err = code20()
 	}
 	return err
 }
 
 func (ad *audio) WriteAudioTelegram(audio string) error {
 	var err error
-	if audio != "" {
+	if err = checkStringValue(audio, ad.Audio); err == nil {
 		ad.audioGottenFrom = Telegram
-		err = ad.writeAudio(audio, "Audio From Telegram")
-	} else {
-		err = code20()
+		ad.Audio, ad.Media = audio, audio
+		logs.DataWrittenSuccessfully(interfaceAudio, "Audio From Telegram")
 	}
 	return err
 }
 
 func (ad *audio) WriteAudioInternet(audio string) error {
 	var err error
-	if audio != "" {
+	if err = checkStringValue(audio, ad.Audio); err == nil {
 		ad.audioGottenFrom = Internet
-		err = ad.writeAudio(audio, "Audio From the Internet")
-	} else {
-		err = code20()
-	}
-	return err
-}
-
-func (ad *audio) writeThumbnail(thumbnail, object string) error {
-	var err error
-	if ad.Thumbnail == "" {
-		ad.Thumbnail = thumbnail
-		logs.DataWrittenSuccessfully(interfaceAudio, object)
-	} else {
-		err = code10()
+		ad.Audio, ad.Media = audio, audio
+		logs.DataWrittenSuccessfully(interfaceAudio, "Audio From Internet")
 	}
 	return err
 }
 
 func (ad *audio) WriteThumbnailStorage(thumbnail string) error {
 	var err error
-	if thumbnail != "" {
+	if err = checkStringValue(thumbnail, ad.Thumbnail); err == nil {
 		if err = isThumbnailCorrectType(thumbnail); err == nil {
 			ad.thumbnailGottenFrom = Storage
-			err = ad.writeThumbnail(thumbnail, "Thumbnail From Storage")
+			ad.Thumbnail = thumbnail
+			logs.DataWrittenSuccessfully(interfaceVideo, "Thumbnail From Storage")
 		}
-	} else {
-		err = code20()
 	}
 	return err
 }
 
 func (ad *audio) WriteThumbnailTelegram(thumbnail string) error {
 	var err error
-	if thumbnail != "" {
+	if err = checkStringValue(thumbnail, ad.Thumbnail); err == nil {
 		ad.thumbnailGottenFrom = Telegram
-		err = ad.writeThumbnail(thumbnail, "Thumbnail From Telegram")
-	} else {
-		err = code20()
+		ad.Thumbnail = thumbnail
+		logs.DataWrittenSuccessfully(interfaceVideo, "Thumbnail From Telegram")
 	}
 	return err
 }
 
 func (ad *audio) WriteThumbnailInternet(thumbnail string) error {
 	var err error
-	if thumbnail != "" {
+	if err = checkStringValue(thumbnail, ad.Thumbnail); err == nil {
 		ad.thumbnailGottenFrom = Internet
-		err = ad.writeThumbnail(thumbnail, "Thumbnail From the Internet")
-	} else {
-		err = code20()
+		ad.Thumbnail = thumbnail
+		logs.DataWrittenSuccessfully(interfaceVideo, "Thumbnail From Internet")
 	}
 	return err
 }
 
 func (ad *audio) WriteCaption(caption string) error {
 	var err error
-	cap := len([]rune(caption))
-	if (cap > 0) && (cap <= 1024) {
-		if ad.Caption == "" {
-			ad.Caption = caption
-			logs.DataWrittenSuccessfully(interfaceAudio, "Caption")
-		} else {
-			err = code10()
-		}
-	} else {
-		err = code20()
+	if err = checkCaption(caption, ad.Caption); err == nil {
+		ad.Caption = caption
+		logs.DataWrittenSuccessfully(interfaceAudio, "Caption")
 	}
 	return err
 }
 
 func (ad *audio) WriteParseMode(parsemode string) error {
 	var err error
-	if (parsemode != types.HTML) && (parsemode != types.Markdown) && (parsemode != types.MarkdownV2) {
-		err = code20()
-	} else {
-		if ad.ParseMode == "" {
-			ad.ParseMode = parsemode
-			logs.DataWrittenSuccessfully(interfaceAudio, "Parse Mode")
-		} else {
-			err = code10()
-		}
+	if err = checkParseMode(parsemode, ad.ParseMode); err == nil {
+		ad.ParseMode = parsemode
+		logs.DataWrittenSuccessfully(interfaceAudio, "Parse Mode")
 	}
 	return err
 }
 
 func (ad *audio) WriteCaptionEntities(captionEntities []*types.MessageEntity) error {
 	var err error
-	if len(captionEntities) != 0 {
-
-		for i := 0; (i < len(captionEntities)) && (err == nil); i++ {
-			if captionEntities[i] == nil {
-				err = code5()
-			}
-		}
-
-		if err == nil {
-			if len(ad.CaptionEntities) == 0 {
-				ad.CaptionEntities = captionEntities
-				logs.DataWrittenSuccessfully(interfaceAudio, "Caption Entities")
-			} else {
-				err = code10()
-			}
-		}
-	} else {
-		err = code20()
+	if err = checkEntities(captionEntities, ad.CaptionEntities); err == nil {
+		ad.CaptionEntities = captionEntities
+		logs.DataWrittenSuccessfully(interfaceAudio, "Caption Entities")
 	}
 	return err
 }
 
 func (ad *audio) WriteDuration(duration int) error {
 	var err error
-	if duration != 0 {
-		if ad.Duration == 0 {
-			ad.Duration = duration
-			logs.DataWrittenSuccessfully(interfaceAudio, "Duration")
-		} else {
-			err = code10()
-		}
-	} else {
-		err = code20()
+	if err = checkIntegerValue(duration, ad.Duration); err == nil {
+		ad.Duration = duration
+		logs.DataWrittenSuccessfully(interfaceAudio, "Duration")
 	}
 	return err
 }
 
 func (ad *audio) WritePerformer(performer string) error {
 	var err error
-	if performer != "" {
-		if ad.Performer == "" {
-			ad.Performer = performer
-			logs.DataWrittenSuccessfully(interfaceAudio, "Performer")
-		} else {
-			err = code10()
-		}
-	} else {
-		err = code20()
+	if err = checkStringValue(performer, ad.Performer); err == nil {
+		ad.Performer = performer
+		logs.DataWrittenSuccessfully(interfaceAudio, "Performer")
 	}
 	return err
 }
 
 func (ad *audio) WriteTitle(title string) error {
 	var err error
-	if title != "" {
-		if ad.Title == "" {
-			ad.Title = title
-			logs.DataWrittenSuccessfully(interfaceAudio, "Title")
-		} else {
-			err = code10()
-		}
-	} else {
-		err = code20()
+	if err = checkStringValue(title, ad.Title); err == nil {
+		ad.Title = title
+		logs.DataWrittenSuccessfully(interfaceAudio, "Title")
 	}
 	return err
 }
@@ -628,146 +505,91 @@ func (ad *audio) GetResponse() types.Audio {
 	return ad.response
 }
 
-func (dc *document) writeDocument(document, object string) error {
-	var err error
-	if dc.Document == "" {
-		dc.Document, dc.Media = document, document
-		logs.DataWrittenSuccessfully(interfaceDocument, object)
-	} else {
-		err = code10()
-	}
-	return err
-}
-
 func (dc *document) WriteDocumentStorage(document string) error {
 	var err error
-	if document != "" {
+	if err = checkStringValue(document, dc.Document); err == nil {
 		dc.documentGottenFrom = Storage
-		err = dc.writeDocument(document, "Document From Storage")
-	} else {
-		err = code20()
+		dc.Document, dc.Media = document, document
+		logs.DataWrittenSuccessfully(interfaceDocument, "Document From Storage")
 	}
 	return err
 }
 
 func (dc *document) WriteDocumentTelegram(document string) error {
 	var err error
-	if document != "" {
+	if err = checkStringValue(document, dc.Document); err == nil {
 		dc.documentGottenFrom = Telegram
-		err = dc.writeDocument(document, "Document From Telegram")
-	} else {
-		err = code20()
+		dc.Document, dc.Media = document, document
+		logs.DataWrittenSuccessfully(interfaceDocument, "Document From Telegram")
 	}
 	return err
 }
 
 func (dc *document) WriteDocumentInternet(document string) error {
 	var err error
-	if document != "" {
+	if err = checkStringValue(document, dc.Document); err == nil {
 		dc.documentGottenFrom = Internet
-		err = dc.writeDocument(document, "Document From the Internet")
-	} else {
-		err = code20()
-	}
-	return err
-}
-
-func (dc *document) writeThumbnail(thumbnail, object string) error {
-	var err error
-	if dc.Thumbnail == "" {
-		dc.Thumbnail = thumbnail
-		logs.DataWrittenSuccessfully(interfaceDocument, object)
-	} else {
-		err = code10()
+		dc.Document, dc.Media = document, document
+		logs.DataWrittenSuccessfully(interfaceDocument, "Document From Internet")
 	}
 	return err
 }
 
 func (dc *document) WriteThumbnailStorage(thumbnail string) error {
 	var err error
-	if thumbnail != "" {
+	if err = checkStringValue(thumbnail, dc.Thumbnail); err == nil {
 		if err = isThumbnailCorrectType(thumbnail); err == nil {
 			dc.thumbnailGottenFrom = Storage
-			err = dc.writeThumbnail(thumbnail, "Thumbnail From Storage")
+			dc.Thumbnail = thumbnail
+			logs.DataWrittenSuccessfully(interfaceDocument, "Thumbnail From Storage")
 		}
-	} else {
-		err = code20()
 	}
 	return err
 }
 
 func (dc *document) WriteThumbnailTelegram(thumbnail string) error {
 	var err error
-	if thumbnail != "" {
+	if err = checkStringValue(thumbnail, dc.Thumbnail); err == nil {
 		dc.thumbnailGottenFrom = Telegram
-		err = dc.writeThumbnail(thumbnail, "Thumbnail From Telegram")
-	} else {
-		err = code20()
+		dc.Thumbnail = thumbnail
+		logs.DataWrittenSuccessfully(interfaceDocument, "Thumbnail From Telegram")
 	}
 	return err
 }
 
 func (dc *document) WriteThumbnailInternet(thumbnail string) error {
 	var err error
-	if thumbnail != "" {
+	if err = checkStringValue(thumbnail, dc.Thumbnail); err == nil {
 		dc.thumbnailGottenFrom = Internet
-		err = dc.writeThumbnail(thumbnail, "Thumbnail From the Internet")
-	} else {
-		err = code20()
+		dc.Thumbnail = thumbnail
+		logs.DataWrittenSuccessfully(interfaceDocument, "Thumbnail From Internet")
 	}
 	return err
 }
 
 func (dc *document) WriteCaption(caption string) error {
 	var err error
-	if caption != "" {
-		if dc.Caption == "" {
-			dc.Caption = caption
-			logs.DataWrittenSuccessfully(interfaceDocument, "Caption")
-		} else {
-			err = code10()
-		}
-	} else {
-		err = code20()
+	if err = checkCaption(caption, dc.Caption); err == nil {
+		dc.Caption = caption
+		logs.DataWrittenSuccessfully(interfaceDocument, "Caption")
 	}
 	return err
 }
 
 func (dc *document) WriteParseMode(parsemode string) error {
 	var err error
-	if (parsemode != types.HTML) && (parsemode != types.Markdown) && (parsemode != types.MarkdownV2) {
-		err = code20()
-	} else {
-		if dc.ParseMode == "" {
-			dc.ParseMode = parsemode
-			logs.DataWrittenSuccessfully(interfaceDocument, "Parse Mode")
-		} else {
-			err = code10()
-		}
+	if err = checkParseMode(parsemode, dc.ParseMode); err == nil {
+		dc.ParseMode = parsemode
+		logs.DataWrittenSuccessfully(interfaceAudio, "Parse Mode")
 	}
 	return err
 }
 
 func (dc *document) WriteCaptionEntities(captionEntities []*types.MessageEntity) error {
 	var err error
-	if len(captionEntities) != 0 {
-
-		for i := 0; (i < len(captionEntities)) && (err == nil); i++ {
-			if captionEntities[i] == nil {
-				err = code5()
-			}
-		}
-
-		if err == nil {
-			if len(dc.CaptionEntities) == 0 {
-				dc.CaptionEntities = captionEntities
-				logs.DataWrittenSuccessfully(interfaceDocument, "Caption Entities")
-			} else {
-				err = code10()
-			}
-		}
-	} else {
-		err = code20()
+	if err = checkEntities(captionEntities, dc.CaptionEntities); err == nil {
+		dc.CaptionEntities = captionEntities
+		logs.DataWrittenSuccessfully(interfaceDocument, "Caption Entities")
 	}
 	return err
 }
@@ -787,139 +609,93 @@ func (dc *document) GetResponse() types.Document {
 	return dc.response
 }
 
-func (an *animation) writeAnimation(animation, object string) error {
-	var err error
-	if an.Animation == "" {
-		an.Animation = animation
-		logs.DataWrittenSuccessfully(interfaceAnimation, object)
-	} else {
-		err = code10()
-	}
-	return err
-}
-
 func (an *animation) WriteAnimationStorage(animation string) error {
 	var err error
-	if animation != "" {
+	if err = checkStringValue(animation, an.Animation); err == nil {
 		if err = an.isCorrectType(animation); err == nil {
 			an.animationGottenFrom = Storage
-			err = an.writeAnimation(animation, "Animation From Storage")
+			an.Animation = animation
+			logs.DataWrittenSuccessfully(interfaceAnimation, "Animation From Storage")
 		}
-	} else {
-		err = code20()
 	}
 	return err
 }
 
 func (an *animation) WriteAnimationTelegram(animation string) error {
 	var err error
-	if animation != "" {
+	if err = checkStringValue(animation, an.Animation); err == nil {
 		an.animationGottenFrom = Telegram
-		err = an.writeAnimation(animation, "Animation From Telegram")
-	} else {
-		err = code20()
+		an.Animation = animation
+		logs.DataWrittenSuccessfully(interfaceAnimation, "Animation From Telegram")
 	}
 	return err
 }
 
 func (an *animation) WriteAnimationInternet(animation string) error {
 	var err error
-	if animation != "" {
+	if err = checkStringValue(animation, an.Animation); err == nil {
 		an.animationGottenFrom = Internet
-		err = an.writeAnimation(animation, "Animation From Internet")
-	} else {
-		err = code20()
+		an.Animation = animation
+		logs.DataWrittenSuccessfully(interfaceAnimation, "Animation From Internet")
 	}
 	return err
 }
 
 func (an *animation) WriteDuration(duration int) error {
 	var err error
-	if duration > 0 {
-		if an.Duration == 0 {
-			an.Duration = duration
-			logs.DataWrittenSuccessfully(interfaceAnimation, "Duration")
-		} else {
-			err = code10()
-		}
-	} else {
-		err = code20()
+	if err = checkIntegerValue(duration, an.Duration); err == nil {
+		an.Duration = duration
+		logs.DataWrittenSuccessfully(interfaceAnimation, "Duration")
 	}
 	return err
 }
 
 func (an *animation) WriteWidth(width int) error {
 	var err error
-	if width > 0 {
-		if an.Width == 0 {
-			an.Width = width
-			logs.DataWrittenSuccessfully(interfaceAnimation, "Width")
-		} else {
-			err = code10()
-		}
-	} else {
-		err = code20()
+	if err = checkIntegerValue(width, an.Width); err == nil {
+		an.Width = width
+		logs.DataWrittenSuccessfully(interfaceAnimation, "Width")
 	}
 	return err
 }
 
 func (an *animation) WriteHeight(height int) error {
 	var err error
-	if height > 0 {
-		if an.Height == 0 {
-			an.Height = height
-			logs.DataWrittenSuccessfully(interfaceAnimation, "Height")
-		} else {
-			err = code10()
-		}
-	} else {
-		err = code20()
-	}
-	return err
-}
-
-func (an *animation) writeThumbnail(thumbnail, object string) error {
-	var err error
-	if an.Thumbnail == "" {
-		an.Thumbnail = thumbnail
-		logs.DataWrittenSuccessfully(interfaceAnimation, object)
-	} else {
-		err = code10()
+	if err = checkIntegerValue(height, an.Height); err == nil {
+		an.Height = height
+		logs.DataWrittenSuccessfully(interfaceAnimation, "Height")
 	}
 	return err
 }
 
 func (an *animation) WriteThumbnailStorage(thumbnail string) error {
 	var err error
-	if thumbnail != "" {
+	if err = checkStringValue(thumbnail, an.Thumbnail); err == nil {
 		if err = isThumbnailCorrectType(thumbnail); err == nil {
 			an.thumbnailGottenFrom = Storage
-			err = an.writeThumbnail(thumbnail, "Thumbnail From Storage")
+			an.Thumbnail = thumbnail
+			logs.DataWrittenSuccessfully(interfaceAnimation, "Thumbnail From Storage")
 		}
-	} else {
-		err = code20()
 	}
 	return err
 }
 
 func (an *animation) WriteThumbnailTelegram(thumbnail string) error {
 	var err error
-	if thumbnail != "" {
+	if err = checkStringValue(thumbnail, an.Thumbnail); err == nil {
 		an.thumbnailGottenFrom = Telegram
-		err = an.writeThumbnail(thumbnail, "Thumbnail From Telegram")
-	} else {
-		err = code20()
+		an.Thumbnail = thumbnail
+		logs.DataWrittenSuccessfully(interfaceAnimation, "Thumbnail From Telegram")
 	}
 	return err
 }
 
 func (an *animation) WriteThumbnailInternet(thumbnail string) error {
 	var err error
-	if thumbnail != "" {
+	if err = checkStringValue(thumbnail, an.Thumbnail); err == nil {
 		an.thumbnailGottenFrom = Internet
-		err = an.writeThumbnail(thumbnail, "Thumbnail From Internet")
-	} else {
-		err = code20()
+		an.Thumbnail = thumbnail
+		logs.DataWrittenSuccessfully(interfaceAnimation, "Thumbnail From Internet")
 	}
 	return err
 }
@@ -939,63 +715,43 @@ func (an *animation) GetResponse() types.Animation {
 	return an.response
 }
 
-func (vc *voice) writeVoice(voice, object string) error {
-	var err error
-	if vc.Voice == "" {
-		vc.Voice = voice
-		logs.DataWrittenSuccessfully(interfaceVoice, object)
-	} else {
-		err = code10()
-	}
-	return err
-}
-
 func (vc *voice) WriteVoiceStorage(voice string) error {
 	var err error
-	if voice != "" {
+	if err = checkStringValue(voice, vc.Voice); err == nil {
 		if err = vc.isCorrectType(voice); err == nil {
 			vc.gottenFrom = Storage
-			err = vc.writeVoice(voice, "Animation From Storage")
+			vc.Voice = voice
+			logs.DataWrittenSuccessfully(interfaceVoice, "Voice From Storage")
 		}
-	} else {
-		err = code20()
 	}
 	return err
 }
 
 func (vc *voice) WriteVoiceTelegram(voiceID string) error {
 	var err error
-	if voiceID != "" {
+	if err = checkStringValue(voiceID, vc.Voice); err == nil {
 		vc.gottenFrom = Telegram
-		err = vc.writeVoice(voiceID, "Animation From Telegram")
-	} else {
-		err = code20()
+		vc.Voice = voiceID
+		logs.DataWrittenSuccessfully(interfaceVoice, "Voice From Telegram")
 	}
 	return err
 }
 
 func (vc *voice) WriteVoiceInternet(URL string) error {
 	var err error
-	if URL != "" {
+	if err = checkStringValue(URL, vc.Voice); err == nil {
 		vc.gottenFrom = Internet
-		err = vc.writeVoice(URL, "Animation From Internet")
-	} else {
-		err = code20()
+		vc.Voice = URL
+		logs.DataWrittenSuccessfully(interfaceVoice, "Voice From Internet")
 	}
 	return err
 }
 
 func (vc *voice) WriteDuration(duration int) error {
 	var err error
-	if duration > 0 {
-		if vc.Duration == 0 {
-			vc.Duration = duration
-			logs.DataWrittenSuccessfully(interfaceVoice, "Duration")
-		} else {
-			err = code10()
-		}
-	} else {
-		err = code20()
+	if err = checkIntegerValue(duration, vc.Duration); err == nil {
+		vc.Duration = duration
+		logs.DataWrittenSuccessfully(interfaceVoice, "Duration")
 	}
 	return err
 }
@@ -1004,124 +760,84 @@ func (vc *voice) GetResponse() types.Voice {
 	return vc.response
 }
 
-func (vdn *videonote) writeVideoNote(videonote, object string) error {
-	var err error
-	if vdn.VideoNote == "" {
-		vdn.VideoNote = videonote
-		logs.DataWrittenSuccessfully(interfaceVoice, object)
-	} else {
-		err = code10()
-	}
-	return err
-}
-
 func (vdn *videonote) WriteVideoNoteStorage(videonote string) error {
 	var err error
-	if videonote != "" {
+	if err = checkStringValue(videonote, vdn.VideoNote); err == nil {
 		if err = vdn.isCorrectType(videonote); err == nil {
 			vdn.videoGottenFrom = Storage
-			err = vdn.writeVideoNote(videonote, "Video-Note From Storage")
+			vdn.VideoNote, vdn.Media = videonote, videonote
+			logs.DataWrittenSuccessfully(interfaceVoice, "Video-Note From Storage")
 		}
-	} else {
-		err = code20()
 	}
 	return err
 }
 
 func (vdn *videonote) WriteVideoNoteTelegram(vdnID string) error {
 	var err error
-	if vdnID != "" {
+	if err = checkStringValue(vdnID, vdn.VideoNote); err == nil {
 		vdn.videoGottenFrom = Telegram
-		err = vdn.writeVideoNote(vdnID, "Video-Note From Telegram")
-	} else {
-		err = code20()
+		vdn.VideoNote, vdn.Media = vdnID, vdnID
+		logs.DataWrittenSuccessfully(interfaceVoice, "Video-Note From Telegram")
 	}
 	return err
 }
 
 func (vdn *videonote) WriteVideoNoteInternet(URL string) error {
 	var err error
-	if URL != "" {
+	if err = checkStringValue(URL, vdn.VideoNote); err == nil {
 		vdn.videoGottenFrom = Internet
-		err = vdn.writeVideoNote(URL, "Video-Note From Internet")
-	} else {
-		err = code20()
+		vdn.VideoNote, vdn.Media = URL, URL
+		logs.DataWrittenSuccessfully(interfaceVoice, "Video-Note From Internet")
 	}
 	return err
 }
 
 func (vdn *videonote) WriteDuration(duration int) error {
 	var err error
-	if duration > 0 {
-		if vdn.Duration == 0 {
-			vdn.Duration = duration
-			logs.DataWrittenSuccessfully(interfaceVideoNote, "Duration")
-		} else {
-			err = code10()
-		}
-	} else {
-		err = code20()
+	if err = checkIntegerValue(duration, vdn.Duration); err == nil {
+		vdn.Duration = duration
+		logs.DataWrittenSuccessfully(interfaceVideoNote, "Duration")
 	}
 	return err
 }
 
 func (vdn *videonote) WriteLength(length int) error {
 	var err error
-	if length > 0 {
-		if vdn.Length == 0 {
-			vdn.Length = length
-			logs.DataWrittenSuccessfully(interfaceVideoNote, "Length")
-		} else {
-			err = code10()
-		}
-	} else {
-		err = code20()
-	}
-	return err
-}
-
-func (vdn *videonote) writeThumbnail(thumb, object string) error {
-	var err error
-	if vdn.Thumbnail == "" {
-		vdn.Thumbnail = thumb
-		logs.DataWrittenSuccessfully(interfaceVideoNote, object)
-	} else {
-		err = code10()
+	if err = checkIntegerValue(length, vdn.Length); err == nil {
+		vdn.Length = length
+		logs.DataWrittenSuccessfully(interfaceVideoNote, "Length")
 	}
 	return err
 }
 
 func (vdn *videonote) WriteThumbnailStorage(thumbnail string) error {
 	var err error
-	if thumbnail != "" {
+	if err = checkStringValue(thumbnail, vdn.Thumbnail); err == nil {
 		if err = isThumbnailCorrectType(thumbnail); err == nil {
 			vdn.thumbnailGottenFrom = Storage
-			err = vdn.writeThumbnail(thumbnail, "Thumbnail From Storage")
+			vdn.Thumbnail = thumbnail
+			logs.DataWrittenSuccessfully(interfaceVideoNote, "Thumbnail From Storage")
 		}
-	} else {
-		err = code20()
 	}
 	return err
 }
 
 func (vdn *videonote) WriteThumbnailTelegram(thumbnailID string) error {
 	var err error
-	if thumbnailID != "" {
+	if err = checkStringValue(thumbnailID, vdn.Thumbnail); err == nil {
 		vdn.thumbnailGottenFrom = Telegram
-		err = vdn.writeThumbnail(thumbnailID, "Thumbnail From Telegram")
-	} else {
-		err = code20()
+		vdn.Thumbnail = thumbnailID
+		logs.DataWrittenSuccessfully(interfaceVideoNote, "Thumbnail From Telegram")
 	}
 	return err
 }
 
 func (vdn *videonote) WriteThumbnailInternet(URL string) error {
 	var err error
-	if URL != "" {
+	if err = checkStringValue(URL, vdn.Thumbnail); err == nil {
 		vdn.thumbnailGottenFrom = Internet
-		err = vdn.writeThumbnail(URL, "Thumbnail From Internet")
-	} else {
-		err = code20()
+		vdn.Thumbnail = URL
+		logs.DataWrittenSuccessfully(interfaceVideoNote, "Thumbnail From Internet")
 	}
 	return err
 }
@@ -1222,90 +938,54 @@ func (loc *location) WriteProximityAlertRadius(proxalrad int) error {
 
 func (loc *location) WriteTitle(title string) error {
 	var err error
-	if title != "" {
-		if loc.Title == "" {
-			loc.Title = title
-			logs.DataWrittenSuccessfully(interfaceLocation, "Title")
-		} else {
-			err = code10()
-		}
-	} else {
-		err = code20()
+	if err = checkStringValue(title, loc.Title); err == nil {
+		loc.Title = title
+		logs.DataWrittenSuccessfully(interfaceLocation, "Title")
 	}
 	return err
 }
 
 func (loc *location) WriteAddress(address string) error {
 	var err error
-	if address != "" {
-		if loc.Address == "" {
-			loc.Address = address
-			logs.DataWrittenSuccessfully(interfaceLocation, "Address")
-		} else {
-			err = code10()
-		}
-	} else {
-		err = code20()
+	if err = checkStringValue(address, loc.Address); err == nil {
+		loc.Address = address
+		logs.DataWrittenSuccessfully(interfaceLocation, "Address")
 	}
 	return err
 }
 
 func (loc *location) WriteFoursquareID(foursquareID string) error {
 	var err error
-	if foursquareID != "" {
-		if loc.FoursquareID == "" {
-			loc.FoursquareID = foursquareID
-			logs.DataWrittenSuccessfully(interfaceLocation, "Foursquare ID")
-		} else {
-			err = code10()
-		}
-	} else {
-		err = code20()
+	if err = checkStringValue(foursquareID, loc.FoursquareID); err == nil {
+		loc.FoursquareID = foursquareID
+		logs.DataWrittenSuccessfully(interfaceLocation, "Foursquare ID")
 	}
 	return err
 }
 
 func (loc *location) WriteFoursquareType(foursquareType string) error {
 	var err error
-	if foursquareType != "" {
-		if loc.FoursquareType == "" {
-			loc.FoursquareType = foursquareType
-			logs.DataWrittenSuccessfully(interfaceLocation, "Foursquare Type")
-		} else {
-			err = code10()
-		}
-	} else {
-		err = code20()
+	if err = checkStringValue(foursquareType, loc.FoursquareType); err == nil {
+		loc.FoursquareType = foursquareType
+		logs.DataWrittenSuccessfully(interfaceLocation, "Foursquare Type")
 	}
 	return err
 }
 
 func (loc *location) WriteGooglePlaceID(googlePlaceID string) error {
 	var err error
-	if googlePlaceID != "" {
-		if loc.GooglePlaceID == "" {
-			loc.GooglePlaceID = googlePlaceID
-			logs.DataWrittenSuccessfully(interfaceLocation, "Google Place ID")
-		} else {
-			err = code10()
-		}
-	} else {
-		err = code20()
+	if err = checkStringValue(googlePlaceID, loc.GooglePlaceID); err == nil {
+		loc.GooglePlaceID = googlePlaceID
+		logs.DataWrittenSuccessfully(interfaceLocation, "Google Place ID")
 	}
 	return err
 }
 
 func (loc *location) WriteGooglePlaceType(googlePlaceType string) error {
 	var err error
-	if googlePlaceType != "" {
-		if loc.GooglePlaceType == "" {
-			loc.GooglePlaceType = googlePlaceType
-			logs.DataWrittenSuccessfully(interfaceLocation, "Google Place Type")
-		} else {
-			err = code10()
-		}
-	} else {
-		err = code20()
+	if err = checkStringValue(googlePlaceType, loc.GooglePlaceType); err == nil {
+		loc.GooglePlaceType = googlePlaceType
+		logs.DataWrittenSuccessfully(interfaceLocation, "Google Place Type")
 	}
 	return err
 }
@@ -1316,60 +996,36 @@ func (loc *location) GetResponse() types.Venue {
 
 func (c *contact) WritePhoneNumber(phone string) error {
 	var err error
-	if phone != "" {
-		if c.PhoneNumber == "" {
-			c.PhoneNumber = phone
-			logs.DataWrittenSuccessfully(interfaceContact, "Phone Number")
-		} else {
-			err = code10()
-		}
-	} else {
-		err = code20()
+	if err = checkStringValue(phone, c.PhoneNumber); err == nil {
+		c.PhoneNumber = phone
+		logs.DataWrittenSuccessfully(interfaceContact, "Phone Number")
 	}
 	return err
 }
 
 func (c *contact) WriteFirstName(fname string) error {
 	var err error
-	if fname != "" {
-		if c.FirstName == "" {
-			c.FirstName = fname
-			logs.DataWrittenSuccessfully(interfaceContact, "First Name")
-		} else {
-			err = code10()
-		}
-	} else {
-		err = code20()
+	if err = checkStringValue(fname, c.FirstName); err == nil {
+		c.FirstName = fname
+		logs.DataWrittenSuccessfully(interfaceContact, "First Name")
 	}
 	return err
 }
 
 func (c *contact) WriteLastName(lname string) error {
 	var err error
-	if lname != "" {
-		if c.LastName == "" {
-			c.LastName = lname
-			logs.DataWrittenSuccessfully(interfaceContact, "Last Name")
-		} else {
-			err = code10()
-		}
-	} else {
-		err = code20()
+	if err = checkStringValue(lname, c.LastName); err == nil {
+		c.LastName = lname
+		logs.DataWrittenSuccessfully(interfaceContact, "Last Name")
 	}
 	return err
 }
 
 func (c *contact) WriteVCard(vcard string) error {
 	var err error
-	if vcard != "" {
-		if c.Vcard == "" {
-			c.Vcard = vcard
-			logs.DataWrittenSuccessfully(interfaceContact, "vCard")
-		} else {
-			err = code10()
-		}
-	} else {
-		err = code20()
+	if err = checkStringValue(vcard, c.Vcard); err == nil {
+		c.Vcard = vcard
+		logs.DataWrittenSuccessfully(interfaceContact, "vCard")
 	}
 	return err
 }
@@ -1396,39 +1052,18 @@ func (p *poll) WriteQuestion(question string) error {
 
 func (p *poll) WriteQuestionParseMode(parsemode string) error {
 	var err error
-	if (parsemode == types.HTML) || (parsemode == types.Markdown) || (parsemode == types.MarkdownV2) {
-		if p.QuestionParsemode == "" {
-			p.QuestionParsemode = parsemode
-			logs.DataWrittenSuccessfully(interfacePoll, "Question Parse Mode")
-		} else {
-			err = code10()
-		}
-	} else {
-		err = code20()
+	if err = checkParseMode(parsemode, p.QuestionParsemode); err == nil {
+		p.QuestionParsemode = parsemode
+		logs.DataWrittenSuccessfully(interfacePoll, "Question Parse Mode")
 	}
 	return err
 }
 
 func (p *poll) WriteQuestionEntities(entities []*types.MessageEntity) error {
 	var err error
-	if len(entities) != 0 {
-
-		for i := 0; (i < len(entities)) && (err == nil); i++ {
-			if entities[i] == nil {
-				err = code5()
-			}
-		}
-
-		if err == nil {
-			if len(p.QuestionEntities) == 0 {
-				p.QuestionEntities = entities
-				logs.DataWrittenSuccessfully(interfacePoll, "Question Entities")
-			} else {
-				err = code10()
-			}
-		}
-	} else {
-		err = code20()
+	if err = checkEntities(entities, p.QuestionEntities); err == nil {
+		p.QuestionEntities = entities
+		logs.DataWrittenSuccessfully(interfacePoll, "Question Entities")
 	}
 	return err
 }
@@ -1496,79 +1131,46 @@ func (p *poll) WriteAllowMultipleAnswers() error {
 
 func (p *poll) WriteCorrectOptionID(optID string) error {
 	var err error
-	if optID != "" {
+	if err = checkStringValue(optID, p.CorrectOptionID); err == nil {
 		r := []rune(optID)
 		if r[0] == '0' {
-			if p.CorrectOptionID == "" {
-				p.CorrectOptionID = optID
-				logs.DataWrittenSuccessfully(interfacePoll, "Correct Option ID")
-			} else {
-				err = code10()
-			}
+			p.CorrectOptionID = optID
+			logs.DataWrittenSuccessfully(interfacePoll, "Correct Option ID")
 		} else {
 			err = code20()
 		}
-	} else {
-		err = code20()
 	}
 	return err
 }
 
 func (p *poll) WriteExplanation(explanation string) error {
 	var err error
-	if explanation != "" {
+	if err = checkStringValue(explanation, p.Explanation); err == nil {
 		exp := []rune(explanation)
 		if len(exp) >= 1 && len(exp) <= 200 {
-			if p.Explanation == "" {
-				p.Explanation = explanation
-				logs.DataWrittenSuccessfully(interfacePoll, "Explanation")
-			} else {
-				err = code10()
-			}
+			p.Explanation = explanation
+			logs.DataWrittenSuccessfully(interfacePoll, "Explanation")
 		} else {
 			err = code20()
 		}
-	} else {
-		err = code20()
 	}
 	return err
 }
 
 func (p *poll) WriteExplanationParseMode(parsemode string) error {
 	var err error
-	if (parsemode == types.HTML) || (parsemode == types.Markdown) || (parsemode == types.MarkdownV2) {
-		if p.ExplanationParsemode == "" {
-			p.ExplanationParsemode = parsemode
-			logs.DataWrittenSuccessfully(interfacePoll, "Explanation Parse Mode")
-		} else {
-			err = code10()
-		}
-	} else {
-		err = code20()
+	if err = checkParseMode(parsemode, p.ExplanationParsemode); err == nil {
+		p.ExplanationParsemode = parsemode
+		logs.DataWrittenSuccessfully(interfacePoll, "Explanation Parse Mode")
 	}
 	return err
 }
 
 func (p *poll) WriteExplanationEntities(entities []*types.MessageEntity) error {
 	var err error
-	if len(entities) != 0 {
-
-		for i := 0; (i < len(entities)) && (err == nil); i++ {
-			if entities[i] == nil {
-				err = code5()
-			}
-		}
-
-		if err == nil {
-			if len(p.ExplanationEntities) == 0 {
-				p.ExplanationEntities = entities
-				logs.DataWrittenSuccessfully(interfacePoll, "Explanation Entities")
-			} else {
-				err = code10()
-			}
-		}
-	} else {
-		err = code20()
+	if err = checkEntities(entities, p.ExplanationEntities); err == nil {
+		p.ExplanationEntities = entities
+		logs.DataWrittenSuccessfully(interfacePoll, "Explanation Entities")
 	}
 	return err
 }
@@ -1628,45 +1230,27 @@ func (p *poll) GetResponse() types.Poll {
 
 func (inf *information) WriteString(text string) error {
 	var err error
-	if text != "" {
-		if inf.Text == "" {
-			inf.Text = text
-			logs.DataWrittenSuccessfully(interfaceInf, "Text")
-		} else {
-			err = code10()
-		}
-	} else {
-		err = code20()
+	if err = checkStringValue(text, inf.Text); err == nil {
+		inf.Text = text
+		logs.DataWrittenSuccessfully(interfaceInf, "Text")
 	}
 	return err
 }
 
 func (inf *information) WriteParseMode(parsemode string) error {
 	var err error
-	if (parsemode != types.HTML) && (parsemode != types.Markdown) && (parsemode != types.MarkdownV2) {
-		err = code20()
-	} else {
-		if inf.ParseMode == "" {
-			inf.ParseMode = parsemode
-			logs.DataWrittenSuccessfully(interfaceInf, "Parse Mode")
-		} else {
-			err = code10()
-		}
+	if err = checkParseMode(parsemode, inf.ParseMode); err == nil {
+		inf.ParseMode = parsemode
+		logs.DataWrittenSuccessfully(interfaceAudio, "Parse Mode")
 	}
 	return err
 }
 
 func (inf *information) WriteMessageThreadID(messageID int) error {
 	var err error
-	if messageID > 0 {
-		if inf.MessageID == 0 {
-			inf.MessageThreadID = messageID
-			logs.DataWrittenSuccessfully(interfaceInf, "Message Thread ID")
-		} else {
-			err = code10()
-		}
-	} else {
-		err = code20()
+	if err = checkIntegerValue(messageID, inf.MessageThreadID); err == nil {
+		inf.MessageThreadID = messageID
+		logs.DataWrittenSuccessfully(interfaceInf, "Message Thread ID")
 	}
 	return err
 }
@@ -1695,39 +1279,18 @@ func (inf *information) WriteProtectContent() error {
 
 func (inf *information) WriteMessageEffectID(messageID string) error {
 	var err error
-	if messageID != "" {
-		if inf.MessageEffectID == "" {
-			inf.MessageEffectID = messageID
-			logs.DataWrittenSuccessfully(interfaceInf, "Message Effect ID")
-		} else {
-			err = code10()
-		}
-	} else {
-		err = code20()
+	if err = checkStringValue(messageID, inf.MessageEffectID); err == nil {
+		inf.MessageEffectID = messageID
+		logs.DataWrittenSuccessfully(interfaceInf, "Message Effect ID")
 	}
 	return err
 }
 
 func (inf *information) WriteEntities(entities []*types.MessageEntity) error {
 	var err error
-	if len(entities) != 0 {
-
-		for i := 0; (i < len(entities)) && (err == nil); i++ {
-			if entities[i] == nil {
-				err = code5()
-			}
-		}
-
-		if err == nil {
-			if len(inf.Entities) == 0 {
-				inf.Entities = entities
-				logs.DataWrittenSuccessfully(interfaceInf, "Entities")
-			} else {
-				err = code10()
-			}
-		}
-	} else {
-		err = code20()
+	if err = checkEntities(entities, inf.Entities); err == nil {
+		inf.Entities = entities
+		logs.DataWrittenSuccessfully(interfaceInf, "Entities")
 	}
 	return err
 }
@@ -1749,15 +1312,9 @@ func (inf *information) WriteLinkPreviewOptions(lpo *types.LinkPreviewOptions) e
 
 func (inf *information) WriteMessageID(messageID int) error {
 	var err error
-	if messageID > 0 {
-		if inf.MessageID == 0 {
-			inf.MessageID = messageID
-			logs.DataWrittenSuccessfully(interfaceInf, "Message ID")
-		} else {
-			err = code10()
-		}
-	} else {
-		err = code20()
+	if err = checkIntegerValue(messageID, inf.MessageID); err == nil {
+		inf.MessageID = messageID
+		logs.DataWrittenSuccessfully(interfaceInf, "Message ID")
 	}
 	return err
 }
@@ -1788,15 +1345,9 @@ func (inf *information) WriteMessageIDs(messageIDs []int) error {
 
 func (inf *information) WriteCaption(caption string) error {
 	var err error
-	if caption != "" {
-		if inf.Caption == "" {
-			inf.Caption = caption
-			logs.DataWrittenSuccessfully(interfaceInf, "Caption")
-		} else {
-			err = code10()
-		}
-	} else {
-		err = code20()
+	if err = checkCaption(caption, inf.Caption); err == nil {
+		inf.Caption = caption
+		logs.DataWrittenSuccessfully(interfaceInf, "Caption")
 	}
 	return err
 }
@@ -1825,26 +1376,11 @@ func (inf *information) WriteReplyParameters(reply *types.ReplyParameters) error
 		}
 
 		if err == nil {
-			switch ch := reply.ChatID.(type) {
-			case int:
-				if ch <= 0 {
-					err = code20()
-				}
-			case string:
-				if ch == "" {
-					err = code20()
-				}
-			default:
-				err = code999()
-			}
-
-			if err == nil {
-				if inf.ReplyParameters == nil {
-					inf.ReplyParameters = reply
-					logs.DataWrittenSuccessfully(interfaceInf, "Reply Parameters")
-				} else {
-					err = code10()
-				}
+			if inf.ReplyParameters == nil {
+				inf.ReplyParameters = reply
+				logs.DataWrittenSuccessfully(interfaceInf, "Reply Parameters")
+			} else {
+				err = code10()
 			}
 		}
 
@@ -1867,30 +1403,18 @@ func (inf *information) WriteAllowPaidBroadcast() error {
 
 func (inf *information) WriteStarCount(amount int) error {
 	var err error
-	if amount > 0 {
-		if inf.StarCount == 0 {
-			inf.StarCount = amount
-			logs.DataWrittenSuccessfully(interfaceInf, "Star Count")
-		} else {
-			err = code10()
-		}
-	} else {
-		err = code20()
+	if err = checkIntegerValue(amount, inf.StarCount); err == nil {
+		inf.StarCount = amount
+		logs.DataWrittenSuccessfully(interfaceInf, "Star Count")
 	}
 	return err
 }
 
 func (inf *information) WritePayload(payload string) error {
 	var err error
-	if payload != "" {
-		if inf.Payload == "" {
-			inf.Payload = payload
-			logs.DataWrittenSuccessfully(interfaceInf, "Payload")
-		} else {
-			err = code10()
-		}
-	} else {
-		err = code20()
+	if err = checkStringValue(payload, inf.Payload); err == nil {
+		inf.Payload = payload
+		logs.DataWrittenSuccessfully(interfaceInf, "Payload")
 	}
 	return err
 }
@@ -1935,15 +1459,9 @@ func (ch *chat) WriteChatName(chatname string) error {
 
 func (ch *chat) WriteBusinessConnectionID(connectionID string) error {
 	var err error
-	if connectionID != "" {
-		if ch.BusinessConnectionID == "" {
-			ch.BusinessConnectionID = connectionID
-			logs.DataWrittenSuccessfully(interfaceChat, "Business Connection ID")
-		} else {
-			err = code10()
-		}
-	} else {
-		err = code20()
+	if err = checkStringValue(connectionID, ch.BusinessConnectionID); err == nil {
+		ch.BusinessConnectionID = connectionID
+		logs.DataWrittenSuccessfully(interfaceChat, "Business Connection ID")
 	}
 	return err
 }
@@ -2016,15 +1534,9 @@ func (in *inline) NewButton(line, pos int) (IInlineButton, error) {
 
 func (inb *inlineKeyboardButton) WriteString(text string) error {
 	var err error
-	if text != "" {
-		if inb.Text == "" {
-			inb.Text = text
-			logs.DataWrittenSuccessfully(inbtn, "Text")
-		} else {
-			err = code10()
-		}
-	} else {
-		err = code20()
+	if err = checkStringValue(text, inb.Text); err == nil {
+		inb.Text = text
+		logs.DataWrittenSuccessfully(inbtn, "Text")
 	}
 	return err
 }
@@ -2041,54 +1553,39 @@ func (inb *inlineKeyboardButton) checkOthers() error {
 
 func (inb *inlineKeyboardButton) WriteURL(url string) error {
 	var err error
-	if url != "" {
-		if inb.Url == "" {
-			err = inb.checkOthers()
-			if err == nil {
-				inb.storage[wURL] = added
-				inb.Url = url
-				logs.DataWrittenSuccessfully(inbtn, "URL")
-			}
-		} else {
-			err = code10()
+	if err = checkStringValue(url, inb.Url); err == nil {
+		if err = inb.checkOthers(); err == nil {
+			inb.storage[wURL] = added
+			inb.Url = url
+			logs.DataWrittenSuccessfully(inbtn, "URL")
 		}
-	} else {
-		err = code20()
 	}
 	return err
 }
 
 func (inb *inlineKeyboardButton) WriteCallbackData(text string) error {
 	var err error
-	if text != "" {
-		if inb.CallbackData == "" {
-			err = inb.checkOthers()
-			if err == nil {
-				inb.storage[wCallback] = added
-				inb.CallbackData = text
-				logs.DataWrittenSuccessfully(inbtn, "Callback Data")
-			}
-		} else {
-			err = code10()
+	if err = checkStringValue(text, inb.CallbackData); err == nil {
+		if err = inb.checkOthers(); err == nil {
+			inb.storage[wCallback] = added
+			inb.CallbackData = text
+			logs.DataWrittenSuccessfully(inbtn, "Callback Data")
 		}
-	} else {
-		err = code20()
 	}
 	return err
 }
 
 func (inb *inlineKeyboardButton) WriteWebApp(wbapp *types.WebAppInfo) error {
 	var err error
-	if wbapp != nil && wbapp.Url != "" {
+	if (wbapp != nil) && (wbapp.Url != "") {
 		if inb.WebApp == nil {
-			err = inb.checkOthers()
-			if err == nil {
+			if err = inb.checkOthers(); err == nil {
 				inb.storage[wWebApp] = added
 				inb.WebApp = wbapp
 				logs.DataWrittenSuccessfully(inbtn, "Web App")
+			} else {
+				err = code10()
 			}
-		} else {
-			err = code10()
 		}
 	} else {
 		err = code20()
@@ -2100,8 +1597,7 @@ func (inb *inlineKeyboardButton) WriteLoginUrl(logurl *types.LoginUrl) error {
 	var err error
 	if logurl != nil {
 		if inb.LoginUrl == nil {
-			err = inb.checkOthers()
-			if err == nil {
+			if err = inb.checkOthers(); err == nil {
 				inb.storage[wLoginUrl] = added
 				inb.LoginUrl = logurl
 				logs.DataWrittenSuccessfully(inbtn, "Login URL")
@@ -2117,38 +1613,24 @@ func (inb *inlineKeyboardButton) WriteLoginUrl(logurl *types.LoginUrl) error {
 
 func (inb *inlineKeyboardButton) WriteSwitchInlineQuery(sw string) error {
 	var err error
-	if sw != "" {
-		if inb.SwitchInlineQuery == "" {
-			err = inb.checkOthers()
-			if err == nil {
-				inb.storage[wSwitchIn] = added
-				inb.SwitchInlineQuery = sw
-				logs.DataWrittenSuccessfully(inbtn, "Switch Inline Query")
-			}
-		} else {
-			err = code10()
+	if err = checkStringValue(sw, inb.SwitchInlineQuery); err == nil {
+		if err = inb.checkOthers(); err == nil {
+			inb.storage[wSwitchIn] = added
+			inb.SwitchInlineQuery = sw
+			logs.DataWrittenSuccessfully(inbtn, "Switch Inline Query")
 		}
-	} else {
-		err = code20()
 	}
 	return err
 }
 
 func (inb *inlineKeyboardButton) WriteSwitchInlineQueryCurrentChat(swcch string) error {
 	var err error
-	if swcch != "" {
-		if inb.SwitchInlineQueryCurrentChat == "" {
-			err = inb.checkOthers()
-			if err == nil {
-				inb.storage[wSwitchInQuery] = added
-				inb.SwitchInlineQueryCurrentChat = swcch
-				logs.DataWrittenSuccessfully(inbtn, "Switch Inline Query Current Chat")
-			}
-		} else {
-			err = code10()
+	if err = checkStringValue(swcch, inb.SwitchInlineQueryCurrentChat); err == nil {
+		if err = inb.checkOthers(); err == nil {
+			inb.storage[wSwitchInQuery] = added
+			inb.SwitchInlineQueryCurrentChat = swcch
+			logs.DataWrittenSuccessfully(inbtn, "Switch Inline Query Current Chat")
 		}
-	} else {
-		err = code20()
 	}
 	return err
 }
@@ -2157,8 +1639,7 @@ func (inb *inlineKeyboardButton) WriteSwitchInlineQueryChosenChat(sw *types.Swit
 	var err error
 	if sw != nil {
 		if inb.SwitchInlineQueryChosenChat == nil {
-			err = inb.checkOthers()
-			if err == nil {
+			if err = inb.checkOthers(); err == nil {
 				inb.storage[wSwitchInQueryCh] = added
 				inb.SwitchInlineQueryChosenChat = sw
 				logs.DataWrittenSuccessfully(inbtn, "Switch Inline Query Chosen Chat")
@@ -2174,15 +1655,18 @@ func (inb *inlineKeyboardButton) WriteSwitchInlineQueryChosenChat(sw *types.Swit
 
 func (inb *inlineKeyboardButton) WriteCallbackGame(game *types.CallbackGame) error {
 	var err error
-	if inb.CallbackGame == nil {
-		err = inb.checkOthers()
-		if err == nil {
-			inb.storage[wGame] = added
-			inb.CallbackGame = game
-			logs.DataWrittenSuccessfully(inbtn, "Callback Game")
+	if game != nil {
+		if inb.CallbackGame == nil {
+			if err = inb.checkOthers(); err == nil {
+				inb.storage[wGame] = added
+				inb.CallbackGame = game
+				logs.DataWrittenSuccessfully(inbtn, "Callback Game")
+			}
+		} else {
+			err = code10()
 		}
 	} else {
-		err = code10()
+		err = code20()
 	}
 	return err
 }
@@ -2190,8 +1674,7 @@ func (inb *inlineKeyboardButton) WriteCallbackGame(game *types.CallbackGame) err
 func (inb *inlineKeyboardButton) WritePay() error {
 	var err error
 	if !inb.Pay {
-		err = inb.checkOthers()
-		if err == nil {
+		if err = inb.checkOthers(); err == nil {
 			inb.storage[wPay] = added
 			inb.Pay = true
 			logs.SettedParam("Pay", inbtn, true)
@@ -2251,15 +1734,9 @@ func (rp *reply) WriteOneTimeKeyboard() error {
 
 func (rp *reply) WriteInputFieldPlaceholder(placeholder string) error {
 	var err error
-	if placeholder != "" {
-		if rp.Keyboard.InputFieldPlaceholder == "" {
-			rp.Keyboard.InputFieldPlaceholder = placeholder
-			logs.DataWrittenSuccessfully(interfaceReplyKB, "Input Field Placeholder")
-		} else {
-			err = code10()
-		}
-	} else {
-		err = code20()
+	if err = checkStringValue(placeholder, rp.Keyboard.InputFieldPlaceholder); err == nil {
+		rp.Keyboard.InputFieldPlaceholder = placeholder
+		logs.DataWrittenSuccessfully(interfaceReplyKB, "Input Field Placeholder")
 	}
 	return err
 }
@@ -2305,16 +1782,9 @@ func (rpb *replyKeyboardButton) checkOthers() error {
 
 func (rpb *replyKeyboardButton) WriteString(text string) error {
 	var err error
-	if text != "" {
-		if rpb.Text == "" {
-			rpb.Text = text
-			logs.DataWrittenSuccessfully(rpbtn, "Text")
-
-		} else {
-			err = code10()
-		}
-	} else {
-		err = code20()
+	if err = checkStringValue(text, rpb.Text); err == nil {
+		rpb.Text = text
+		logs.DataWrittenSuccessfully(rpbtn, "Text")
 	}
 	return err
 }
@@ -2385,7 +1855,7 @@ func (rpb *replyKeyboardButton) WriteRequestLocation() error {
 
 func (rpb *replyKeyboardButton) WriteRequestPoll(poll *types.KeyboardButtonPollType) error {
 	var err error
-	if (poll != nil) && (poll.Type != "") {
+	if poll != nil {
 		if rpb.RequestPoll == nil {
 			if err = rpb.checkOthers(); err == nil {
 				rpb.storage[wReqPoll] = added

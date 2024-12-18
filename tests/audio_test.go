@@ -69,7 +69,7 @@ func audioStorageUnreqWithName(t *testing.T) {
 	if err := ad.WriteTitle("A SOUND"); err != nil {
 		t.Fatal(err)
 	}
-	inf := msg.NewMessage()
+	inf := msg.NewParameters()
 	if err := inf.WriteString("<b>SELAM</b> ALEYKUM!"); err != nil {
 		t.Fatal(err)
 	}
@@ -124,7 +124,7 @@ func audioStorageUnreqReplyKB(t *testing.T) {
 	if err := ad.WriteTitle("A SOUND"); err != nil {
 		t.Fatal(err)
 	}
-	inf := msg.NewMessage()
+	inf := msg.NewParameters()
 	if err := inf.WriteString("<b>SELAM</b> ALEYKUM!"); err != nil {
 		t.Fatal(err)
 	}
@@ -179,7 +179,7 @@ func audioStorageUnreqWithoutName(t *testing.T) {
 	if err := ad.WriteTitle("A SOUND"); err != nil {
 		t.Fatal(err)
 	}
-	inf := msg.NewMessage()
+	inf := msg.NewParameters()
 	if err := inf.WriteString("<b>SELAM</b> ALEYKUM!"); err != nil {
 		t.Fatal(err)
 	}
@@ -279,7 +279,7 @@ func audioTelegramUnreqWithName(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	inf := msg.NewMessage()
+	inf := msg.NewParameters()
 	if err := inf.WriteString("<b>SELAM</b> ALEYKUM!"); err != nil {
 		t.Fatal(err)
 	}
@@ -335,7 +335,7 @@ func audioTelegramUnreqReplyKB(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	inf := msg.NewMessage()
+	inf := msg.NewParameters()
 	if err := inf.WriteString("<b>SELAM</b> ALEYKUM!"); err != nil {
 		t.Fatal(err)
 	}
@@ -388,7 +388,7 @@ func audioTelegramUnreqWithoutName(t *testing.T) {
 	ad.WritePerformer("?")
 	ad.WriteTitle("A SOUND")
 
-	inf := msg.NewMessage()
+	inf := msg.NewParameters()
 	inf.WriteDisableNotification()
 	inf.WriteProtectContent()
 	inf.WriteReplyParameters(&types.ReplyParameters{MessageID: 532, ChatID: 738070596})

@@ -81,7 +81,7 @@ func videoStorageUnreqWithoutName(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	inf := msg.NewMessage()
+	inf := msg.NewParameters()
 	if err := inf.WriteDisableNotification(); err != nil {
 		t.Fatal(err)
 	}
@@ -148,7 +148,7 @@ func videoStorageUnreqWithName(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	inf := msg.NewMessage()
+	inf := msg.NewParameters()
 	if err := inf.WriteDisableNotification(); err != nil {
 		t.Fatal(err)
 	}
@@ -263,7 +263,7 @@ func videoTelegramUnreqWithoutName(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	inf := msg.NewMessage()
+	inf := msg.NewParameters()
 	if err := inf.WriteDisableNotification(); err != nil {
 		t.Fatal(err)
 	}
@@ -330,7 +330,7 @@ func videoTelegramUnreqWithName(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	inf := msg.NewMessage()
+	inf := msg.NewParameters()
 	if err := inf.WriteDisableNotification(); err != nil {
 		t.Fatal(err)
 	}

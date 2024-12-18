@@ -128,7 +128,7 @@ func locationUnreqFieldsWithName(t *testing.T) {
 	msg := formatter.CreateEmpltyMessage()
 	ch := createChat(msg, t)
 	loc := msg.NewLocation()
-	param := msg.NewMessage()
+	param := msg.NewParameters()
 	writeLocUnreqFields(loc, msg, t)
 	if err := param.WriteDisableNotification(); err != nil {
 		t.Fatal(err)
@@ -158,7 +158,7 @@ func locationUnreqFieldsWithoutName(t *testing.T) {
 	msg := formatter.CreateEmpltyMessage()
 	ch := createChat(msg, t)
 	loc := msg.NewLocation()
-	param := msg.NewMessage()
+	param := msg.NewParameters()
 	writeLocUnreqFields(loc, msg, t)
 	if err := param.WriteDisableNotification(); err != nil {
 		t.Fatal(err)
@@ -227,7 +227,7 @@ func venueUnreqFieldsWithName(t *testing.T) {
 	msg := formatter.CreateEmpltyMessage()
 	ch := createChat(msg, t)
 	loc := msg.NewLocation()
-	param := msg.NewMessage()
+	param := msg.NewParameters()
 	writeVenueUnreqFields(loc, msg, t)
 	if err := param.WriteDisableNotification(); err != nil {
 		t.Fatal(err)
@@ -257,7 +257,7 @@ func venueUnreqFieldsWithoutName(t *testing.T) {
 	msg := formatter.CreateEmpltyMessage()
 	ch := createChat(msg, t)
 	loc := msg.NewLocation()
-	param := msg.NewMessage()
+	param := msg.NewParameters()
 	writeVenueUnreqFields(loc, msg, t)
 	if err := param.WriteDisableNotification(); err != nil {
 		t.Fatal(err)

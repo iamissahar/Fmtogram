@@ -97,7 +97,7 @@ func paidMediaUnreq(msg *formatter.Message, pr formatter.IParameters, t *testing
 
 func paidPhotoReqFieldsWithName1x(t *testing.T) {
 	msg := formatter.CreateEmpltyMessage()
-	pr := msg.NewMessage()
+	pr := msg.NewParameters()
 	ch := createChat(msg, t)
 	holder := []interface{}{msg.NewPhoto()}
 	writeAndAddMediaMinSt(msg, holder, t)
@@ -115,7 +115,7 @@ func paidPhotoReqFieldsWithName1x(t *testing.T) {
 
 func paidPhotoReqFieldsWithName2x(t *testing.T) {
 	msg := formatter.CreateEmpltyMessage()
-	pr := msg.NewMessage()
+	pr := msg.NewParameters()
 	ch := createChat(msg, t)
 	holder := []interface{}{msg.NewPhoto(), msg.NewPhoto()}
 	writeAndAddMediaMinTg(msg, holder, t)
@@ -133,7 +133,7 @@ func paidPhotoReqFieldsWithName2x(t *testing.T) {
 
 func paidPhotoReqFieldsWithName10x(t *testing.T) {
 	msg := formatter.CreateEmpltyMessage()
-	pr := msg.NewMessage()
+	pr := msg.NewParameters()
 	ch := createChat(msg, t)
 	holder := []interface{}{msg.NewPhoto(), msg.NewPhoto(),
 		msg.NewPhoto(), msg.NewPhoto(),
@@ -161,7 +161,7 @@ func paidPhotoReqFieldsWithName(t *testing.T) {
 
 func paidPhotoReqFieldsWithoutName1x(t *testing.T) {
 	msg := formatter.CreateEmpltyMessage()
-	pr := msg.NewMessage()
+	pr := msg.NewParameters()
 	ch := createChat(msg, t)
 	holder := []interface{}{msg.NewPhoto()}
 	writeAndAddMediaMinSt(msg, holder, t)
@@ -176,7 +176,7 @@ func paidPhotoReqFieldsWithoutName1x(t *testing.T) {
 
 func paidPhotoReqFieldsWithoutName2x(t *testing.T) {
 	msg := formatter.CreateEmpltyMessage()
-	pr := msg.NewMessage()
+	pr := msg.NewParameters()
 	ch := createChat(msg, t)
 	holder := []interface{}{msg.NewPhoto(), msg.NewPhoto()}
 	writeAndAddMediaMinSt(msg, holder, t)
@@ -191,7 +191,7 @@ func paidPhotoReqFieldsWithoutName2x(t *testing.T) {
 
 func paidPhotoReqFieldsWithoutName10x(t *testing.T) {
 	msg := formatter.CreateEmpltyMessage()
-	pr := msg.NewMessage()
+	pr := msg.NewParameters()
 	ch := createChat(msg, t)
 	holder := []interface{}{msg.NewPhoto(), msg.NewPhoto(),
 		msg.NewPhoto(), msg.NewPhoto(),
@@ -216,7 +216,7 @@ func paidPhotoReqFieldsWithoutName(t *testing.T) {
 
 func paidPhotoUnReqFieldsWithName1x(t *testing.T) {
 	msg := formatter.CreateEmpltyMessage()
-	pr := msg.NewMessage()
+	pr := msg.NewParameters()
 	ch := createChat(msg, t)
 	holder := []interface{}{msg.NewPhoto()}
 	writeAndAddMediaMinTg(msg, holder, t)
@@ -235,7 +235,7 @@ func paidPhotoUnReqFieldsWithName1x(t *testing.T) {
 
 func paidPhotoUnReqFieldsWithName2x(t *testing.T) {
 	msg := formatter.CreateEmpltyMessage()
-	pr := msg.NewMessage()
+	pr := msg.NewParameters()
 	ch := createChat(msg, t)
 	holder := []interface{}{msg.NewPhoto(), msg.NewPhoto()}
 	writeAndAddMediaMinTg(msg, holder, t)
@@ -254,7 +254,7 @@ func paidPhotoUnReqFieldsWithName2x(t *testing.T) {
 
 func paidPhotoUnReqFieldsWithName10x(t *testing.T) {
 	msg := formatter.CreateEmpltyMessage()
-	pr := msg.NewMessage()
+	pr := msg.NewParameters()
 	ch := createChat(msg, t)
 	holder := []interface{}{msg.NewPhoto(), msg.NewPhoto(),
 		msg.NewPhoto(), msg.NewPhoto(),
@@ -283,7 +283,7 @@ func paidPhotoUnReqFieldsWithName(t *testing.T) {
 
 func paidPhotoUnReqFieldsWithoutName1x(t *testing.T) {
 	msg := formatter.CreateEmpltyMessage()
-	pr := msg.NewMessage()
+	pr := msg.NewParameters()
 	ch := createChat(msg, t)
 	holder := []interface{}{msg.NewPhoto()}
 	writeAndAddMediaMinSt(msg, holder, t)
@@ -299,7 +299,7 @@ func paidPhotoUnReqFieldsWithoutName1x(t *testing.T) {
 
 func paidPhotoUnReqFieldsWithoutName2x(t *testing.T) {
 	msg := formatter.CreateEmpltyMessage()
-	pr := msg.NewMessage()
+	pr := msg.NewParameters()
 	ch := createChat(msg, t)
 	holder := []interface{}{msg.NewPhoto(), msg.NewPhoto()}
 	writeAndAddMediaMinSt(msg, holder, t)
@@ -315,7 +315,7 @@ func paidPhotoUnReqFieldsWithoutName2x(t *testing.T) {
 
 func paidPhotoUnReqFieldsWithoutName10x(t *testing.T) {
 	msg := formatter.CreateEmpltyMessage()
-	pr := msg.NewMessage()
+	pr := msg.NewParameters()
 	ch := createChat(msg, t)
 	holder := []interface{}{msg.NewPhoto(), msg.NewPhoto(),
 		msg.NewPhoto(), msg.NewPhoto(),
@@ -349,7 +349,7 @@ func paidPhoto(t *testing.T) {
 // Paid Video Tests
 func paidVideoReqFieldsWithName1x(t *testing.T) {
 	msg := formatter.CreateEmpltyMessage()
-	pr := msg.NewMessage()
+	pr := msg.NewParameters()
 	ch := createChat(msg, t)
 	holder := []interface{}{msg.NewVideo()}
 	writeAndAddMediaMinSt(msg, holder, t)
@@ -367,7 +367,7 @@ func paidVideoReqFieldsWithName1x(t *testing.T) {
 
 func paidVideoReqFieldsWithName2x(t *testing.T) {
 	msg := formatter.CreateEmpltyMessage()
-	pr := msg.NewMessage()
+	pr := msg.NewParameters()
 	ch := createChat(msg, t)
 	holder := []interface{}{msg.NewVideo(), msg.NewVideo()}
 	writeAndAddMediaMinSt(msg, holder, t)
@@ -385,7 +385,7 @@ func paidVideoReqFieldsWithName2x(t *testing.T) {
 
 func paidVideoReqFieldsWithName10x(t *testing.T) {
 	msg := formatter.CreateEmpltyMessage()
-	pr := msg.NewMessage()
+	pr := msg.NewParameters()
 	ch := createChat(msg, t)
 	holder := []interface{}{msg.NewVideo(), msg.NewVideo(),
 		msg.NewVideo(), msg.NewVideo(),
@@ -413,7 +413,7 @@ func paidVideoReqFieldsWithName(t *testing.T) {
 
 func paidVideoReqFieldsWithoutName1x(t *testing.T) {
 	msg := formatter.CreateEmpltyMessage()
-	pr := msg.NewMessage()
+	pr := msg.NewParameters()
 	ch := createChat(msg, t)
 	holder := []interface{}{msg.NewVideo()}
 	writeAndAddMediaMinSt(msg, holder, t)
@@ -428,7 +428,7 @@ func paidVideoReqFieldsWithoutName1x(t *testing.T) {
 
 func paidVideoReqFieldsWithoutName2x(t *testing.T) {
 	msg := formatter.CreateEmpltyMessage()
-	pr := msg.NewMessage()
+	pr := msg.NewParameters()
 	ch := createChat(msg, t)
 	holder := []interface{}{msg.NewVideo(), msg.NewVideo()}
 	writeAndAddMediaMinSt(msg, holder, t)
@@ -443,7 +443,7 @@ func paidVideoReqFieldsWithoutName2x(t *testing.T) {
 
 func paidVideoReqFieldsWithoutName10x(t *testing.T) {
 	msg := formatter.CreateEmpltyMessage()
-	pr := msg.NewMessage()
+	pr := msg.NewParameters()
 	ch := createChat(msg, t)
 	holder := []interface{}{msg.NewVideo(), msg.NewVideo(),
 		msg.NewVideo(), msg.NewVideo(),
@@ -471,7 +471,7 @@ func paidVideoReqFieldsWithoutName(t *testing.T) {
 
 func paidVideoUnReqFieldsWithName1x(t *testing.T) {
 	msg := formatter.CreateEmpltyMessage()
-	pr := msg.NewMessage()
+	pr := msg.NewParameters()
 	ch := createChat(msg, t)
 	holder := []formatter.IVideo{msg.NewVideo()}
 	paidVideoStMax(msg, holder, t)
@@ -490,7 +490,7 @@ func paidVideoUnReqFieldsWithName1x(t *testing.T) {
 
 func paidVideoUnReqFieldsWithName2x(t *testing.T) {
 	msg := formatter.CreateEmpltyMessage()
-	pr := msg.NewMessage()
+	pr := msg.NewParameters()
 	ch := createChat(msg, t)
 	holder := []formatter.IVideo{msg.NewVideo(), msg.NewVideo()}
 	paidVideoStMax(msg, holder, t)
@@ -509,7 +509,7 @@ func paidVideoUnReqFieldsWithName2x(t *testing.T) {
 
 func paidVideoUnReqFieldsWithName10x(t *testing.T) {
 	msg := formatter.CreateEmpltyMessage()
-	pr := msg.NewMessage()
+	pr := msg.NewParameters()
 	ch := createChat(msg, t)
 	holder := []formatter.IVideo{msg.NewVideo(), msg.NewVideo(),
 		msg.NewVideo(), msg.NewVideo(),
@@ -538,7 +538,7 @@ func paidVideoUnReqFieldsWithName(t *testing.T) {
 
 func paidVideoUnReqFieldsWithoutName1x(t *testing.T) {
 	msg := formatter.CreateEmpltyMessage()
-	pr := msg.NewMessage()
+	pr := msg.NewParameters()
 	ch := createChat(msg, t)
 	holder := []formatter.IVideo{msg.NewVideo()}
 	paidVideoStMax(msg, holder, t)
@@ -554,7 +554,7 @@ func paidVideoUnReqFieldsWithoutName1x(t *testing.T) {
 
 func paidVideoUnReqFieldsWithoutName2x(t *testing.T) {
 	msg := formatter.CreateEmpltyMessage()
-	pr := msg.NewMessage()
+	pr := msg.NewParameters()
 	ch := createChat(msg, t)
 	holder := []formatter.IVideo{msg.NewVideo(), msg.NewVideo(),
 		msg.NewVideo(), msg.NewVideo(),
@@ -574,7 +574,7 @@ func paidVideoUnReqFieldsWithoutName2x(t *testing.T) {
 
 func paidVideoUnReqFieldsWithoutName10x(t *testing.T) {
 	msg := formatter.CreateEmpltyMessage()
-	pr := msg.NewMessage()
+	pr := msg.NewParameters()
 	ch := createChat(msg, t)
 	holder := []formatter.IVideo{msg.NewVideo(), msg.NewVideo(),
 		msg.NewVideo(), msg.NewVideo(),
@@ -608,7 +608,7 @@ func paidVideo(t *testing.T) {
 // Photo and Video Tests
 func paidVideoAndPhotoReqFieldsWithName1x(t *testing.T) {
 	msg := formatter.CreateEmpltyMessage()
-	pr := msg.NewMessage()
+	pr := msg.NewParameters()
 	ch := createChat(msg, t)
 	holder := []interface{}{msg.NewVideo(), msg.NewPhoto()}
 	writeAndAddMediaMinSt(msg, holder, t)
@@ -626,7 +626,7 @@ func paidVideoAndPhotoReqFieldsWithName1x(t *testing.T) {
 
 func paidVideoAndPhotoReqFieldsWithName2x(t *testing.T) {
 	msg := formatter.CreateEmpltyMessage()
-	pr := msg.NewMessage()
+	pr := msg.NewParameters()
 	ch := createChat(msg, t)
 	holder := []interface{}{msg.NewVideo(), msg.NewPhoto(), msg.NewVideo(), msg.NewPhoto()}
 	writeAndAddMediaMinSt(msg, holder, t)
@@ -644,7 +644,7 @@ func paidVideoAndPhotoReqFieldsWithName2x(t *testing.T) {
 
 func paidVideoAndPhotoReqFieldsWithName10x(t *testing.T) {
 	msg := formatter.CreateEmpltyMessage()
-	pr := msg.NewMessage()
+	pr := msg.NewParameters()
 	ch := createChat(msg, t)
 	holder := []interface{}{msg.NewVideo(), msg.NewPhoto(),
 		msg.NewVideo(), msg.NewPhoto(),
@@ -672,7 +672,7 @@ func paidVideoAndPhotoReqFieldsWithName(t *testing.T) {
 
 func paidVideoAndPhotoReqFieldsWithoutName1x(t *testing.T) {
 	msg := formatter.CreateEmpltyMessage()
-	pr := msg.NewMessage()
+	pr := msg.NewParameters()
 	ch := createChat(msg, t)
 	holder := []interface{}{msg.NewVideo(), msg.NewPhoto()}
 	writeAndAddMediaMinSt(msg, holder, t)
@@ -687,7 +687,7 @@ func paidVideoAndPhotoReqFieldsWithoutName1x(t *testing.T) {
 
 func paidVideoAndPhotoReqFieldsWithoutName2x(t *testing.T) {
 	msg := formatter.CreateEmpltyMessage()
-	pr := msg.NewMessage()
+	pr := msg.NewParameters()
 	ch := createChat(msg, t)
 	holder := []interface{}{msg.NewVideo(), msg.NewPhoto(), msg.NewVideo(), msg.NewPhoto()}
 	writeAndAddMediaMinSt(msg, holder, t)
@@ -702,7 +702,7 @@ func paidVideoAndPhotoReqFieldsWithoutName2x(t *testing.T) {
 
 func paidVideoAndPhotoReqFieldsWithoutName10x(t *testing.T) {
 	msg := formatter.CreateEmpltyMessage()
-	pr := msg.NewMessage()
+	pr := msg.NewParameters()
 	ch := createChat(msg, t)
 	holder := []interface{}{msg.NewVideo(), msg.NewPhoto(),
 		msg.NewVideo(), msg.NewPhoto(),
@@ -727,7 +727,7 @@ func paidVideoAndPhotoReqFieldsWithoutName(t *testing.T) {
 
 func paidVideoAndPhotoUnReqFieldsWithName1x(t *testing.T) {
 	msg := formatter.CreateEmpltyMessage()
-	pr := msg.NewMessage()
+	pr := msg.NewParameters()
 	ch := createChat(msg, t)
 	holder1 := []interface{}{msg.NewPhoto()}
 	holder2 := []formatter.IVideo{msg.NewVideo()}
@@ -749,7 +749,7 @@ func paidVideoAndPhotoUnReqFieldsWithName1x(t *testing.T) {
 
 func paidVideoAndPhotoUnReqFieldsWithName2x(t *testing.T) {
 	msg := formatter.CreateEmpltyMessage()
-	pr := msg.NewMessage()
+	pr := msg.NewParameters()
 	ch := createChat(msg, t)
 	holder1 := []interface{}{msg.NewPhoto(), msg.NewPhoto()}
 	holder2 := []formatter.IVideo{msg.NewVideo(), msg.NewVideo()}
@@ -771,7 +771,7 @@ func paidVideoAndPhotoUnReqFieldsWithName2x(t *testing.T) {
 
 func paidVideoAndPhotoUnReqFieldsWithName10x(t *testing.T) {
 	msg := formatter.CreateEmpltyMessage()
-	pr := msg.NewMessage()
+	pr := msg.NewParameters()
 	ch := createChat(msg, t)
 	holder1 := []interface{}{msg.NewPhoto(), msg.NewPhoto(), msg.NewPhoto(), msg.NewPhoto(), msg.NewPhoto()}
 	holder2 := []formatter.IVideo{msg.NewVideo(), msg.NewVideo(), msg.NewVideo(), msg.NewVideo(), msg.NewVideo()}
@@ -799,7 +799,7 @@ func paidVideoAndPhotoUnReqFieldsWithName(t *testing.T) {
 
 func paidVideoAndPhotoUnReqFieldsWithoutName1x(t *testing.T) {
 	msg := formatter.CreateEmpltyMessage()
-	pr := msg.NewMessage()
+	pr := msg.NewParameters()
 	ch := createChat(msg, t)
 	holder1 := []interface{}{msg.NewPhoto()}
 	holder2 := []formatter.IVideo{msg.NewVideo()}
@@ -818,7 +818,7 @@ func paidVideoAndPhotoUnReqFieldsWithoutName1x(t *testing.T) {
 
 func paidVideoAndPhotoUnReqFieldsWithoutName2x(t *testing.T) {
 	msg := formatter.CreateEmpltyMessage()
-	pr := msg.NewMessage()
+	pr := msg.NewParameters()
 	ch := createChat(msg, t)
 	holder1 := []interface{}{msg.NewPhoto(), msg.NewPhoto()}
 	holder2 := []formatter.IVideo{msg.NewVideo(), msg.NewVideo()}
@@ -837,7 +837,7 @@ func paidVideoAndPhotoUnReqFieldsWithoutName2x(t *testing.T) {
 
 func paidVideoAndPhotoUnReqFieldsWithoutName10x(t *testing.T) {
 	msg := formatter.CreateEmpltyMessage()
-	pr := msg.NewMessage()
+	pr := msg.NewParameters()
 	ch := createChat(msg, t)
 	holder1 := []interface{}{msg.NewPhoto(), msg.NewPhoto(), msg.NewPhoto(), msg.NewPhoto(), msg.NewPhoto()}
 	holder2 := []formatter.IVideo{msg.NewVideo(), msg.NewVideo(), msg.NewVideo(), msg.NewVideo(), msg.NewVideo()}

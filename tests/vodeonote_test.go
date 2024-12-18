@@ -67,7 +67,7 @@ func videonoteStorageUnreqWithoutName(t *testing.T) {
 
 	f := make([]*types.MessageEntity, 1)
 	f[0] = &types.MessageEntity{Type: "text_link", Offset: 0, Length: 7, Url: "https://youtube.com"}
-	inf := msg.NewMessage()
+	inf := msg.NewParameters()
 	if err := inf.WriteDisableNotification(); err != nil {
 		t.Fatal(err)
 	}
@@ -125,7 +125,7 @@ func videonoteStorageUnreqWithName(t *testing.T) {
 
 	f := make([]*types.MessageEntity, 1)
 	f[0] = &types.MessageEntity{Type: "text_link", Offset: 0, Length: 7, Url: "https://youtube.com"}
-	inf := msg.NewMessage()
+	inf := msg.NewParameters()
 	if err := inf.WriteDisableNotification(); err != nil {
 		t.Fatal(err)
 	}
@@ -184,7 +184,7 @@ func videonoteStorageUnreqReplyKB(t *testing.T) {
 
 	f := make([]*types.MessageEntity, 1)
 	f[0] = &types.MessageEntity{Type: "text_link", Offset: 0, Length: 7, Url: "https://youtube.com"}
-	inf := msg.NewMessage()
+	inf := msg.NewParameters()
 	if err := inf.WriteDisableNotification(); err != nil {
 		t.Fatal(err)
 	}
@@ -286,7 +286,7 @@ func videonoteTelegramUnReqWithoutName(t *testing.T) {
 
 	f := make([]*types.MessageEntity, 1)
 	f[0] = &types.MessageEntity{Type: "text_link", Offset: 0, Length: 7, Url: "https://youtube.com"}
-	inf := msg.NewMessage()
+	inf := msg.NewParameters()
 	if err := inf.WriteDisableNotification(); err != nil {
 		t.Fatal(err)
 	}
@@ -344,7 +344,7 @@ func videonoteTelegramUnReqWithName(t *testing.T) {
 
 	f := make([]*types.MessageEntity, 1)
 	f[0] = &types.MessageEntity{Type: "text_link", Offset: 0, Length: 7, Url: "https://youtube.com"}
-	inf := msg.NewMessage()
+	inf := msg.NewParameters()
 	if err := inf.WriteDisableNotification(); err != nil {
 		t.Fatal(err)
 	}
@@ -403,7 +403,7 @@ func videonoteTelegramUnreqReplyKB(t *testing.T) {
 
 	f := make([]*types.MessageEntity, 1)
 	f[0] = &types.MessageEntity{Type: "text_link", Offset: 0, Length: 7, Url: "https://youtube.com"}
-	inf := msg.NewMessage()
+	inf := msg.NewParameters()
 	if err := inf.WriteDisableNotification(); err != nil {
 		t.Fatal(err)
 	}

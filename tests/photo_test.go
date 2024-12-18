@@ -71,7 +71,7 @@ func photoStorageUnreqWithoutName(t *testing.T) {
 
 	f := make([]*types.MessageEntity, 1)
 	f[0] = &types.MessageEntity{Type: "text_link", Offset: 0, Length: 7, Url: "https://youtube.com"}
-	inf := msg.NewMessage()
+	inf := msg.NewParameters()
 	if err = inf.WriteDisableNotification(); err != nil {
 		t.Fatal(err)
 	}
@@ -128,7 +128,7 @@ func photoStorageUnreqWithName(t *testing.T) {
 
 	f := make([]*types.MessageEntity, 1)
 	f[0] = &types.MessageEntity{Type: "text_link", Offset: 0, Length: 7, Url: "https://youtube.com"}
-	inf := msg.NewMessage()
+	inf := msg.NewParameters()
 	if err := inf.WriteDisableNotification(); err != nil {
 		t.Fatal(err)
 	}
@@ -186,7 +186,7 @@ func photoStorageUnreqReplyKB(t *testing.T) {
 
 	f := make([]*types.MessageEntity, 1)
 	f[0] = &types.MessageEntity{Type: "text_link", Offset: 0, Length: 7, Url: "https://youtube.com"}
-	inf := msg.NewMessage()
+	inf := msg.NewParameters()
 	if err := inf.WriteDisableNotification(); err != nil {
 		t.Fatal(err)
 	}
@@ -291,7 +291,7 @@ func photoTelegramUnReqWithoutName(t *testing.T) {
 
 	f := make([]*types.MessageEntity, 1)
 	f[0] = &types.MessageEntity{Type: "text_link", Offset: 0, Length: 7, Url: "https://youtube.com"}
-	inf := msg.NewMessage()
+	inf := msg.NewParameters()
 	if err := inf.WriteDisableNotification(); err != nil {
 		t.Fatal(err)
 	}
@@ -354,7 +354,7 @@ func photoTelegramUnReqWithName(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	inf := msg.NewMessage()
+	inf := msg.NewParameters()
 	if err := inf.WriteDisableNotification(); err != nil {
 		t.Fatal(err)
 	}
@@ -412,7 +412,7 @@ func photoTelegramUnreqReplyKB(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	inf := msg.NewMessage()
+	inf := msg.NewParameters()
 	if err := inf.WriteDisableNotification(); err != nil {
 		t.Fatal(err)
 	}

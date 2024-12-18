@@ -171,7 +171,7 @@ func createChat(msg *formatter.Message, t *testing.T) formatter.IChat {
 
 func msgAndChatID(t *testing.T) {
 	msg := formatter.CreateEmpltyMessage()
-	inf := msg.NewMessage()
+	inf := msg.NewParameters()
 	inf.WriteString("Shalom")
 
 	ch := createChat(msg, t)
@@ -189,7 +189,7 @@ func msgAndChatID(t *testing.T) {
 
 func msgChatIDInline(t *testing.T) {
 	msg := formatter.CreateEmpltyMessage()
-	inf := msg.NewMessage()
+	inf := msg.NewParameters()
 	inf.WriteString("<b>SHALOM</b> TO Y'<b>ALL</b>")
 	inf.WriteParseMode(types.HTML)
 
@@ -219,7 +219,7 @@ func forwardReq(t *testing.T) {
 	ch := createChat(msg, t)
 	ch.WriteFromChatID(1051812255)
 
-	inf := msg.NewMessage()
+	inf := msg.NewParameters()
 	inf.WriteMessageID(501)
 
 	msg.AddMethod(methods.ForwardMessage)
@@ -240,7 +240,7 @@ func forwardUnreq(t *testing.T) {
 	ch := createChat(msg, t)
 	ch.WriteFromChatID(1051812255)
 
-	inf := msg.NewMessage()
+	inf := msg.NewParameters()
 	inf.WriteMessageID(501)
 	inf.WriteDisableNotification()
 	inf.WriteProtectContent()
@@ -268,7 +268,7 @@ func forwardMsgsReq(t *testing.T) {
 	ch := createChat(msg, t)
 	ch.WriteFromChatID(1051812255)
 
-	inf := msg.NewMessage()
+	inf := msg.NewParameters()
 	inf.WriteMessageIDs([]int{501, 507, 508, 509})
 
 	msg.AddMethod(methods.ForwardMessages)
@@ -289,7 +289,7 @@ func forwardMsgsUnreq(t *testing.T) {
 	ch := createChat(msg, t)
 	ch.WriteFromChatID(1051812255)
 
-	inf := msg.NewMessage()
+	inf := msg.NewParameters()
 	inf.WriteMessageIDs([]int{501, 507, 508, 509})
 	inf.WriteDisableNotification()
 	inf.WriteProtectContent()
@@ -317,7 +317,7 @@ func copyReq(t *testing.T) {
 	ch := createChat(msg, t)
 	ch.WriteFromChatID(1051812255)
 
-	inf := msg.NewMessage()
+	inf := msg.NewParameters()
 	inf.WriteMessageID(507)
 
 	msg.AddMethod(methods.CopyMessage)
@@ -338,7 +338,7 @@ func copyUnreq(t *testing.T) {
 	ch := createChat(msg, t)
 	ch.WriteFromChatID(1051812255)
 
-	inf := msg.NewMessage()
+	inf := msg.NewParameters()
 	inf.WriteMessageID(507)
 	inf.WriteCaption("<b>SHALOM</b> Y'ALL!!")
 	inf.WriteParseMode(types.HTML)
@@ -374,7 +374,7 @@ func copyMsgsReq(t *testing.T) {
 	ch := createChat(msg, t)
 	ch.WriteFromChatID(1051812255)
 
-	inf := msg.NewMessage()
+	inf := msg.NewParameters()
 	inf.WriteMessageIDs([]int{501, 507, 508, 509})
 
 	msg.AddMethod(methods.CopyMessages)
@@ -395,7 +395,7 @@ func copyMsgsUnreq(t *testing.T) {
 	ch := createChat(msg, t)
 	ch.WriteFromChatID(1051812255)
 
-	inf := msg.NewMessage()
+	inf := msg.NewParameters()
 	inf.WriteMessageIDs([]int{501, 507, 508, 509})
 	inf.WriteDisableNotification()
 	inf.WriteProtectContent()
@@ -685,7 +685,7 @@ func TestCopyMessages(t *testing.T) {
 // 		f[0] = &types.MessageEntity{Type: "/start@jobs_bot"}
 // 		vc.WriteDuration(3)
 
-// 		inf := msg.NewMessage()
+// 		inf := msg.NewParameters()
 // 		inf.WriteString("SHALOM! <b>Y'ALL</b>")
 // 		inf.WriteParseMode(types.HTML)
 // 		inf.WriteDisableNotification()
@@ -758,7 +758,7 @@ func TestCopyMessages(t *testing.T) {
 // 		vdn.WriteDuration(3)
 // 		vdn.WriteLength(8)
 
-// 		inf := msg.NewMessage()
+// 		inf := msg.NewParameters()
 // 		inf.WriteString("<b>SELAM</b> ALEYKUM!")
 // 		inf.WriteParseMode(types.HTML)
 // 		inf.WriteDisableNotification()
@@ -790,7 +790,7 @@ func TestCopyMessages(t *testing.T) {
 // 	vd := msg.NewVideo()
 // 	vd.WriteVideoTelegram("BAACAgIAAxkDAAICW2cmSEhOkyaHOAABq1xHkIJ4eRwwxwAC1FsAAlq0MUlyV6gDqCe2NjYE")
 
-// 	inf := msg.NewMessage()
+// 	inf := msg.NewParameters()
 // 	inf.WriteStarCount(4)
 
 // 	msg.AddVideo(vd)
@@ -816,7 +816,7 @@ func TestCopyMessages(t *testing.T) {
 // 	ph := msg.NewPhoto()
 // 	ph.WritePhotoStorage("media_test/photo1.jpg")
 
-// 	inf := msg.NewMessage()
+// 	inf := msg.NewParameters()
 // 	inf.WriteStarCount(4)
 
 // 	msg.AddParameters(inf)
@@ -841,7 +841,7 @@ func TestCopyMessages(t *testing.T) {
 // 	ph := msg.NewPhoto()
 // 	ph.WritePhotoStorage("media_test/photo1.jpg")
 
-// 	inf := msg.NewMessage()
+// 	inf := msg.NewParameters()
 // 	inf.WriteStarCount(4)
 
 // 	msg.AddParameters(inf)
@@ -863,7 +863,7 @@ func TestCopyMessages(t *testing.T) {
 // 	ph := msg.NewPhoto()
 // 	ph.WritePhotoStorage("media_test/photo1.jpg")
 
-// 	inf := msg.NewMessage()
+// 	inf := msg.NewParameters()
 // 	inf.WriteStarCount(4)
 
 // 	msg.AddParameters(inf)
@@ -886,7 +886,7 @@ func TestCopyMessages(t *testing.T) {
 // 	ph := msg.NewPhoto()
 // 	ph.WritePhotoTelegram("AgACAgIAAxkDAAICJGcf5rBCBtGmJm-IRRgrYK2XeIjqAAJn7jEbe80AAUmH5LwgebRpFwEAAwIAA3MAAzYE")
 
-// 	inf := msg.NewMessage()
+// 	inf := msg.NewParameters()
 // 	inf.WriteStarCount(4)
 // 	inf.WritePayload("123")
 // 	inf.WriteString("SHALOM! <b>Y'ALL</b>")
@@ -920,7 +920,7 @@ func TestCopyMessages(t *testing.T) {
 // 	vd := msg.NewVideo()
 // 	vd.WriteVideoTelegram("BAACAgIAAxkDAAICW2cmSEhOkyaHOAABq1xHkIJ4eRwwxwAC1FsAAlq0MUlyV6gDqCe2NjYE")
 
-// 	inf := msg.NewMessage()
+// 	inf := msg.NewParameters()
 // 	inf.WriteStarCount(9)
 // 	inf.WritePayload("123")
 // 	inf.WriteString("SHALOM! <b>Y'ALL</b>")
@@ -959,7 +959,7 @@ func TestCopyMessages(t *testing.T) {
 // 	vd.WriteVideoTelegram("BAACAgIAAxkDAAICW2cmSEhOkyaHOAABq1xHkIJ4eRwwxwAC1FsAAlq0MUlyV6gDqCe2NjYE")
 // 	vd.WriteVideoTelegram("BAACAgIAAxkDAAICW2cmSEhOkyaHOAABq1xHkIJ4eRwwxwAC1FsAAlq0MUlyV6gDqCe2NjYE")
 
-// 	inf := msg.NewMessage()
+// 	inf := msg.NewParameters()
 // 	inf.WriteStarCount(9)
 // 	inf.WritePayload("123")
 // 	inf.WriteString("SHALOM! <b>Y'ALL</b>")
@@ -1002,7 +1002,7 @@ func TestCopyMessages(t *testing.T) {
 // 	ph1.WritePhotoTelegram("AgACAgIAAxkDAAICJGcf5rBCBtGmJm-IRRgrYK2XeIjqAAJn7jEbe80AAUmH5LwgebRpFwEAAwIAA3MAAzYE")
 // 	ph2.WritePhotoTelegram("AgACAgIAAxkDAAICJGcf5rBCBtGmJm-IRRgrYK2XeIjqAAJn7jEbe80AAUmH5LwgebRpFwEAAwIAA3MAAzYE")
 
-// 	inf := msg.NewMessage()
+// 	inf := msg.NewParameters()
 // 	inf.WriteStarCount(9)
 
 // 	msg.AddParameters(inf)

@@ -73,7 +73,7 @@ func scontactReqFields(t *testing.T) {
 func scontactUnreqFieldsWithName(t *testing.T) {
 	msg := formatter.CreateEmpltyMessage()
 	con := msg.NewContact()
-	param := msg.NewMessage()
+	param := msg.NewParameters()
 	ch := createChat(msg, t)
 	writeUnreqContactFields(msg, con, t)
 	if err := param.WriteDisableNotification(); err != nil {
@@ -102,7 +102,7 @@ func scontactUnreqFieldsWithName(t *testing.T) {
 func scontactUnreqFieldsWithoutName(t *testing.T) {
 	msg := formatter.CreateEmpltyMessage()
 	con := msg.NewContact()
-	param := msg.NewMessage()
+	param := msg.NewParameters()
 	ch := createChat(msg, t)
 	writeUnreqContactFields(msg, con, t)
 	if err := param.WriteDisableNotification(); err != nil {

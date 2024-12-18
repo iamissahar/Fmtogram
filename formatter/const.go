@@ -12,6 +12,7 @@ const (
 	constVoice         int    = 5
 	constVideoNote     int    = 6
 	allowed            int    = 1
+	interfaceParam     string = "IParameters"
 	interfacePhoto     string = "IPhoto"
 	interfaceVideo     string = "IVideo"
 	interfaceAudio     string = "IAudio"

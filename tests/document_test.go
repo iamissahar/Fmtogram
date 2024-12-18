@@ -70,7 +70,7 @@ func docStorageUnreqWithoutName(t *testing.T) {
 
 	f := make([]*types.MessageEntity, 1)
 	f[0] = &types.MessageEntity{Type: "text_link", Offset: 0, Length: 7, Url: "https://youtube.com"}
-	inf := msg.NewMessage()
+	inf := msg.NewParameters()
 	if err := inf.WriteDisableNotification(); err != nil {
 		t.Fatal(err)
 	}
@@ -127,7 +127,7 @@ func docStorageUnreqWithName(t *testing.T) {
 
 	f := make([]*types.MessageEntity, 1)
 	f[0] = &types.MessageEntity{Type: "text_link", Offset: 0, Length: 7, Url: "https://youtube.com"}
-	inf := msg.NewMessage()
+	inf := msg.NewParameters()
 	if err := inf.WriteDisableNotification(); err != nil {
 		t.Fatal(err)
 	}
@@ -185,7 +185,7 @@ func docStorageUnreqReplyKB(t *testing.T) {
 
 	f := make([]*types.MessageEntity, 1)
 	f[0] = &types.MessageEntity{Type: "text_link", Offset: 0, Length: 7, Url: "https://youtube.com"}
-	inf := msg.NewMessage()
+	inf := msg.NewParameters()
 	if err := inf.WriteDisableNotification(); err != nil {
 		t.Fatal(err)
 	}
@@ -290,7 +290,7 @@ func docTelegramUnReqWithoutName(t *testing.T) {
 
 	f := make([]*types.MessageEntity, 1)
 	f[0] = &types.MessageEntity{Type: "text_link", Offset: 0, Length: 7, Url: "https://youtube.com"}
-	inf := msg.NewMessage()
+	inf := msg.NewParameters()
 	if err := inf.WriteDisableNotification(); err != nil {
 		t.Fatal(err)
 	}
@@ -347,7 +347,7 @@ func docTelegramUnReqWithName(t *testing.T) {
 
 	f := make([]*types.MessageEntity, 1)
 	f[0] = &types.MessageEntity{Type: "text_link", Offset: 0, Length: 7, Url: "https://youtube.com"}
-	inf := msg.NewMessage()
+	inf := msg.NewParameters()
 	if err := inf.WriteDisableNotification(); err != nil {
 		t.Fatal(err)
 	}
@@ -405,7 +405,7 @@ func docTelegramUnreqReplyKB(t *testing.T) {
 
 	f := make([]*types.MessageEntity, 1)
 	f[0] = &types.MessageEntity{Type: "text_link", Offset: 0, Length: 7, Url: "https://youtube.com"}
-	inf := msg.NewMessage()
+	inf := msg.NewParameters()
 	if err := inf.WriteDisableNotification(); err != nil {
 		t.Fatal(err)
 	}
