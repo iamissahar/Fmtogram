@@ -15,7 +15,7 @@ type mediaHolder struct {
 type formatter struct {
 	inf         *information
 	ch          *chat
-	kb          handlerKB
+	kb          *keyboard
 	loc         *location
 	con         *contact
 	poll        *poll

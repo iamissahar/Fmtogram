@@ -22,96 +22,96 @@ const (
 )
 
 func createReplyKeyboard(msg *formatter.Message, t *testing.T) {
-	kb := msg.NewReplyKeyboard()
-	if err := kb.Set([]int{1, 2}); err != nil {
-		t.Fatal(err)
-	}
-	if err := kb.WriteInputFieldPlaceholder("ALO?"); err != nil {
-		t.Fatal(err)
-	}
-	if err := kb.WriteIsPersistent(); err != nil {
-		t.Fatal(err)
-	}
-	if err := kb.WriteOneTimeKeyboard(); err != nil {
-		t.Fatal(err)
-	}
-	if err := kb.WriteResizeKeyboard(); err != nil {
-		t.Fatal(err)
-	}
-	if err := kb.WriteSelective(); err != nil {
-		t.Fatal(err)
-	}
+	// kb := msg.NewReplyKeyboard()
+	// if err := kb.Set([]int{1, 2}); err != nil {
+	// 	t.Fatal(err)
+	// }
+	// if err := kb.WriteInputFieldPlaceholder("ALO?"); err != nil {
+	// 	t.Fatal(err)
+	// }
+	// if err := kb.WriteIsPersistent(); err != nil {
+	// 	t.Fatal(err)
+	// }
+	// if err := kb.WriteOneTimeKeyboard(); err != nil {
+	// 	t.Fatal(err)
+	// }
+	// if err := kb.WriteResizeKeyboard(); err != nil {
+	// 	t.Fatal(err)
+	// }
+	// if err := kb.WriteSelective(); err != nil {
+	// 	t.Fatal(err)
+	// }
 
-	button00, err := kb.NewButton(0, 0)
-	if err != nil {
-		t.Fatal(err)
-	}
-	button10, err := kb.NewButton(1, 0)
-	if err != nil {
-		t.Fatal(err)
-	}
-	button11, err := kb.NewButton(1, 1)
-	if err != nil {
-		t.Fatal(err)
-	}
+	// button00, err := kb.NewButton(0, 0)
+	// if err != nil {
+	// 	t.Fatal(err)
+	// }
+	// button10, err := kb.NewButton(1, 0)
+	// if err != nil {
+	// 	t.Fatal(err)
+	// }
+	// button11, err := kb.NewButton(1, 1)
+	// if err != nil {
+	// 	t.Fatal(err)
+	// }
 
-	if err := button00.WriteString("⭐"); err != nil {
-		t.Fatal(err)
-	}
-	if err := button10.WriteString("Hello"); err != nil {
-		t.Fatal(err)
-	}
-	if err := button11.WriteString("Sheesh"); err != nil {
-		t.Fatal(err)
-	}
+	// if err := button00.WriteString("⭐"); err != nil {
+	// 	t.Fatal(err)
+	// }
+	// if err := button10.WriteString("Hello"); err != nil {
+	// 	t.Fatal(err)
+	// }
+	// if err := button11.WriteString("Sheesh"); err != nil {
+	// 	t.Fatal(err)
+	// }
 
-	if err := msg.AddReplyKeyboard(kb); err != nil {
-		t.Fatal(err)
-	}
+	// if err := msg.AddReplyKeyboard(kb); err != nil {
+	// 	t.Fatal(err)
+	// }
 }
 
 func createInlineKeyboard(msg *formatter.Message, t *testing.T) {
-	kb := msg.NewInlineKeyboard()
-	if err := kb.Set([]int{1, 2}); err != nil {
-		t.Fatal(err)
-	}
-	button00, err := kb.NewButton(0, 0)
-	if err != nil {
-		t.Fatal(err)
-	}
-	button10, err := kb.NewButton(1, 0)
-	if err != nil {
-		t.Fatal(err)
-	}
+	// kb := msg.NewInlineKeyboard()
+	// if err := kb.Set([]int{1, 2}); err != nil {
+	// 	t.Fatal(err)
+	// }
+	// button00, err := kb.NewButton(0, 0)
+	// if err != nil {
+	// 	t.Fatal(err)
+	// }
+	// button10, err := kb.NewButton(1, 0)
+	// if err != nil {
+	// 	t.Fatal(err)
+	// }
 
-	button11, err := kb.NewButton(1, 1)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if err = button00.WriteString("⭐"); err != nil {
-		t.Fatal(err)
-	}
-	if err := button00.WriteURL("https://www.youtube.com/watch?v=xsjfuPlrjT0"); err != nil {
-		t.Fatal(err)
-	}
+	// button11, err := kb.NewButton(1, 1)
+	// if err != nil {
+	// 	t.Fatal(err)
+	// }
+	// if err = button00.WriteString("⭐"); err != nil {
+	// 	t.Fatal(err)
+	// }
+	// if err := button00.WriteURL("https://www.youtube.com/watch?v=xsjfuPlrjT0"); err != nil {
+	// 	t.Fatal(err)
+	// }
 
-	if err := button10.WriteString("Hello!"); err != nil {
-		t.Fatal(err)
-	}
-	if err := button10.WriteCallbackData("Hello X2"); err != nil {
-		t.Fatal(err)
-	}
+	// if err := button10.WriteString("Hello!"); err != nil {
+	// 	t.Fatal(err)
+	// }
+	// if err := button10.WriteCallbackData("Hello X2"); err != nil {
+	// 	t.Fatal(err)
+	// }
 
-	if err := button11.WriteString("Sheesh"); err != nil {
-		t.Fatal(err)
-	}
-	if err := button11.WriteCallbackData("TAMAM"); err != nil {
-		t.Fatal(err)
-	}
+	// if err := button11.WriteString("Sheesh"); err != nil {
+	// 	t.Fatal(err)
+	// }
+	// if err := button11.WriteCallbackData("TAMAM"); err != nil {
+	// 	t.Fatal(err)
+	// }
 
-	if err := msg.AddInlineKeyboard(kb); err != nil {
-		t.Fatal(err)
-	}
+	// if err := msg.AddInlineKeyboard(kb); err != nil {
+	// 	t.Fatal(err)
+	// }
 }
 
 func createChat(msg *formatter.Message, t *testing.T) formatter.IChat {

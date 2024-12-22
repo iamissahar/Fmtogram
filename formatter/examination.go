@@ -224,3 +224,39 @@ func isDefaultParams(pr *information) bool {
 	}
 	return res
 }
+
+func (in *inline) isOK() error {
+	var err error
+	if in.Keyboard != nil {
+		for i := 0; (i < len(in.Keyboard)) && (err == nil); i++ {
+			for j := 0; (j < len(in.Keyboard[i])) && (err == nil); j++ {
+				if in.Keyboard[i][j].Text == "" {
+					err = code21()
+				}
+			}
+		}
+	} else {
+		err = code21()
+	}
+	return err
+}
+
+func (rp *reply) isOK() error {
+	var err error
+	if rp.Keyboard != nil {
+		for i := 0; (i < len(rp.Keyboard)) && (err == nil); i++ {
+			for j := 0; (j < len(rp.Keyboard[i])) && (err == nil); j++ {
+				if rp.Keyboard[i][j].Text == "" {
+					err = code21()
+				}
+			}
+		}
+	} else {
+		err = code21()
+	}
+	return err
+}
+
+func (frp *forcereply) isOK() error {
+	return nil
+}

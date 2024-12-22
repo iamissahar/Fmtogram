@@ -8,6 +8,13 @@ import (
 	"github.com/l1qwie/Fmtogram/types"
 )
 
+func code01() error {
+	err := new(fmerrors.FME)
+	err.Code = 1
+	err.String = "there isnt a place to put a data in"
+	return err
+}
+
 func code3() error {
 	err := new(fmerrors.FME)
 	err.Code = 3
@@ -1496,13 +1503,58 @@ func (ch *chat) WriteFromChatName(chatname string) error {
 	return err
 }
 
+func isNill(data interface{}) error {
+	var err error
+	if data != nil {
+		err = code20()
+	}
+	return err
+}
+
+func (kb *keyboard) WriteReply() (IReply, error) {
+	var err error
+	rp := new(reply)
+	if err = isNill(kb.Keyboard); err == nil {
+		kb.Keyboard = rp
+	}
+	return rp, err
+}
+
+func (kb *keyboard) WriteInline() (IInline, error) {
+	var err error
+	in := new(inline)
+	if err = isNill(kb.Keyboard); err == nil {
+		kb.Keyboard = in
+	}
+	return in, err
+}
+
+func (kb *keyboard) WriteForceReply() (IForceReply, error) {
+	var err error
+	frp := new(forcereply)
+	if err = isNill(kb.Keyboard); err == nil {
+		kb.Keyboard = frp
+	}
+	return frp, err
+}
+
 func (in *inline) Set(plan []int) error {
 	var err error
 	if len(plan) > 0 {
-		in.Keyboard = new(inlineKeyboard)
-		in.Keyboard.InlineKeyboard = make([][]*inlineKeyboardButton, len(plan))
-		for i := range in.Keyboard.InlineKeyboard {
-			in.Keyboard.InlineKeyboard[i] = make([]*inlineKeyboardButton, plan[i])
+		for i := 0; (i < len(plan)) && (err == nil); i++ {
+			if plan[i] == 0 {
+				err = code20()
+			}
+		}
+		if err == nil {
+			if in.Keyboard == nil {
+				in.Keyboard = make([][]*inlineKeyboardButton, len(plan))
+				for i := range in.Keyboard {
+					in.Keyboard[i] = make([]*inlineKeyboardButton, plan[i])
+				}
+			} else {
+				err = code10()
+			}
 		}
 	} else {
 		err = code20()
@@ -1517,14 +1569,16 @@ func (ch *chat) GetResponse() types.Chat {
 func (in *inline) NewButton(line, pos int) (IInlineButton, error) {
 	var err error
 	but := new(inlineKeyboardButton)
-
-	if (line >= 0) && (pos >= 0) && len(in.Keyboard.InlineKeyboard) > line && len(in.Keyboard.InlineKeyboard[line]) > pos {
-
-		if in.Keyboard.InlineKeyboard[line][pos] == nil {
-			in.Keyboard.InlineKeyboard[line][pos] = new(inlineKeyboardButton)
-			but = in.Keyboard.InlineKeyboard[line][pos]
+	if (line >= 0) && (pos >= 0) {
+		if (in.Keyboard != nil) && ((len(in.Keyboard) > line) && (len(in.Keyboard[line]) > pos)) {
+			if in.Keyboard[line][pos] == nil {
+				in.Keyboard[line][pos] = new(inlineKeyboardButton)
+				but = in.Keyboard[line][pos]
+			} else {
+				err = code10()
+			}
 		} else {
-			err = code10()
+			err = code01()
 		}
 	} else {
 		err = code20()
@@ -1583,9 +1637,9 @@ func (inb *inlineKeyboardButton) WriteWebApp(wbapp *types.WebAppInfo) error {
 				inb.storage[wWebApp] = added
 				inb.WebApp = wbapp
 				logs.DataWrittenSuccessfully(inbtn, "Web App")
-			} else {
-				err = code10()
 			}
+		} else {
+			err = code10()
 		}
 	} else {
 		err = code20()
@@ -1688,10 +1742,20 @@ func (inb *inlineKeyboardButton) WritePay() error {
 func (rp *reply) Set(plan []int) error {
 	var err error
 	if len(plan) > 0 {
-		rp.Keyboard = new(replyKeyboard)
-		rp.Keyboard.Keyboard = make([][]*replyKeyboardButton, len(plan))
-		for i := range rp.Keyboard.Keyboard {
-			rp.Keyboard.Keyboard[i] = make([]*replyKeyboardButton, plan[i])
+		for i := 0; (i < len(plan)) && (err == nil); i++ {
+			if plan[i] == 0 {
+				err = code20()
+			}
+		}
+		if err == nil {
+			if rp.Keyboard == nil {
+				rp.Keyboard = make([][]*replyKeyboardButton, len(plan))
+				for i := range rp.Keyboard {
+					rp.Keyboard[i] = make([]*replyKeyboardButton, plan[i])
+				}
+			} else {
+				err = code10()
+			}
 		}
 	} else {
 		err = code20()
@@ -1701,19 +1765,20 @@ func (rp *reply) Set(plan []int) error {
 
 func (rp *reply) WriteIsPersistent() error {
 	var err error
-	if !rp.Keyboard.IsPersistent {
-		rp.Keyboard.IsPersistent = true
+	if !rp.IsPersistent {
+		rp.IsPersistent = true
 		logs.SettedParam("Is Persistent", interfaceReplyKB, true)
 	} else {
 		err = code10()
 	}
+
 	return err
 }
 
 func (rp *reply) WriteResizeKeyboard() error {
 	var err error
-	if !rp.Keyboard.ResizeKeyboard {
-		rp.Keyboard.ResizeKeyboard = true
+	if !rp.ResizeKeyboard {
+		rp.ResizeKeyboard = true
 		logs.SettedParam("Resize Keyboard", interfaceReplyKB, true)
 	} else {
 		err = code10()
@@ -1723,8 +1788,8 @@ func (rp *reply) WriteResizeKeyboard() error {
 
 func (rp *reply) WriteOneTimeKeyboard() error {
 	var err error
-	if !rp.Keyboard.OneTimeKeyboard {
-		rp.Keyboard.OneTimeKeyboard = true
+	if !rp.OneTimeKeyboard {
+		rp.OneTimeKeyboard = true
 		logs.SettedParam("One Time Keyboard", interfaceReplyKB, true)
 	} else {
 		err = code10()
@@ -1734,8 +1799,8 @@ func (rp *reply) WriteOneTimeKeyboard() error {
 
 func (rp *reply) WriteInputFieldPlaceholder(placeholder string) error {
 	var err error
-	if err = checkStringValue(placeholder, rp.Keyboard.InputFieldPlaceholder); err == nil {
-		rp.Keyboard.InputFieldPlaceholder = placeholder
+	if err = checkStringValue(placeholder, rp.InputFieldPlaceholder); err == nil {
+		rp.InputFieldPlaceholder = placeholder
 		logs.DataWrittenSuccessfully(interfaceReplyKB, "Input Field Placeholder")
 	}
 	return err
@@ -1743,9 +1808,20 @@ func (rp *reply) WriteInputFieldPlaceholder(placeholder string) error {
 
 func (rp *reply) WriteSelective() error {
 	var err error
-	if !rp.Keyboard.Selective {
-		rp.Keyboard.Selective = true
+	if !rp.Selective {
+		rp.Selective = true
 		logs.SettedParam("Selective", interfaceReplyKB, true)
+	} else {
+		err = code10()
+	}
+	return err
+}
+
+func (rp *reply) WriteRemove() error {
+	var err error
+	if !rp.Remove {
+		rp.Remove = true
+		logs.SettedParam("Remove", interfaceReplyKB, true)
 	} else {
 		err = code10()
 	}
@@ -1755,14 +1831,16 @@ func (rp *reply) WriteSelective() error {
 func (rp *reply) NewButton(line, pos int) (IReplyButton, error) {
 	var err error
 	but := new(replyKeyboardButton)
-
-	if (line >= 0) && (pos >= 0) && (len(rp.Keyboard.Keyboard) > line) && (len(rp.Keyboard.Keyboard[line]) > pos) {
-
-		if rp.Keyboard.Keyboard[line][pos] == nil {
-			rp.Keyboard.Keyboard[line][pos] = new(replyKeyboardButton)
-			but = rp.Keyboard.Keyboard[line][pos]
+	if (line >= 0) && (pos >= 0) {
+		if (rp.Keyboard != nil) && ((len(rp.Keyboard) > line) && (len(rp.Keyboard[line]) > pos)) {
+			if rp.Keyboard[line][pos] == nil {
+				rp.Keyboard[line][pos] = new(replyKeyboardButton)
+				but = rp.Keyboard[line][pos]
+			} else {
+				err = code10()
+			}
 		} else {
-			err = code10()
+			err = code01()
 		}
 	} else {
 		err = code20()

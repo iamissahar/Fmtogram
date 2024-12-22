@@ -12,9 +12,9 @@ type handlerMedia interface {
 	uniqueConst() (constID int)
 }
 
-type handlerKB interface {
-	multipartFields(writer *multipart.Writer) error
-	jsonFields() (jsbody []byte, err error)
+type kb interface {
+	get() ([]byte, error)
+	isOK() error
 }
 
 type IPhoto interface {
@@ -432,6 +432,15 @@ type IChat interface {
 	GetResponse() types.Chat
 }
 
+// You can create and send only one type of keyboard. There are 3 available types
+type IKeyboard interface {
+	WriteReply() (IReply, error)
+
+	WriteInline() (IInline, error)
+
+	WriteForceReply() (IForceReply, error)
+}
+
 // This interface represents a custom keyboard with reply options. Not supported in channels and for messages sent on behalf of a Telegram Business account.
 type IReply interface {
 	// Receives 2 coordinates. The first one is a line you expect to see the button and the second one is a position on the line you just mentioned.
@@ -463,6 +472,10 @@ type IReply interface {
 	//
 	// Example: A user requests to change the bot's language, bot replies to the request with a keyboard to select the new language. Other users in the group don't see the keyboard.
 	WriteSelective() error
+
+	// Requests clients to remove the custom keyboard (user will not be able to summon this keyboard;
+	// if you want to hide the keyboard from sight but keep it accessible, use (IReply).WriteOneTimeKeyboard()
+	WriteRemove() error
 }
 
 // This interface represents one button of IReply interface. WriteString() is requied, and at most one of the rest functions must be used to specify type of the button. For simple text buttons, String can be used instead of this object to specify the button text.
@@ -546,4 +559,7 @@ type IInlineButton interface {
 	// Receives the description of the Web App that will be launched when the user presses the button. The Web App will be able to send an arbitrary message on behalf of the user using the method answerWebAppQuery.
 	// Available only in private chats between a user and the bot. Not supported for messages sent on behalf of a Telegram Business account.
 	WriteWebApp(webapp *types.WebAppInfo) error
+}
+
+type IForceReply interface {
 }

@@ -553,26 +553,26 @@ func (ch *chat) createJson() ([]byte, error) {
 	return json.Marshal(ch)
 }
 
-func (in *inline) multipartFields(writer *multipart.Writer) error {
-	inbody, err := json.Marshal(in.Keyboard)
-	if err == nil {
-		err = writer.WriteField("reply_markup", string(inbody))
-	}
-	return err
-}
-
-func (in *inline) jsonFields() ([]byte, error) {
+func (in *inline) get() ([]byte, error) {
 	return json.Marshal(in)
 }
 
-func (rp *reply) multipartFields(writer *multipart.Writer) error {
-	rpbody, err := json.Marshal(rp.Keyboard)
+func (rp *reply) get() ([]byte, error) {
+	return json.Marshal(rp)
+}
+
+func (frp *forcereply) get() ([]byte, error) {
+	return json.Marshal(frp)
+}
+
+func (kb *keyboard) multipartFields(writer *multipart.Writer) error {
+	body, err := kb.Keyboard.get()
 	if err == nil {
-		err = writer.WriteField("reply_markup", string(rpbody))
+		err = writer.WriteField("reply_markup", string(body))
 	}
 	return err
 }
 
-func (rp *reply) jsonFields() ([]byte, error) {
-	return json.Marshal(rp)
+func (kb *keyboard) jsonFields() ([]byte, error) {
+	return json.Marshal(kb)
 }

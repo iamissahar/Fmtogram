@@ -70,14 +70,19 @@ func (msg *Message) NewChat() IChat {
 	return &chat{}
 }
 
-// Creates a new inline-keyboard stucture and returns an interface with connected functions. This is the only one way to add your data to an object
-func (msg *Message) NewInlineKeyboard() IInline {
-	logs.NewInterfaceCreated("Inline Keyboard")
-	return &inline{}
+func (msg *Message) NewKeyboard() IKeyboard {
+	logs.NewInterfaceCreated(interfaceKeyboard)
+	return &keyboard{}
 }
 
-// Creates a new reply-keyboard stucture and returns an interface with connected functions. This is the only one way to add your data to an object
-func (msg *Message) NewReplyKeyboard() IReply {
-	logs.NewInterfaceCreated("Reply Keyboard")
-	return &reply{}
-}
+// // Creates a new inline-keyboard stucture and returns an interface with connected functions. This is the only one way to add your data to an object
+// func (msg *Message) NewInlineKeyboard() IInline {
+// 	logs.NewInterfaceCreated("Inline Keyboard")
+// 	return &inline{}
+// }
+
+// // Creates a new reply-keyboard stucture and returns an interface with connected functions. This is the only one way to add your data to an object
+// func (msg *Message) NewReplyKeyboard() IReply {
+// 	logs.NewInterfaceCreated("Reply Keyboard")
+// 	return &reply{}
+// }

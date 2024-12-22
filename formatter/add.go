@@ -301,57 +301,18 @@ func (msg *Message) AddChat(ch IChat) error {
 	return err
 }
 
-// Add a reply-keyboard interface to the message you're building
-func (msg *Message) AddReplyKeyboard(replykb IReply) error {
+func (msg *Message) AddKeyboard(kb IKeyboard) error {
 	var err error
-	if kb, ok := replykb.(*reply); ok {
-		if kb.Keyboard != nil {
-			for i := 0; (i < len(kb.Keyboard.Keyboard)) && (err == nil); i++ {
-				for j := 0; (j < len(kb.Keyboard.Keyboard[i])) && (err == nil); j++ {
-					if kb.Keyboard.Keyboard[i][j].Text == "" {
-						err = code21()
-					}
-				}
-			}
-			if err == nil {
+	if k, ok := kb.(*keyboard); ok {
+		if err = isNill(k.Keyboard); err == nil {
+			if err = k.Keyboard.isOK(); err == nil {
 				if msg.fm.kb == nil {
-					msg.fm.kb = kb
-					logs.InterfaceSaved(interfaceReplyKB)
+					msg.fm.kb = k
+					logs.InterfaceSaved(interfaceKeyboard)
 				} else {
 					err = code10()
 				}
 			}
-		} else {
-			err = code21()
-		}
-	} else {
-		err = code20()
-	}
-	return err
-}
-
-// Add a inline-keyboard interface to the message you're building
-func (msg *Message) AddInlineKeyboard(inlinekb IInline) error {
-	var err error
-	if kb, ok := inlinekb.(*inline); ok {
-		if kb.Keyboard != nil {
-			for i := 0; (i < len(kb.Keyboard.InlineKeyboard)) && (err == nil); i++ {
-				for j := 0; (j < len(kb.Keyboard.InlineKeyboard[i])) && (err == nil); j++ {
-					if kb.Keyboard.InlineKeyboard[i][j].Text == "" {
-						err = code21()
-					}
-				}
-			}
-			if err == nil {
-				if msg.fm.kb == nil {
-					msg.fm.kb = kb
-					logs.InterfaceSaved(interfaceInKB)
-				} else {
-					err = code10()
-				}
-			}
-		} else {
-			err = code21()
 		}
 	} else {
 		err = code20()

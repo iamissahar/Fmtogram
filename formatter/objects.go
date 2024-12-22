@@ -194,13 +194,24 @@ type inlineKeyboardButton struct {
 	storage                      [9]int
 }
 
-type inline struct {
-	Keyboard *inlineKeyboard `json:"reply_markup,omitempty"`
+type keyboard struct {
+	Keyboard kb `json:"reply_markup,omitempty"`
 }
 
-type inlineKeyboard struct {
-	InlineKeyboard [][]*inlineKeyboardButton `json:"inline_keyboard"`
+type forcereply struct {
+	Forcereply            bool   `json:"force_reply,omitempty"`
+	InputFieldPlaceholder string `json:"input_field_placeholder,omitempty"`
+	Selective             bool   `json:"selective,omitempty"`
 }
+
+type inline struct {
+	// Keyboard *inlineKeyboard `json:"reply_markup,omitempty"`
+	Keyboard [][]*inlineKeyboardButton `json:"inline_keyboard"`
+}
+
+// type inlineKeyboard struct {
+// 	InlineKeyboard [][]*inlineKeyboardButton `json:"inline_keyboard"`
+// }
 
 type replyKeyboardButton struct {
 	Text            string                            `json:"text"`
@@ -214,14 +225,22 @@ type replyKeyboardButton struct {
 }
 
 type reply struct {
-	Keyboard *replyKeyboard `json:"reply_markup,omitempty"`
-}
-
-type replyKeyboard struct {
+	// Keyboard *replyKeyboard `json:"reply_markup,omitempty"`
 	Keyboard              [][]*replyKeyboardButton `json:"keyboard"`
 	IsPersistent          bool                     `json:"is_persistent,omitempty"`
 	ResizeKeyboard        bool                     `json:"resize_keyboard,omitempty"`
 	OneTimeKeyboard       bool                     `json:"one_time_keyboard,omitempty"`
 	InputFieldPlaceholder string                   `json:"input_field_placeholder,omitempty"`
 	Selective             bool                     `json:"selective,omitempty"`
+	Remove                bool                     `json:"remove_keyboard,omitempty"`
 }
+
+// type replyKeyboard struct {
+// 	Keyboard              [][]*replyKeyboardButton `json:"keyboard"`
+// 	IsPersistent          bool                     `json:"is_persistent,omitempty"`
+// 	ResizeKeyboard        bool                     `json:"resize_keyboard,omitempty"`
+// 	OneTimeKeyboard       bool                     `json:"one_time_keyboard,omitempty"`
+// 	InputFieldPlaceholder string                   `json:"input_field_placeholder,omitempty"`
+// 	Selective             bool                     `json:"selective,omitempty"`
+// 	Remove                bool                     `json:"remove_keyboard,omitempty"`
+// }

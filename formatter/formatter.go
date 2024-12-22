@@ -259,31 +259,6 @@ func requiredMessage(msg *Message, tgr *interface{}, object string) error {
 	return err
 }
 
-func requiredKeyboard(msg *Message) error {
-	var err error
-	if msg.fm.kb != nil {
-		switch kb := msg.fm.kb.(type) {
-		case *inline:
-			for i := 0; i < len(kb.Keyboard.InlineKeyboard) && err == nil; i++ {
-				for j := 0; j < len(kb.Keyboard.InlineKeyboard[i]) && err == nil; j++ {
-					if kb.Keyboard.InlineKeyboard[i][j].Text == "" {
-						err = fmerrors.MissedRequiredField("IInlineButton", "WriteString()", j, i, false, true)
-					}
-				}
-			}
-		case *reply:
-			for i := 0; i < len(kb.Keyboard.Keyboard) && err == nil; i++ {
-				for j := 0; j < len(kb.Keyboard.Keyboard[i]) && err == nil; j++ {
-					if kb.Keyboard.Keyboard[i][j].Text == "" {
-						err = fmerrors.MissedRequiredField("IReplyButton", "WriteString()", j, i, false, true)
-					}
-				}
-			}
-		}
-	}
-	return err
-}
-
 func mediaPart(msg *Message) error {
 	var err error
 
@@ -443,9 +418,7 @@ func makeRequest(msg *Message, tgr *interface{}) error {
 			shouldSkip[0] = true
 		}
 		if err = guessMethod(msg, tgr); err == nil {
-			if err = requiredMessage(msg, tgr, object); err == nil {
-				err = requiredKeyboard(msg)
-			}
+			err = requiredMessage(msg, tgr, object)
 		}
 
 	}
