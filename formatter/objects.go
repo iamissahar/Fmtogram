@@ -1,6 +1,10 @@
 package formatter
 
-import "github.com/l1qwie/Fmtogram/types"
+import (
+	"time"
+
+	"github.com/l1qwie/Fmtogram/types"
+)
 
 type photo struct {
 	Type                  string                 `json:"type,omitempty"`
@@ -152,32 +156,59 @@ type poll struct {
 // }
 
 type information struct {
-	MessageID             int                       `json:"message_id,omitempty"`
-	MessageIDs            []int                     `json:"message_ids,omitempty"`
-	Text                  string                    `json:"text,omitempty"`
-	Caption               string                    `json:"caption,omitempty"`
-	ParseMode             string                    `json:"parse_mode,omitempty"`
-	MessageThreadID       int                       `json:"message_thread_id,omitempty"`
-	Entities              []*types.MessageEntity    `json:"entities,omitempty"`
-	CaptionEntities       []*types.MessageEntity    `json:"caption_entities,omitempty"`
-	LinkPreviewOptions    *types.LinkPreviewOptions `json:"link_preview_options,omitempty"`
-	DisableNotification   bool                      `json:"disable_notification,omitempty"`
-	ProtectContent        bool                      `json:"protect_content,omitempty"`
-	MessageEffectID       string                    `json:"message_effect_id,omitempty"`
-	ShowCaptionAboveMedia bool                      `json:"show_caption_above_media,omitempty"`
-	ReplyParameters       *types.ReplyParameters    `json:"reply_parameters,omitempty"`
-	AllowPaidBroadcast    bool                      `json:"allow_paid_broadcast,omitempty"`
-	StarCount             int                       `json:"star_count,omitempty"`
-	Payload               string                    `json:"payload,omitempty"`
-	response              types.User
-	responseMessageIDs    []int
+	MessageID                  int                            `json:"message_id,omitempty"`
+	MessageIDs                 []int                          `json:"message_ids,omitempty"`
+	Text                       string                         `json:"text,omitempty"`
+	Caption                    string                         `json:"caption,omitempty"`
+	ParseMode                  string                         `json:"parse_mode,omitempty"`
+	MessageThreadID            int                            `json:"message_thread_id,omitempty"`
+	Entities                   []*types.MessageEntity         `json:"entities,omitempty"`
+	CaptionEntities            []*types.MessageEntity         `json:"caption_entities,omitempty"`
+	LinkPreviewOptions         *types.LinkPreviewOptions      `json:"link_preview_options,omitempty"`
+	DisableNotification        bool                           `json:"disable_notification,omitempty"`
+	ProtectContent             bool                           `json:"protect_content,omitempty"`
+	MessageEffectID            string                         `json:"message_effect_id,omitempty"`
+	ShowCaptionAboveMedia      bool                           `json:"show_caption_above_media,omitempty"`
+	ReplyParameters            *types.ReplyParameters         `json:"reply_parameters,omitempty"`
+	AllowPaidBroadcast         bool                           `json:"allow_paid_broadcast,omitempty"`
+	StarCount                  int                            `json:"star_count,omitempty"`
+	Payload                    string                         `json:"payload,omitempty"`
+	Emoji                      string                         `json:"emoji,omitempty"`
+	Action                     string                         `json:"action,omitempty"`
+	Reaction                   []*types.ReactionType          `json:"reaction,omitempty"`
+	ReactionIsBig              bool                           `json:"is_big,omitempty"`
+	Offset                     int                            `json:"offset,omitempty"`
+	Limit                      int                            `json:"limit,omitempty"`
+	EmojiStatusCustomEmojiID   string                         `json:"emoji_status_custom_emoji_id,omitempty"`
+	EmojiStatusExpirationDate  int                            `json:"emoji_status_expiration_date,omitempty"`
+	FileID                     string                         `json:"file_id,omitempty"`
+	UntilDate                  time.Duration                  `json:"until_date,omitempty"`
+	RevokeMessages             bool                           `json:"revoke_messages,omitempty"`
+	OnlyIfBanned               bool                           `json:"only_if_banned,omitempty"`
+	Permissions                *types.ChatPermissions         `json:"permissions,omitempty"`
+	IndependentChatPermissions bool                           `json:"use_independent_chat_permissions,omitempty"`
+	AdminRights                *types.ChatAdministratorRights `json:",inline"`
+	CustomTitle                string                         `json:"custom_title,omitempty"`
+	response                   types.User
+	responseMessageIDs         []int
 }
 
 type chat struct {
 	FromChatID           interface{} `json:"from_chat_id,omitempty"`
 	ID                   interface{} `json:"chat_id,omitempty"`
 	BusinessConnectionID string      `json:"business_connection_id,omitempty"`
+	SenderChatID         int         `json:"sender_chat_id,omitempty"`
 	response             types.Chat
+}
+
+type link struct {
+	Name               string        `json:"name,omitempty"`
+	ExpireDate         time.Duration `json:"expire_date,omitempty"`
+	MemberLimit        int           `json:"member_limit,omitempty"`
+	JoinRequest        bool          `json:"creates_join_request,omitempty"`
+	InviteLink         string        `json:"invite_link,omitempty"`
+	SubscriptionPeriod int           `json:"subscription_period,omitempty"`
+	SubscriptionPrice  int           `json:"subscription_price,omitempty"`
 }
 
 type inlineKeyboardButton struct {
@@ -205,13 +236,8 @@ type forcereply struct {
 }
 
 type inline struct {
-	// Keyboard *inlineKeyboard `json:"reply_markup,omitempty"`
 	Keyboard [][]*inlineKeyboardButton `json:"inline_keyboard"`
 }
-
-// type inlineKeyboard struct {
-// 	InlineKeyboard [][]*inlineKeyboardButton `json:"inline_keyboard"`
-// }
 
 type replyKeyboardButton struct {
 	Text            string                            `json:"text"`
@@ -234,13 +260,3 @@ type reply struct {
 	Selective             bool                     `json:"selective,omitempty"`
 	Remove                bool                     `json:"remove_keyboard,omitempty"`
 }
-
-// type replyKeyboard struct {
-// 	Keyboard              [][]*replyKeyboardButton `json:"keyboard"`
-// 	IsPersistent          bool                     `json:"is_persistent,omitempty"`
-// 	ResizeKeyboard        bool                     `json:"resize_keyboard,omitempty"`
-// 	OneTimeKeyboard       bool                     `json:"one_time_keyboard,omitempty"`
-// 	InputFieldPlaceholder string                   `json:"input_field_placeholder,omitempty"`
-// 	Selective             bool                     `json:"selective,omitempty"`
-// 	Remove                bool                     `json:"remove_keyboard,omitempty"`
-// }

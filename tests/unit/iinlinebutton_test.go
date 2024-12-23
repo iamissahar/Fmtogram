@@ -161,38 +161,26 @@ func (inbtc *inbTestContainer) writeWebApp() {
 	inbtc.buildF = putIButtonWriteWebApp
 }
 
-func (inb *inlineButtonT) checkError(err error, t *testing.T) {
-	if !inb.isExpectedErr {
-		if err != nil {
-			t.Fatal(err)
-		}
-	} else {
-		if err.Error() != inb.codeErr {
-			t.Fatalf(errMsg, err)
-		}
-	}
-}
-
 func (inb *inlineButtonT) startTest(part string, i int, t *testing.T) {
 	switch f := inb.testedFunc.(type) {
 	case func(string) error:
 		printTestLog(part, inb.name, inb.codeErr, inb.str, inb.isExpectedErr, i)
-		inb.checkError(f(inb.str), t)
+		checkError(f(inb.str), inb.isExpectedErr, inb.codeErr, t)
 	case func(*types.CallbackGame) error:
 		printTestLog(part, inb.name, inb.codeErr, inb.game, inb.isExpectedErr, i)
-		inb.checkError(f(inb.game), t)
+		checkError(f(inb.game), inb.isExpectedErr, inb.codeErr, t)
 	case func(*types.LoginUrl) error:
 		printTestLog(part, inb.name, inb.codeErr, inb.login, inb.isExpectedErr, i)
-		inb.checkError(f(inb.login), t)
+		checkError(f(inb.login), inb.isExpectedErr, inb.codeErr, t)
 	case func(*types.SwitchInlineQueryChosenChat) error:
 		printTestLog(part, inb.name, inb.codeErr, inb.sw, inb.isExpectedErr, i)
-		inb.checkError(f(inb.sw), t)
+		checkError(f(inb.sw), inb.isExpectedErr, inb.codeErr, t)
 	case func(*types.WebAppInfo) error:
 		printTestLog(part, inb.name, inb.codeErr, inb.webapp, inb.isExpectedErr, i)
-		inb.checkError(f(inb.webapp), t)
+		checkError(f(inb.webapp), inb.isExpectedErr, inb.codeErr, t)
 	case func() error:
 		printTestLog(part, inb.name, inb.codeErr, true, inb.isExpectedErr, i)
-		inb.checkError(f(), t)
+		checkError(f(), inb.isExpectedErr, inb.codeErr, t)
 	default:
 		t.Fatalf("unexpected type of tested function: %T", f)
 	}

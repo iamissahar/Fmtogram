@@ -30,3 +30,15 @@ func doubleCheck(container []UnitTest, t *testing.T) {
 func printTestLog(part string, name, codeErr string, data interface{}, isExpectedErr bool, i int) {
 	log.Printf(part, fmt.Sprintf(logMsg, name, data, data, isExpectedErr, codeErr, i))
 }
+
+func checkError(err error, isExpected bool, errorCode string, t *testing.T) {
+	if !isExpected {
+		if err != nil {
+			t.Fatal(err)
+		}
+	} else {
+		if err.Error() != errorCode {
+			t.Fatalf(errMsg, err)
+		}
+	}
+}

@@ -22,27 +22,41 @@ type chTestContainer struct {
 	isExpectedErr []bool
 	codeErr       []string
 	amount, until int
-	buildF        func(chtc chTestContainer, ch formatter.IChat, i int) *chatT
+	buildF        func(chtc chTestContainer, ch formatter.IChat, c *chatT, i int)
 }
 
-func putChatWriteBusinessConnectionID(chtc chTestContainer, ch formatter.IChat, i int) *chatT {
-	return &chatT{chtc.name, chtc.inputStr[i], 0, ch.WriteBusinessConnectionID, chtc.isExpectedErr[i], chtc.codeErr[i]}
+func (chtc chTestContainer) defaultChatT(i int) *chatT {
+	return &chatT{name: chtc.name, isExpectedErr: chtc.isExpectedErr[i], codeErr: chtc.codeErr[i]}
 }
 
-func putChatWriteChatID(chtc chTestContainer, ch formatter.IChat, i int) *chatT {
-	return &chatT{chtc.name, "", chtc.inputInt[i], ch.WriteChatID, chtc.isExpectedErr[i], chtc.codeErr[i]}
+func putChatWriteBusinessConnectionID(chtc chTestContainer, ch formatter.IChat, c *chatT, i int) {
+	c.testedFunc = ch.WriteBusinessConnectionID
+	c.str = chtc.inputStr[i]
 }
 
-func putChatWriteChatName(chtc chTestContainer, ch formatter.IChat, i int) *chatT {
-	return &chatT{chtc.name, chtc.inputStr[i], 0, ch.WriteChatName, chtc.isExpectedErr[i], chtc.codeErr[i]}
+func putChatWriteChatID(chtc chTestContainer, ch formatter.IChat, c *chatT, i int) {
+	c.testedFunc = ch.WriteChatID
+	c.integer = chtc.inputInt[i]
 }
 
-func putChatWriteFromChatID(chtc chTestContainer, ch formatter.IChat, i int) *chatT {
-	return &chatT{chtc.name, "", chtc.inputInt[i], ch.WriteFromChatID, chtc.isExpectedErr[i], chtc.codeErr[i]}
+func putChatWriteChatName(chtc chTestContainer, ch formatter.IChat, c *chatT, i int) {
+	c.testedFunc = ch.WriteChatName
+	c.str = chtc.inputStr[i]
 }
 
-func putChatWriteFromChatName(chtc chTestContainer, ch formatter.IChat, i int) *chatT {
-	return &chatT{chtc.name, chtc.inputStr[i], 0, ch.WriteFromChatName, chtc.isExpectedErr[i], chtc.codeErr[i]}
+func putChatWriteFromChatID(chtc chTestContainer, ch formatter.IChat, c *chatT, i int) {
+	c.testedFunc = ch.WriteFromChatID
+	c.integer = chtc.inputInt[i]
+}
+
+func putChatWriteFromChatName(chtc chTestContainer, ch formatter.IChat, c *chatT, i int) {
+	c.testedFunc = ch.WriteFromChatName
+	c.str = chtc.inputStr[i]
+}
+
+func putChatWriteSenderChatID(chtc chTestContainer, ch formatter.IChat, c *chatT, i int) {
+	c.testedFunc = ch.WriteSenderChatID
+	c.integer = chtc.inputInt[i]
 }
 
 func (chtc *chTestContainer) writeBusinessConnectionID() {
@@ -90,53 +104,26 @@ func (chtc *chTestContainer) writeFromChatName() {
 	chtc.buildF = putChatWriteFromChatName
 }
 
-func (ch *chatT) callStrF(f func(string) error, t *testing.T) {
-	if !ch.isExpectedErr {
-		if err := f(ch.str); err != nil {
-			t.Fatalf(errMsg, err)
-		}
-	} else {
-		if err := f(ch.str); err.Error() != ch.codeErr {
-			t.Fatalf(errMsg, err)
-		}
-	}
-}
-
-func (ch *chatT) callIntF(f func(int) error, t *testing.T) {
-	if !ch.isExpectedErr {
-		if err := f(ch.integer); err != nil {
-			t.Fatalf(errMsg, err)
-		}
-	} else {
-		if err := f(ch.integer); err.Error() != ch.codeErr {
-			t.Fatalf(errMsg, err)
-		}
-	}
-}
-
-func (ch *chatT) callBoolF(f func() error, t *testing.T) {
-	if !ch.isExpectedErr {
-		if err := f(); err != nil {
-			t.Fatalf(errMsg, err)
-		}
-	} else {
-		if err := f(); err.Error() != ch.codeErr {
-			t.Fatalf(errMsg, err)
-		}
-	}
+func (chtc *chTestContainer) writeSenderChatID() {
+	chtc.name = "(IChat).WriteSenderChatID()"
+	chtc.inputInt = []int{10230, 0, 2214, 666623}
+	chtc.isExpectedErr = []bool{false, true, false, true}
+	chtc.codeErr = []string{"", "20", "", "10"}
+	chtc.amount, chtc.until = 4, 2
+	chtc.buildF = putChatWriteSenderChatID
 }
 
 func (ch *chatT) startTest(part string, i int, t *testing.T) {
 	switch f := ch.testedFunc.(type) {
 	case func(string) error:
 		printTestLog(part, ch.name, ch.codeErr, ch.str, ch.isExpectedErr, i)
-		ch.callStrF(f, t)
+		checkError(f(ch.str), ch.isExpectedErr, ch.codeErr, t)
 	case func(int) error:
 		printTestLog(part, ch.name, ch.codeErr, ch.integer, ch.isExpectedErr, i)
-		ch.callIntF(f, t)
+		checkError(f(ch.integer), ch.isExpectedErr, ch.codeErr, t)
 	case func() error:
 		printTestLog(part, ch.name, ch.codeErr, true, ch.isExpectedErr, i)
-		ch.callBoolF(f, t)
+		checkError(f(), ch.isExpectedErr, ch.codeErr, t)
 	default:
 		t.Fatal("unexpected type of tested function")
 	}
@@ -146,14 +133,17 @@ func (chtc *chTestContainer) createTestArrays(msg *formatter.Message) ([]UnitTes
 	var ch formatter.IChat
 	a, b := make([]UnitTest, chtc.until), make([]UnitTest, chtc.amount-chtc.until)
 	for i, j := 0, 0; i < chtc.amount; i++ {
+		c := chtc.defaultChatT(i)
 		if i < chtc.until {
 			ch = msg.NewChat()
-			a[i] = chtc.buildF(*chtc, ch, i)
+			chtc.buildF(*chtc, ch, c, i)
+			a[i] = c
 		} else {
 			if j%2 == 0 {
 				ch = msg.NewChat()
 			}
-			b[j] = chtc.buildF(*chtc, ch, i)
+			chtc.buildF(*chtc, ch, c, i)
+			b[j] = c
 			j++
 		}
 	}
@@ -197,6 +187,13 @@ func TestChatWriteFromChatID(t *testing.T) {
 func TestChatWriteFromChatName(t *testing.T) {
 	chtc := new(chTestContainer)
 	chtc.writeFromChatName()
+	msg := formatter.CreateEmpltyMessage()
+	chtc.mainLogic(msg, t)
+}
+
+func TestChatWriteSenderChatID(t *testing.T) {
+	chtc := new(chTestContainer)
+	chtc.writeSenderChatID()
 	msg := formatter.CreateEmpltyMessage()
 	chtc.mainLogic(msg, t)
 }

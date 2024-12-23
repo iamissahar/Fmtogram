@@ -2,11 +2,17 @@ package formatter
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/l1qwie/Fmtogram/fmerrors"
 	"github.com/l1qwie/Fmtogram/logs"
 	"github.com/l1qwie/Fmtogram/types"
 )
+
+type emojich struct {
+	permissibleQuantity int
+	amount              int
+}
 
 func code01() error {
 	err := new(fmerrors.FME)
@@ -99,6 +105,19 @@ func checkParseMode(parsemode, cell string) error {
 		if cell != "" {
 			err = code10()
 		}
+	}
+	return err
+}
+
+func checkInputPlaceHolder(placeholder, cell string) error {
+	var err error
+	p := []rune(placeholder)
+	if len(p) > 0 && len(p) <= 64 {
+		if cell != "" {
+			err = code10()
+		}
+	} else {
+		err = code20()
 	}
 	return err
 }
@@ -1235,6 +1254,103 @@ func (p *poll) GetResponse() types.Poll {
 	return p.response
 }
 
+func (l *link) WriteName(name string) error {
+	var err error
+	n := len([]rune(name))
+	if n > 0 && n <= 32 {
+		if l.Name == "" {
+			l.Name = name
+			logs.DataWrittenSuccessfully(interfaceLink, "Name")
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
+
+	}
+	return err
+}
+
+func (l *link) WriteExpireDate(date time.Duration) error {
+	var err error
+	if date > 0 {
+		if l.ExpireDate == 0 {
+			l.ExpireDate = date
+			logs.DataWrittenSuccessfully(interfaceLink, "Expire Date")
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (l *link) WriteMemberLimit(limit int) error {
+	var err error
+	if limit > 0 && limit <= 99999 {
+		if l.MemberLimit == 0 {
+			l.MemberLimit = limit
+			logs.DataWrittenSuccessfully(interfaceLink, "Member Limit")
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (l *link) WriteJoinRequest() error {
+	var err error
+	if !l.JoinRequest {
+		l.JoinRequest = true
+		logs.SettedParam("Join Request", interfaceLink, true)
+	} else {
+		err = code10()
+	}
+	return err
+}
+
+func (l *link) WriteIniveLink(link string) error {
+	var err error
+	if err = checkStringValue(link, l.InviteLink); err == nil {
+		l.InviteLink = link
+		logs.DataWrittenSuccessfully(interfaceLink, "Invite Link")
+	}
+	return err
+}
+
+func (l *link) WriteSubscriptionPeriod(period int) error {
+	var err error
+	if period == 2592000 {
+		if l.SubscriptionPeriod == 0 {
+			l.SubscriptionPeriod = period
+			logs.DataWrittenSuccessfully(interfaceLink, "Subscription Period")
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (l *link) WriteSubscriptionPrice(price int) error {
+	var err error
+	if price > 0 && price <= 2500 {
+		if l.SubscriptionPrice == 0 {
+			l.SubscriptionPrice = price
+			logs.DataWrittenSuccessfully(interfaceLink, "Subscription Price")
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
 func (inf *information) WriteString(text string) error {
 	var err error
 	if err = checkStringValue(text, inf.Text); err == nil {
@@ -1426,6 +1542,257 @@ func (inf *information) WritePayload(payload string) error {
 	return err
 }
 
+func makeMap() map[rune]*emojich {
+	emojiMap := make(map[rune]*emojich, len(types.Emojis))
+	emojiMap[rune('🎲')] = &emojich{permissibleQuantity: 6}
+	emojiMap[rune('🎯')] = &emojich{permissibleQuantity: 6}
+	emojiMap[rune('🏀')] = &emojich{permissibleQuantity: 5}
+	emojiMap[rune('⚽')] = &emojich{permissibleQuantity: 5}
+	emojiMap[rune('🎳')] = &emojich{permissibleQuantity: 6}
+	emojiMap[rune('🎰')] = &emojich{permissibleQuantity: 64}
+	return emojiMap
+}
+
+func isArrEmojiOK(arr []rune, emojimap map[rune]*emojich) error {
+	var err error
+	for i := 1; (i < len(arr)) && (err == nil); i++ {
+		if arr[i] != arr[0] {
+			err = code20()
+		} else {
+			emojimap[arr[0]].amount++
+		}
+	}
+	return err
+}
+
+func (inf *information) WriteEmoji(emoji string) error {
+	var err error
+	emojiMap := makeMap()
+	em := []rune(emoji)
+	if len(em) > 0 {
+		if _, ok := emojiMap[em[0]]; !ok {
+			err = code20()
+		} else {
+			if err = isArrEmojiOK(em, emojiMap); err == nil {
+				if emojiMap[em[0]].amount < emojiMap[em[0]].permissibleQuantity {
+					if inf.Emoji == "" {
+						inf.Emoji = emoji
+						logs.DataWrittenSuccessfully(interfaceInf, "Emoji")
+					} else {
+						err = code10()
+					}
+				} else {
+					err = code20()
+
+				}
+			}
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (inf *information) WriteAction(action string) error {
+	var err error
+	var found bool
+	for i := 0; (i < len(types.Actions)) && (!found); i++ {
+		if types.Actions[i] == action {
+			found = true
+		} else if i+1 == len(types.Actions) {
+			err = code20()
+		}
+	}
+	if err == nil {
+		if inf.Action == "" {
+			inf.Action = action
+			logs.DataWrittenSuccessfully(interfaceInf, "Action")
+		} else {
+			err = code10()
+		}
+	}
+	return err
+}
+
+func (inf *information) WriteReaction(reaction []*types.ReactionType) error {
+	var err error
+	if reaction != nil {
+		for i := 0; (i < len(reaction)) && (err == nil); i++ {
+			if reaction[i] == nil {
+				err = code5()
+			}
+		}
+		if err == nil {
+			if inf.Reaction == nil {
+				inf.Reaction = reaction
+				logs.DataWrittenSuccessfully(interfaceInf, "Reaction")
+			} else {
+				err = code10()
+			}
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (inf *information) WriteReactionIsBig() error {
+	var err error
+	if !inf.ReactionIsBig {
+		inf.ReactionIsBig = true
+		logs.SettedParam("Reaction Is Big", interfaceInf, true)
+	} else {
+		err = code10()
+	}
+	return err
+}
+
+func (inf *information) WriteOffset(offset int) error {
+	var err error
+	if err = checkIntegerValue(offset, inf.Offset); err == nil {
+		inf.Offset = offset
+		logs.DataWrittenSuccessfully(interfaceInf, "Offset")
+	}
+	return err
+}
+
+func (inf *information) WriteLimit(limit int) error {
+	var err error
+	if limit > 0 && limit <= 100 {
+		if inf.Limit == 0 {
+			inf.Limit = limit
+			logs.DataWrittenSuccessfully(interfaceInf, "Limit")
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (inf *information) WriteEmojiStatusCustomEmojiID(emojiID string) error {
+	var err error
+	if err = checkStringValue(emojiID, inf.EmojiStatusCustomEmojiID); err == nil {
+		inf.EmojiStatusCustomEmojiID = emojiID
+		logs.DataWrittenSuccessfully(interfaceInf, "Emoji Status Custom Emoji ID")
+	}
+	return err
+}
+
+func (inf *information) WriteEmojiStatusExpirationDate(date int) error {
+	var err error
+	if err = checkIntegerValue(date, inf.EmojiStatusExpirationDate); err == nil {
+		inf.EmojiStatusExpirationDate = date
+		logs.DataWrittenSuccessfully(interfaceInf, "Emoji Status Expiration Date")
+	}
+	return err
+}
+
+func (inf *information) WriteFileID(fileID string) error {
+	var err error
+	if err = checkStringValue(fileID, inf.FileID); err == nil {
+		inf.FileID = fileID
+		logs.DataWrittenSuccessfully(interfaceInf, "File ID")
+	}
+	return err
+}
+
+func (inf *information) WriteUntilDate(date time.Duration) error {
+	var err error
+	if date > 0 {
+		if inf.UntilDate == 0 {
+			inf.UntilDate = date
+			logs.DataWrittenSuccessfully(interfaceInf, "Until Date")
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (inf *information) WriteRevokeMessages() error {
+	var err error
+	if !inf.RevokeMessages {
+		inf.RevokeMessages = true
+		logs.SettedParam("Revoke Messages", interfaceInf, true)
+	} else {
+		err = code10()
+	}
+	return err
+}
+
+func (inf *information) WriteOnlyIfBanned() error {
+	var err error
+	if !inf.OnlyIfBanned {
+		inf.OnlyIfBanned = true
+		logs.SettedParam("Only If Banned", interfaceInf, true)
+	} else {
+		err = code10()
+	}
+	return err
+}
+
+func (inf *information) WritePermissions(permissions *types.ChatPermissions) error {
+	var err error
+	if permissions != nil {
+		if inf.Permissions == nil {
+			inf.Permissions = permissions
+			logs.DataWrittenSuccessfully(interfaceInf, "Permissions")
+		} else {
+			err = code10()
+		}
+	} else {
+
+		err = code20()
+	}
+	return err
+}
+
+func (inf *information) WriteIndependentChatPermissions() error {
+	var err error
+	if !inf.IndependentChatPermissions {
+		inf.IndependentChatPermissions = true
+		logs.SettedParam("Independent Chat Permissions", interfaceInf, true)
+	} else {
+		err = code10()
+	}
+	return err
+}
+
+func (inf *information) WriteAdministratorRights(chAdminRights *types.ChatAdministratorRights) error {
+	var err error
+	if chAdminRights != nil {
+		if inf.AdminRights == nil {
+			inf.AdminRights = chAdminRights
+			logs.DataWrittenSuccessfully(interfaceInf, "Admin Rights")
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (inf *information) WriteCustomTitle(title string) error {
+	var err error
+	t := len([]rune(title))
+	if t > 0 && t <= 16 {
+		if inf.CustomTitle == "" {
+			inf.CustomTitle = title
+			logs.DataWrittenSuccessfully(interfaceInf, "Custom Title")
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
 func (inf *information) GetResponse() types.User {
 	return inf.response
 }
@@ -1499,6 +1866,15 @@ func (ch *chat) WriteFromChatName(chatname string) error {
 		}
 	} else {
 		err = code20()
+	}
+	return err
+}
+
+func (ch *chat) WriteSenderChatID(chatID int) error {
+	var err error
+	if err = checkIntegerValue(chatID, ch.SenderChatID); err == nil {
+		ch.SenderChatID = chatID
+		logs.DataWrittenSuccessfully(interfaceChat, "Sender Chat ID")
 	}
 	return err
 }
@@ -1799,7 +2175,7 @@ func (rp *reply) WriteOneTimeKeyboard() error {
 
 func (rp *reply) WriteInputFieldPlaceholder(placeholder string) error {
 	var err error
-	if err = checkStringValue(placeholder, rp.InputFieldPlaceholder); err == nil {
+	if err = checkInputPlaceHolder(placeholder, rp.InputFieldPlaceholder); err == nil {
 		rp.InputFieldPlaceholder = placeholder
 		logs.DataWrittenSuccessfully(interfaceReplyKB, "Input Field Placeholder")
 	}
@@ -1963,6 +2339,37 @@ func (rpb *replyKeyboardButton) WriteWebApp(webapp *types.WebAppInfo) error {
 		}
 	} else {
 		err = code20()
+	}
+	return err
+}
+
+func (frp *forcereply) WriteForceReply() error {
+	var err error
+	if !frp.Forcereply {
+		frp.Forcereply = true
+		logs.SettedParam("Force Reply", interfaceForceReplyKB, true)
+	} else {
+		err = code10()
+	}
+	return err
+}
+
+func (frp *forcereply) WriteInputFieldPlaceholder(placeholder string) error {
+	var err error
+	if err = checkInputPlaceHolder(placeholder, frp.InputFieldPlaceholder); err == nil {
+		frp.InputFieldPlaceholder = placeholder
+		logs.DataWrittenSuccessfully(interfaceForceReplyKB, "Input Field Placeholder")
+	}
+	return err
+}
+
+func (frp *forcereply) WriteSelective() error {
+	var err error
+	if !frp.Selective {
+		frp.Selective = true
+		logs.SettedParam("Selective", interfaceForceReplyKB, true)
+	} else {
+		err = code10()
 	}
 	return err
 }

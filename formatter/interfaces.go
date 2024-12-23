@@ -2,6 +2,7 @@ package formatter
 
 import (
 	"mime/multipart"
+	"time"
 
 	"github.com/l1qwie/Fmtogram/types"
 )
@@ -399,6 +400,56 @@ type IParameters interface {
 	// Bot-defined paid media payload, 0-128 bytes. This will not be displayed to the user, use it for your internal processes.
 	WritePayload(payload string) error
 
+	// Use this only if you're going to use method methods.Dice. In anyother cases you'd prefer put emoji just in text message.
+	// All emojis that available for this function are in the types.Emojis array
+	WriteEmoji(emoji string) error
+
+	// Type of action to broadcast. Choose one of types.Actions, depending on what the user is about to receive:
+	// types.Actions[0] for text messages, types.Actions[1] for photos, types.Actions[2] or types.Actions[3] for videos,
+	// types.Actions[4] or types.Actions[5] for voice notes, types.Actions[6] for general files, types.Actions[7]
+	// for stickers, types.Actions[8] for location data, types.Actions[9] or types.Actions[10] for video notes.
+	WriteAction(action string) error
+
+	// Recieves a slice of reaction types to set on the message. Currently, as non-premium users,
+	// bots can set up to one reaction per message. A custom emoji reaction can be used if it is either
+	// already present on the message or explicitly allowed by chat administrators. Paid reactions can't be used by bots.
+	WriteReaction(reaction []*types.ReactionType) error
+
+	// Call it to set the reaction with a big animation
+	WriteReactionIsBig() error
+
+	// Sequential number of the first photo to be returned. By default, all photos are returned.
+	WriteOffset(offset int) error
+
+	WriteLimit(limit int) error
+
+	WriteEmojiStatusCustomEmojiID(emojiID string) error
+
+	WriteEmojiStatusExpirationDate(date int) error
+
+	WriteFileID(fileID string) error
+
+	// Date when the user will be unbanned; Unix time. If user is banned for more than 366 days or less than
+	// 30 seconds from the current time they are considered to be banned forever. Applied for supergroups and channels only.
+	WriteUntilDate(date time.Duration) error
+
+	// Call it to delete all messages from the chat for the user that is being removed. If you don't call it when you just banned a user, the
+	// user will be able to see messages in the group that were sent before the user was removed.
+	// Always setted for supergroups and channels
+	WriteRevokeMessages() error
+
+	// Do nothing if the user is not banned
+	WriteOnlyIfBanned() error
+
+	WritePermissions(permissions *types.ChatPermissions) error
+
+	WriteIndependentChatPermissions() error
+
+	WriteAdministratorRights(chAdminRights *types.ChatAdministratorRights) error
+
+	// New custom title for the administrator; 0-16 characters, emoji are not allowed
+	WriteCustomTitle(title string) error
+
 	// You can call this function after calling Send(). It returns you a structure with some data about the user you just sent a message to
 	GetResponse() types.User
 
@@ -428,8 +479,36 @@ type IChat interface {
 	// Receives the name of the chat. Must be the name of the chat of the original message that was sent
 	WriteFromChatName(name string) error
 
+	WriteSenderChatID(chatID int) error
+
 	// You can call this function after calling Send(). It returns you a structure with some data about the chat you just sent a message to
 	GetResponse() types.Chat
+}
+
+type ILink interface {
+	// Invite link name; 0-32 characters
+	WriteName(name string) error
+
+	// Point in time (Unix timestamp) when the link will expire
+	WriteExpireDate(date time.Duration) error
+
+	// The maximum number of users that can be members of the chat simultaneously after
+	// joining the chat via this invite link; 1-99999
+	WriteMemberLimit(limit int) error
+
+	// If users joining the chat via the link need to be approved by chat administrators.
+	// If called, member_limit can't be specified
+	WriteJoinRequest() error
+
+	// The invite link to edit
+	WriteIniveLink(link string) error
+
+	// The number of seconds the subscription will be active for before the next payment.
+	// Currently, it must always be 2592000 (30 days).
+	WriteSubscriptionPeriod(period int) error
+
+	// The amount of Telegram Stars a user must pay initially and after each subsequent subscription period to be a member of the chat; 1-2500
+	WriteSubscriptionPrice(price int) error
 }
 
 // You can create and send only one type of keyboard. There are 3 available types
@@ -562,4 +641,14 @@ type IInlineButton interface {
 }
 
 type IForceReply interface {
+	// Shows reply interface to the user, as if they manually selected the bot's message and tapped 'Reply'
+	WriteForceReply() error
+
+	// The placeholder to be shown in the input field when the reply is active; 1-64 characters
+	WriteInputFieldPlaceholder(placeholder string) error
+
+	// Use this parameter if you want to force reply from specific users only. Targets: 1) users that
+	// are @mentioned in the text of the Message object; 2) if the bot's message is a reply
+	// to a message in the same chat and forum topic, sender of the original message.
+	WriteSelective() error
 }
