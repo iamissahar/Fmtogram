@@ -1351,6 +1351,480 @@ func (l *link) WriteSubscriptionPrice(price int) error {
 	return err
 }
 
+func (st *sticker) WriteSetName(name string) error {
+	var err error
+	if err = checkStringValue(name, st.SetName); err == nil {
+		st.SetName = name
+		logs.DataWrittenSuccessfully(interfaceSticker, "Set Name")
+	}
+	return err
+}
+
+func (st *sticker) WriteStickerStorage(path string) error {
+	var err error
+	if err = checkStringValue(path, st.Sticker); err == nil {
+		if err = st.isCorrectType(); err == nil {
+			st.Sticker, st.stickerGottenFrom = path, Storage
+			logs.DataWrittenSuccessfully(interfaceSticker, "Sticker From Storage")
+		}
+	}
+	return err
+}
+
+func (st *sticker) WriteStickerTelegram(stickerID string) error {
+	var err error
+	if err = checkStringValue(stickerID, st.Sticker); err == nil {
+		st.Sticker, st.stickerGottenFrom = stickerID, Telegram
+		logs.DataWrittenSuccessfully(interfaceSticker, "Sticker From Telegram")
+	}
+	return err
+}
+
+func (st *sticker) WriteStickerInternet(url string) error {
+	var err error
+	if err = checkStringValue(url, st.Sticker); err == nil {
+		st.Sticker, st.stickerGottenFrom = url, Telegram
+		logs.DataWrittenSuccessfully(interfaceSticker, "Sticker From The Internet")
+	}
+	return err
+}
+
+func (st *sticker) WriteAssociatedEmoji(emoji string) error {
+	var err error
+	if err = checkStringValue(emoji, st.Emoji); err == nil {
+		st.Emoji = emoji
+		logs.DataWrittenSuccessfully(interfaceSticker, "Associated Emoji")
+	}
+	return err
+}
+
+func (st *sticker) WriteAssociatedEmojies(emojies []string) error {
+	var err error
+	if emojies != nil {
+		for i := 0; (i < len(emojies)) && (err == nil); i++ {
+			if emojies[i] == "" {
+				err = code5()
+			}
+		}
+		if err == nil {
+			if st.Emojies == nil {
+				st.Emojies = emojies
+				logs.DataWrittenSuccessfully(interfaceSticker, "Associated Emojies")
+			} else {
+				err = code10()
+			}
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (st *sticker) WriteEmojiID(emojiID string) error {
+	var err error
+	if err = checkStringValue(emojiID, st.EmojiID); err == nil {
+		st.EmojiID = emojiID
+		logs.DataWrittenSuccessfully(interfaceSticker, "Emoji ID")
+	}
+	return err
+}
+
+func (st *sticker) WriteEmojiIDs(emojiIDs []string) error {
+	var err error
+	if emojiIDs != nil {
+		for i := 0; (i < len(emojiIDs)) && (err == nil); i++ {
+			if emojiIDs[i] == "" {
+				err = code5()
+			}
+		}
+		if err == nil {
+			if st.EmojiIDs == nil {
+				st.EmojiIDs = emojiIDs
+				logs.DataWrittenSuccessfully(interfaceSticker, "Emoji IDs")
+			} else {
+				err = code10()
+			}
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (st *sticker) WriteFormat(format string) error {
+	var err error
+	if format == "static" || format == "animated" || format == "video" {
+		if st.Format == "" {
+			st.Format = format
+			logs.DataWrittenSuccessfully(interfaceSticker, "Format")
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (st *sticker) WriteTitle(title string) error {
+	var err error
+	t := len([]rune(title))
+	if t > 0 && t <= 64 {
+		if st.Title == "" {
+			st.Title = title
+			logs.DataWrittenSuccessfully(interfaceSticker, "Title")
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (st *sticker) WriteStickerType(stickertype string) error {
+	var err error
+	if stickertype == "regular" || stickertype == "mask" || stickertype == "custom_emoji" {
+		if st.StickerType == "" {
+			st.StickerType = stickertype
+			logs.DataWrittenSuccessfully(interfaceSticker, "Sticker Type")
+		} else {
+			err = code01()
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (st *sticker) WriteNeedsRepainting() error {
+	var err error
+	if !st.NeedsRepainting {
+		st.NeedsRepainting = true
+		logs.SettedParam("Needs Repainting", interfaceSticker, true)
+	} else {
+		err = code10()
+	}
+	return err
+}
+
+func (st *sticker) WritePosition(pos string) error {
+	var err error
+	p := []rune(pos)
+	if p[0] == '0' {
+		if st.Position == "" {
+			st.Position = pos
+			logs.DataWrittenSuccessfully(interfaceSticker, "Position")
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (st *sticker) WriteOldSticker(stickerID string) error {
+	var err error
+	if err = checkStringValue(stickerID, st.OldSticker); err == nil {
+		st.OldSticker = stickerID
+		logs.DataWrittenSuccessfully(interfaceSticker, "Old Sticker")
+	}
+	return err
+}
+
+func (st *sticker) WriteKeywords(words []string) error {
+	var err error
+	if len(words) <= 20 {
+		for i := 0; (i < len(words)) && (err == nil); i++ {
+			if len([]rune(words[i])) > 64 {
+				err = code5()
+			}
+		}
+		if err == nil {
+			if st.Keywords == nil {
+				st.Keywords = words
+				logs.DataWrittenSuccessfully(interfaceSticker, "Keywords")
+			} else {
+				err = code10()
+			}
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (st *sticker) WriteMaskPosition(maskpos *types.MaskPosition) error {
+	var err error
+	if maskpos != nil {
+		if st.MaskPosition == nil {
+			st.MaskPosition = maskpos
+			logs.DataWrittenSuccessfully(interfaceSticker, "Mask Position")
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (st *sticker) WriteThumbnailStorage(path string) error {
+	var err error
+	if err = checkStringValue(path, st.Thumbnail); err == nil {
+		if err = st.isThumbnailCorrectType(); err == nil {
+			st.Thumbnail, st.thumbnailGottenFrom = path, Storage
+			logs.DataWrittenSuccessfully(interfaceSticker, "Thumbnail From Storage")
+		}
+	}
+	return err
+}
+
+func (st *sticker) WriteThumbnailTelegram(thumbnailID string) error {
+	var err error
+	if err = checkStringValue(thumbnailID, st.Thumbnail); err == nil {
+		st.Thumbnail, st.thumbnailGottenFrom = thumbnailID, Telegram
+		logs.DataWrittenSuccessfully(interfaceSticker, "Thumbnail From Telegram")
+	}
+	return err
+}
+
+func (st *sticker) WriteThumbnailInternet(url string) error {
+	var err error
+	if err = checkStringValue(url, st.Thumbnail); err == nil {
+		st.Thumbnail, st.thumbnailGottenFrom = url, Internet
+		logs.DataWrittenSuccessfully(interfaceSticker, "Thumbnail From The Internet")
+	}
+	return err
+}
+
+func (st *sticker) WriteThumbnailFormat(format string) error {
+	var err error
+	if (format == "static" && (st.thumbnailType == ".WEBP/.PNG" || st.thumbnailType == "")) ||
+		(format == "animated" && (st.thumbnailType == ".TGS" || st.thumbnailType == "")) ||
+		(format == "video" && (st.thumbnailType == ".WEBM" || st.thumbnailType == "")) {
+		if st.ThumbnailFormat == "" {
+			st.ThumbnailFormat = format
+			logs.DataWrittenSuccessfully(interfaceSticker, "Thumbnail Format")
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (st *sticker) WriteGiftID(giftID string) error {
+	var err error
+	if err = checkStringValue(giftID, st.GiftID); err == nil {
+		st.GiftID = giftID
+		logs.DataWrittenSuccessfully(interfaceSticker, "Gift ID")
+	}
+	return err
+}
+
+func (st *sticker) WriteTextParseMode(parsemode string) error {
+	var err error
+	if err = checkParseMode(parsemode, st.ParseMode); err == nil {
+		st.ParseMode = parsemode
+		logs.DataWrittenSuccessfully(interfaceSticker, "Text Parse Mode")
+	}
+	return err
+}
+
+func (st *sticker) WriteTextEntities(entities []*types.MessageEntity) error {
+	var err error
+	if err = checkEntities(entities, st.Entities); err == nil {
+		st.Entities = entities
+		logs.DataWrittenSuccessfully(interfaceSticker, "Text Entities")
+	}
+	return err
+}
+
+func (f *forum) WriteName(name string) error {
+	var err error
+	n := len([]rune(name))
+	if n > 0 && n <= 128 {
+		if f.Name == "" {
+			f.Name = name
+			logs.DataWrittenSuccessfully(interfaceForum, "Name")
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (f *forum) WriteIconColor(color int) error {
+	var err error
+	if color == 0x6FB9F0 || color == 0xFFD67E || color == 0xCB86DB || color == 0x8EEE98 || color == 0xFF93B2 || color == 0xFB6F5F {
+		if f.IconColor == 0 {
+			f.IconColor = color
+			logs.DataWrittenSuccessfully(interfaceForum, "Icon Color")
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (f *forum) WriteIconEmojiID(emojiID string) error {
+	var err error
+	if err = checkStringValue(emojiID, f.IconEmojiID); err == nil {
+		f.IconEmojiID = emojiID
+		logs.DataWrittenSuccessfully(interfaceForum, "Icon Emoji ID")
+	}
+	return err
+}
+
+func (b *bot) WriteCommands(commands []*types.BotCommand) error {
+	var err error
+	if commands != nil {
+		for i := 0; (i < len(commands)) && (err == nil); i++ {
+			if commands[i] == nil {
+				err = code5()
+			}
+		}
+		if err == nil {
+			if b.Commands == nil {
+				b.Commands = commands
+				logs.DataWrittenSuccessfully(interfaceBot, "Commands")
+			} else {
+				err = code10()
+			}
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (b *bot) WriteScope(scope *types.BotCommandScope) error {
+	var err error
+	if scope != nil {
+		if b.Scope == nil {
+			b.Scope = scope
+			logs.DataWrittenSuccessfully(interfaceBot, "Scope")
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (b *bot) WriteLanguage(lang string) error {
+	var err error
+	l := len([]rune(lang))
+	if l == 0 || l == 2 {
+		if b.Language == "" {
+			b.Language = lang
+			logs.DataWrittenSuccessfully(interfaceBot, "Language")
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (b *bot) WriteName(name string) error {
+	var err error
+	n := len([]rune(name))
+	if n >= 0 && n <= 64 {
+		if b.Name == "" {
+			b.Name = name
+			logs.DataWrittenSuccessfully(interfaceBot, "Name")
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (b *bot) WriteDescription(description string) error {
+	var err error
+	d := len([]rune(description))
+	if d >= 0 && d <= 512 {
+		if b.Description == "" {
+			b.Description = description
+			logs.DataWrittenSuccessfully(interfaceBot, "Description")
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (b *bot) WriteShortDescription(description string) error {
+	var err error
+	d := len([]rune(description))
+	if d >= 0 && d <= 120 {
+		if b.ShortDescription == "" {
+			b.ShortDescription = description
+			logs.DataWrittenSuccessfully(interfaceBot, "Description")
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (b *bot) WriteMenuButton(button *types.MenuButton) error {
+	var err error
+	if button != nil {
+		if b.MenuButtom == nil {
+			b.MenuButtom = button
+			logs.DataWrittenSuccessfully(interfaceBot, "Menu Buttom")
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (b *bot) WriteRights(rights *types.ChatAdministratorRights) error {
+	var err error
+	if rights != nil {
+		if b.Rights == nil {
+			b.Rights = rights
+			logs.DataWrittenSuccessfully(interfaceBot, "Rights")
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (b *bot) WriteForChannels() error {
+	var err error
+	if !b.ForChannels {
+		b.ForChannels = true
+		logs.SettedParam("For Channels", interfaceBot, true)
+	} else {
+		err = code10()
+	}
+	return err
+}
+
 func (inf *information) WriteString(text string) error {
 	var err error
 	if err = checkStringValue(text, inf.Text); err == nil {
@@ -1793,6 +2267,62 @@ func (inf *information) WriteCustomTitle(title string) error {
 	return err
 }
 
+func (inf *information) WriteUserID(userID int) error {
+	var err error
+	if err = checkIntegerValue(userID, inf.UserID); err == nil {
+		inf.UserID = userID
+		logs.DataWrittenSuccessfully(interfaceInf, "User ID")
+	}
+	return err
+}
+
+func (inf *information) WriteCallBackQueryID(queryID string) error {
+	var err error
+	if err = checkStringValue(queryID, inf.CallBackQueryID); err == nil {
+		inf.CallBackQueryID = queryID
+		logs.DataWrittenSuccessfully(interfaceInf, "CallBack Query ID")
+	}
+	return err
+}
+
+func (inf *information) WriteShowAlert() error {
+	var err error
+	if !inf.ShowAlert {
+		inf.ShowAlert = true
+		logs.SettedParam("Show Alert", interfaceInf, true)
+	} else {
+		err = code10()
+	}
+	return err
+}
+
+func (inf *information) WriteURL(url string) error {
+	var err error
+	if err = checkStringValue(url, inf.Url); err == nil {
+		inf.Url = url
+		logs.DataWrittenSuccessfully(interfaceInf, "URL")
+	}
+	return err
+}
+
+func (inf *information) WriteCacheTime(time int) error {
+	var err error
+	if err = checkIntegerValue(time, inf.CacheTime); err == nil {
+		inf.CacheTime = time
+		logs.DataWrittenSuccessfully(interfaceInf, "Cache Time")
+	}
+	return err
+}
+
+func (inf *information) WriteInlineMessageID(messageID string) error {
+	var err error
+	if err = checkStringValue(messageID, inf.InlineMessageID); err == nil {
+		inf.InlineMessageID = messageID
+		logs.DataWrittenSuccessfully(interfaceInf, "Inline Message ID")
+	}
+	return err
+}
+
 func (inf *information) GetResponse() types.User {
 	return inf.response
 }
@@ -1875,6 +2405,38 @@ func (ch *chat) WriteSenderChatID(chatID int) error {
 	if err = checkIntegerValue(chatID, ch.SenderChatID); err == nil {
 		ch.SenderChatID = chatID
 		logs.DataWrittenSuccessfully(interfaceChat, "Sender Chat ID")
+	}
+	return err
+}
+
+func (ch *chat) WriteTitle(title string) error {
+	var err error
+	t := len([]rune(title))
+	if t > 0 && t <= 128 {
+		if ch.Title == "" {
+			ch.Title = title
+			logs.DataWrittenSuccessfully(interfaceChat, "Title")
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (ch *chat) WriteDescription(description string) error {
+	var err error
+	d := len([]rune(description))
+	if d >= 0 && d <= 255 {
+		if ch.Description == "" {
+			ch.Description = description
+			logs.DataWrittenSuccessfully(interfaceChat, "Description")
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
 	}
 	return err
 }

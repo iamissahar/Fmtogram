@@ -146,14 +146,36 @@ type poll struct {
 	response             types.Poll
 }
 
-// type sticker struct {
-// 	Type       string `json:"type,omitempty"`
-// 	Media      string `json:"media,omitepty"`
-// 	Sticker    string `json:"sticker,omitempty"`
-// 	Emoji      string `json:"emoji,omitempty"`
-// 	gottenFrom int
-// 	response   types.Sticker
-// }
+type sticker struct {
+	SetName             string                 `json:"sticker_set_name,omitempty"`
+	Sticker             string                 `jsno:"sticker"`
+	Emoji               string                 `json:"emoji"`
+	Emojies             []string               `json:"emoji_list"`
+	EmojiID             string                 `json:"custom_emoji_id"`
+	EmojiIDs            []string               `json:"custom_emoji_ids"`
+	Format              string                 `json:"sticker_format"`
+	Title               string                 `json:"title"`
+	StickerType         string                 `json:"sticker_type"`
+	NeedsRepainting     bool                   `json:"needs_repainting"`
+	Position            string                 `json:"position"`
+	OldSticker          string                 `json:"old_sticker"`
+	Keywords            []string               `json:"keywords"`
+	MaskPosition        *types.MaskPosition    `json:"mask_position"`
+	Thumbnail           string                 `json:"thumbnail"`
+	ThumbnailFormat     string                 `json:"format"`
+	GiftID              string                 `json:"gift_id"`
+	ParseMode           string                 `json:"text_parse_mode"`
+	Entities            []*types.MessageEntity `json:"text_entities"`
+	stickerGottenFrom   int
+	thumbnailGottenFrom int
+	thumbnailType       string
+}
+
+type forum struct {
+	Name        string `json:"name,omitempty"`
+	IconColor   int    `json:"icon_color,omitempty"`
+	IconEmojiID string `json:"icon_custom_emoji_id,omitempty"`
+}
 
 type information struct {
 	MessageID                  int                            `json:"message_id,omitempty"`
@@ -189,6 +211,12 @@ type information struct {
 	IndependentChatPermissions bool                           `json:"use_independent_chat_permissions,omitempty"`
 	AdminRights                *types.ChatAdministratorRights `json:",inline"`
 	CustomTitle                string                         `json:"custom_title,omitempty"`
+	UserID                     int                            `json:"user_id,omitempty"`
+	CallBackQueryID            string                         `json:"callback_query_id,omitempty"`
+	ShowAlert                  bool                           `json:"show_alert,omitempty"`
+	Url                        string                         `json:"url,omitempty"`
+	CacheTime                  int                            `json:"cache_time,omitempty"`
+	InlineMessageID            string                         `json:"inline_message_id,omitempty"`
 	response                   types.User
 	responseMessageIDs         []int
 }
@@ -198,6 +226,8 @@ type chat struct {
 	ID                   interface{} `json:"chat_id,omitempty"`
 	BusinessConnectionID string      `json:"business_connection_id,omitempty"`
 	SenderChatID         int         `json:"sender_chat_id,omitempty"`
+	Title                string      `json:"title,omitempty"`
+	Description          string      `json:"description,omitempty"`
 	response             types.Chat
 }
 
@@ -209,6 +239,18 @@ type link struct {
 	InviteLink         string        `json:"invite_link,omitempty"`
 	SubscriptionPeriod int           `json:"subscription_period,omitempty"`
 	SubscriptionPrice  int           `json:"subscription_price,omitempty"`
+}
+
+type bot struct {
+	Commands         []*types.BotCommand            `json:"commands,omitempty"`
+	Scope            *types.BotCommandScope         `json:"scope,omitempty"`
+	Language         string                         `json:"language_code,omitempty"`
+	Name             string                         `json:"name,omitempty"`
+	Description      string                         `json:"description,omitempty"`
+	ShortDescription string                         `json:"short_description,omitempty"`
+	MenuButtom       *types.MenuButton              `json:"menu_button,omitempty"`
+	Rights           *types.ChatAdministratorRights `json:"rights,omitempty"`
+	ForChannels      bool                           `json:"for_channels,omitempty"`
 }
 
 type inlineKeyboardButton struct {

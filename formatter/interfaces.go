@@ -337,19 +337,92 @@ type IPoll interface {
 	GetResponse() types.Poll
 }
 
-// type ISticker interface {
-// 	// Receives a path of a sticker file in formats: static .WEBP, animated .TGS or video .WEBM
-// 	WriteStickerStorage(path string) error
+type ISticker interface {
+	// Name of the sticker set to be set as the group sticker set
+	WriteSetName(name string) error
 
-// 	// Receives a Telegram ID of a sticker
-// 	WriteStickerTelegram(stickerID string) error
+	WriteStickerStorage(path string) error
 
-// 	// Receives an URL-link of a sticker
-// 	WriteStickerInternet(URL string) error
+	WriteStickerTelegram(stickerID string) error
 
-// 	// 	Emoji associated with the sticker; only for just uploaded stickers
-// 	WriteEmoji(emoji string) error
-// }
+	WriteStickerInternet(url string) error
+
+	WriteAssociatedEmoji(emoji string) error
+
+	WriteAssociatedEmojies(emojies []string) error
+
+	WriteEmojiID(emojiID string) error
+
+	WriteEmojiIDs(emojiIDs []string) error
+
+	WriteFormat(format string) error
+
+	WriteTitle(title string) error
+
+	WriteStickerType(stickertype string) error
+
+	WriteNeedsRepainting() error
+
+	// New sticker position in the set, zero-based
+	WritePosition(pos string) error
+
+	WriteOldSticker(stickerID string) error
+
+	// list of 0-20 search keywords for the sticker with total length of up to 64 characters
+	WriteKeywords(words []string) error
+
+	WriteMaskPosition(maskpos *types.MaskPosition) error
+
+	WriteThumbnailStorage(path string) error
+
+	WriteThumbnailTelegram(thumbnailID string) error
+
+	WriteThumbnailInternet(url string) error
+
+	WriteThumbnailFormat(format string) error
+
+	WriteGiftID(giftID string) error
+
+	WriteTextParseMode(parsemode string) error
+
+	WriteTextEntities(entities []*types.MessageEntity) error
+}
+
+type IForum interface {
+	// Topic name, 1-128 characters
+	WriteName(name string) error
+
+	// Color of the topic icon in RGB format. Currently, must be one of 7322096 (0x6FB9F0), 16766590
+	// (0xFFD67E), 13338331 (0xCB86DB), 9367192 (0x8EEE98), 16749490 (0xFF93B2), or 16478047 (0xFB6F5F)
+	WriteIconColor(color int) error
+
+	WriteIconEmojiID(emojiID string) error
+}
+
+type IBot interface {
+	// Recieves a slice of bot commands to be set as the list of the bot's commands. At most 100 commands can be specified.
+	WriteCommands(commands []*types.BotCommand) error
+
+	WriteScope(scope *types.BotCommandScope) error
+
+	// Recieves a two-letter ISO 639-1 language code.
+	WriteLanguage(lang string) error
+
+	// New bot name; 0-64 characters. Pass an empty string to remove the dedicated name for the given language.
+	WriteName(name string) error
+
+	// New bot description; 0-512 characters. Pass an empty string to remove the dedicated description for the given language.
+	WriteDescription(description string) error
+
+	// New short description for the bot; 0-120 characters. Pass an empty string to remove the dedicated short description for the given language.
+	WriteShortDescription(description string) error
+
+	WriteMenuButton(button *types.MenuButton) error
+
+	WriteRights(rights *types.ChatAdministratorRights) error
+
+	WriteForChannels() error
+}
 
 type IParameters interface {
 	// Doesn't revieve anything. If the function was called, the message you send to a client will be gotten without a notification
@@ -450,6 +523,22 @@ type IParameters interface {
 	// New custom title for the administrator; 0-16 characters, emoji are not allowed
 	WriteCustomTitle(title string) error
 
+	WriteUserID(userID int) error
+
+	// 	Unique identifier for the query to be answered
+	WriteCallBackQueryID(queryID string) error
+
+	// An alert will be shown by the client instead of a notification at the top of the chat screen
+	WriteShowAlert() error
+
+	WriteURL(url string) error
+
+	// The maximum amount of time in seconds that the result of the callback query may be cached
+	// client-side. Telegram apps will support caching starting in version 3.14.
+	WriteCacheTime(time int) error
+
+	WriteInlineMessageID(messageID string) error
+
 	// You can call this function after calling Send(). It returns you a structure with some data about the user you just sent a message to
 	GetResponse() types.User
 
@@ -480,6 +569,12 @@ type IChat interface {
 	WriteFromChatName(name string) error
 
 	WriteSenderChatID(chatID int) error
+
+	// New chat title, 1-128 characters
+	WriteTitle(title string) error
+
+	// New chat description, 0-255 characters
+	WriteDescription(description string) error
 
 	// You can call this function after calling Send(). It returns you a structure with some data about the chat you just sent a message to
 	GetResponse() types.Chat

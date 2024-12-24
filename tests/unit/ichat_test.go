@@ -1,6 +1,7 @@
 package unit
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/l1qwie/Fmtogram/formatter"
@@ -59,6 +60,16 @@ func putChatWriteSenderChatID(chtc chTestContainer, ch formatter.IChat, c *chatT
 	c.integer = chtc.inputInt[i]
 }
 
+func putChatWriteTitle(chtc chTestContainer, ch formatter.IChat, c *chatT, i int) {
+	c.testedFunc = ch.WriteTitle
+	c.str = chtc.inputStr[i]
+}
+
+func putChatWriteDescription(chtc chTestContainer, ch formatter.IChat, c *chatT, i int) {
+	c.testedFunc = ch.WriteDescription
+	c.str = chtc.inputStr[i]
+}
+
 func (chtc *chTestContainer) writeBusinessConnectionID() {
 	chtc.name = "(IChat).WriteBusinessConnectionID()"
 	chtc.inputStr = []string{"iljksasdkljaskljd", "", "1203891o3l1k", "as;'das;'d;'asd;'"}
@@ -111,6 +122,24 @@ func (chtc *chTestContainer) writeSenderChatID() {
 	chtc.codeErr = []string{"", "20", "", "10"}
 	chtc.amount, chtc.until = 4, 2
 	chtc.buildF = putChatWriteSenderChatID
+}
+
+func (chtc *chTestContainer) writeTitle() {
+	chtc.name = "(IChat).WriteTitle()"
+	chtc.inputStr = []string{"Name", "", "y", strings.Repeat("u", 128), strings.Repeat("i", 129), ":noname", "something like a name"}
+	chtc.isExpectedErr = []bool{false, true, false, false, true, false, true}
+	chtc.codeErr = []string{"", "20", "", "", "20", "", "10"}
+	chtc.amount, chtc.until = 7, 5
+	chtc.buildF = putChatWriteTitle
+}
+
+func (chtc *chTestContainer) writeDescription() {
+	chtc.name = "(IChat).WriteDescription()"
+	chtc.inputStr = []string{"Description", "", "y", strings.Repeat("u", 255), strings.Repeat("i", 256), ":noname", "something like a name"}
+	chtc.isExpectedErr = []bool{false, false, false, false, true, false, true}
+	chtc.codeErr = []string{"", "", "", "", "20", "", "10"}
+	chtc.amount, chtc.until = 7, 5
+	chtc.buildF = putChatWriteDescription
 }
 
 func (ch *chatT) startTest(part string, i int, t *testing.T) {
@@ -194,6 +223,20 @@ func TestChatWriteFromChatName(t *testing.T) {
 func TestChatWriteSenderChatID(t *testing.T) {
 	chtc := new(chTestContainer)
 	chtc.writeSenderChatID()
+	msg := formatter.CreateEmpltyMessage()
+	chtc.mainLogic(msg, t)
+}
+
+func TestChatWriteTitle(t *testing.T) {
+	chtc := new(chTestContainer)
+	chtc.writeTitle()
+	msg := formatter.CreateEmpltyMessage()
+	chtc.mainLogic(msg, t)
+}
+
+func TestChatWriteDescription(t *testing.T) {
+	chtc := new(chTestContainer)
+	chtc.writeDescription()
 	msg := formatter.CreateEmpltyMessage()
 	chtc.mainLogic(msg, t)
 }

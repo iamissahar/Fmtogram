@@ -196,8 +196,37 @@ func putParamWriteAdministratorRights(prmtc prmTestContainer, prm formatter.IPar
 	p.adminrights = prmtc.inputAdmin[i]
 }
 
-func WriteCustomTitle(prmtc prmTestContainer, prm formatter.IParameters, p *paramsT, i int) {
+func putParamWriteCustomTitle(prmtc prmTestContainer, prm formatter.IParameters, p *paramsT, i int) {
 	p.testedFunc = prm.WriteCustomTitle
+	p.str = prmtc.inputStr[i]
+}
+
+func putParamWriteUserID(prmtc prmTestContainer, prm formatter.IParameters, p *paramsT, i int) {
+	p.testedFunc = prm.WriteUserID
+	p.integer = prmtc.inputInt[i]
+}
+
+func putParamWriteCallBackQueryID(prmtc prmTestContainer, prm formatter.IParameters, p *paramsT, i int) {
+	p.testedFunc = prm.WriteCallBackQueryID
+	p.str = prmtc.inputStr[i]
+}
+
+func putParamWriteShowAlert(prmtc prmTestContainer, prm formatter.IParameters, p *paramsT, i int) {
+	p.testedFunc = prm.WriteShowAlert
+}
+
+func putParamWriteURL(prmtc prmTestContainer, prm formatter.IParameters, p *paramsT, i int) {
+	p.testedFunc = prm.WriteURL
+	p.str = prmtc.inputStr[i]
+}
+
+func putParamWriteCacheTime(prmtc prmTestContainer, prm formatter.IParameters, p *paramsT, i int) {
+	p.testedFunc = prm.WriteCacheTime
+	p.integer = prmtc.inputInt[i]
+}
+
+func putParamWriteInlineMessageID(prmtc prmTestContainer, prm formatter.IParameters, p *paramsT, i int) {
+	p.testedFunc = prm.WriteInlineMessageID
 	p.str = prmtc.inputStr[i]
 }
 
@@ -539,7 +568,60 @@ func (prmtc *prmTestContainer) writeCustomTitle() {
 	prmtc.isExpectedErr = []bool{false, true, false, false, true, false, true}
 	prmtc.codeErr = []string{"", "20", "", "", "20", "", "10"}
 	prmtc.amount, prmtc.until = 7, 5
-	prmtc.buildF = WriteCustomTitle
+	prmtc.buildF = putParamWriteCustomTitle
+}
+
+func (prmtc *prmTestContainer) writeUserID() {
+	prmtc.name = "(IParameters).WriteUserID"
+	prmtc.inputInt = []int{231, 0, 999, 1231}
+	prmtc.isExpectedErr = []bool{false, true, false, true}
+	prmtc.codeErr = []string{"", "20", "", "10"}
+	prmtc.amount, prmtc.until = 4, 2
+	prmtc.buildF = putParamWriteUserID
+}
+
+func (prmtc *prmTestContainer) writeCallBackQueryID() {
+	prmtc.name = "(IParameters).WriteCallBackQueryID"
+	prmtc.inputStr = []string{"kl;asdok-", "", "0-1230-1", "23828913819"}
+	prmtc.isExpectedErr = []bool{false, true, false, true}
+	prmtc.codeErr = []string{"", "20", "", "10"}
+	prmtc.amount, prmtc.until = 4, 2
+	prmtc.buildF = putParamWriteCallBackQueryID
+}
+
+func (prmtc *prmTestContainer) writeShowAlert() {
+	prmtc.name = "(IParameters).WriteShowAlert"
+	prmtc.isExpectedErr = []bool{false, false, true}
+	prmtc.codeErr = []string{"", "", "10"}
+	prmtc.amount, prmtc.until = 3, 1
+	prmtc.buildF = putParamWriteShowAlert
+}
+
+func (prmtc *prmTestContainer) writeURL() {
+	prmtc.name = "(IParameters).WriteURL"
+	prmtc.inputStr = []string{"kl;asdok-", "", "0-1230-1", "23828913819"}
+	prmtc.isExpectedErr = []bool{false, true, false, true}
+	prmtc.codeErr = []string{"", "20", "", "10"}
+	prmtc.amount, prmtc.until = 4, 2
+	prmtc.buildF = putParamWriteURL
+}
+
+func (prmtc *prmTestContainer) writeCacheTime() {
+	prmtc.name = "(IParameters).WriteCacheTime"
+	prmtc.inputInt = []int{231, 0, 999, 1231}
+	prmtc.isExpectedErr = []bool{false, true, false, true}
+	prmtc.codeErr = []string{"", "20", "", "10"}
+	prmtc.amount, prmtc.until = 4, 2
+	prmtc.buildF = putParamWriteCacheTime
+}
+
+func (prmtc *prmTestContainer) writeInlineMessageID() {
+	prmtc.name = "(IParameters).WriteInlineMessageID"
+	prmtc.inputStr = []string{"kl;asdok-", "", "0-1230-1", "23828913819"}
+	prmtc.isExpectedErr = []bool{false, true, false, true}
+	prmtc.codeErr = []string{"", "20", "", "10"}
+	prmtc.amount, prmtc.until = 4, 2
+	prmtc.buildF = putParamWriteInlineMessageID
 }
 
 func (prm *paramsT) startTest(part string, i int, t *testing.T) {
@@ -828,6 +910,48 @@ func TestParamWriteAdministratorRights(t *testing.T) {
 func TestParamWriteCustomTitle(t *testing.T) {
 	prmtc := new(prmTestContainer)
 	prmtc.writeCustomTitle()
+	msg := formatter.CreateEmpltyMessage()
+	mainParametersLogic(msg, *prmtc, t)
+}
+
+func TestParamWriteUserID(t *testing.T) {
+	prmtc := new(prmTestContainer)
+	prmtc.writeUserID()
+	msg := formatter.CreateEmpltyMessage()
+	mainParametersLogic(msg, *prmtc, t)
+}
+
+func TestParamWriteCallBackQueryID(t *testing.T) {
+	prmtc := new(prmTestContainer)
+	prmtc.writeCallBackQueryID()
+	msg := formatter.CreateEmpltyMessage()
+	mainParametersLogic(msg, *prmtc, t)
+}
+
+func TestParamWriteShowAlert(t *testing.T) {
+	prmtc := new(prmTestContainer)
+	prmtc.writeShowAlert()
+	msg := formatter.CreateEmpltyMessage()
+	mainParametersLogic(msg, *prmtc, t)
+}
+
+func TestParamWriteURL(t *testing.T) {
+	prmtc := new(prmTestContainer)
+	prmtc.writeURL()
+	msg := formatter.CreateEmpltyMessage()
+	mainParametersLogic(msg, *prmtc, t)
+}
+
+func TestParamWriteCacheTime(t *testing.T) {
+	prmtc := new(prmTestContainer)
+	prmtc.writeCacheTime()
+	msg := formatter.CreateEmpltyMessage()
+	mainParametersLogic(msg, *prmtc, t)
+}
+
+func TestParamWriteInlineMessageID(t *testing.T) {
+	prmtc := new(prmTestContainer)
+	prmtc.writeInlineMessageID()
 	msg := formatter.CreateEmpltyMessage()
 	mainParametersLogic(msg, *prmtc, t)
 }

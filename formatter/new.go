@@ -63,6 +63,21 @@ func (msg *Message) NewLink() ILink {
 	return &link{}
 }
 
+func (msg *Message) NewSticker() ISticker {
+	logs.NewInterfaceCreated(interfaceSticker)
+	return &sticker{}
+}
+
+func (msg *Message) NewForum() IForum {
+	logs.NewInterfaceCreated(interfaceForum)
+	return &forum{}
+}
+
+func (msg *Message) NewBot() IBot {
+	logs.NewInterfaceCreated(interfaceBot)
+	return &bot{}
+}
+
 // Creates a new message(inf) stucture and returns an interface with connected functions. This is the only one way to add your data to an object
 func (msg *Message) NewParameters() IParameters {
 	logs.NewInterfaceCreated(interfaceParam)
