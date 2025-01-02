@@ -302,3 +302,9 @@ type reply struct {
 	Selective             bool                     `json:"selective,omitempty"`
 	Remove                bool                     `json:"remove_keyboard,omitempty"`
 }
+
+type inlinemode struct {
+}
+
+type result struct {
+}

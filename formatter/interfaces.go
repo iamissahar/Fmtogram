@@ -424,6 +424,77 @@ type IBot interface {
 	WriteForChannels() error
 }
 
+type IResult interface {
+	WriteCachedAudio(cachedAudio *types.InlineQueryResultCachedAudio) error
+
+	WriteCachedDocuent(cachedDocument *types.InlineQueryResultCachedDocument) error
+
+	WriteCachedGif(cachedGif *types.InlineQueryResultCachedGif) error
+
+	WriteCachedMpeg4Gif(cachedMpeg4Gif *types.InlineQueryResultCachedMpeg4Gif) error
+
+	WriteCachedPhoto(cachedPhoto *types.InlineQueryResultCachedPhoto) error
+
+	WriteCachedSticker(cachedSticker *types.InlineQueryResultCachedSticker) error
+
+	WriteCachedVideo(cachedVideo *types.InlineQueryResultCachedVideo) error
+
+	WriteCachedVoice(cachedVoice *types.InlineQueryResultCachedVoice) error
+
+	WriteArticle(art *types.InlineQueryResultArticle) error
+
+	WriteAudio(ad *types.InlineQueryResultAudio) error
+
+	WriteContact(cont *types.InlineQueryResultContact) error
+
+	WriteGame(game *types.InlineQueryResultGame) error
+
+	WriteDocument(doc *types.InlineQueryResultDocument)
+
+	WriteGif(gif *types.InlineQueryResultGif) error
+
+	WriteLocation(loc *types.InlineQueryResultLocation) error
+
+	WriteMpeg4Gif(mpeg4gif *types.InlineQueryResultMpeg4Gif) error
+
+	WritePhoto(ph *types.InlineQueryResultPhoto) error
+
+	WriteVenue(ven *types.InlineQueryResultVenue) error
+
+	WriteVideo(vd *types.InlineQueryResultVideo) error
+
+	WriteVoice(vc *types.InlineQueryResultVoice) error
+}
+
+type IInlineMode interface {
+	WriteQueryID(queryID string) error
+
+	WriteWebAppQueryID(queryID string) error
+
+	WriteResults() (res IResult, err error)
+
+	WriteCacheTime(time int) error
+
+	WriteIsPersonal() error
+
+	WriteNextOffset(offset string) error
+
+	// Recieves an object that represents a button to be shown above inline query results. You must use exactly one of the optional fields.
+	WriteButton(but *types.InlineQueryResultsButton) error
+
+	WriteAllowUserChats() error
+
+	WriteAllowBotChats() error
+
+	WriteAllowGroupChats() error
+
+	WriteAllowChannelChats() error
+
+	GetSentWebAppMessage() types.SentWebAppMessage
+
+	GetPreparedInlineMessage() types.PreparedInlineMessage
+}
+
 type IParameters interface {
 	// Doesn't revieve anything. If the function was called, the message you send to a client will be gotten without a notification
 	WriteDisableNotification() error

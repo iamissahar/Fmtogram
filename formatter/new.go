@@ -95,14 +95,7 @@ func (msg *Message) NewKeyboard() IKeyboard {
 	return &keyboard{}
 }
 
-// // Creates a new inline-keyboard stucture and returns an interface with connected functions. This is the only one way to add your data to an object
-// func (msg *Message) NewInlineKeyboard() IInline {
-// 	logs.NewInterfaceCreated("Inline Keyboard")
-// 	return &inline{}
-// }
-
-// // Creates a new reply-keyboard stucture and returns an interface with connected functions. This is the only one way to add your data to an object
-// func (msg *Message) NewReplyKeyboard() IReply {
-// 	logs.NewInterfaceCreated("Reply Keyboard")
-// 	return &reply{}
-// }
+func (msg *Message) NewInlineMode() IInlineMode {
+	logs.NewInterfaceCreated(interfaceInlineMode)
+	return &inlinemode{}
+}

@@ -1363,7 +1363,7 @@ func (st *sticker) WriteSetName(name string) error {
 func (st *sticker) WriteStickerStorage(path string) error {
 	var err error
 	if err = checkStringValue(path, st.Sticker); err == nil {
-		if err = st.isCorrectType(); err == nil {
+		if err = st.isCorrectType(path); err == nil {
 			st.Sticker, st.stickerGottenFrom = path, Storage
 			logs.DataWrittenSuccessfully(interfaceSticker, "Sticker From Storage")
 		}
@@ -1489,7 +1489,7 @@ func (st *sticker) WriteStickerType(stickertype string) error {
 			st.StickerType = stickertype
 			logs.DataWrittenSuccessfully(interfaceSticker, "Sticker Type")
 		} else {
-			err = code01()
+			err = code10()
 		}
 	} else {
 		err = code20()
@@ -1511,7 +1511,7 @@ func (st *sticker) WriteNeedsRepainting() error {
 func (st *sticker) WritePosition(pos string) error {
 	var err error
 	p := []rune(pos)
-	if p[0] == '0' {
+	if (len(p) > 0) && (p[0] == '0') {
 		if st.Position == "" {
 			st.Position = pos
 			logs.DataWrittenSuccessfully(interfaceSticker, "Position")
@@ -1573,7 +1573,7 @@ func (st *sticker) WriteMaskPosition(maskpos *types.MaskPosition) error {
 func (st *sticker) WriteThumbnailStorage(path string) error {
 	var err error
 	if err = checkStringValue(path, st.Thumbnail); err == nil {
-		if err = st.isThumbnailCorrectType(); err == nil {
+		if err = st.isThumbnailCorrectType(path); err == nil {
 			st.Thumbnail, st.thumbnailGottenFrom = path, Storage
 			logs.DataWrittenSuccessfully(interfaceSticker, "Thumbnail From Storage")
 		}
@@ -2934,4 +2934,143 @@ func (frp *forcereply) WriteSelective() error {
 		err = code10()
 	}
 	return err
+}
+
+func (in *inlinemode) WriteQueryID(queryID string) error {
+	var err error
+	if err = checkStringValue(queryID, in.QueryID); err == nil {
+		in.QueryID = queryID
+		logs.DataWrittenSuccessfully(interfaceInlineMode, "Query ID")
+	}
+	return err
+}
+
+func (in *inlinemode) WriteWebAppQueryID(queryID string) error {
+	var err error
+	if err = checkStringValue(queryID, in.WebAppQueryID); err == nil {
+		in.WebAppQueryID = queryID
+		logs.DataWrittenSuccessfully(interfaceInlineMode, "Web App Query ID")
+	}
+	return err
+}
+
+func (in *inlinemode) WriteResults() (IResult, error) {
+	var err error
+	var r IResult
+	if in.Results == nil && in.Result == nil {
+		r = &result{}
+	} else {
+		err = code10()
+	}
+	return r, err
+}
+
+func (in *inlinemode) WriteCacheTime(time int) error {
+	var err error
+	if err = checkIntegerValue(time, in.CacheTime); err == nil {
+		in.CacheTime = time
+		logs.DataWrittenSuccessfully(interfaceInlineMode, "Cache Time")
+	}
+	return err
+}
+
+func (in *inlinemode) WriteIsPersonal() error {
+	var err error
+	if !in.IsPersonal {
+		in.Personal = true
+		logs.SettedParam("Is Personal", interfaceInlineMode, true)
+	} else {
+		err = code10()
+	}
+	return err
+}
+
+func (in *inlinemode) WriteNextOffset(offset string) error {
+	var err error
+	if len(offset) <= 64 {
+		if in.NextOffset == "" {
+			in.NextOffset = offset
+			logs.DataWrittenSuccessfully(interfaceInlineMode, "Next Offset")
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (in *inlinemode) WriteButton(but *types.InlineQueryResultsButton) error {
+	var err error
+	if but != nil {
+		if but.Text != "" {
+			if (but.StartParameter != "") || (but.WebApp != nil) {
+				if in.Button == nil {
+					in.Button = but
+					logs.DataWrittenSuccessfully(interfaceInlineMode, "Button")
+				} else {
+					err = code10()
+				}
+			} else {
+				err = code20()
+			}
+		} else {
+			err = code20()
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (in *inlinemode) WriteAllowUserChats() error {
+	var err error
+	if in.AllowUserChats {
+		in.AllowUserChats = true
+		logs.SettedParam("Allow User Chats", interfaceInlineMode, true)
+	} else {
+		err = code10()
+	}
+	return err
+}
+
+func (in *inlinemode) WriteAllowBotChats() error {
+	var err error
+	if in.AllowBotChats {
+		in.AllowBotChats = true
+		logs.SettedParam("Allow Bot Chats", interfaceInlineMode, true)
+	} else {
+		err = code10()
+	}
+	return err
+}
+
+func (in *inlinemode) WriteAllowGroupChats() error {
+	var err error
+	if in.AllowGroupChats {
+		in.AllowGroupChats = true
+		logs.SettedParam("Allow Group Chats", interfaceInlineMode, true)
+	} else {
+		err = code10()
+	}
+	return err
+}
+
+func (in *inlinemode) WriteAllowChannelChats() error {
+	var err error
+	if in.AllowChannelChats {
+		in.AllowChannelChats = true
+		logs.SettedParam("Allow Channel Chats", interfaceInlineMode, true)
+	} else {
+		err = code10()
+	}
+	return err
+}
+
+func (in *inlinemode) GetSentWebAppMessage() types.SentWebAppMessage {
+	return *in.webAppResponse
+}
+
+func (in *inlinemode) GetPreparedInlineMessage() types.PreparedInlineMessage {
+	return *in.inMessageResponse
 }

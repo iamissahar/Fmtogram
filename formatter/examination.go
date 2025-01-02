@@ -47,6 +47,18 @@ func oggWithOpus(buf []byte) bool {
 	return len(buf) >= 36 && bytes.HasPrefix(buf, []byte("OggS")) && bytes.HasPrefix(buf[28:], []byte("OpusHead"))
 }
 
+func webp(buf []byte) bool {
+	return len(buf) >= 12 && bytes.HasPrefix(buf, []byte("RIFF")) && bytes.HasPrefix(buf[8:], []byte("WEBP"))
+}
+
+func tgs(buf []byte) bool {
+	return len(buf) > 0 && bytes.HasPrefix(buf, []byte{'{', '"'})
+}
+
+func webm(buf []byte) bool {
+	return len(buf) >= 4 && bytes.HasPrefix(buf, []byte{0x1A, 0x45, 0xDF, 0xA3}) // EBML header
+}
+
 func headerGiver(header *[]byte, path string) error {
 	var n int
 	file, err := os.Open(path)
@@ -80,11 +92,39 @@ func (vd *video) isCorrectType(path string) error {
 	return err
 }
 
+func (st *sticker) isCorrectType(path string) error {
+	var err error
+	buf := make([]byte, 12)
+	if err = headerGiver(&buf, path); err == nil {
+		if !webp(buf) && !webm(buf) && !tgs(buf) {
+			err = code12()
+		}
+	}
+	return err
+}
+
 func isThumbnailCorrectType(path string) error {
 	var err error
 	buf := make([]byte, 8)
 	if err = headerGiver(&buf, path); err == nil {
 		if !jpeg(buf) {
+			err = code12()
+		}
+	}
+	return err
+}
+
+func (st *sticker) isThumbnailCorrectType(path string) error {
+	var err error
+	buf := make([]byte, 12)
+	if err = headerGiver(&buf, path); err == nil {
+		if png(buf) || webp(buf) {
+			st.thumbnailType = ".WEBP/.PNG"
+		} else if tgs(buf) {
+			st.thumbnailType = ".TGS"
+		} else if webm(buf) {
+			st.thumbnailType = ".WEBM"
+		} else {
 			err = code12()
 		}
 	}

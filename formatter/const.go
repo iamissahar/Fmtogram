@@ -36,6 +36,7 @@ const (
 	button                string = "Button"
 	inbtn                 string = "Inline Button"
 	rpbtn                 string = "Reply Button"
+	interfaceInlineMode   string = "IInlineMode"
 	checkString           int    = -1
 	checkArray            int    = -2
 	checkBool             int    = -3
