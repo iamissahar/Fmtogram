@@ -427,7 +427,7 @@ type IBot interface {
 type IResult interface {
 	WriteCachedAudio(cachedAudio *types.InlineQueryResultCachedAudio) error
 
-	WriteCachedDocuent(cachedDocument *types.InlineQueryResultCachedDocument) error
+	WriteCachedDocument(cachedDocument *types.InlineQueryResultCachedDocument) error
 
 	WriteCachedGif(cachedGif *types.InlineQueryResultCachedGif) error
 
@@ -449,7 +449,7 @@ type IResult interface {
 
 	WriteGame(game *types.InlineQueryResultGame) error
 
-	WriteDocument(doc *types.InlineQueryResultDocument)
+	WriteDocument(doc *types.InlineQueryResultDocument) error
 
 	WriteGif(gif *types.InlineQueryResultGif) error
 
@@ -471,7 +471,9 @@ type IInlineMode interface {
 
 	WriteWebAppQueryID(queryID string) error
 
-	WriteResults() (res IResult, err error)
+	WriteResult() (res IResult, err error)
+
+	WriteResults(length int) (res []IResult, err error)
 
 	WriteCacheTime(time int) error
 

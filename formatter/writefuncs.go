@@ -2954,13 +2954,33 @@ func (in *inlinemode) WriteWebAppQueryID(queryID string) error {
 	return err
 }
 
-func (in *inlinemode) WriteResults() (IResult, error) {
+func (in *inlinemode) WriteResult() (IResult, error) {
 	var err error
 	var r IResult
 	if in.Results == nil && in.Result == nil {
 		r = &result{}
+		in.Result = r
 	} else {
 		err = code10()
+	}
+	return r, err
+}
+
+func (in *inlinemode) WriteResults(length int) ([]IResult, error) {
+	var err error
+	var r []IResult
+	if length > 0 {
+		if in.Results == nil && in.Result == nil {
+			r = make([]IResult, length)
+			for i := range r {
+				r[i] = &result{}
+			}
+			in.Results = r
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
 	}
 	return r, err
 }
@@ -2977,7 +2997,7 @@ func (in *inlinemode) WriteCacheTime(time int) error {
 func (in *inlinemode) WriteIsPersonal() error {
 	var err error
 	if !in.IsPersonal {
-		in.Personal = true
+		in.IsPersonal = true
 		logs.SettedParam("Is Personal", interfaceInlineMode, true)
 	} else {
 		err = code10()
@@ -3025,7 +3045,7 @@ func (in *inlinemode) WriteButton(but *types.InlineQueryResultsButton) error {
 
 func (in *inlinemode) WriteAllowUserChats() error {
 	var err error
-	if in.AllowUserChats {
+	if !in.AllowUserChats {
 		in.AllowUserChats = true
 		logs.SettedParam("Allow User Chats", interfaceInlineMode, true)
 	} else {
@@ -3036,7 +3056,7 @@ func (in *inlinemode) WriteAllowUserChats() error {
 
 func (in *inlinemode) WriteAllowBotChats() error {
 	var err error
-	if in.AllowBotChats {
+	if !in.AllowBotChats {
 		in.AllowBotChats = true
 		logs.SettedParam("Allow Bot Chats", interfaceInlineMode, true)
 	} else {
@@ -3047,7 +3067,7 @@ func (in *inlinemode) WriteAllowBotChats() error {
 
 func (in *inlinemode) WriteAllowGroupChats() error {
 	var err error
-	if in.AllowGroupChats {
+	if !in.AllowGroupChats {
 		in.AllowGroupChats = true
 		logs.SettedParam("Allow Group Chats", interfaceInlineMode, true)
 	} else {
@@ -3058,7 +3078,7 @@ func (in *inlinemode) WriteAllowGroupChats() error {
 
 func (in *inlinemode) WriteAllowChannelChats() error {
 	var err error
-	if in.AllowChannelChats {
+	if !in.AllowChannelChats {
 		in.AllowChannelChats = true
 		logs.SettedParam("Allow Channel Chats", interfaceInlineMode, true)
 	} else {
@@ -3073,4 +3093,304 @@ func (in *inlinemode) GetSentWebAppMessage() types.SentWebAppMessage {
 
 func (in *inlinemode) GetPreparedInlineMessage() types.PreparedInlineMessage {
 	return *in.inMessageResponse
+}
+
+func (r *result) WriteCachedAudio(cachedAudio *types.InlineQueryResultCachedAudio) error {
+	var err error
+	if cachedAudio != nil {
+		if r.CachedAudio == nil {
+			r.CachedAudio = cachedAudio
+			logs.DataWrittenSuccessfully(interfaceResult, "Cached Audio")
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (r *result) WriteCachedDocument(cachedDocument *types.InlineQueryResultCachedDocument) error {
+	var err error
+	if cachedDocument != nil {
+		if r.CachedDocument == nil {
+			r.CachedDocument = cachedDocument
+			logs.DataWrittenSuccessfully(interfaceResult, "Cached Document")
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (r *result) WriteCachedGif(cachedGif *types.InlineQueryResultCachedGif) error {
+	var err error
+	if cachedGif != nil {
+		if r.CachedGif == nil {
+			r.CachedGif = cachedGif
+			logs.DataWrittenSuccessfully(interfaceResult, "Cached Gif")
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (r *result) WriteCachedMpeg4Gif(cachedMpeg4Gif *types.InlineQueryResultCachedMpeg4Gif) error {
+	var err error
+	if cachedMpeg4Gif != nil {
+		if r.CachedMpeg4Gif == nil {
+			r.CachedMpeg4Gif = cachedMpeg4Gif
+			logs.DataWrittenSuccessfully(interfaceResult, "Cached Mpeg4 Gif")
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (r *result) WriteCachedPhoto(cachedPhoto *types.InlineQueryResultCachedPhoto) error {
+	var err error
+	if cachedPhoto != nil {
+		if r.CachedPhoto == nil {
+			r.CachedPhoto = cachedPhoto
+			logs.DataWrittenSuccessfully(interfaceResult, "Cached Photo")
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (r *result) WriteCachedSticker(cachedSticker *types.InlineQueryResultCachedSticker) error {
+	var err error
+	if cachedSticker != nil {
+		if r.CachedSticker == nil {
+			r.CachedSticker = cachedSticker
+			logs.DataWrittenSuccessfully(interfaceResult, "Cached Sticker")
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (r *result) WriteCachedVideo(cachedVideo *types.InlineQueryResultCachedVideo) error {
+	var err error
+	if cachedVideo != nil {
+		if r.CachedVideo == nil {
+			r.CachedVideo = cachedVideo
+			logs.DataWrittenSuccessfully(interfaceResult, "Cached Video")
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (r *result) WriteCachedVoice(cachedVoice *types.InlineQueryResultCachedVoice) error {
+	var err error
+	if cachedVoice != nil {
+		if r.CachedVoice == nil {
+			r.CachedVoice = cachedVoice
+			logs.DataWrittenSuccessfully(interfaceResult, "Cached Voice")
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (r *result) WriteArticle(art *types.InlineQueryResultArticle) error {
+	var err error
+	if art != nil {
+		if r.Article == nil {
+			r.Article = art
+			logs.DataWrittenSuccessfully(interfaceResult, "Article")
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (r *result) WriteAudio(ad *types.InlineQueryResultAudio) error {
+	var err error
+	if ad != nil {
+		if r.Audio == nil {
+			r.Audio = ad
+			logs.DataWrittenSuccessfully(interfaceResult, "Audio")
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (r *result) WriteContact(cont *types.InlineQueryResultContact) error {
+	var err error
+	if cont != nil {
+		if r.Contact == nil {
+			r.Contact = cont
+			logs.DataWrittenSuccessfully(interfaceResult, "Contact")
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (r *result) WriteGame(game *types.InlineQueryResultGame) error {
+	var err error
+	if game != nil {
+		if r.Game == nil {
+			r.Game = game
+			logs.DataWrittenSuccessfully(interfaceResult, "Game")
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (r *result) WriteDocument(doc *types.InlineQueryResultDocument) error {
+	var err error
+	if doc != nil {
+		if r.Document == nil {
+			r.Document = doc
+			logs.DataWrittenSuccessfully(interfaceResult, "Document")
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (r *result) WriteGif(gif *types.InlineQueryResultGif) error {
+	var err error
+	if gif != nil {
+		if r.Gif == nil {
+			r.Gif = gif
+			logs.DataWrittenSuccessfully(interfaceResult, "Gif")
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (r *result) WriteLocation(loc *types.InlineQueryResultLocation) error {
+	var err error
+	if loc != nil {
+		if r.Location == nil {
+			r.Location = loc
+			logs.DataWrittenSuccessfully(interfaceResult, "Location")
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (r *result) WriteMpeg4Gif(mpeg4gif *types.InlineQueryResultMpeg4Gif) error {
+	var err error
+	if mpeg4gif != nil {
+		if r.Mpeg4Gif == nil {
+			r.Mpeg4Gif = mpeg4gif
+			logs.DataWrittenSuccessfully(interfaceResult, "Mpeg4 Gif")
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (r *result) WritePhoto(ph *types.InlineQueryResultPhoto) error {
+	var err error
+	if ph != nil {
+		if r.Photo == nil {
+			r.Photo = ph
+			logs.DataWrittenSuccessfully(interfaceResult, "Photo")
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (r *result) WriteVenue(ven *types.InlineQueryResultVenue) error {
+	var err error
+	if ven != nil {
+		if r.Venue == nil {
+			r.Venue = ven
+			logs.DataWrittenSuccessfully(interfaceResult, "Venue")
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (r *result) WriteVideo(vd *types.InlineQueryResultVideo) error {
+	var err error
+	if vd != nil {
+		if r.Video == nil {
+			r.Video = vd
+			logs.DataWrittenSuccessfully(interfaceResult, "Video")
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (r *result) WriteVoice(vc *types.InlineQueryResultVoice) error {
+	var err error
+	if vc != nil {
+		if r.Voice == nil {
+			r.Voice = vc
+			logs.DataWrittenSuccessfully(interfaceResult, "Voice")
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
+	}
+	return err
 }

@@ -304,7 +304,41 @@ type reply struct {
 }
 
 type inlinemode struct {
+	QueryID           string                          `json:"inline_query_id"`
+	WebAppQueryID     string                          `json:"web_app_query_id"`
+	Result            IResult                         `json:"result"`
+	Results           []IResult                       `json:"results"`
+	CacheTime         int                             `json:"cache_time"`
+	IsPersonal        bool                            `json:"is_personal"`
+	NextOffset        string                          `json:"next_offset"`
+	Button            *types.InlineQueryResultsButton `json:"button"`
+	AllowUserChats    bool                            `json:"allow_user_chats"`
+	AllowBotChats     bool                            `json:"allow_bot_chats"`
+	AllowGroupChats   bool                            `json:"allow_group_chats"`
+	AllowChannelChats bool                            `json:"allow_channel_chats"`
+	webAppResponse    *types.SentWebAppMessage
+	inMessageResponse *types.PreparedInlineMessage
 }
 
 type result struct {
+	CachedAudio    *types.InlineQueryResultCachedAudio
+	CachedDocument *types.InlineQueryResultCachedDocument
+	CachedGif      *types.InlineQueryResultCachedGif
+	CachedMpeg4Gif *types.InlineQueryResultCachedMpeg4Gif
+	CachedPhoto    *types.InlineQueryResultCachedPhoto
+	CachedSticker  *types.InlineQueryResultCachedSticker
+	CachedVideo    *types.InlineQueryResultCachedVideo
+	CachedVoice    *types.InlineQueryResultCachedVoice
+	Article        *types.InlineQueryResultArticle
+	Audio          *types.InlineQueryResultAudio
+	Contact        *types.InlineQueryResultContact
+	Game           *types.InlineQueryResultGame
+	Document       *types.InlineQueryResultDocument
+	Gif            *types.InlineQueryResultGif
+	Location       *types.InlineQueryResultLocation
+	Mpeg4Gif       *types.InlineQueryResultMpeg4Gif
+	Photo          *types.InlineQueryResultPhoto
+	Venue          *types.InlineQueryResultVenue
+	Video          *types.InlineQueryResultVideo
+	Voice          *types.InlineQueryResultVoice
 }
