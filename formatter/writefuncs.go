@@ -1323,7 +1323,7 @@ func (l *link) WriteIniveLink(link string) error {
 
 func (l *link) WriteSubscriptionPeriod(period int) error {
 	var err error
-	if period == 2592000 {
+	if period == Month {
 		if l.SubscriptionPeriod == 0 {
 			l.SubscriptionPeriod = period
 			logs.DataWrittenSuccessfully(interfaceLink, "Subscription Period")
@@ -3391,6 +3391,403 @@ func (r *result) WriteVoice(vc *types.InlineQueryResultVoice) error {
 		}
 	} else {
 		err = code20()
+	}
+	return err
+}
+
+func (p *payment) WriteTitle(title string) error {
+	var err error
+	t := len([]rune(title))
+	if t > 0 && t <= 32 {
+		if p.Title == "" {
+			p.Title = title
+			logs.DataWrittenSuccessfully(interfacePayment, "Title")
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (p *payment) WriteDescription(description string) error {
+	var err error
+	t := len([]rune(description))
+	if t > 0 && t <= 255 {
+		if p.Description == "" {
+			p.Description = description
+			logs.DataWrittenSuccessfully(interfacePayment, "Description")
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (p *payment) WritePayload(payload string) error {
+	var err error
+	t := len([]byte(payload))
+	if t > 0 && t <= 128 {
+		if p.Payload == "" {
+			p.Payload = payload
+			logs.DataWrittenSuccessfully(interfacePayment, "Payload")
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (p *payment) WriteProviderToken(token string) error {
+	var err error
+	if err = checkStringValue(token, p.ProviderToken); err == nil {
+		p.ProviderToken = token
+		logs.DataWrittenSuccessfully(interfacePayment, "Provider Token")
+	}
+	return err
+}
+
+func (p *payment) WriteCurrency(currency string) error {
+	var err error
+	if _, ok := Currencies[currency]; ok {
+		if (currency == telegramStars && (p.Prices == nil || p.Prices[0].Amount <= 2500)) || currency != telegramStars {
+			if p.Currency == "" {
+				p.Currency = currency
+				logs.DataWrittenSuccessfully(interfacePayment, "Currency")
+			} else {
+				err = code10()
+			}
+		} else {
+			err = code20()
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (p *payment) WritePrices(prices []*types.LabeledPrice) error {
+	var err error
+	if len(prices) != 0 {
+
+		for i := 0; (i < len(prices)) && (err == nil); i++ {
+			if prices[i] == nil {
+				err = code5()
+			} else {
+				if prices[i].Label == telegramStars && prices[i].Amount > 2500 {
+					err = code20()
+				} else if prices[i].Label != telegramStars && p.SubscriptionPeriod != 0 {
+					err = code20()
+				}
+			}
+		}
+
+		if err == nil {
+			if len(p.Prices) == 0 {
+				p.Prices = prices
+				logs.DataWrittenSuccessfully(interfacePayment, "Prices")
+			} else {
+				err = code10()
+			}
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (p *payment) WriteStartParameter(prm string) error {
+	var err error
+	if err = checkStringValue(prm, p.StartParameter); err == nil {
+		p.StartParameter = prm
+		logs.DataWrittenSuccessfully(interfacePayment, "Start Parameter")
+	}
+	return err
+}
+
+func (p *payment) WriteProviderData(data string) error {
+	var err error
+	if err = checkStringValue(data, p.ProviderData); err == nil {
+		p.ProviderData = data
+		logs.DataWrittenSuccessfully(interfacePayment, "Provider Data")
+	}
+	return err
+}
+
+func (p *payment) WriteSubscriptionPeriod(period int) error {
+	var err error
+	if (p.Currency == "" || p.Currency == telegramStars) && (p.Prices == nil || p.Prices[0].Amount <= 2500) && period == Month {
+		if p.SubscriptionPeriod == 0 {
+			p.SubscriptionPeriod = period
+			logs.DataWrittenSuccessfully(interfacePayment, "Subscription Period")
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (p *payment) WriteMaxTipAmount(amount int) error {
+	var err error
+	if p.Currency != telegramStars && p.SubscriptionPeriod == 0 {
+		if amount > 0 {
+			if p.MaxTipAmount == 0 {
+				p.MaxTipAmount = amount
+				logs.DataWrittenSuccessfully(interfacePayment, "Max Tip Amount")
+			} else {
+				err = code10()
+			}
+		} else {
+			err = code20()
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (p *payment) WriteSuggestedTipAmounts(amounts []int) error {
+	var err error
+	if len(amounts) > 0 && len(amounts) <= 4 {
+		for i := 0; i < len(amounts) && err == nil; i++ {
+			if amounts[i] < 1 {
+				err = code5()
+			}
+		}
+		if err == nil {
+			if p.SuggestedTipAmounts == nil {
+				p.SuggestedTipAmounts = amounts
+				logs.DataWrittenSuccessfully(interfacePayment, "Suggested Tip Amounts")
+			} else {
+				err = code10()
+			}
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (p *payment) WritePhotoUrl(url string) error {
+	var err error
+	if err = checkStringValue(url, p.PhotoUrl); err == nil {
+		p.PhotoUrl = url
+		logs.DataWrittenSuccessfully(interfacePayment, "Photo Url")
+	}
+	return err
+}
+
+func (p *payment) WritePhotoSize(size int) error {
+	var err error
+	if err = checkIntegerValue(size, p.PhotoSize); err == nil {
+		p.PhotoSize = size
+		logs.DataWrittenSuccessfully(interfacePayment, "Photo Size")
+	}
+	return err
+}
+
+func (p *payment) WritePhotoWidth(width int) error {
+	var err error
+	if err = checkIntegerValue(width, p.PhotoWidth); err == nil {
+		p.PhotoWidth = width
+		logs.DataWrittenSuccessfully(interfacePayment, "Photo Width")
+	}
+	return err
+}
+
+func (p *payment) WritePhotoHeight(height int) error {
+	var err error
+	if err = checkIntegerValue(height, p.PhotoHeight); err == nil {
+		p.PhotoHeight = height
+		logs.DataWrittenSuccessfully(interfacePayment, "Photo Height")
+	}
+	return err
+}
+
+func (p *payment) WriteNeedName() error {
+	var err error
+	if !p.NeedName {
+		p.NeedName = true
+		logs.SettedParam("Need Name", interfacePayment, true)
+	} else {
+		err = code10()
+	}
+	return err
+}
+
+func (p *payment) WriteNeedPhoneNumber() error {
+	var err error
+	if !p.NeedPhoneNumber {
+		p.NeedPhoneNumber = true
+		logs.SettedParam("Need Phone Number", interfacePayment, true)
+	} else {
+		err = code10()
+	}
+	return err
+}
+
+func (p *payment) WriteNeedEmail() error {
+	var err error
+	if !p.NeedEmail {
+		p.NeedEmail = true
+		logs.SettedParam("Need Email", interfacePayment, true)
+	} else {
+		err = code10()
+	}
+	return err
+}
+
+func (p *payment) WriteNeedShippingAddress() error {
+	var err error
+	if !p.NeedShippingAddress {
+		p.NeedShippingAddress = true
+		logs.SettedParam("Need Shipping Address", interfacePayment, true)
+	} else {
+		err = code10()
+	}
+	return err
+}
+
+func (p *payment) WriteSendPhoneNumberToProvider() error {
+	var err error
+	if !p.SendPhoneNumberToProvider {
+		p.SendPhoneNumberToProvider = true
+		logs.SettedParam("Send Phone Number To Provider", interfacePayment, true)
+	} else {
+		err = code10()
+	}
+	return err
+}
+
+func (p *payment) WriteSendEmailToProvider() error {
+	var err error
+	if !p.SendEmailToProvider {
+		p.SendEmailToProvider = true
+		logs.SettedParam("Send Email To Provider", interfacePayment, true)
+	} else {
+		err = code10()
+	}
+	return err
+}
+
+func (p *payment) WriteIsFlexible() error {
+	var err error
+	if !p.IsFlexible {
+		p.IsFlexible = true
+		logs.SettedParam("Is Flexible", interfacePayment, true)
+	} else {
+		err = code10()
+	}
+	return err
+}
+
+func (p *payment) WriteShippingID(id string) error {
+	var err error
+	if err = checkStringValue(id, p.ShippingID); err == nil {
+		p.ShippingID = id
+		logs.DataWrittenSuccessfully(interfacePayment, "Shipping ID")
+	}
+	return err
+}
+
+func (p *payment) WriteOK() error {
+	var err error
+	if !p.OK {
+		p.OK = true
+		logs.SettedParam("OK", interfacePayment, true)
+	} else {
+		err = code10()
+	}
+	return err
+}
+
+func (p *payment) WriteShippingOptions(options []*types.ShippingOption) error {
+	var err error
+	if options != nil {
+		for i := 0; i < len(options) && err == nil; i++ {
+			if options[i] == nil {
+				err = code5()
+			}
+		}
+		if err == nil {
+			if p.ShippingOptions == nil {
+				p.ShippingOptions = options
+				logs.DataWrittenSuccessfully(interfacePayment, "Shipping Options")
+			} else {
+				err = code10()
+			}
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (p *payment) WriteErrorMessage(msg string) error {
+	var err error
+	if err = checkStringValue(msg, p.ErrorMessage); err == nil {
+		p.ErrorMessage = msg
+		logs.DataWrittenSuccessfully(interfacePayment, "Error Message")
+	}
+	return err
+}
+
+func (p *payment) WritePreCheckoutID(id string) error {
+	var err error
+	if err = checkStringValue(id, p.PreCheckoutID); err == nil {
+		p.PreCheckoutID = id
+		logs.DataWrittenSuccessfully(interfacePayment, "Pre-Checkout ID")
+	}
+	return err
+}
+
+func (p *payment) WriteLimit(limit int) error {
+	var err error
+	if limit > 0 && limit <= 100 {
+		if p.Limit == 0 {
+			p.Limit = limit
+			logs.DataWrittenSuccessfully(interfacePayment, "Limit")
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (p *payment) WriteOffset(offset int) error {
+	var err error
+	if err = checkIntegerValue(offset, p.Offset); err == nil {
+		p.Offset = offset
+		logs.DataWrittenSuccessfully(interfacePayment, "Offset")
+	}
+	return err
+}
+
+func (p *payment) WriteTelegramPaymentChargeID(id string) error {
+	var err error
+	if err = checkStringValue(id, p.TelegramPaymentChargeID); err == nil {
+		p.TelegramPaymentChargeID = id
+		logs.DataWrittenSuccessfully(interfacePayment, "Telegram Payment Charge ID")
+	}
+	return err
+}
+
+func (p *payment) WriteIsCanceled() error {
+	var err error
+	if !p.IsCanceled {
+		p.IsCanceled = true
+		logs.SettedParam("Is Canceled", interfacePayment, true)
+	} else {
+		err = code10()
 	}
 	return err
 }

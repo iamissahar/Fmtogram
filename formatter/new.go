@@ -86,7 +86,7 @@ func (msg *Message) NewParameters() IParameters {
 
 // Creates a new chat stucture and returns an interface with connected functions. This is the only one way to add your data to an object
 func (msg *Message) NewChat() IChat {
-	logs.NewInterfaceCreated("Chat")
+	logs.NewInterfaceCreated(interfaceChat)
 	return &chat{}
 }
 
@@ -98,4 +98,9 @@ func (msg *Message) NewKeyboard() IKeyboard {
 func (msg *Message) NewInlineMode() IInlineMode {
 	logs.NewInterfaceCreated(interfaceInlineMode)
 	return &inlinemode{}
+}
+
+func (msg *Message) NewPayment() IPayment {
+	logs.NewInterfaceCreated(interfacePayment)
+	return &payment{}
 }

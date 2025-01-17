@@ -342,3 +342,37 @@ type result struct {
 	Video          *types.InlineQueryResultVideo
 	Voice          *types.InlineQueryResultVoice
 }
+
+type payment struct {
+	Title                     string                  `json:"title"`
+	Description               string                  `json:"description"`
+	Payload                   string                  `json:"payload"`
+	ProviderToken             string                  `json:"provider_token"`
+	Currency                  string                  `json:"currency"`
+	Prices                    []*types.LabeledPrice   `json:"prices"`
+	MaxTipAmount              int                     `json:"max_tip_amount"`
+	SuggestedTipAmounts       []int                   `json:"suggested_tip_amounts"`
+	StartParameter            string                  `json:"start_parameter"`
+	ProviderData              string                  `json:"provider_data"`
+	PhotoUrl                  string                  `json:"photo_url"`
+	PhotoSize                 int                     `json:"photo_size"`
+	PhotoWidth                int                     `json:"photo_width"`
+	PhotoHeight               int                     `json:"photo_height"`
+	NeedName                  bool                    `json:"need_name"`
+	NeedPhoneNumber           bool                    `json:"need_phone_number"`
+	NeedEmail                 bool                    `json:"need_email"`
+	NeedShippingAddress       bool                    `json:"need_shipping_address"`
+	SendPhoneNumberToProvider bool                    `json:"send_phone_number_to_provider"`
+	SendEmailToProvider       bool                    `json:"send_email_to_provider"`
+	IsFlexible                bool                    `json:"is_flexible"`
+	SubscriptionPeriod        int                     `json:"subscription_period"`
+	ShippingID                string                  `json:"shipping_query_id"`
+	OK                        bool                    `json:"ok"`
+	ShippingOptions           []*types.ShippingOption `json:"shipping_options"`
+	ErrorMessage              string                  `json:"error_message"`
+	PreCheckoutID             string                  `json:"pre_checkout_query_id"`
+	Offset                    int                     `json:"offset"`
+	Limit                     int                     `json:"limit"`
+	TelegramPaymentChargeID   string                  `json:"telegram_payment_charge_id"`
+	IsCanceled                bool                    `json:"is_canceled"`
+}

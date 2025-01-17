@@ -212,3 +212,16 @@ type InputPaidMedia struct {
 	InputPaidMediaPhoto *InputPaidMediaPhoto
 	InputPaidMediaVideo *InputPaidMediaVideo
 }
+
+type Gift struct {
+	ID               string  `json:"id"`
+	Sticker          Sticker `json:"sticker"`
+	StarCount        int     `json:"star_count"`
+	UpgradeStarCount *int    `json:"upgrade_star_count,omitempty"`
+	TotalCount       *int    `json:"total_count,omitempty"`
+	RemainingCount   *int    `json:"remaining_count,omitempty"`
+}
+
+type Gifts struct {
+	G []*Gift `json:"gifts"`
+}

@@ -820,3 +820,70 @@ type IForceReply interface {
 	// to a message in the same chat and forum topic, sender of the original message.
 	WriteSelective() error
 }
+
+type IPayment interface {
+	// 1-32 characters
+	WriteTitle(title string) error
+
+	// 1-255 characters
+	WriteDescription(description string) error
+
+	// Bot-defined invoice payload, 1-128 bytes. This will not be displayed to the user, use it for your internal processes.
+	WritePayload(payload string) error
+
+	WriteProviderToken(token string) error
+
+	WriteCurrency(currency string) error
+
+	WritePrices(prices []*types.LabeledPrice) error
+
+	WriteSubscriptionPeriod(period int) error
+
+	WriteMaxTipAmount(amout int) error
+
+	WriteSuggestedTipAmounts(amounts []int) error
+
+	WriteStartParameter(prm string) error
+
+	WriteProviderData(data string) error
+
+	WritePhotoUrl(url string) error
+
+	WritePhotoSize(size int) error
+
+	WritePhotoWidth(width int) error
+
+	WritePhotoHeight(height int) error
+
+	WriteNeedName() error
+
+	WriteNeedPhoneNumber() error
+
+	WriteNeedEmail() error
+
+	WriteNeedShippingAddress() error
+
+	WriteSendPhoneNumberToProvider() error
+
+	WriteSendEmailToProvider() error
+
+	WriteIsFlexible() error
+
+	WriteShippingID(id string) error
+
+	WriteOK() error
+
+	WriteShippingOptions(options []*types.ShippingOption) error
+
+	WriteErrorMessage(msg string) error
+
+	WritePreCheckoutID(id string) error
+
+	WriteLimit(limit int) error
+
+	WriteOffset(offset int) error
+
+	WriteTelegramPaymentChargeID(id string) error
+
+	WriteIsCanceled() error
+}
