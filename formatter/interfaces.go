@@ -612,6 +612,8 @@ type IParameters interface {
 
 	WriteInlineMessageID(messageID string) error
 
+	WriteErrors(errors []*types.PassportElementError) error
+
 	// You can call this function after calling Send(). It returns you a structure with some data about the user you just sent a message to
 	GetResponse() types.User
 
@@ -886,4 +888,14 @@ type IPayment interface {
 	WriteTelegramPaymentChargeID(id string) error
 
 	WriteIsCanceled() error
+}
+
+type IGame interface {
+	WriteShortName(name string) error
+
+	WriteScore(score int) error
+
+	WriteForce() error
+
+	WriteDisableEditMessage() error
 }

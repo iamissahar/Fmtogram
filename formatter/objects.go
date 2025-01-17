@@ -217,6 +217,7 @@ type information struct {
 	Url                        string                         `json:"url,omitempty"`
 	CacheTime                  int                            `json:"cache_time,omitempty"`
 	InlineMessageID            string                         `json:"inline_message_id,omitempty"`
+	Errors                     []*types.PassportElementError  `json:"errors,omitempty"`
 	response                   types.User
 	responseMessageIDs         []int
 }
@@ -375,4 +376,11 @@ type payment struct {
 	Limit                     int                     `json:"limit"`
 	TelegramPaymentChargeID   string                  `json:"telegram_payment_charge_id"`
 	IsCanceled                bool                    `json:"is_canceled"`
+}
+
+type game struct {
+	ShortName          string `json:"game_short_name,omitempty"`
+	Score              int    `json:"score,omitempty"`
+	Force              bool   `json:"force,omitempty"`
+	DisableEditMessage bool   `json:"disable_edit_message,omitempty"`
 }

@@ -39,6 +39,7 @@ const (
 	interfaceInlineMode   string = "IInlineMode"
 	interfaceResult       string = "IResult"
 	interfacePayment      string = "IPayment"
+	interfaceGame         string = "IGame"
 	checkString           int    = -1
 	checkArray            int    = -2
 	checkBool             int    = -3

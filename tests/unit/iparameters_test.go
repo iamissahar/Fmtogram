@@ -22,6 +22,7 @@ type paramsT struct {
 	reaction      []*types.ReactionType
 	permis        *types.ChatPermissions
 	adminrights   *types.ChatAdministratorRights
+	errors        []*types.PassportElementError
 	testedFunc    interface{}
 	isExpectedErr bool
 	codeErr       string
@@ -39,6 +40,7 @@ type prmTestContainer struct {
 	inputReaction [][]*types.ReactionType
 	inputPermis   []*types.ChatPermissions
 	inputAdmin    []*types.ChatAdministratorRights
+	inputErr      [][]*types.PassportElementError
 	isExpectedErr []bool
 	codeErr       []string
 	amount, until int
@@ -228,6 +230,11 @@ func putParamWriteCacheTime(prmtc prmTestContainer, prm formatter.IParameters, p
 func putParamWriteInlineMessageID(prmtc prmTestContainer, prm formatter.IParameters, p *paramsT, i int) {
 	p.testedFunc = prm.WriteInlineMessageID
 	p.str = prmtc.inputStr[i]
+}
+
+func putParamWriteErrors(prmtc prmTestContainer, prm formatter.IParameters, p *paramsT, i int) {
+	p.testedFunc = prm.WriteErrors
+	p.errors = prmtc.inputErr[i]
 }
 
 func (prmtc *prmTestContainer) writeDisableNotification() {
@@ -624,6 +631,15 @@ func (prmtc *prmTestContainer) writeInlineMessageID() {
 	prmtc.buildF = putParamWriteInlineMessageID
 }
 
+func (prmtc *prmTestContainer) writeErrors() {
+	prmtc.name = "(IParameters).WriteErrors()"
+	prmtc.inputErr = [][]*types.PassportElementError{{{}, {}}, nil, {{}, {}, nil}, {{}, {}}, {{}, {}}}
+	prmtc.isExpectedErr = []bool{false, true, true, false, true}
+	prmtc.codeErr = []string{"", "20", "5", "", "10"}
+	prmtc.amount, prmtc.until = 5, 3
+	prmtc.buildF = putParamWriteErrors
+}
+
 func (prm *paramsT) startTest(part string, i int, t *testing.T) {
 	switch f := prm.testedFunc.(type) {
 	case func(string) error:
@@ -659,6 +675,9 @@ func (prm *paramsT) startTest(part string, i int, t *testing.T) {
 	case func(*types.ChatAdministratorRights) error:
 		printTestLog(part, prm.name, prm.codeErr, prm.adminrights, prm.isExpectedErr, i)
 		checkError(f(prm.adminrights), prm.isExpectedErr, prm.codeErr, t)
+	case func([]*types.PassportElementError) error:
+		printTestLog(part, prm.name, prm.codeErr, prm.errors, prm.isExpectedErr, i)
+		checkError(f(prm.errors), prm.isExpectedErr, prm.codeErr, t)
 	default:
 		t.Fatal("unexpected type of tested function")
 	}
@@ -952,6 +971,13 @@ func TestParamWriteCacheTime(t *testing.T) {
 func TestParamWriteInlineMessageID(t *testing.T) {
 	prmtc := new(prmTestContainer)
 	prmtc.writeInlineMessageID()
+	msg := formatter.CreateEmpltyMessage()
+	mainParametersLogic(msg, *prmtc, t)
+}
+
+func TestParamWriteErrors(t *testing.T) {
+	prmtc := new(prmTestContainer)
+	prmtc.writeErrors()
 	msg := formatter.CreateEmpltyMessage()
 	mainParametersLogic(msg, *prmtc, t)
 }

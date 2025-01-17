@@ -2323,6 +2323,29 @@ func (inf *information) WriteInlineMessageID(messageID string) error {
 	return err
 }
 
+func (inf *information) WriteErrors(errors []*types.PassportElementError) error {
+	var err error
+	if len(errors) > 0 {
+		for i := 0; i < len(errors) && err == nil; i++ {
+			if errors[i] == nil {
+				err = code5()
+			}
+		}
+
+		if err == nil {
+			if inf.Errors == nil {
+				inf.Errors = errors
+				logs.DataWrittenSuccessfully(interfaceInf, "Errors")
+			} else {
+				err = code10()
+			}
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
 func (inf *information) GetResponse() types.User {
 	return inf.response
 }
@@ -3786,6 +3809,52 @@ func (p *payment) WriteIsCanceled() error {
 	if !p.IsCanceled {
 		p.IsCanceled = true
 		logs.SettedParam("Is Canceled", interfacePayment, true)
+	} else {
+		err = code10()
+	}
+	return err
+}
+
+func (g *game) WriteShortName(name string) error {
+	var err error
+	if err = checkStringValue(name, g.ShortName); err == nil {
+		g.ShortName = name
+		logs.DataWrittenSuccessfully(interfaceGame, "Short Name")
+	}
+	return err
+}
+
+func (g *game) WriteScore(score int) error {
+	var err error
+	if score >= 0 {
+		if g.Score == 0 {
+			g.Score = score
+			logs.DataWrittenSuccessfully(interfaceGame, "Score")
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (g *game) WriteForce() error {
+	var err error
+	if !g.Force {
+		g.Force = true
+		logs.SettedParam("Force", interfaceGame, true)
+	} else {
+		err = code10()
+	}
+	return err
+}
+
+func (g *game) WriteDisableEditMessage() error {
+	var err error
+	if !g.DisableEditMessage {
+		g.DisableEditMessage = true
+		logs.SettedParam("Disable Edit Message", interfaceGame, true)
 	} else {
 		err = code10()
 	}

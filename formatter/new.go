@@ -104,3 +104,8 @@ func (msg *Message) NewPayment() IPayment {
 	logs.NewInterfaceCreated(interfacePayment)
 	return &payment{}
 }
+
+func (msg *Message) NewGame() IGame {
+	logs.NewInterfaceCreated(interfaceGame)
+	return &game{}
+}
