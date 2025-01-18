@@ -1400,7 +1400,7 @@ func (st *sticker) WriteAssociatedEmoji(emoji string) error {
 
 func (st *sticker) WriteAssociatedEmojies(emojies []string) error {
 	var err error
-	if emojies != nil {
+	if emojies != nil && len(emojies) <= 20 {
 		for i := 0; (i < len(emojies)) && (err == nil); i++ {
 			if emojies[i] == "" {
 				err = code5()
@@ -1625,20 +1625,11 @@ func (st *sticker) WriteGiftID(giftID string) error {
 	return err
 }
 
-func (st *sticker) WriteTextParseMode(parsemode string) error {
+func (st *sticker) WritePayForUpgrade() error {
 	var err error
-	if err = checkParseMode(parsemode, st.ParseMode); err == nil {
-		st.ParseMode = parsemode
-		logs.DataWrittenSuccessfully(interfaceSticker, "Text Parse Mode")
-	}
-	return err
-}
-
-func (st *sticker) WriteTextEntities(entities []*types.MessageEntity) error {
-	var err error
-	if err = checkEntities(entities, st.Entities); err == nil {
-		st.Entities = entities
-		logs.DataWrittenSuccessfully(interfaceSticker, "Text Entities")
+	if !st.PayForUpgrade {
+		st.PayForUpgrade = true
+		logs.SettedParam("Pay For Upgrade", interfaceSticker, true)
 	}
 	return err
 }
@@ -2339,6 +2330,22 @@ func (inf *information) WriteErrors(errors []*types.PassportElementError) error 
 			} else {
 				err = code10()
 			}
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
+func (inf *information) WriteDescription(desc string) error {
+	var err error
+	d := len([]rune(desc))
+	if d <= 70 {
+		if inf.Description == "" {
+			inf.Description = desc
+			logs.DataWrittenSuccessfully(interfaceInf, "Description")
+		} else {
+			err = code10()
 		}
 	} else {
 		err = code20()

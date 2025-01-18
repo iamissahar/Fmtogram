@@ -411,9 +411,9 @@ type MenuButtonDefault struct {
 }
 
 type MenuButton struct {
-	MenuButtonCommands *MenuButtonCommands
-	MenuButtonWebApp   *MenuButtonWebApp
-	MenuButtonDefault  *MenuButtonDefault
+	*MenuButtonCommands
+	*MenuButtonWebApp
+	*MenuButtonDefault
 }
 
 type Update struct {

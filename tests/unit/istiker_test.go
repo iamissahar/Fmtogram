@@ -318,7 +318,7 @@ func (sttc *stTestContainer) writeThumbnailStorage() {
 		"../media_test/tel-aviv.jpg",
 		"../media_test/cookie.png", "../media_test/cookie.png"}
 	sttc.isExpectedErr = []bool{false, false, false, true, true, false, true}
-	sttc.codeErr = []string{"", "", "", "20", "20", "", "10"}
+	sttc.codeErr = []string{"", "", "", "20", "12", "", "10"}
 	sttc.amount, sttc.until = 7, 5
 	sttc.buildF = sttc.thumbnailStorage
 }

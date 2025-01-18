@@ -383,9 +383,11 @@ type ISticker interface {
 
 	WriteGiftID(giftID string) error
 
-	WriteTextParseMode(parsemode string) error
+	WritePayForUpgrade() error
 
-	WriteTextEntities(entities []*types.MessageEntity) error
+	// GetSet() types.StickerSet
+
+	// GetStickers() []types.Sticker
 }
 
 type IForum interface {
@@ -397,6 +399,8 @@ type IForum interface {
 	WriteIconColor(color int) error
 
 	WriteIconEmojiID(emojiID string) error
+
+	// GetForum() types.ForumTopic
 }
 
 type IBot interface {
@@ -422,6 +426,18 @@ type IBot interface {
 	WriteRights(rights *types.ChatAdministratorRights) error
 
 	WriteForChannels() error
+
+	// GetCommands() types.BotCommand
+
+	// GetName() string
+
+	// GetDescription() string
+
+	// GetShortDescription() string
+
+	// GetMenuButtonI() types.MenuButton
+
+	// GetAdminRights() types.ChatAdministratorRights
 }
 
 type IResult interface {
@@ -614,11 +630,23 @@ type IParameters interface {
 
 	WriteErrors(errors []*types.PassportElementError) error
 
+	WriteDescription(desc string) error
+
 	// You can call this function after calling Send(). It returns you a structure with some data about the user you just sent a message to
 	GetResponse() types.User
 
 	// Call it after methods.ForwardMessages, methods.CopyMessage and methods.CopyMessages. In any other cases it returns nil
 	GetMessageIDs() []int
+
+	// GetProfilePhotos() types.UserProfilePhotos
+
+	// GetFile() types.File
+
+	// GetInviteLink() string
+
+	// GetNewInviteLink() types.ChatInviteLink
+
+	// GetMessage() types.Message
 }
 
 type IChat interface {
@@ -653,6 +681,16 @@ type IChat interface {
 
 	// You can call this function after calling Send(). It returns you a structure with some data about the chat you just sent a message to
 	GetResponse() types.Chat
+
+	// GetChat() types.ChatFullInfo
+
+	// GetMembers() []types.ChatMember
+
+	// GetMemberAmount() int
+
+	// GetUsersBoosts() types.UserChatBoosts
+
+	// GetBusinessConnection() types.BusinessConnection
 }
 
 type ILink interface {
@@ -888,6 +926,8 @@ type IPayment interface {
 	WriteTelegramPaymentChargeID(id string) error
 
 	WriteIsCanceled() error
+
+	// GetInvoiceLink() string
 }
 
 type IGame interface {

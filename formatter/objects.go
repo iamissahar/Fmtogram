@@ -147,25 +147,26 @@ type poll struct {
 }
 
 type sticker struct {
-	SetName             string                 `json:"sticker_set_name,omitempty"`
-	Sticker             string                 `jsno:"sticker"`
-	Emoji               string                 `json:"emoji"`
-	Emojies             []string               `json:"emoji_list"`
-	EmojiID             string                 `json:"custom_emoji_id"`
-	EmojiIDs            []string               `json:"custom_emoji_ids"`
-	Format              string                 `json:"sticker_format"`
-	Title               string                 `json:"title"`
-	StickerType         string                 `json:"sticker_type"`
-	NeedsRepainting     bool                   `json:"needs_repainting"`
-	Position            string                 `json:"position"`
-	OldSticker          string                 `json:"old_sticker"`
-	Keywords            []string               `json:"keywords"`
-	MaskPosition        *types.MaskPosition    `json:"mask_position"`
-	Thumbnail           string                 `json:"thumbnail"`
-	ThumbnailFormat     string                 `json:"format"`
-	GiftID              string                 `json:"gift_id"`
-	ParseMode           string                 `json:"text_parse_mode"`
-	Entities            []*types.MessageEntity `json:"text_entities"`
+	SetName             string              `json:"sticker_set_name,omitempty"`
+	Sticker             string              `jsno:"sticker"`
+	Stickers            [50]string          `json:"stickers"`
+	Name                string              `json:"name"`
+	Emoji               string              `json:"emoji"`
+	Emojies             []string            `json:"emoji_list"`
+	EmojiID             string              `json:"custom_emoji_id"`
+	EmojiIDs            []string            `json:"custom_emoji_ids"`
+	Format              string              `json:"sticker_format"`
+	Title               string              `json:"title"`
+	StickerType         string              `json:"sticker_type"`
+	NeedsRepainting     bool                `json:"needs_repainting"`
+	Position            string              `json:"position"`
+	OldSticker          string              `json:"old_sticker"`
+	Keywords            []string            `json:"keywords"`
+	MaskPosition        *types.MaskPosition `json:"mask_position"`
+	Thumbnail           string              `json:"thumbnail"`
+	ThumbnailFormat     string              `json:"format"`
+	GiftID              string              `json:"gift_id"`
+	PayForUpgrade       bool                `json:"pay_for_upgrade"`
 	stickerGottenFrom   int
 	thumbnailGottenFrom int
 	thumbnailType       string
@@ -218,6 +219,9 @@ type information struct {
 	CacheTime                  int                            `json:"cache_time,omitempty"`
 	InlineMessageID            string                         `json:"inline_message_id,omitempty"`
 	Errors                     []*types.PassportElementError  `json:"errors,omitempty"`
+	GiftParseMode              string                         `json:"text_parse_mode"`
+	GiftEntities               []*types.MessageEntity         `json:"text_entities"`
+	Description                string                         `json:"custom_description"`
 	response                   types.User
 	responseMessageIDs         []int
 }
