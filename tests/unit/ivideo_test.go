@@ -69,7 +69,7 @@ func putWriteVideoShowCaptionAboveMedia(vdtc vdTestContainer, vd formatter.IVide
 }
 
 func putWriteVideoSupportStreaming(vdtc vdTestContainer, vd formatter.IVideo, i int) *videoT {
-	return &videoT{vdtc.name, "", 0, nil, vd.WriteSupportStreaming, vdtc.isExpectedErr[i], vdtc.codeErr[i]}
+	return &videoT{vdtc.name, "", 0, nil, vd.WriteSupportsStreaming, vdtc.isExpectedErr[i], vdtc.codeErr[i]}
 }
 
 func putWriteVideoThumbnailStorage(vdtc vdTestContainer, vd formatter.IVideo, i int) *videoT {

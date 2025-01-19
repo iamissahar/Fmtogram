@@ -222,6 +222,7 @@ type information struct {
 	GiftParseMode              string                         `json:"text_parse_mode"`
 	GiftEntities               []*types.MessageEntity         `json:"text_entities"`
 	Description                string                         `json:"custom_description"`
+	RemoveCaption              bool                           `json:"remove_caption"`
 	response                   types.User
 	responseMessageIDs         []int
 }

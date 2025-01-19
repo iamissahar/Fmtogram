@@ -1,11 +1,30 @@
 package methods
 
 const (
-	// Use this method to send text messages
+	// Use this method to send text messages. Parameters:
+	// 	(formatter.IChat).WriteBusinessConnectionID() [Optional]
+	// 	(formatter.IChat).WriteChatID or (formatter.IChat).WriteChatName() [Required]
+	// 	(formatter.IParameters).WriteMessageThreadID() [Optional]
+	// 	(formatter.IParameters).WriteString() [Required]
+	// 	(formatter.IParameters).WriteParseMode() [Optional]
+	// 	(formatter.IParameters).WriteEntities() [Optional]
+	// 	(formatter.IParameters).WriteLinkPreviewOptions() [Optional]
+	// 	(formatter.IParameters).WriteDisableNotification() [Optional]
+	// 	(formatter.IParameters).WriteProtectContent() [Optional]
+	// 	(formatter.IParameters).WriteAllowPaidBroadcast() [Optional]
+	// 	(formatter.IParameters).WriteMessageEffectID() [Optional]
+	// 	(formatter.IParameters).WriteReplyParameters() [Optional]
+	// 	(formatter.IKeyboard).WriteReply() or (formatter.IKeyboard).WriteInline() or (formatter.IKeyboard).WriteForceReply() [Optional]
 	Message string = "sendMessage"
 
 	// Use this method to forward messages of any kind. Service messages and messages with protected content can't be forwarded.
-	// Use usual function GetResponse() in interfaces you have mentioned to have response data from Telegram
+	// Use usual function GetResponse() in interfaces you have mentioned to have response data from Telegram. Parameters:
+	// 	(formatter.IChat).WriteChatID or (formatter.IChat).WriteChatName() [Required]
+	// 	(formatter.IParameters).WriteMessageThreadID() [Optional]
+	// 	(formatter.IChat).WriteFromChatID() [Required]
+	// 	(formatter.IParameters).WriteDisableNotification() [Optional]
+	// 	(formatter.IParameters).WriteProtectContent() [Optional]
+	// 	(formatter.IParameters).WriteMessageID() [Required]
 	ForwardMessage string = "forwardMessage"
 
 	// Use this method to forward multiple messages of any kind. If some of the specified
@@ -14,73 +33,354 @@ const (
 	// messagesUse this method to forward multiple messages of any kind. If some of the specified
 	// messages can't be found or forwarded, they are skipped. Service messages and messages with
 	// protected content can't be forwarded. Album grouping is kept for forwarded messages.
-	// On success call {IMSGInformation}.GetMessageIDs() to have the response data from Telegram
+	// On success call (formatter.IParameters).GetMessageIDs() to have the response data from Telegram. Parameters:
+	// 	(formatter.IChat).WriteChatID or (formatter.IChat).WriteChatName() [Required]
+	// 	(formatter.IParameters).WriteMessageThreadID() [Optional]
+	// 	(formatter.IChat).WriteFromChatID() [Required]
+	// 	(formatter.IParameters).WriteMessageIDs() [Required]
+	// 	(formatter.IParameters).WriteDisableNotification() [Optional]
+	// 	(formatter.IParameters).WriteProtectContent() [Optional]
 	ForwardMessages string = "forwardMessages"
 
 	// Use this method to copy messages of any kind. Service messages, paid media messages,
 	// giveaway messages, giveaway winners messages, and invoice messages can't be copied. Copying means that the bot copys
-	// the message and then sends it to the chat with the unique identifier you put in {IChat}.WriteChat{ID/Name}()
-	// On success call {IMSGInformation}.GetMessageIDs() to have the response data from Telegram
+	// the message and then sends it to the chat with the unique identifier you put in (formatter.IChat).WriteChat{ID/Name}()
+	// On success call (formatter.IParameters).GetMessageIDs() to have the response data from Telegram. Parameters:
+	// 	(formatter.IChat).WriteChatID or (formatter.IChat).WriteChatName() [Required]
+	// 	(formatter.IParameters).WriteMessageThreadID() [Optional]
+	// 	(formatter.IChat).WriteFromChatID() [Required]
+	// 	(formatter.IParameters).WriteMessageID() [Required]
+	// 	(formatter.IParameters).WriteCaption() [Optional]
+	// 	(formatter.IParameters).WriteParseMode() [Optional]
+	// 	(formatter.IParameters).WriteEntities() [Optional]
+	// 	(formatter.IParameters).WriteShowCaptionAboveMedia() [Optional]
+	// 	(formatter.IParameters).WriteDisableNotification() [Optional]
+	// 	(formatter.IParameters).WriteProtectContent() [Optional]
+	// 	(formatter.IParameters).WriteAllowPaidBroadcast() [Optional]
+	// 	(formatter.IParameters).WriteReplyParameters() [Optional]
+	// 	(formatter.IKeyboard).WriteReply() or (formatter.IKeyboard).WriteInline() or (formatter.IKeyboard).WriteForceReply() [Optional]
 	CopyMessage string = "copyMessage"
 
 	// Use this method to copy messages of any kind. If some of the specified messages can't be found or copied,
 	// they are skipped. Service messages, paid media messages, giveaway messages, giveaway winners messages,
-	// and invoice messages can't be copied.
+	// and invoice messages can't be copied. Parameters:
+	// 	(formatter.IChat).WriteChatID or (formatter.IChat).WriteChatName() [Required]
+	// 	(formatter.IParameters).WriteMessageThreadID() [Optional]
+	// 	(formatter.IChat).WriteFromChatID() [Required]
+	// 	(formatter.IParameters).WriteMessageIDs() [Required]
+	// 	(formatter.IParameters).WriteDisableNotification() [Optional]
+	// 	(formatter.IParameters).WriteProtectContent() [Optional]
+	// 	(formatter.IParameters).WriteRemoveCaption() [Optional]
 	CopyMessages string = "copyMessages"
 
 	// Use this method to send photos. Might be used by default. Just mention a photo in Message structure.
-	// Call GetResponse() in each interface you have created and gave to Message structure.
+	// Call GetResponse() in each interface you have created and gave to Message structure. Parameters:
+	// 	(formatter.IChat).WriteBusinessConnectionID() [Optional]
+	// 	(formatter.IChat).WriteChatID or (formatter.IChat).WriteChatName() [Required]
+	// 	(formatter.IParameters).WriteMessageThreadID() [Optional]
+	// 	(formatter.IPhoto).WritePhotoStorage(), (formatter.IPhoto).WritePhotoTelegram()  or (formatter.IPhoto).WritePhotoInternet() [Required]
+	// 	(formatter.IParameters).WriteString() [Optional]
+	// 	(formatter.IParameters).WriteParseMode() [Optional]
+	// 	(formatter.IParameters).WriteEntities() [Optional]
+	// 	(formatter.IParameters).WriteShowCaptionAboveMedia() [Optional]
+	// 	(formatter.IPhoto).WriteHasSpoiler() [Optional]
+	// 	(formatter.IParameters).WriteDisableNotification() [Optional]
+	// 	(formatter.IParameters).WriteProtectContent() [Optional]
+	// 	(formatter.IParameters).WriteAllowPaidBroadcast() [Optional]
+	// 	(formatter.IParameters).WriteMessageEffectID() [Optional]
+	// 	(formatter.IParameters).WriteReplyParameters() [Optional]
+	// 	(formatter.IKeyboard).WriteReply() or (formatter.IKeyboard).WriteInline() or (formatter.IKeyboard).WriteForceReply() [Optional]
 	Photo string = "sendPhoto"
 
 	// Use this method to send audio files, if you want Telegram clients to display them in the music player.
 	// Your audio must be in the .MP3 or .M4A format. On success, call GetResponse() in each interface you have
 	// created and gave to Message structure. Bots can currently send audio files of up to 50 MB in size,
-	// this limit may be changed in the future.
+	// this limit may be changed in the future. Parameters:
+	// 	(formatter.IChat).WriteBusinessConnectionID() [Optional]
+	// 	(formatter.IChat).WriteChatID or (formatter.IChat).WriteChatName() [Required]
+	// 	(formatter.IParameters).WriteMessageThreadID() [Optional]
+	// 	(formatter.IAudio).WriteAudioStorage(), (formatter.IAudio).WriteAudioTelegram() or (formatter.IAudio).WriteAudioInternet() [Required]
+	// 	(formatter.IParameters).WriteString() [Optional]
+	// 	(formatter.IParameters).WriteParseMode() [Optional]
+	// 	(formatter.IParameters).WriteEntities() [Optional]
+	// 	(formatter.IAudio).WriteDuration() [Optional]
+	// 	(formatter.IAudio).WritePerformer() [Optional]
+	// 	(formatter.IAudio).WriteTitle() [Optional]
+	// 	(formatter.IAudio).WriteThumbnailStorage(), (formatter.IAudio).WriteThumbnailTelegram() or (formatter.IAudio).WriteThumbnailInternet() [Optional]
+	// 	(formatter.IParameters).WriteDisableNotification() [Optional]
+	// 	(formatter.IParameters).WriteProtectContent() [Optional]
+	// 	(formatter.IParameters).WriteAllowPaidBroadcast() [Optional]
+	// 	(formatter.IParameters).WriteMessageEffectID() [Optional]
+	// 	(formatter.IParameters).WriteReplyParameters() [Optional]
+	// 	(formatter.IKeyboard).WriteReply() or (formatter.IKeyboard).WriteInline() or (formatter.IKeyboard).WriteForceReply() [Optional]
 	Audio string = "sendAudio"
 
 	// Use this method to send general files.
-	// Bots can currently send files of any type of up to 50 MB in size, this limit may be changed in the future.
+	// Bots can currently send files of any type of up to 50 MB in size, this limit may be changed in the future. Parameters:
+	// 	(formatter.IChat).WriteBusinessConnectionID() [Optional]
+	// 	(formatter.IChat).WriteChatID or (formatter.IChat).WriteChatName() [Required]
+	// 	(formatter.IParameters).WriteMessageThreadID() [Optional]
+	// 	(formatter.IDocument).WriteDocumentStorage(), (formatter.IDocument).WriteDocumentTelegram() or (formatter.IDocument).WriteDocumentInternet() [Required]
+	// 	(formatter.IDocument).WriteThumbnailStorage(), (formatter.IDocument).WriteThumbnailTelegram() or (formatter.IDocument).WriteThumbnailInternet() [Optional]
+	// 	(formatter.IParameters).WriteString() [Optional]
+	// 	(formatter.IParameters).WriteParseMode() [Optional]
+	// 	(formatter.IParameters).WriteEntities() [Optional]
+	// 	(formatter.IDocument).WriteDisableContentTypeDetection() [Optional]
+	// 	(formatter.IParameters).WriteDisableNotification() [Optional]
+	// 	(formatter.IParameters).WriteProtectContent() [Optional]
+	// 	(formatter.IParameters).WriteAllowPaidBroadcast() [Optional]
+	// 	(formatter.IParameters).WriteMessageEffectID() [Optional]
+	// 	(formatter.IParameters).WriteReplyParameters() [Optional]
+	// 	(formatter.IKeyboard).WriteReply() or (formatter.IKeyboard).WriteInline() or (formatter.IKeyboard).WriteForceReply() [Optional]
 	Document string = "sendDocument"
 
 	// Use this method to send video files, Telegram clients support MPEG4 videos (other formats may be sent as Document).
-	// Bots can currently send video files of up to 50 MB in size, this limit may be changed in the future.
+	// Bots can currently send video files of up to 50 MB in size, this limit may be changed in the future. Parameters:
+	// 	(formatter.IChat).WriteBusinessConnectionID() [Optional]
+	// 	(formatter.IChat).WriteChatID or (formatter.IChat).WriteChatName() [Required]
+	// 	(formatter.IParameters).WriteMessageThreadID() [Optional]
+	// 	(formatter.IVideo).WriteVideoStorage(), (formatter.IVideo).WriteVideoTelegram() or (formatter.IVideo).WriteVideoInternet() [Required]
+	// 	(formatter.IVideo).WriteDuration() [Optional]
+	// 	(formatter.IVideo).WriteWidth() [Optional]
+	// 	(formatter.IVideo).WriteHeight() [Optional]
+	// 	(formatter.IVideo).WriteThumbnailStorage(), (formatter.IVideo).WriteThumbnailTelegram() or (formatter.IVideo).WriteThumbnailInternet() [Optional]
+	// 	(formatter.IParameters).WriteString() [Optional]
+	// 	(formatter.IParameters).WriteParseMode() [Optional]
+	// 	(formatter.IParameters).WriteEntities() [Optional]
+	// 	(formatter.IParameters).WriteShowCaptionAboveMedia() [Optional]
+	//	(formatter.IVideo).WriteHasSpoiler() [Optional]
+	// 	(formatter.IVideo).WriteSupportsStreaming() [Optional]
+	// 	(formatter.IParameters).WriteDisableNotification() [Optional]
+	// 	(formatter.IParameters).WriteProtectContent() [Optional]
+	// 	(formatter.IParameters).WriteAllowPaidBroadcast() [Optional]
+	// 	(formatter.IParameters).WriteMessageEffectID() [Optional]
+	// 	(formatter.IParameters).WriteReplyParameters() [Optional]
+	// 	(formatter.IKeyboard).WriteReply() or (formatter.IKeyboard).WriteInline() or (formatter.IKeyboard).WriteForceReply() [Optional]
 	Video string = "sendVideo"
 
 	// Use this method to send animation files (GIF or H.264/MPEG-4 AVC video without sound).
-	// Bots can currently send animation files of up to 50 MB in size, this limit may be changed in the future.
+	// Bots can currently send animation files of up to 50 MB in size, this limit may be changed in the future. Parameters:
+	// 	(formatter.IChat).WriteBusinessConnectionID() [Optional]
+	// 	(formatter.IChat).WriteChatID or (formatter.IChat).WriteChatName() [Required]
+	// 	(formatter.IParameters).WriteMessageThreadID() [Optional]
+	// 	(formatter.IAnimation).WriteAnimationStorage(), (formatter.IAnimation).WriteAnimationTelegram() or (formatter.IAnimation).WriteAnimationInternet() [Required]
+	// 	(formatter.IAnimation).WriteDuration() [Optional]
+	// 	(formatter.IAnimation).WriteWidth() [Optional]
+	// 	(formatter.IAnimation).WriteHeight() [Optional]
+	// 	(formatter.IAnimation).WriteThumbnailStorage(), (formatter.IAnimation).WriteThumbnailTelegram() or (formatter.IAnimation).WriteThumbnailInternet() [Optional]
+	// 	(formatter.IParameters).WriteString() [Optional]
+	// 	(formatter.IParameters).WriteParseMode() [Optional]
+	// 	(formatter.IParameters).WriteEntities() [Optional]
+	// 	(formatter.IParameters).WriteShowCaptionAboveMedia() [Optional]
+	//	(formatter.IAnimation).WriteHasSpoiler() [Optional]
+	// 	(formatter.IParameters).WriteDisableNotification() [Optional]
+	// 	(formatter.IParameters).WriteProtectContent() [Optional]
+	// 	(formatter.IParameters).WriteAllowPaidBroadcast() [Optional]
+	// 	(formatter.IParameters).WriteMessageEffectID() [Optional]
+	// 	(formatter.IParameters).WriteReplyParameters() [Optional]
+	// 	(formatter.IKeyboard).WriteReply() or (formatter.IKeyboard).WriteInline() or (formatter.IKeyboard).WriteForceReply() [Optional]
 	Animation string = "sendAnimation"
 
 	// Use this method to send audio files, if you want Telegram clients to display the file
 	// as a playable voice message. For this to work, your audio must be in an .OGG file encoded with OPUS,
 	// or in .MP3 format, or in .M4A format (other formats may be sent as Audio or Document).
-	// Bots can currently send voice messages of up to 50 MB in size, this limit may be changed in the future.
+	// Bots can currently send voice messages of up to 50 MB in size, this limit may be changed in the future. Parameters:
+	// 	(formatter.IChat).WriteBusinessConnectionID() [Optional]
+	// 	(formatter.IChat).WriteChatID or (formatter.IChat).WriteChatName() [Required]
+	// 	(formatter.IParameters).WriteMessageThreadID() [Optional]
+	// 	(formatter.IVoice).WriteVoiceStorage(), (formatter.IVoice).WriteVoiceTelegram() or (formatter.IVoice).WriteVoiceInternet() [Required]
+	// 	(formatter.IParameters).WriteString() [Optional]
+	// 	(formatter.IParameters).WriteParseMode() [Optional]
+	// 	(formatter.IParameters).WriteEntities() [Optional]
+	// 	(formatter.IVoice).WriteDuration() [Optional]
+	// 	(formatter.IParameters).WriteDisableNotification() [Optional]
+	// 	(formatter.IParameters).WriteProtectContent() [Optional]
+	// 	(formatter.IParameters).WriteAllowPaidBroadcast() [Optional]
+	// 	(formatter.IParameters).WriteMessageEffectID() [Optional]
+	// 	(formatter.IParameters).WriteReplyParameters() [Optional]
+	// 	(formatter.IKeyboard).WriteReply() or (formatter.IKeyboard).WriteInline() or (formatter.IKeyboard).WriteForceReply() [Optional]
 	Voice string = "sendVoice"
 
-	// Telegram clients support rounded square MPEG4 videos of up to 1 minute long. Use this method to send video messages.
+	// Telegram clients support rounded square MPEG4 videos of up to 1 minute long. Use this method to send video messages. Parameters:
+	// 	(formatter.IChat).WriteBusinessConnectionID() [Optional]
+	// 	(formatter.IChat).WriteChatID or (formatter.IChat).WriteChatName() [Required]
+	// 	(formatter.IParameters).WriteMessageThreadID() [Optional]
+	// 	(formatter.IVideoNote).WriteVideoNoteStorage(), (formatter.IVideoNote).WriteVideoNoteTelegram() or (formatter.IVideoNote).WriteVideoNoteInternet() [Required]
+	// 	(formatter.IVideoNote).WriteDuration() [Optional]
+	// 	(formatter.IVideoNote).WriteLength() [Optional]
+	// 	(formatter.IVideoNote).WriteThumbnailStorage(), (formatter.IVideoNote).WriteThumbnailTelegram() or (formatter.IVideoNote).WriteThumbnailInternet() [Optional]
+	// 	(formatter.IParameters).WriteDisableNotification() [Optional]
+	// 	(formatter.IParameters).WriteProtectContent() [Optional]
+	// 	(formatter.IParameters).WriteAllowPaidBroadcast() [Optional]
+	// 	(formatter.IParameters).WriteMessageEffectID() [Optional]
+	// 	(formatter.IParameters).WriteReplyParameters() [Optional]
+	// 	(formatter.IKeyboard).WriteReply() or (formatter.IKeyboard).WriteInline() or (formatter.IKeyboard).WriteForceReply() [Optional]
 	VideoNote string = "sendVideoNote"
 
-	// Use this method to send paid media. Paid media can be only IPhoto or IVideo. Also, the fields of methods.Photo
+	// Use this method to send paid media. Paid media can be only (formatter.IPhoto) or (formatter.IVideo). Also, the fields of methods.Photo
 	// and methds.PaidMedia are diffirent. So, please make sure because all data that you might mention may be ignored
-	// because it isn't allowed to send this with this method
+	// because it isn't allowed to send this with this method. Parameters:
+	// 	(formatter.IChat).WriteBusinessConnectionID() [Optional]
+	// 	(formatter.IChat).WriteChatID or (formatter.IChat).WriteChatName() [Required]
+	// 	(formatter.IParameters).WriteStarCount() [Required]
+	// 	(formatter.IParameters).WritePayload() [Optional]
+	// 	(formatter.IParameters).WriteString() [Optional]
+	// 	(formatter.IParameters).WriteParseMode() [Optional]
+	// 	(formatter.IParameters).WriteEntities() [Optional]
+	// 	(formatter.IParameters).WriteShowCaptionAboveMedia() [Optional]
+	// 	(formatter.IParameters).WriteDisableNotification() [Optional]
+	// 	(formatter.IParameters).WriteProtectContent() [Optional]
+	// 	(formatter.IParameters).WriteAllowPaidBroadcast() [Optional]
+	// 	(formatter.IParameters).WriteReplyParameters() [Optional]
+	// 	(formatter.IKeyboard).WriteReply() or (formatter.IKeyboard).WriteInline() or (formatter.IKeyboard).WriteForceReply() [Optional]
+	// Next a few parameters depend on what you're sending. If you're sending a photo(s):
+	// 	(formatter.IPhoto).WritePhotoStorage(), (formatter.IPhoto).WritePhotoTelegram() or (formatter.IPhoto).WritePhotoInternet() [Required]
+	// If you're sending a video(s):
+	// 	(formatter.IVideo).WriteVideoStorage(), (formatter.IVideo).WriteVideoTelegram() or (formatter.IVideo).WriteVideoInternet() [Required]
+	// 	(formatter.IVideo).WriteThumbnailStorage(), (formatter.IVideo).WriteThumbnailTelegram() or (formatter.IVideo).WriteThumbnailInternet() [Optional]
+	// 	(formatter.IVideo).WriteWidth() [Optional]
+	// 	(formatter.IVideo).WriteHeight() [Optional]
+	// 	(formatter.IVideo).WriteDuration() [Optional]
+	// 	(formatter.IVideo).WriteSupportsStreaming() [Optional]
 	PaidMedia string = "sendPaidMedia"
 
 	// Use this method to send a group of photos, videos, documents or audios as an album.
 	// Documents and audio files can be only grouped in an album with messages of the same type.
+	// 	(formatter.IChat).WriteBusinessConnectionID() [Optional]
+	// 	(formatter.IChat).WriteChatID or (formatter.IChat).WriteChatName() [Required]
+	// 	(formatter.IParameters).WriteMessageThreadID() [Optional]
+	// 	(formatter.IParameters).WriteDisableNotification() [Optional]
+	// 	(formatter.IParameters).WriteProtectContent() [Optional]
+	// 	(formatter.IParameters).WriteAllowPaidBroadcast() [Optional]
+	// 	(formatter.IParameters).WriteMessageEffectID() [Optional]
+	// 	(formatter.IParameters).WriteReplyParameters() [Optional]
+	// Next a few parameters depend on what you're going to send. If you're going to send photos:
+	// 	(formatter.IPhoto).WritePhotoStorage(), (formatter.IPhoto).WritePhotoTelegram() or (formatter.IPhoto).WritePhotoInternet() [Required]
+	// 	(formatter.IPhoto).WriteCaption() [Optional]
+	// 	(formatter.IPhoto).WriteParseMode() [Optional]
+	// 	(formatter.IPhoto).WriteCaptionEntities() [Optional]
+	// 	(formatter.IPhoto).WriteShowCaptionAboveMedia() [Optional]
+	// 	(formatter.IPhoto).WriteHasSpoiler() [Optional]
+	// If you're going to send videos:
+	//	(formatter.IVideo).WriteVideoStorage(), (formatter.IVideo).WriteVideoTelegram() or (formatter.IVideo).WriteVideoInternet() [Required]
+	// 	(formatter.IVideo).WriteThumbnailStorage(), (formatter.IVideo).WriteThumbnailTelegram() or (formatter.IVideo).WriteThumbnailInternet() [Optional]
+	// 	(formatter.IVideo).WriteCaption() [Optional]
+	// 	(formatter.IVideo).WriteParseMode() [Optional]
+	// 	(formatter.IVideo).WriteCaptionEntities() [Optional]
+	// 	(formatter.IVideo).WriteShowCaptionAboveMedia() [Optional]
+	// 	(formatter.IVideo).WriteWidth() [Optional]
+	// 	(formatter.IVideo).WriteHeight() [Optional]
+	// 	(formatter.IVideo).WriteDuration() [Optional]
+	// 	(formatter.IVideo).WriteSupportsStreaming() [Optional]
+	// 	(formatter.IVideo).WriteHasSpoiler() [Optional]
+	// If you're going to send documents:
+	// 	(formatter.IDocument).WriteDocumentStorage(), (formatter.IDocument).WriteDocumentTelegram() or (formatter.IDocument).WriteDocumentInternet() [Required]
+	// 	(formatter.IDocument).WriteThumbnailStorage(), (formatter.IDocument).WriteThumbnailTelegram() or (formatter.IDocument).WriteThumbnailInternet() [Optional]
+	// 	(formatter.IDocument).WriteCaption() [Optional]
+	// 	(formatter.IDocument).WriteParseMode() [Optional]
+	// 	(formatter.IDocument).WriteCaptionEntities() [Optional]
+	// 	(formatter.IDocument).WriteDisableContentTypeDetection() [Optional]
+	// If you're going to send audios:
+	// 	(formatter.IAudio).WriteAudioStorage(), (formatter.IAudio).WriteAudioTelegram() or (formatter.IAudio).WriteAudioInternet() [Required]
+	// 	(formatter.IAudio).WriteCaption() [Optional]
+	// 	(formatter.IAudio).WriteParseMode() [Optional]
+	// 	(formatter.IAudio).WriteCaptionEntities() [Optional]
+	// 	(formatter.IAudio).WriteDuration() [Optional]
+	// 	(formatter.IAudio).WritePerformer() [Optional]
+	// 	(formatter.IAudio).WriteTitle() [Optional]
 	MediaGroup string = "sendMediaGroup"
 
-	// Use this method to send point on the map
+	// Use this method to send point on the map. Parameters:
+	// 	(formatter.IChat).WriteBusinessConnectionID() [Optional]
+	// 	(formatter.IChat).WriteChatID or (formatter.IChat).WriteChatName() [Required]
+	// 	(formatter.IParameters).WriteMessageThreadID() [Optional]
+	// 	(formatter.ILocation).WriteLatitude() [Required]
+	// 	(formatter.ILocation).WriteLongitude() [Required]
+	// 	(formatter.ILocation).WriteHorizontalAccuracy() [Optional]
+	// 	(formatter.ILocation).WriteLivePeriod() [Optional]
+	// 	(formatter.ILocation).WriteHeading() [Optional]
+	// 	(formatter.ILocation).WriteProximityAlertRadius() [Optional]
+	// 	(formatter.IParameters).WriteDisableNotification() [Optional]
+	// 	(formatter.IParameters).WriteProtectContent() [Optional]
+	// 	(formatter.IParameters).WriteAllowPaidBroadcast() [Optional]
+	// 	(formatter.IParameters).WriteMessageEffectID() [Optional]
+	// 	(formatter.IParameters).WriteReplyParameters() [Optional]
+	// 	(formatter.IKeyboard).WriteReply() or (formatter.IKeyboard).WriteInline() or (formatter.IKeyboard).WriteForceReply() [Optional]
 	Location string = "sendLocation"
 
-	// Use this method to send information about a venue.
+	// Use this method to send information about a venue. Parameters:
+	// 	(formatter.IChat).WriteBusinessConnectionID() [Optional]
+	// 	(formatter.IChat).WriteChatID or (formatter.IChat).WriteChatName() [Required]
+	// 	(formatter.IParameters).WriteMessageThreadID() [Optional]
+	// 	(formatter.ILocation).WriteLatitude() [Required]
+	// 	(formatter.ILocation).WriteLongitude() [Required]
+	// 	(formatter.ILocation).WriteTitle() [Required]
+	// 	(formatter.ILocation).WriteAddress() [Required]
+	// 	(formatter.ILocation).WriteFoursquareID() [Optional]
+	// 	(formatter.ILocation).WriteFoursquareType() [Optional]
+	// 	(formatter.ILocation).WriteGooglePlaceID() [Optional]
+	// 	(formatter.ILocation).WriteGooglePlaceType() [Optional]
+	// 	(formatter.IParameters).WriteDisableNotification() [Optional]
+	// 	(formatter.IParameters).WriteProtectContent() [Optional]
+	// 	(formatter.IParameters).WriteAllowPaidBroadcast() [Optional]
+	// 	(formatter.IParameters).WriteMessageEffectID() [Optional]
+	// 	(formatter.IParameters).WriteReplyParameters() [Optional]
+	// 	(formatter.IKeyboard).WriteReply() or (formatter.IKeyboard).WriteInline() or (formatter.IKeyboard).WriteForceReply() [Optional]
 	Venue string = "sendVenue"
 
-	// Use this method to send phone contacts.
+	// Use this method to send phone contacts. Parameters:
+	// 	(formatter.IChat).WriteBusinessConnectionID() [Optional]
+	// 	(formatter.IChat).WriteChatID or (formatter.IChat).WriteChatName() [Required]
+	// 	(formatter.IParameters).WriteMessageThreadID() [Optional]
+	// 	(formatter.IContact).WritePhoneNumber() [Required]
+	// 	(formatter.IContact).WriteFirstName() [Required]
+	// 	(formatter.IContact).WriteLastName() [Optional]
+	// 	(formatter.IContact).WriteVCard() [Optional]
+	// 	(formatter.IParameters).WriteDisableNotification() [Optional]
+	// 	(formatter.IParameters).WriteProtectContent() [Optional]
+	// 	(formatter.IParameters).WriteAllowPaidBroadcast() [Optional]
+	// 	(formatter.IParameters).WriteMessageEffectID() [Optional]
+	// 	(formatter.IParameters).WriteReplyParameters() [Optional]
+	// 	(formatter.IKeyboard).WriteReply() or (formatter.IKeyboard).WriteInline() or (formatter.IKeyboard).WriteForceReply() [Optional]
 	Contact string = "sendContact"
 
-	// Use this method to send a native poll.
+	// Use this method to send a native poll. Parameters:
+	// 	(formatter.IChat).WriteBusinessConnectionID() [Optional]
+	// 	(formatter.IChat).WriteChatID or (formatter.IChat).WriteChatName() [Required]
+	// 	(formatter.IParameters).WriteMessageThreadID() [Optional]
+	// 	(formatter.IPoll).WriteQuestion() [Required]
+	// 	(formatter.IPoll).WriteOptions() [Required]
+	// 	(formatter.IPoll).WriteQuestionParseMode() [Optional]
+	// 	(formatter.IPoll).WriteQuestionEntities() [Optional]
+	//	(formatter.IPoll).WriteAnonymous() [Optional]
+	// 	(formatter.IPoll).WriteType() [Optional]
+	// 	(formatter.IPoll).WriteAllowMultipleAnswers() [Optional]
+	// 	(formatter.IPoll).WriteCorrectOptionID() [Optional]
+	// 	(formatter.IPoll).WriteExplanation() [Optional]
+	// 	(formatter.IPoll).WriteExplanationParseMode() [Optional]
+	// 	(formatter.IPoll).WriteExplanationEntities() [Optional]
+	// 	(formatter.IPoll).WriteOpenPeriod() [Optional]
+	// 	(formatter.IPoll).WriteCloseDate() [Optional]
+	// 	(formatter.IPoll).WriteClosed() [Optional]
+	// 	(formatter.IParameters).WriteDisableNotification() [Optional]
+	// 	(formatter.IParameters).WriteProtectContent() [Optional]
+	// 	(formatter.IParameters).WriteAllowPaidBroadcast() [Optional]
+	// 	(formatter.IParameters).WriteMessageEffectID() [Optional]
+	// 	(formatter.IParameters).WriteReplyParameters() [Optional]
+	// 	(formatter.IKeyboard).WriteReply() or (formatter.IKeyboard).WriteInline() or (formatter.IKeyboard).WriteForceReply() [Optional]
 	Poll string = "sendPoll"
 
-	// Use this method to send an animated emoji that will display a random value
+	// Use this method to send an animated emoji that will display a random value. Parameters:
+	// 	(formatter.IChat).WriteBusinessConnectionID() [Optional]
+	// 	(formatter.IChat).WriteChatID or (formatter.IChat).WriteChatName() [Required]
+	// 	(formatter.IParameters).WriteMessageThreadID() [Optional]
+	// 	(formatter.IParameters).WriteEmoji() [Optional]
+	// 	(formatter.IParameters).WriteDisableNotification() [Optional]
+	// 	(formatter.IParameters).WriteProtectContent() [Optional]
+	// 	(formatter.IParameters).WriteAllowPaidBroadcast() [Optional]
+	// 	(formatter.IParameters).WriteMessageEffectID() [Optional]
+	// 	(formatter.IParameters).WriteReplyParameters() [Optional]
+	// 	(formatter.IKeyboard).WriteReply() or (formatter.IKeyboard).WriteInline() or (formatter.IKeyboard).WriteForceReply() [Optional]
 	Dice string = "sendDice"
 
 	// Use this method when you need to tell the user that something is happening on
@@ -88,36 +388,56 @@ const (
 	// Telegram clients clear its typing status)
 	// 	Example: The an ImageBot needs some time to process a request and upload the image.
 	// 	Instead of sending a text message along the lines of “Retrieving image, please wait…”,
-	// 	the bot may use ChatAction method with IParameters.WriteAction(types.Action[1]). The user will see a
-	// 	“sending photo” status for the bot.
+	// 	the bot may use ChatAction method with (formatter.IParameters).WriteAction(types.Action[1]). The user will see a
+	// 	“sending photo” status for the bot. Parameters:
+	// 	(formatter.IChat).WriteBusinessConnectionID() [Optional]
+	// 	(formatter.IChat).WriteChatID or (formatter.IChat).WriteChatName() [Required]
+	// 	(formatter.IParameters).WriteMessageThreadID() [Optional]
+	// 	(formatter.IParameters).WriteAction() [Required]
 	ChatAction string = "sendChatAction"
 
 	// Use this method to change the chosen reactions on a message.
 	// Service messages can't be reacted to. Automatically forwarded messages from a channel
 	// to its discussion group have the same available reactions as messages in the channel.
-	// Bots can't use paid reactions.
+	// Bots can't use paid reactions. Parameters:
+	// 	(formatter.IChat).WriteChatID or (formatter.IChat).WriteChatName() [Required]
+	// 	(formatter.IParameters).WriteMessageID() [Required]
+	// 	(formatter.IParameters).WriteReaction() [Optional]
+	// 	(formatter.IParameters).WriteReactionIsBig() [Optional]
 	MessageReaction string = "setMessageReaction"
 
 	// Use this method to get a list of profile pictures for a user. The file
 	// can then be downloaded via the link "https://api.telegram.org/file/bot<token>/<file_path>",
-	// where <file_path> is taken from the response. It is guaranteed that the link will be valid for at least 1 hour.
+	// where <file_path> is taken from the response. It is guaranteed that the link will be valid for at least 1 hour. Parameters:
+	// 	(formatter.IParameters).WriteUserID() [Required]
+	// 	(formatter.IParameters).WriteOffset() [Optional]
+	// 	(formatter.IParameters).WriteLimit() [Optional]
 	// Get the results here:
-	// 	(IParameters).GetProfilePhotos()
+	// 	(formatter.IParameters).GetProfilePhotos()
 	UserProfilePhotos string = "getUserProfilePhotos"
 
 	// Changes the emoji status for a given user that previously allowed the bot to manage
-	// their emoji status via the Mini App method https://core.telegram.org/bots/webapps#initializing-mini-apps
+	// their emoji status via the Mini App method https://core.telegram.org/bots/webapps#initializing-mini-apps. Parameters:
+	// 	(formatter.IParameters).WriteUserID() [Required]
+	// 	(formatter.IParameters).WriteEmojiStatusCustomEmojiID() [Optional]
+	// 	(formatter.IParameters).WriteEmojiStatusExpirationDate() [Optional]
 	UserEmojiStatus string = "setUserEmojiStatus"
 
 	// Use this method to get basic information about a file and prepare it for downloading.
-	// For the moment, bots can download files of up to 20MB in size. Get the results here:
-	// 	(IParameters).GetFile()
+	// For the moment, bots can download files of up to 20MB in size. Parameters:
+	// 	(formatter.IParameters).WriteFileID() [Required]
+	//  Get the results here:
+	// 	(formatter.IParameters).GetFile()
 	File string = "getFile"
 
 	// Use this method to ban a user in a group, a supergroup or a channel.
 	// In the case of supergroups and channels, the user will not be able to return
 	// to the chat on their own using invite links, etc., unless unbanned first. The bot must be an
-	// administrator in the chat for this to work and must have the appropriate administrator rights.
+	// administrator in the chat for this to work and must have the appropriate administrator rights. Parameters:
+	// 	(formatter.IChat).WriteChatID() or (formatter.IChat).WriteChatName() [Required]
+	// 	(formatter.IParameters).WriteUserID() [Required]
+	// 	(formatter.IParameters).WriteUntilDate() [Optional]
+	// 	(formatter.IParameters).WriteRevokeMessages() [Optional]
 	BanMember string = "banChatMember"
 
 	// Use this method to unban a previously banned user in a supergroup or channel. The user
@@ -125,127 +445,207 @@ const (
 	// The bot must be an administrator for this to work. By default, this method guarantees that after
 	// the call the user is not a member of the chat, but will be able to join it. So if the user is a member
 	// of the chat they will also be removed from the chat. If you don't want this, use
-	// 	(IParameters).WriteOnlyIfBanned()
+	// 	(formatter.IParameters).WriteOnlyIfBanned()
+	// Parameters:
+	// 	(formatter.IChat).WriteChatID() or (formatter.IChat).WriteChatName() [Required]
+	// 	(formatter.IParameters).WriteUserID() [Required]
+	// 	(formatter.IParameters).WriteOnlyIfBanned() [Optional]
 	UnbanMember string = "unbanChatMember"
 
 	// Use this method to restrict a user in a supergroup. The bot must be an administrator in the supergroup for
 	// this to work and must have the appropriate administrator rights. Pass true for all fields in *types.ChatPermissions
-	// that you put in (IParameters).WritePermissions() restrictions from a user.
+	// that you put in (formatter.IParameters).WritePermissions() restrictions from a user. Parameters:
+	// 	(formatter.IChat).WriteChatID() or (formatter.IChat).WriteChatName() [Required]
+	// 	(formatter.IParameters).WriteUserID() [Required]
+	// 	(formatter.IParameters).WritePermissions() [Required]
+	// 	(formatter.IParameters).WriteIndependentChatPermissions() [Optional]
+	// 	(formatter.IParameters).WriteUntilDate() [Optional]
 	RestrictMember string = "restrictChatMember"
 
 	// Use this method to promote or demote a user in a supergroup or a channel. The bot must be an administrator
 	// in the chat for this to work and must have the appropriate administrator rights. Pass False for all fields in *types.ChatAdministratorRights
-	// that you put in (IParameters).WriteAdministratorRights() parameters to demote a user.
+	// that you put in (formatter.IParameters).WriteAdministratorRights() parameters to demote a user. Parameters:
+	// 	(formatter.IChat).WriteChatID() or (formatter.IChat).WriteChatName() [Required]
+	// 	(formatter.IParameters).WriteUserID() [Required]
+	// 	(formatter.IParameters).WriteAdministratorRights() [Optional]
 	PromoteMember string = "promoteChatMember"
 
-	// Use this method to set a custom title for an administrator in a supergroup promoted by the bot.
+	// Use this method to set a custom title for an administrator in a supergroup promoted by the bot. Parameters:
+	// 	(formatter.IChat).WriteChatID() or (formatter.IChat).WriteChatName() [Required]
+	// 	(formatter.IParameters).WriteUserID() [Required]
+	// 	(formatter.IParameters).WriteCustomTitle() [Required]
 	ChatAdministratorTitle string = "setChatAdministratorCustomTitle"
 
 	// Use this method to ban a channel chat in a supergroup or a channel. Until the chat is unbanned,
 	// the owner of the banned chat won't be able to send messages on behalf of any of their channels.
-	// The bot must be an administrator in the supergroup or channel for this to work and must have the appropriate administrator rights.
+	// The bot must be an administrator in the supergroup or channel for this to work and must have the appropriate administrator rights. Parameters:
+	// 	(formatter.IChat).WriteChatID() or (formatter.IChat).WriteChatName() [Required]
+	// 	(formatter.IChat).WriteSenderChatID() [Required]
 	BanSenderChat string = "banChatSenderChat"
 
 	// Use this method to unban a previously banned channel chat in a supergroup or channel. The bot must be an administrator
-	// for this to work and must have the appropriate administrator rights.
+	// for this to work and must have the appropriate administrator rights. Parameters:
+	// 	(formatter.IChat).WriteChatID() or (formatter.IChat).WriteChatName() [Required]
+	// 	(formatter.IChat).WriteSenderChatID() [Required]
 	UnbanSenderChat string = "unbanChatSenderChat"
 
 	// Use this method to set default chat permissions for all members.
 	// The bot must be an administrator in the group or a supergroup for
-	// this to work and must have the types.ChatAdministratorRights.CanRestrictMembers administrator rights.
+	// this to work and must have the types.ChatAdministratorRights.CanRestrictMembers administrator rights. Parameters:
+	// 	(formatter.IChat).WriteChatID() or (formatter.IChat).WriteChatName() [Required]
+	// 	(formatter.IParameters).WritePermissions() [Required]
+	// 	(formatter.IParameters).WriteIndependentChatPermissions() [Optional]
 	ChatPermissions string = "setChatPermissions"
 
 	// Use this method to generate a new primary invite link for a chat; any previously generated primary link is revoked.
-	// The bot must be an administrator in the chat for this to work and must have the appropriate administrator rights. Get the results here:
-	// 	(IParameters).GetInviteLink()
+	// The bot must be an administrator in the chat for this to work and must have the appropriate administrator rights. Parameters:
+	// 	(formatter.IChat).WriteChatID() or (formatter.IChat).WriteChatName() [Required]
+	// Get the results here:
+	// 	(formatter.IParameters).GetInviteLink()
 	ExportInviteLink string = "exportChatInviteLink"
 
 	// Use this method to create an additional invite link for a chat. The bot must be an administrator in the chat for this to work and must
-	// have the appropriate administrator rights. The link can be revoked using the method RevokeInviteLink. Get the results here:
+	// have the appropriate administrator rights. The link can be revoked using the method RevokeInviteLink. Parameters:
+	// 	(formatter.IChat).WriteChatID() or (formatter.IChat).WriteChatName() [Required]
+	// 	(formatter.Ilink).WriteName() [Optional]
+	// 	(formatter.Ilink).WriteExpireDate() [Optional]
+	// 	(formatter.Ilink).WriteMemberLimit() [Optional]
+	// 	(formatter.Ilink).WriteJoinRequest() [Optional]
+	// Get the results here:
 	// 	(IParameters).GetNewInviteLink()
 	CreateInviteLink string = "createChatInviteLink"
 
 	// Use this method to edit a non-primary invite link created by the bot. The bot must be an administrator in the chat for this to work
-	// and must have the appropriate administrator rights. Get the results here:
+	// and must have the appropriate administrator rights. Parameters:
+	// 	(formatter.IChat).WriteChatID() or (formatter.IChat).WriteChatName() [Required]
+	// 	(formatter.Ilink).WriteInviteLink() [Required]
+	// 	(formatter.Ilink).WriteName() [Optional]
+	// 	(formatter.Ilink).WriteExpireDate() [Optional]
+	// 	(formatter.Ilink).WriteMemberLimit() [Optional]
+	// 	(formatter.Ilink).WriteJoinRequest() [Optional]
+	// Get the results here:
 	// 	(IParameters).GetNewInviteLink()
 	EditInviteLink string = "editChatInviteLink"
 
 	// Use this method to create a subscription invite link for a channel chat. The bot must have the types.ChatAdministratorRights.CanInviteUsers administrator rights.
+	// Parameters:
+	// 	(formatter.IChat).WriteChatID() or (formatter.IChat).WriteChatName() [Required]
+	// 	(formatter.Ilink).WriteName() [Optional]
+	// 	(formatter.ILink).WriteSubscriptionPeriod() [Required]
+	// 	(formatter.ILink).WriteSubscriptionPrice() [Required]
 	// Get the results here:
 	// 	(IParameters).GetNewInviteLink()
 	CreateSubInviteLink string = "createChatSubscriptionInviteLink"
 
 	// Use this method to edit a subscription invite link created by the bot. The bot must have the types.ChatAdministratorRights.CanInviteUsers administrator rights.
+	// Parameters:
+	// 	(formatter.IChat).WriteChatID() or (formatter.IChat).WriteChatName() [Required]
+	// 	(formatter.Ilink).WriteInviteLink() [Required]
+	// 	(formatter.Ilink).WriteName() [Optional]
 	// Get the results here:
 	// 	(IParameters).GetNewInviteLink()
 	EditSubInviteLink string = "editChatSubscriptionInviteLink"
 
 	// Use this method to revoke an invite link created by the bot. If the primary link is revoked, a new link is automatically generated.
-	// The bot must be an administrator in the chat for this to work and must have the appropriate administrator rights. Get the results here:
+	// The bot must be an administrator in the chat for this to work and must have the appropriate administrator rights. Parameters:
+	// 	(formatter.IChat).WriteChatID() or (formatter.IChat).WriteChatName() [Required]
+	// 	(formatter.Ilink).WriteInviteLink() [Required]
+	// Get the results here:
 	// 	(IParameters).GetNewInviteLink()
 	RevokeInviteLink string = "revokeChatInviteLink"
 
-	// Use this method to approve a chat join request. The bot must be an administrator in the chat for this to work and must have the types.ChatAdministratorRights.CanInviteUsers administrator rights.
+	// Use this method to approve a chat join request. The bot must be an administrator in the chat for this
+	// to work and must have the types.ChatAdministratorRights.CanInviteUsers administrator rights. Parameters:
+	// 	(formatter.IChat).WriteChatID() or (formatter.IChat).WriteChatName() [Required]
+	// 	(formmatter.IParameters).WriteUserID() [Required]
 	ApproveJoinReq string = "approveChatJoinRequest"
 
-	// Use this method to decline a chat join request. The bot must be an administrator in the chat for this to work and must have the types.ChatAdministratorRights.CanInviteUsers administrator rights.
+	// Use this method to decline a chat join request. The bot must be an administrator in the
+	// chat for this to work and must have the types.ChatAdministratorRights.CanInviteUsers administrator rights. Parameters:
+	// 	(formatter.IChat).WriteChatID() or (formatter.IChat).WriteChatName() [Required]
+	// 	(formmatter.IParameters).WriteUserID() [Required]
 	DeclineJoinReq string = "declineChatJoinRequest"
 
 	// Use this method to set a new profile photo for the chat. Photos can't be changed for private chats. The bot must be an administrator in the
-	// chat for this to work and must have the appropriate administrator rights.
+	// chat for this to work and must have the appropriate administrator rights. Parameters:
+	// 	(formatter.IChat).WriteChatID() or (formatter.IChat).WriteChatName() [Required]
+	// 	(formatter.IPhoto).WritePhotoStorage() [Required]
 	SetChatPhoto string = "setChatPhoto"
 
 	// Use this method to delete a chat photo. Photos can't be changed for private chats. The bot must be an administrator in the chat for this
-	// to work and must have the appropriate administrator rights.
+	// to work and must have the appropriate administrator rights. Parameters:
+	// 	(formatter.IChat).WriteChatID() or (formatter.IChat).WriteChatName() [Required]
 	DeleteChatPhoto string = "deleteChatPhoto"
 
 	// Use this method to change the title of a chat. Titles can't be changed for private chats. The bot must be an administrator in the chat
-	// for this to work and must have the appropriate administrator rights.
+	// for this to work and must have the appropriate administrator rights. Parameters:
+	// 	(formatter.IChat).WriteChatID() or (formatter.IChat).WriteChatName() [Required]
+	// (formatter.IChat).WriteTitle() [Required]
 	ChatTitle string = "setChatTitle"
 
 	// Use this method to change the description of a group, a supergroup or a channel. The bot must be an administrator in the chat for
-	// this to work and must have the appropriate administrator rights.
+	// this to work and must have the appropriate administrator rights. Parameters:
+	// 	(formatter.IChat).WriteChatID() or (formatter.IChat).WriteChatName() [Required]
+	// 	(formatter.IChat).WriteDescription() [Required]
 	ChatDescription string = "setChatDescription"
 
 	// Use this method to add a message to the list of pinned messages in a chat. If the chat is not a private chat,
 	// the bot must be an administrator in the chat for this to work and must have the types.ChatAdministratorRights.CanPinMessages
-	// administrator right in a supergroup or types.ChatAdministratorRights.CanEditMessages administrator right in a channel.
+	// administrator right in a supergroup or types.ChatAdministratorRights.CanEditMessages administrator right in a channel. Parameters:
+	// 	(formatter.IChat).WriteBusinessConnectionID() [Optional]
+	// 	(formatter.IChat).WriteChatID() or (formatter.IChat).WriteChatName() [Required]
+	// 	(formmatter.IParameters).WriteMessageID() [Required]
+	// 	(formatter.IParameters).WriteDisableNotification [Optional]
 	PinMessage string = "pinChatMessage"
 
 	// Use this method to remove a message from the list of pinned messages in a chat. If the chat is not a private chat,
 	// the bot must be an administrator in the chat for this to work and must have the types.ChatAdministratorRights.CanPinMessages
-	// administrator right in a supergroup or types.ChatAdministratorRights.CanEditMessages administrator right in a channel.
+	// administrator right in a supergroup or types.ChatAdministratorRights.CanEditMessages administrator right in a channel. Parameters:
+	// 	(formatter.IChat).WriteBusinessConnectionID() [Optional]
+	// 	(formatter.IChat).WriteChatID() or (formatter.IChat).WriteChatName() [Required]
+	// 	(formmatter.IParameters).WriteMessageID() [Optional]
 	UnpinMessage string = "unpinChatMessage"
 
 	// Use this method to clear the list of pinned messages in a chat. If the chat is not a private chat,
 	// the bot must be an administrator in the chat for this to work and must have the types.ChatAdministratorRights.CanPinMessages
-	// administrator right in a supergroup or types.ChatAdministratorRights.CanEditMessages administrator right in a channel.
+	// administrator right in a supergroup or types.ChatAdministratorRights.CanEditMessages administrator right in a channel. Parameters:
+	// 	(formatter.IChat).WriteChatID() or (formatter.IChat).WriteChatName() [Required]
 	UnpinAll string = "unpinAllChatMessages"
 
-	// Use this method for your bot to leave a group, supergroup or channel.
+	// Use this method for your bot to leave a group, supergroup or channel. Parameters:
+	// 	(formatter.IChat).WriteChatID() or (formatter.IChat).WriteChatName() [Required]
 	LeaveChat string = "leaveChat"
 
-	// Use this method to get up-to-date information about the chat. Get the results here:
+	// Use this method to get up-to-date information about the chat. Parameters:
+	// 	(formatter.IChat).WriteChatID() or (formatter.IChat).WriteChatName() [Required]
+	// Get the results here:
 	// 	(IChat).GetChat()
 	GetChat string = "getChat"
 
-	// Use this method to get a list of administrators in a chat, which aren't bots. Get the results here:
+	// Use this method to get a list of administrators in a chat, which aren't bots. Parameters:
+	// 	(formatter.IChat).WriteChatID() or (formatter.IChat).WriteChatName() [Required]
+	// Get the results here:
 	// 	(IChat).GetMembers()
 	GetAdmins string = "getChatAdministrators"
 
-	// Use this method to get the number of members in a chat. Get the results here:
+	// Use this method to get the number of members in a chat. Parameters:
+	// 	(formatter.IChat).WriteChatID() or (formatter.IChat).WriteChatName() [Required]
+	// Get the results here:
 	// 	(IChat).GetMembersAmount()
 	GetMemberCount string = "getChatMemberCount"
 
 	// Use this method to get information about a member of a chat. The method is only guaranteed to work for other users if the
-	// bot is an administrator in the chat. Get the results here:
+	// bot is an administrator in the chat. Parameters:
+	// 	(formatter.IChat).WriteChatID() or (formatter.IChat).WriteChatName() [Required]
+	// 	(formatter.IParameters).WriteUserID() [Required]
+	// Get the results here:
 	// 	(IChat).GetMembers() [always zero element]
 	GetMember string = "getChatMember"
 
 	//Use this method to set a new group sticker set for a supergroup. The bot must be an administrator in the chat
 	// for this to work and must have the appropriate administrator rights. Parameters:
-	// 	(IChat).WriteChatID() or (formatter.IChat).WriteChatName() [Required]
-	// 	(Isticker).WriteSetName() [Required]
+	// 	(formatter.IChat).WriteChatID() or (formatter.IChat).WriteChatName() [Required]
+	// 	(formatter.ISticker).WriteSetName() [Required]
 	ChatStickerSet string = "getChatStickerSet"
 
 	// Use this method to delete a group sticker set from a supergroup. The bot must be an administrator in the chat
@@ -771,8 +1171,92 @@ const (
 	// 	(formatter.IPayment).GetInvoiceLink()
 	CreateInvoiceLink string = "createInvoiceLink"
 
-	//
+	// If you sent an invoice requesting a shipping address and the parameter formatter.IPayment).WriteIsFlexible() was specified,
+	// the Bot API will send an (formatter.IPayment).GetUpdate with a shipping_query field to the bot. Use this method to reply to shipping queries.
+	// Parameters:
+	// 	(formatter.IPayment).WriteShippingID() [Required]
+	// 	(formatter.IPayment).WriteOK() [Required]
+	// 	(formatter.IPayment).WriteShippingOptions() [Optional]
+	// 	(formatter.IPayment).WriteErrorMessage() [Optional]
 	AnswerShippingQuery string = "answerShippingQuery"
+
+	// Once the user has confirmed their payment and shipping details, the Bot API sends the final confirmation in the form of
+	// a (formatter.IPayment).GetUpdate with the field PreCheckoutQuery. Use this method to respond to such pre-checkout queries. Note: The Bot API must
+	// receive an answer within 10 seconds after the pre-checkout query was sent. Parameters:
+	// 	(formatter.IPayment).WritePreCheckoutID() [Required]
+	// 	(formatter.IPayment).WriteOK() [Required]
+	// 	(formatter.IIPayment).WriteErrorMessage() [Optional]
+	AnswerPreCheckoutQuery string = "answerPreCheckoutQuery"
+
+	// Returns the bot's Telegram Star transactions in chronological order. Parameters:
+	// 	(formatter.IPayment).WriteLimit() [Optional]
+	// 	(formatter.IPaymentt).WriteOffset() [Optional]
+	// Get the results here:
+	// 	(formatter.IPayment).GetStarTransactions()
+	GetStarTransactions string = "getStarTransactions"
+
+	// Refunds a successful payment in Telegram Stars. Parameters:
+	// 	(formatter.IParameters).WriteUserID() [Required]
+	// 	(formatter.IPayment).WriteTelegramPaymentChargeID() [Required]
+	RefundStarPayment string = "refundStarPayment"
+
+	// Allows the bot to cancel or re-enable extension of a subscription paid in Telegram Stars. Parameters:
+	// 	(formatter.IParameters).WriteUserID() [Required]
+	// 	(formatter.IPayment).WriteTelegramPaymentChargeID() [Required]
+	// 	(formatter.IPayment).WriteIsCanceled() [Required]
+	EditUserStarSubscription string = "editUserStarSubscription"
+
+	// Informs a user that some of the Telegram Passport elements they provided contains errors. The user will not be able to re-submit
+	// their Passport to you until the errors are fixed (the contents of the field for which you returned the error must change). Use this if the
+	// data submitted by the user doesn't satisfy the standards your service requires for any reason. For example, if
+	// a birthday date seems invalid, a submitted document is blurry, a scan shows evidence of tampering, etc. Supply some
+	// details in the error message to make sure the user knows how to correct the issues. Parameters:
+	// 	(formatter.IParameters).WriteUserID() [Required]
+	// 	(formatter.IParameters).WriteErrors() [Required]
+	SetPassportDataErrors string = "setPassportDataErrors"
+
+	// Use this method to send a game. Parameters:
+	// 	(formatter.IChat).WriteBusinessConnectionID() [Optional]
+	// 	(formatter.IChat).WriteChatID [Required]
+	// 	(formatter.IParameters).WriteMessageThreadID() [Optional]
+	// 	(formatter.IGame).WriteShortName() [Required]
+	// 	(formatter.IParameters).WriteDisableNotification() [Optional]
+	// 	(formatter.IParameters).WriteProtectContent() [Optional]
+	// 	(formatter.IParameters).WriteAllowPaidBroadcast() [Optional]
+	// 	(formatter.IParameters).WriteMessageEffectID() [Optional]
+	// 	(formatter.IParameters).WriteReplyParameters() [Optional]
+	// 	(formatter.IKeyboard).WriteInline() [Optional]
+	Game string = "sendGame"
+
+	// Use this method to set the score of the specified user in a game message. Parameters:
+	// 	(formatter.IParameters).WriteUserID() [Required]
+	// 	(formatter.IGame).WriteScore() [Required]
+	// 	(formatter.IGame).WriteForce() [Optional]
+	// 	(formatter.IGame).WriteDisableEditMessage() [Optional]
+	// 	(formatter.IChat).WriteChatID() [Optional]
+	// 	(formatter.IParameters).WriteMessageID() [Optional]
+	//	(formatter.IParameters).WriteInlineMessageID() [Optional]
+	SetGameScore string = "setGameScore"
+
+	// Use this method to get data for high score tables. Will return the score of the
+	// specified user and several of their neighbors in a game. This method will currently
+	// return scores for the target user, plus two of their closest neighbors on each side. Will also
+	// return the top three users if the user and their neighbors are not among them. Please note that this
+	// behavior is subject to change. Parameters:
+	// 	(formatter.IParameters).WriteUserID() [Required]
+	// 	(formatter.IChat).WriteChatID() [Optional]
+	// 	(formatter.IParameters).WriteMessageID() [Optional]
+	// 	(formatter.IParameters).WriteInlineMessageID() [Optional]
+	SetGameHighScores string = "getGameHighScores"
 )
 
-var Media = map[string]struct{}{Photo: {}, Audio: {}, Document: {}, Video: {}, MediaGroup: {}, Animation: {}, Voice: {}}
+var Media = map[string]struct{}{Photo: {}, Audio: {}, Document: {},
+	Video: {}, MediaGroup: {}, Animation: {}, Voice: {}}
+
+var Lvl1 = []string{Message, Photo, Audio,
+	Document, Video, Animation,
+	Voice, VideoNote, PaidMedia,
+	MediaGroup, Location, Venue,
+	Contact, Poll, Dice,
+	ChatAction, Sticker, Gift,
+	Invoice, Game}

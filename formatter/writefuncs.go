@@ -383,7 +383,7 @@ func (vd *video) WriteDuration(duration int) error {
 	return err
 }
 
-func (vd *video) WriteSupportStreaming() error {
+func (vd *video) WriteSupportsStreaming() error {
 	var err error
 	if !vd.SupportsStreaming {
 		vd.SupportsStreaming = true
@@ -1312,7 +1312,7 @@ func (l *link) WriteJoinRequest() error {
 	return err
 }
 
-func (l *link) WriteIniveLink(link string) error {
+func (l *link) WriteInviteLink(link string) error {
 	var err error
 	if err = checkStringValue(link, l.InviteLink); err == nil {
 		l.InviteLink = link
@@ -2349,6 +2349,17 @@ func (inf *information) WriteDescription(desc string) error {
 		}
 	} else {
 		err = code20()
+	}
+	return err
+}
+
+func (inf *information) WriteRemoveCaption() error {
+	var err error
+	if !inf.RemoveCaption {
+		inf.RemoveCaption = true
+		logs.SettedParam("Remove Caption", interfaceInf, true)
+	} else {
+		err = code10()
 	}
 	return err
 }

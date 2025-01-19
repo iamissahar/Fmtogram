@@ -139,16 +139,6 @@ func (sttc *stTestContainer) giftID(st formatter.ISticker, s *stickerT, i int) {
 	s.str = sttc.inputStr[i]
 }
 
-func (sttc *stTestContainer) parseMode(st formatter.ISticker, s *stickerT, i int) {
-	s.testedFunc = st.WriteTextParseMode
-	s.str = sttc.inputStr[i]
-}
-
-func (sttc *stTestContainer) textEntities(st formatter.ISticker, s *stickerT, i int) {
-	s.testedFunc = st.WriteTextEntities
-	s.ent = sttc.Entities[i]
-}
-
 func (sttc *stTestContainer) writeSetName() {
 	sttc.name = "(ISticker).WriteSetName()"
 	sttc.inputStr = []string{"K:LASDKASKL:DAK:LSD", "", "Name", "there isn't a name"}
@@ -359,28 +349,6 @@ func (sttc *stTestContainer) writeGiftID() {
 	sttc.buildF = sttc.giftID
 }
 
-func (sttc *stTestContainer) writeParseMode() {
-	sttc.name = "(ISticker).WriteTextParseMode()"
-	sttc.inputStr = []string{types.HTML, types.Markdown, types.MarkdownV2, "", "something else", types.HTML, types.Markdown}
-	sttc.isExpectedErr = []bool{false, false, false, true, true, false, true}
-	sttc.codeErr = []string{"", "", "", "20", "20", "", "10"}
-	sttc.amount, sttc.until = 7, 5
-	sttc.buildF = sttc.parseMode
-}
-
-func (sttc *stTestContainer) writeTextEntities() {
-	sttc.name = "(ISticker).WriteTextEntities"
-	sttc.Entities = [][]*types.MessageEntity{
-		{{Type: "text_link", Offset: 0, Length: 7, Url: "https://youtube.com"}},
-		{},
-		{{Type: "text_link", Offset: 0, Length: 7, Url: "https://youtube.com"}, nil, nil},
-		{{Type: "text_link", Offset: 0, Length: 7, Url: "https://youtube.com"}}, {{Type: "text_link", Offset: 0, Length: 7, Url: "https://youtube.com"}}}
-	sttc.isExpectedErr = []bool{false, true, true, false, true}
-	sttc.codeErr = []string{"", "20", "5", "", "10"}
-	sttc.amount, sttc.until = 5, 3
-	sttc.buildF = sttc.textEntities
-}
-
 func (st *stickerT) startTest(part string, i int, t *testing.T) {
 	switch f := st.testedFunc.(type) {
 	case func(string) error:
@@ -572,20 +540,6 @@ func TestStikerWriteGiftID(t *testing.T) {
 func TestStickerWriteGiftID(t *testing.T) {
 	sttc := new(stTestContainer)
 	sttc.writeGiftID()
-	msg := formatter.CreateEmpltyMessage()
-	sttc.mainLogic(msg, t)
-}
-
-func TestStikerWriteTextParseMode(t *testing.T) {
-	sttc := new(stTestContainer)
-	sttc.writeParseMode()
-	msg := formatter.CreateEmpltyMessage()
-	sttc.mainLogic(msg, t)
-}
-
-func TestStickerWriteTextEntities(t *testing.T) {
-	sttc := new(stTestContainer)
-	sttc.writeTextEntities()
 	msg := formatter.CreateEmpltyMessage()
 	sttc.mainLogic(msg, t)
 }

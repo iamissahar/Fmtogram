@@ -53,7 +53,7 @@ func (linktc *linkTestContainer) putLinkWriteJoinRequest(link formatter.ILink, l
 }
 
 func (linktc *linkTestContainer) putLinkWriteIniveLink(link formatter.ILink, l *linkT, i int) {
-	l.testedFunc = link.WriteIniveLink
+	l.testedFunc = link.WriteInviteLink
 	l.str = linktc.inputStr[i]
 }
 

@@ -74,7 +74,7 @@ func videoStorageUnreqWithoutName(t *testing.T) {
 	if err := vd.WriteWidth(886); err != nil {
 		t.Fatal(err)
 	}
-	if err := vd.WriteSupportStreaming(); err != nil {
+	if err := vd.WriteSupportsStreaming(); err != nil {
 		t.Fatal(err)
 	}
 	if err := vd.WriteHasSpoiler(); err != nil {
@@ -141,7 +141,7 @@ func videoStorageUnreqWithName(t *testing.T) {
 	if err := vd.WriteWidth(886); err != nil {
 		t.Fatal(err)
 	}
-	if err := vd.WriteSupportStreaming(); err != nil {
+	if err := vd.WriteSupportsStreaming(); err != nil {
 		t.Fatal(err)
 	}
 	if err := vd.WriteHasSpoiler(); err != nil {
@@ -256,7 +256,7 @@ func videoTelegramUnreqWithoutName(t *testing.T) {
 	if err := vd.WriteWidth(886); err != nil {
 		t.Fatal(err)
 	}
-	if err := vd.WriteSupportStreaming(); err != nil {
+	if err := vd.WriteSupportsStreaming(); err != nil {
 		t.Fatal(err)
 	}
 	if err := vd.WriteHasSpoiler(); err != nil {
@@ -323,7 +323,7 @@ func videoTelegramUnreqWithName(t *testing.T) {
 	if err := vd.WriteWidth(886); err != nil {
 		t.Fatal(err)
 	}
-	if err := vd.WriteSupportStreaming(); err != nil {
+	if err := vd.WriteSupportsStreaming(); err != nil {
 		t.Fatal(err)
 	}
 	if err := vd.WriteHasSpoiler(); err != nil {
@@ -420,7 +420,7 @@ func videoStOKs(t *testing.T) {
 	if err := vd.WriteWidth(886); err != nil {
 		t.Fatal(err)
 	}
-	if err := vd.WriteSupportStreaming(); err != nil {
+	if err := vd.WriteSupportsStreaming(); err != nil {
 		t.Fatal(err)
 	}
 	if err := vd.WriteHasSpoiler(); err != nil {
@@ -501,7 +501,7 @@ func videoTgOKs(t *testing.T) {
 	if err := vd.WriteWidth(886); err != nil {
 		t.Fatal(err)
 	}
-	if err := vd.WriteSupportStreaming(); err != nil {
+	if err := vd.WriteSupportsStreaming(); err != nil {
 		t.Fatal(err)
 	}
 	if err := vd.WriteHasSpoiler(); err != nil {
@@ -573,7 +573,7 @@ func videoIntOKs(t *testing.T) {
 	if err := vd.WriteWidth(886); err != nil {
 		t.Fatal(err)
 	}
-	if err := vd.WriteSupportStreaming(); err != nil {
+	if err := vd.WriteSupportsStreaming(); err != nil {
 		t.Fatal(err)
 	}
 	if err := vd.WriteHasSpoiler(); err != nil {
@@ -846,7 +846,7 @@ func videoShowCaptionAboveMedia(t *testing.T) {
 func videoSupStrK(t *testing.T) {
 	msg := formatter.CreateEmpltyMessage()
 	vd := msg.NewVideo()
-	if err := vd.WriteSupportStreaming(); err != nil {
+	if err := vd.WriteSupportsStreaming(); err != nil {
 		t.Fatal(err)
 	}
 }
@@ -854,10 +854,10 @@ func videoSupStrK(t *testing.T) {
 func videoSupStr10(t *testing.T) {
 	msg := formatter.CreateEmpltyMessage()
 	vd := msg.NewVideo()
-	if err := vd.WriteSupportStreaming(); err != nil {
+	if err := vd.WriteSupportsStreaming(); err != nil {
 		t.Fatal(err)
 	}
-	if err := vd.WriteSupportStreaming(); err.Error() != code10 {
+	if err := vd.WriteSupportsStreaming(); err.Error() != code10 {
 		t.Fatal(err)
 	}
 }
@@ -999,7 +999,7 @@ func videoUnit(t *testing.T) {
 	t.Run("WriteHeight", videoHeight)
 	t.Run("WriteWidth", videoWidth)
 	t.Run("WriteShowCaptionAboveMedia", videoShowCaptionAboveMedia)
-	t.Run("WriteSupportStreaming", videoSupportsStreaming)
+	t.Run("WriteSupportsStreaming", videoSupportsStreaming)
 	t.Run("WriteThumbnailStorage", videoThumbnailStorage)
 	t.Run("WriteThumbnailTelegram", videoThumbnailTelegram)
 	t.Run("WriteThumbnailInternet", videoThumbnailInternet)

@@ -85,7 +85,7 @@ type IVideo interface {
 
 	// Call it, if the caption must be shown above the message media (only if you copy a message that has Media Type). Ignored if a new caption isn't specified.
 	WriteShowCaptionAboveMedia() error
-	WriteSupportStreaming() error
+	WriteSupportsStreaming() error
 	WriteThumbnailStorage(path string) error
 	WriteThumbnailTelegram(thumbnailID string) error
 	WriteThumbnailInternet(URL string) error
@@ -632,6 +632,8 @@ type IParameters interface {
 
 	WriteDescription(desc string) error
 
+	WriteRemoveCaption() error
+
 	// You can call this function after calling Send(). It returns you a structure with some data about the user you just sent a message to
 	GetResponse() types.User
 
@@ -709,7 +711,7 @@ type ILink interface {
 	WriteJoinRequest() error
 
 	// The invite link to edit
-	WriteIniveLink(link string) error
+	WriteInviteLink(link string) error
 
 	// The number of seconds the subscription will be active for before the next payment.
 	// Currently, it must always be 2592000 (30 days).
@@ -928,6 +930,10 @@ type IPayment interface {
 	WriteIsCanceled() error
 
 	// GetInvoiceLink() string
+
+	// GetStarTransactions() types.StarTransactions
+
+	// GetUpdate() types.Update
 }
 
 type IGame interface {
