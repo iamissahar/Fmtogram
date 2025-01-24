@@ -109,3 +109,9 @@ func (msg *Message) NewGame() IGame {
 	logs.NewInterfaceCreated(interfaceGame)
 	return &game{}
 }
+
+func (msg *Message) NewIGet() IGet {
+	logs.NewInterfaceCreated(interfaceGet)
+	msg.fm.g = &get{}
+	return msg.fm.g
+}

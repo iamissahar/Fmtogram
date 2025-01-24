@@ -1,5 +1,10 @@
 package formatter
 
+import (
+	"github.com/l1qwie/Fmtogram/formatter/methods"
+	"github.com/l1qwie/Fmtogram/types"
+)
+
 const (
 	Storage               int    = 1
 	Telegram              int    = 2
@@ -18,7 +23,6 @@ const (
 	interfaceVideo        string = "IVideo"
 	interfaceAudio        string = "IAudio"
 	interfaceDocument     string = "IDocument"
-	interfaceInf          string = "MSG Information"
 	interfaceChat         string = "IChat"
 	interfaceAnimation    string = "IAnimation"
 	interfaceVoice        string = "IVoice"
@@ -40,6 +44,7 @@ const (
 	interfaceResult       string = "IResult"
 	interfacePayment      string = "IPayment"
 	interfaceGame         string = "IGame"
+	interfaceGet          string = "IGet"
 	checkString           int    = -1
 	checkArray            int    = -2
 	checkBool             int    = -3
@@ -166,3 +171,6 @@ var Currencies = map[string]Currency{
 	"ZAR": {18.75, 187492.35},
 	"XTR": {},
 }
+
+var structForMethods = map[string]interface{}{methods.Message: &types.TelegramResponse{},
+	methods.ForwardMessage: &types.TelegramResponse{}}

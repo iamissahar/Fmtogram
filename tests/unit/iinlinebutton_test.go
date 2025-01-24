@@ -119,8 +119,8 @@ func (inbtc *inbTestContainer) writeString() {
 func (inbtc *inbTestContainer) writeSwitchInlineQuery() {
 	inbtc.name = "(IInlineButton).WriteSwitchInlineQuery()"
 	inbtc.inputStr = []string{"string", "", "nothing", "a"}
-	inbtc.isExpectedErr = []bool{false, true, false, true}
-	inbtc.codeErr = []string{"", "20", "", "10"}
+	inbtc.isExpectedErr = []bool{false, false, false, true}
+	inbtc.codeErr = []string{"", "", "", "10"}
 	inbtc.amount, inbtc.until = 4, 2
 	inbtc.buildF = putIButtonWriteSwitchInlineQuery
 }
@@ -137,8 +137,8 @@ func (inbtc *inbTestContainer) writeSwitchInlineQueryChosenChat() {
 func (inbtc *inbTestContainer) writeSwitchInlineQueryCurrentChat() {
 	inbtc.name = "(IInlineButton).WriteSwitchInlineQueryCurrentChat()"
 	inbtc.inputStr = []string{"string", "", "nothing", "a"}
-	inbtc.isExpectedErr = []bool{false, true, false, true}
-	inbtc.codeErr = []string{"", "20", "", "10"}
+	inbtc.isExpectedErr = []bool{false, false, false, true}
+	inbtc.codeErr = []string{"", "", "", "10"}
 	inbtc.amount, inbtc.until = 4, 2
 	inbtc.buildF = putIButtonWriteSwitchInlineQueryCurrentChat
 }

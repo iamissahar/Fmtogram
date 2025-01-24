@@ -18,6 +18,18 @@ type kb interface {
 	isOK() error
 }
 
+type IGet interface {
+	Status() bool
+	Error() (code int, msg string)
+	Chat() types.Chat
+	User() types.User
+	Bot() types.User
+	Date() int
+	MessageID() int
+	Replyed() IGet
+	ForwardOrigin() types.MessageOrigin
+}
+
 type IPhoto interface {
 	// Receives a path of a photo. The path can't be an empty string.
 	//
@@ -637,8 +649,10 @@ type IParameters interface {
 	// You can call this function after calling Send(). It returns you a structure with some data about the user you just sent a message to
 	GetResponse() types.User
 
+	// Get() Get
+
 	// Call it after methods.ForwardMessages, methods.CopyMessage and methods.CopyMessages. In any other cases it returns nil
-	GetMessageIDs() []int
+	// GetMessageIDs() []int
 
 	// GetProfilePhotos() types.UserProfilePhotos
 

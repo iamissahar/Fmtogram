@@ -49,13 +49,6 @@ func code12() error {
 	return err
 }
 
-func code14() error {
-	err := new(fmerrors.FME)
-	err.Code = 14
-	err.String = "media method is specified, media data isn't"
-	return err
-}
-
 func code20() error {
 	err := new(fmerrors.FME)
 	err.Code = 20
@@ -1820,7 +1813,7 @@ func (inf *information) WriteString(text string) error {
 	var err error
 	if err = checkStringValue(text, inf.Text); err == nil {
 		inf.Text = text
-		logs.DataWrittenSuccessfully(interfaceInf, "Text")
+		logs.DataWrittenSuccessfully(interfaceParam, "Text")
 	}
 	return err
 }
@@ -1829,7 +1822,7 @@ func (inf *information) WriteParseMode(parsemode string) error {
 	var err error
 	if err = checkParseMode(parsemode, inf.ParseMode); err == nil {
 		inf.ParseMode = parsemode
-		logs.DataWrittenSuccessfully(interfaceAudio, "Parse Mode")
+		logs.DataWrittenSuccessfully(interfaceParam, "Parse Mode")
 	}
 	return err
 }
@@ -1838,7 +1831,7 @@ func (inf *information) WriteMessageThreadID(messageID int) error {
 	var err error
 	if err = checkIntegerValue(messageID, inf.MessageThreadID); err == nil {
 		inf.MessageThreadID = messageID
-		logs.DataWrittenSuccessfully(interfaceInf, "Message Thread ID")
+		logs.DataWrittenSuccessfully(interfaceParam, "Message Thread ID")
 	}
 	return err
 }
@@ -1847,7 +1840,7 @@ func (inf *information) WriteDisableNotification() error {
 	var err error
 	if !inf.DisableNotification {
 		inf.DisableNotification = true
-		logs.SettedParam("Disable Notification", interfaceInf, inf.DisableNotification)
+		logs.SettedParam("Disable Notification", interfaceParam, inf.DisableNotification)
 	} else {
 		err = code10()
 	}
@@ -1858,7 +1851,7 @@ func (inf *information) WriteProtectContent() error {
 	var err error
 	if !inf.ProtectContent {
 		inf.ProtectContent = true
-		logs.SettedParam("Protect Content", interfaceInf, inf.ProtectContent)
+		logs.SettedParam("Protect Content", interfaceParam, inf.ProtectContent)
 	} else {
 		err = code10()
 	}
@@ -1869,7 +1862,7 @@ func (inf *information) WriteMessageEffectID(messageID string) error {
 	var err error
 	if err = checkStringValue(messageID, inf.MessageEffectID); err == nil {
 		inf.MessageEffectID = messageID
-		logs.DataWrittenSuccessfully(interfaceInf, "Message Effect ID")
+		logs.DataWrittenSuccessfully(interfaceParam, "Message Effect ID")
 	}
 	return err
 }
@@ -1878,7 +1871,7 @@ func (inf *information) WriteEntities(entities []*types.MessageEntity) error {
 	var err error
 	if err = checkEntities(entities, inf.Entities); err == nil {
 		inf.Entities = entities
-		logs.DataWrittenSuccessfully(interfaceInf, "Entities")
+		logs.DataWrittenSuccessfully(interfaceParam, "Entities")
 	}
 	return err
 }
@@ -1888,7 +1881,7 @@ func (inf *information) WriteLinkPreviewOptions(lpo *types.LinkPreviewOptions) e
 	if lpo != nil {
 		if inf.LinkPreviewOptions == nil {
 			inf.LinkPreviewOptions = lpo
-			logs.DataWrittenSuccessfully(interfaceInf, "Link Preview Options")
+			logs.DataWrittenSuccessfully(interfaceParam, "Link Preview Options")
 		} else {
 			err = code10()
 		}
@@ -1902,7 +1895,7 @@ func (inf *information) WriteMessageID(messageID int) error {
 	var err error
 	if err = checkIntegerValue(messageID, inf.MessageID); err == nil {
 		inf.MessageID = messageID
-		logs.DataWrittenSuccessfully(interfaceInf, "Message ID")
+		logs.DataWrittenSuccessfully(interfaceParam, "Message ID")
 	}
 	return err
 }
@@ -1920,7 +1913,7 @@ func (inf *information) WriteMessageIDs(messageIDs []int) error {
 		if err == nil {
 			if len(inf.MessageIDs) == 0 {
 				inf.MessageIDs = messageIDs
-				logs.DataWrittenSuccessfully(interfaceInf, "Message IDs")
+				logs.DataWrittenSuccessfully(interfaceParam, "Message IDs")
 			} else {
 				err = code10()
 			}
@@ -1935,7 +1928,7 @@ func (inf *information) WriteCaption(caption string) error {
 	var err error
 	if err = checkCaption(caption, inf.Caption); err == nil {
 		inf.Caption = caption
-		logs.DataWrittenSuccessfully(interfaceInf, "Caption")
+		logs.DataWrittenSuccessfully(interfaceParam, "Caption")
 	}
 	return err
 }
@@ -1944,7 +1937,7 @@ func (inf *information) WriteShowCaptionAboveMedia() error {
 	var err error
 	if !inf.ShowCaptionAboveMedia {
 		inf.ShowCaptionAboveMedia = true
-		logs.DataWrittenSuccessfully(interfaceInf, "Show Caption Above Media")
+		logs.DataWrittenSuccessfully(interfaceParam, "Show Caption Above Media")
 	} else {
 		err = code10()
 	}
@@ -1966,7 +1959,7 @@ func (inf *information) WriteReplyParameters(reply *types.ReplyParameters) error
 		if err == nil {
 			if inf.ReplyParameters == nil {
 				inf.ReplyParameters = reply
-				logs.DataWrittenSuccessfully(interfaceInf, "Reply Parameters")
+				logs.DataWrittenSuccessfully(interfaceParam, "Reply Parameters")
 			} else {
 				err = code10()
 			}
@@ -1982,7 +1975,7 @@ func (inf *information) WriteAllowPaidBroadcast() error {
 	var err error
 	if !inf.AllowPaidBroadcast {
 		inf.AllowPaidBroadcast = true
-		logs.DataWrittenSuccessfully(interfaceInf, "Allow Paid Broadcast")
+		logs.DataWrittenSuccessfully(interfaceParam, "Allow Paid Broadcast")
 	} else {
 		err = code10()
 	}
@@ -1993,7 +1986,7 @@ func (inf *information) WriteStarCount(amount int) error {
 	var err error
 	if err = checkIntegerValue(amount, inf.StarCount); err == nil {
 		inf.StarCount = amount
-		logs.DataWrittenSuccessfully(interfaceInf, "Star Count")
+		logs.DataWrittenSuccessfully(interfaceParam, "Star Count")
 	}
 	return err
 }
@@ -2002,7 +1995,7 @@ func (inf *information) WritePayload(payload string) error {
 	var err error
 	if err = checkStringValue(payload, inf.Payload); err == nil {
 		inf.Payload = payload
-		logs.DataWrittenSuccessfully(interfaceInf, "Payload")
+		logs.DataWrittenSuccessfully(interfaceParam, "Payload")
 	}
 	return err
 }
@@ -2042,7 +2035,7 @@ func (inf *information) WriteEmoji(emoji string) error {
 				if emojiMap[em[0]].amount < emojiMap[em[0]].permissibleQuantity {
 					if inf.Emoji == "" {
 						inf.Emoji = emoji
-						logs.DataWrittenSuccessfully(interfaceInf, "Emoji")
+						logs.DataWrittenSuccessfully(interfaceParam, "Emoji")
 					} else {
 						err = code10()
 					}
@@ -2071,7 +2064,7 @@ func (inf *information) WriteAction(action string) error {
 	if err == nil {
 		if inf.Action == "" {
 			inf.Action = action
-			logs.DataWrittenSuccessfully(interfaceInf, "Action")
+			logs.DataWrittenSuccessfully(interfaceParam, "Action")
 		} else {
 			err = code10()
 		}
@@ -2090,7 +2083,7 @@ func (inf *information) WriteReaction(reaction []*types.ReactionType) error {
 		if err == nil {
 			if inf.Reaction == nil {
 				inf.Reaction = reaction
-				logs.DataWrittenSuccessfully(interfaceInf, "Reaction")
+				logs.DataWrittenSuccessfully(interfaceParam, "Reaction")
 			} else {
 				err = code10()
 			}
@@ -2105,7 +2098,7 @@ func (inf *information) WriteReactionIsBig() error {
 	var err error
 	if !inf.ReactionIsBig {
 		inf.ReactionIsBig = true
-		logs.SettedParam("Reaction Is Big", interfaceInf, true)
+		logs.SettedParam("Reaction Is Big", interfaceParam, true)
 	} else {
 		err = code10()
 	}
@@ -2116,7 +2109,7 @@ func (inf *information) WriteOffset(offset int) error {
 	var err error
 	if err = checkIntegerValue(offset, inf.Offset); err == nil {
 		inf.Offset = offset
-		logs.DataWrittenSuccessfully(interfaceInf, "Offset")
+		logs.DataWrittenSuccessfully(interfaceParam, "Offset")
 	}
 	return err
 }
@@ -2126,7 +2119,7 @@ func (inf *information) WriteLimit(limit int) error {
 	if limit > 0 && limit <= 100 {
 		if inf.Limit == 0 {
 			inf.Limit = limit
-			logs.DataWrittenSuccessfully(interfaceInf, "Limit")
+			logs.DataWrittenSuccessfully(interfaceParam, "Limit")
 		} else {
 			err = code10()
 		}
@@ -2140,7 +2133,7 @@ func (inf *information) WriteEmojiStatusCustomEmojiID(emojiID string) error {
 	var err error
 	if err = checkStringValue(emojiID, inf.EmojiStatusCustomEmojiID); err == nil {
 		inf.EmojiStatusCustomEmojiID = emojiID
-		logs.DataWrittenSuccessfully(interfaceInf, "Emoji Status Custom Emoji ID")
+		logs.DataWrittenSuccessfully(interfaceParam, "Emoji Status Custom Emoji ID")
 	}
 	return err
 }
@@ -2149,7 +2142,7 @@ func (inf *information) WriteEmojiStatusExpirationDate(date int) error {
 	var err error
 	if err = checkIntegerValue(date, inf.EmojiStatusExpirationDate); err == nil {
 		inf.EmojiStatusExpirationDate = date
-		logs.DataWrittenSuccessfully(interfaceInf, "Emoji Status Expiration Date")
+		logs.DataWrittenSuccessfully(interfaceParam, "Emoji Status Expiration Date")
 	}
 	return err
 }
@@ -2158,7 +2151,7 @@ func (inf *information) WriteFileID(fileID string) error {
 	var err error
 	if err = checkStringValue(fileID, inf.FileID); err == nil {
 		inf.FileID = fileID
-		logs.DataWrittenSuccessfully(interfaceInf, "File ID")
+		logs.DataWrittenSuccessfully(interfaceParam, "File ID")
 	}
 	return err
 }
@@ -2168,7 +2161,7 @@ func (inf *information) WriteUntilDate(date time.Duration) error {
 	if date > 0 {
 		if inf.UntilDate == 0 {
 			inf.UntilDate = date
-			logs.DataWrittenSuccessfully(interfaceInf, "Until Date")
+			logs.DataWrittenSuccessfully(interfaceParam, "Until Date")
 		} else {
 			err = code10()
 		}
@@ -2182,7 +2175,7 @@ func (inf *information) WriteRevokeMessages() error {
 	var err error
 	if !inf.RevokeMessages {
 		inf.RevokeMessages = true
-		logs.SettedParam("Revoke Messages", interfaceInf, true)
+		logs.SettedParam("Revoke Messages", interfaceParam, true)
 	} else {
 		err = code10()
 	}
@@ -2193,7 +2186,7 @@ func (inf *information) WriteOnlyIfBanned() error {
 	var err error
 	if !inf.OnlyIfBanned {
 		inf.OnlyIfBanned = true
-		logs.SettedParam("Only If Banned", interfaceInf, true)
+		logs.SettedParam("Only If Banned", interfaceParam, true)
 	} else {
 		err = code10()
 	}
@@ -2205,7 +2198,7 @@ func (inf *information) WritePermissions(permissions *types.ChatPermissions) err
 	if permissions != nil {
 		if inf.Permissions == nil {
 			inf.Permissions = permissions
-			logs.DataWrittenSuccessfully(interfaceInf, "Permissions")
+			logs.DataWrittenSuccessfully(interfaceParam, "Permissions")
 		} else {
 			err = code10()
 		}
@@ -2220,7 +2213,7 @@ func (inf *information) WriteIndependentChatPermissions() error {
 	var err error
 	if !inf.IndependentChatPermissions {
 		inf.IndependentChatPermissions = true
-		logs.SettedParam("Independent Chat Permissions", interfaceInf, true)
+		logs.SettedParam("Independent Chat Permissions", interfaceParam, true)
 	} else {
 		err = code10()
 	}
@@ -2232,7 +2225,7 @@ func (inf *information) WriteAdministratorRights(chAdminRights *types.ChatAdmini
 	if chAdminRights != nil {
 		if inf.AdminRights == nil {
 			inf.AdminRights = chAdminRights
-			logs.DataWrittenSuccessfully(interfaceInf, "Admin Rights")
+			logs.DataWrittenSuccessfully(interfaceParam, "Admin Rights")
 		} else {
 			err = code10()
 		}
@@ -2248,7 +2241,7 @@ func (inf *information) WriteCustomTitle(title string) error {
 	if t > 0 && t <= 16 {
 		if inf.CustomTitle == "" {
 			inf.CustomTitle = title
-			logs.DataWrittenSuccessfully(interfaceInf, "Custom Title")
+			logs.DataWrittenSuccessfully(interfaceParam, "Custom Title")
 		} else {
 			err = code10()
 		}
@@ -2262,7 +2255,7 @@ func (inf *information) WriteUserID(userID int) error {
 	var err error
 	if err = checkIntegerValue(userID, inf.UserID); err == nil {
 		inf.UserID = userID
-		logs.DataWrittenSuccessfully(interfaceInf, "User ID")
+		logs.DataWrittenSuccessfully(interfaceParam, "User ID")
 	}
 	return err
 }
@@ -2271,7 +2264,7 @@ func (inf *information) WriteCallBackQueryID(queryID string) error {
 	var err error
 	if err = checkStringValue(queryID, inf.CallBackQueryID); err == nil {
 		inf.CallBackQueryID = queryID
-		logs.DataWrittenSuccessfully(interfaceInf, "CallBack Query ID")
+		logs.DataWrittenSuccessfully(interfaceParam, "CallBack Query ID")
 	}
 	return err
 }
@@ -2280,7 +2273,7 @@ func (inf *information) WriteShowAlert() error {
 	var err error
 	if !inf.ShowAlert {
 		inf.ShowAlert = true
-		logs.SettedParam("Show Alert", interfaceInf, true)
+		logs.SettedParam("Show Alert", interfaceParam, true)
 	} else {
 		err = code10()
 	}
@@ -2291,7 +2284,7 @@ func (inf *information) WriteURL(url string) error {
 	var err error
 	if err = checkStringValue(url, inf.Url); err == nil {
 		inf.Url = url
-		logs.DataWrittenSuccessfully(interfaceInf, "URL")
+		logs.DataWrittenSuccessfully(interfaceParam, "URL")
 	}
 	return err
 }
@@ -2300,7 +2293,7 @@ func (inf *information) WriteCacheTime(time int) error {
 	var err error
 	if err = checkIntegerValue(time, inf.CacheTime); err == nil {
 		inf.CacheTime = time
-		logs.DataWrittenSuccessfully(interfaceInf, "Cache Time")
+		logs.DataWrittenSuccessfully(interfaceParam, "Cache Time")
 	}
 	return err
 }
@@ -2309,7 +2302,7 @@ func (inf *information) WriteInlineMessageID(messageID string) error {
 	var err error
 	if err = checkStringValue(messageID, inf.InlineMessageID); err == nil {
 		inf.InlineMessageID = messageID
-		logs.DataWrittenSuccessfully(interfaceInf, "Inline Message ID")
+		logs.DataWrittenSuccessfully(interfaceParam, "Inline Message ID")
 	}
 	return err
 }
@@ -2326,7 +2319,7 @@ func (inf *information) WriteErrors(errors []*types.PassportElementError) error 
 		if err == nil {
 			if inf.Errors == nil {
 				inf.Errors = errors
-				logs.DataWrittenSuccessfully(interfaceInf, "Errors")
+				logs.DataWrittenSuccessfully(interfaceParam, "Errors")
 			} else {
 				err = code10()
 			}
@@ -2343,7 +2336,7 @@ func (inf *information) WriteDescription(desc string) error {
 	if d <= 70 {
 		if inf.Description == "" {
 			inf.Description = desc
-			logs.DataWrittenSuccessfully(interfaceInf, "Description")
+			logs.DataWrittenSuccessfully(interfaceParam, "Description")
 		} else {
 			err = code10()
 		}
@@ -2357,7 +2350,7 @@ func (inf *information) WriteRemoveCaption() error {
 	var err error
 	if !inf.RemoveCaption {
 		inf.RemoveCaption = true
-		logs.SettedParam("Remove Caption", interfaceInf, true)
+		logs.SettedParam("Remove Caption", interfaceParam, true)
 	} else {
 		err = code10()
 	}
@@ -2646,24 +2639,28 @@ func (inb *inlineKeyboardButton) WriteLoginUrl(logurl *types.LoginUrl) error {
 
 func (inb *inlineKeyboardButton) WriteSwitchInlineQuery(sw string) error {
 	var err error
-	if err = checkStringValue(sw, inb.SwitchInlineQuery); err == nil {
+	if inb.SwitchInlineQuery == nil {
 		if err = inb.checkOthers(); err == nil {
 			inb.storage[wSwitchIn] = added
-			inb.SwitchInlineQuery = sw
+			inb.SwitchInlineQuery = &sw
 			logs.DataWrittenSuccessfully(inbtn, "Switch Inline Query")
 		}
+	} else {
+		err = code10()
 	}
 	return err
 }
 
 func (inb *inlineKeyboardButton) WriteSwitchInlineQueryCurrentChat(swcch string) error {
 	var err error
-	if err = checkStringValue(swcch, inb.SwitchInlineQueryCurrentChat); err == nil {
+	if inb.SwitchInlineQueryCurrentChat == nil {
 		if err = inb.checkOthers(); err == nil {
 			inb.storage[wSwitchInQuery] = added
-			inb.SwitchInlineQueryCurrentChat = swcch
+			inb.SwitchInlineQueryCurrentChat = &swcch
 			logs.DataWrittenSuccessfully(inbtn, "Switch Inline Query Current Chat")
 		}
+	} else {
+		err = code10()
 	}
 	return err
 }

@@ -55,10 +55,10 @@ type MessageOriginChannel struct {
 }
 
 type MessageOrigin struct {
-	MessageOriginUser       *MessageOriginUser
-	MessageOriginHiddenUser *MessageOriginHiddenUser
-	MessageOriginChat       *MessageOriginChat
-	MessageOriginChannel    *MessageOriginChannel
+	*MessageOriginUser
+	*MessageOriginHiddenUser
+	*MessageOriginChat
+	*MessageOriginChannel
 }
 
 type MessageAutoDeleteTimerChanged struct {

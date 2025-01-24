@@ -15,6 +15,15 @@ const (
 	// 	(formatter.IParameters).WriteMessageEffectID() [Optional]
 	// 	(formatter.IParameters).WriteReplyParameters() [Optional]
 	// 	(formatter.IKeyboard).WriteReply() or (formatter.IKeyboard).WriteInline() or (formatter.IKeyboard).WriteForceReply() [Optional]
+	// Get the results here:
+	// 	(formatter.IGet).Status()
+	// 	(formatter.IGet).Error()
+	// 	(formatter.IGet).Chat()
+	// 	(formatter.IGet).User()
+	// 	(formatter.IGet).Bot()
+	// 	(formatter.IGet).Date()
+	// 	(formatter.IGet).MessageID()
+	// 	(formatter.IGet).Replyed()
 	Message string = "sendMessage"
 
 	// Use this method to forward messages of any kind. Service messages and messages with protected content can't be forwarded.

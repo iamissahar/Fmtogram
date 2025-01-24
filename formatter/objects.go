@@ -210,7 +210,7 @@ type information struct {
 	OnlyIfBanned               bool                           `json:"only_if_banned,omitempty"`
 	Permissions                *types.ChatPermissions         `json:"permissions,omitempty"`
 	IndependentChatPermissions bool                           `json:"use_independent_chat_permissions,omitempty"`
-	AdminRights                *types.ChatAdministratorRights `json:",inline"`
+	AdminRights                *types.ChatAdministratorRights `json:",omitempty"`
 	CustomTitle                string                         `json:"custom_title,omitempty"`
 	UserID                     int                            `json:"user_id,omitempty"`
 	CallBackQueryID            string                         `json:"callback_query_id,omitempty"`
@@ -219,10 +219,10 @@ type information struct {
 	CacheTime                  int                            `json:"cache_time,omitempty"`
 	InlineMessageID            string                         `json:"inline_message_id,omitempty"`
 	Errors                     []*types.PassportElementError  `json:"errors,omitempty"`
-	GiftParseMode              string                         `json:"text_parse_mode"`
-	GiftEntities               []*types.MessageEntity         `json:"text_entities"`
-	Description                string                         `json:"custom_description"`
-	RemoveCaption              bool                           `json:"remove_caption"`
+	GiftParseMode              string                         `json:"text_parse_mode,omitempty"`
+	GiftEntities               []*types.MessageEntity         `json:"text_entities,omitempty"`
+	Description                string                         `json:"custom_description,omitempty"`
+	RemoveCaption              bool                           `json:"remove_caption,omitempty"`
 	response                   types.User
 	responseMessageIDs         []int
 }
@@ -265,8 +265,8 @@ type inlineKeyboardButton struct {
 	CallbackData                 string                             `json:"callback_data,omitempty"`
 	WebApp                       *types.WebAppInfo                  `json:"web_app,omitempty"`
 	LoginUrl                     *types.LoginUrl                    `json:"login_url,omitempty"`
-	SwitchInlineQuery            string                             `json:"switch_inline_query,omitempty"`
-	SwitchInlineQueryCurrentChat string                             `json:"switch_inline_query_current_chat,omitempty"`
+	SwitchInlineQuery            *string                            `json:"switch_inline_query,omitempty"`
+	SwitchInlineQueryCurrentChat *string                            `json:"switch_inline_query_current_chat,omitempty"`
 	SwitchInlineQueryChosenChat  *types.SwitchInlineQueryChosenChat `json:"switch_inline_query_chosen_chat,omitempty"`
 	CallbackGame                 *types.CallbackGame                `json:"callback_game,omitempty"`
 	Pay                          bool                               `json:"pay,omitempty"`
@@ -299,7 +299,6 @@ type replyKeyboardButton struct {
 }
 
 type reply struct {
-	// Keyboard *replyKeyboard `json:"reply_markup,omitempty"`
 	Keyboard              [][]*replyKeyboardButton `json:"keyboard"`
 	IsPersistent          bool                     `json:"is_persistent,omitempty"`
 	ResizeKeyboard        bool                     `json:"resize_keyboard,omitempty"`
@@ -388,4 +387,17 @@ type game struct {
 	Score              int    `json:"score,omitempty"`
 	Force              bool   `json:"force,omitempty"`
 	DisableEditMessage bool   `json:"disable_edit_message,omitempty"`
+}
+
+type get struct {
+	status    bool
+	errorCode int
+	errorMsg  string
+	chat      types.Chat
+	user      types.User
+	bot       types.User
+	date      int
+	msgID     int
+	replyed   *get
+	msgOrigin types.MessageOrigin
 }

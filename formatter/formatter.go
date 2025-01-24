@@ -11,7 +11,6 @@ import (
 
 	"github.com/l1qwie/Fmtogram/fmerrors"
 	"github.com/l1qwie/Fmtogram/formatter/methods"
-	"github.com/l1qwie/Fmtogram/logs"
 	"github.com/l1qwie/Fmtogram/testbotdata"
 	"github.com/l1qwie/Fmtogram/types"
 )
@@ -160,108 +159,8 @@ func CreateEmpltyMessage() *Message {
 // 	return err
 // }
 
-func mediaMethod(msg *Message, tgr *interface{}) {
-	for i, j := 0, 0; i < len(msg.fm.mh.storage); i++ {
-		if msg.fm.mh.storage[i] != nil {
-			if !msg.fm.notchange {
-				switch msg.fm.mh.storage[i].(type) {
-				case *photo:
-					msg.fm.method = methods.Photo
-				case *audio:
-					msg.fm.method = methods.Audio
-				case *video:
-					msg.fm.method = methods.Video
-				case *document:
-					msg.fm.method = methods.Document
-				case *animation:
-					msg.fm.method = methods.Animation
-				case *voice:
-					msg.fm.method = methods.Voice
-				case *videonote:
-					msg.fm.method = methods.VideoNote
-				}
-			}
-
-			if j >= 1 {
-				msg.fm.method = methods.MediaGroup
-				*tgr = new(types.TelegramMediaGroup)
-			} else {
-				*tgr = new(types.TelegramResponse)
-			}
-			j++
-
-		}
-	}
-}
-
-// NOT A FINAL RESULT
-func guessMethod(msg *Message, tgr *interface{}) error {
-	var err error
-	if msg.fm.loc != nil {
-		if msg.fm.method == "" {
-			if msg.fm.loc.Title == "" {
-				msg.fm.method = methods.Location
-			} else {
-				msg.fm.method = methods.Venue
-			}
-		}
-		*tgr = new(types.TelegramResponse)
-		msg.fm.contentType = "application/json"
-	}
-	if msg.fm.con != nil {
-		if msg.fm.method == "" {
-			msg.fm.method = methods.Contact
-		}
-		*tgr = new(types.TelegramResponse)
-		msg.fm.contentType = "application/json"
-	}
-	return err
-}
-
-func requiredMessage(msg *Message, tgr *interface{}, object string) error {
-	var err error
-	if (msg.fm.method == "") && (msg.fm.inf.Text == "") {
-		err = fmerrors.MissedRequiredField("IMSGInformation", "WriteString()", 0, 0, false, false)
-	}
-	if _, ok := methods.Media[msg.fm.method]; (ok) && (msg.fm.inf.Text != "") {
-		if msg.fm.mh.i > 1 {
-			logs.DataMightBeLost("IMSGInformation", "WriteString()", msg.fm.inf.Text, object, "WriteCaption()")
-		} else {
-			msg.fm.inf.Caption, msg.fm.inf.Text = msg.fm.inf.Text, ""
-			msg.fm.inf.CaptionEntities, msg.fm.inf.Entities = msg.fm.inf.Entities, nil
-		}
-	}
-	if msg.fm.method == "" {
-		msg.fm.method = methods.Message
-		msg.fm.contentType = "application/json"
-		*tgr = new(types.TelegramResponse)
-	} else if (msg.fm.method == methods.ForwardMessage) || (msg.fm.method == methods.ForwardMessages) || (msg.fm.method == methods.CopyMessage) || (msg.fm.method == methods.CopyMessages) {
-		if msg.fm.ch.FromChatID == nil {
-			err = fmerrors.MissedRequiredField("IChat", "WriteFromChat{ID/Name}()", 0, 0, false, false)
-		}
-		if (msg.fm.inf.MessageID == 0) && ((msg.fm.method == methods.ForwardMessage) || (msg.fm.method == methods.CopyMessage)) {
-			err = fmerrors.MissedRequiredField("IMSGInformation", "WriteMessageID()", 0, 0, false, false)
-		}
-		if (msg.fm.inf.MessageIDs == nil) && ((msg.fm.method == methods.ForwardMessages) || (msg.fm.method == methods.CopyMessages)) {
-			err = fmerrors.MissedRequiredField("IMSGInformation", "WriteMessageIDs()", 0, 0, false, false)
-		}
-		msg.fm.contentType = "application/json"
-		if (msg.fm.method == methods.ForwardMessage) || (msg.fm.method == methods.CopyMessage) {
-			*tgr = new(types.TelegramResponse)
-		} else {
-			*tgr = new(types.TelegramMessageIDs)
-		}
-	} else if (msg.fm.method == methods.PaidMedia) && (msg.fm.inf.StarCount == 0) {
-		err = fmerrors.MissedRequiredField("IMSGInformation", "WriteStarCount()", 0, 0, false, false)
-	} else if ((msg.fm.method == methods.Video) || (msg.fm.method == methods.Photo)) && (msg.fm.inf.StarCount != 0) {
-		msg.fm.method = methods.PaidMedia
-	}
-	return err
-}
-
 func mediaPart(msg *Message) error {
 	var err error
-
 	if (msg.fm.mh.amount == 1) && (msg.fm.method != methods.PaidMedia) {
 		err = uniqueMedia(msg)
 	} else {
@@ -273,14 +172,10 @@ func mediaPart(msg *Message) error {
 func messagePart(msg *Message) error {
 	var err error
 	var bytes []byte
-
 	if msg.fm.mh.atLeastOnce {
 		err = msg.fm.inf.multipartFields(msg.fm.writer)
 	} else {
-
-		bytes, err = msg.fm.inf.createJSON()
-
-		if err == nil {
+		if bytes, err = msg.fm.inf.createJSON(); err == nil {
 			msg.fm.buf.Write(bytes)
 		}
 	}
@@ -290,16 +185,11 @@ func messagePart(msg *Message) error {
 func keyboardPart(msg *Message) error {
 	var err error
 	var bytes []byte
-
 	if msg.fm.kb != nil {
-
 		if msg.fm.mh.atLeastOnce {
 			err = msg.fm.kb.multipartFields(msg.fm.writer)
 		} else {
-
-			bytes, err = msg.fm.kb.jsonFields()
-
-			if err == nil {
+			if bytes, err = msg.fm.kb.jsonFields(); err == nil {
 				msg.fm.buf.Write(bytes)
 			}
 		}
@@ -312,18 +202,11 @@ func chatPart(msg *Message) error {
 	var err error
 	var bytes []byte
 
-	if msg.fm.ch.ID == nil {
-		err = fmerrors.ChatIDIsMissed()
+	if msg.fm.mh.atLeastOnce {
+		err = msg.fm.ch.multipartFields(msg.fm.writer)
 	} else {
-		if msg.fm.mh.atLeastOnce {
-			err = msg.fm.ch.multipartFields(msg.fm.writer)
-		} else {
-
-			bytes, err = msg.fm.ch.createJson()
-
-			if err == nil {
-				msg.fm.buf.Write(bytes)
-			}
+		if bytes, err = msg.fm.ch.createJson(); err == nil {
+			msg.fm.buf.Write(bytes)
 		}
 	}
 
@@ -384,25 +267,8 @@ func uniteEverything(msg *Message) error {
 	return err
 }
 
-func preMediaCheck(msg *Message) error {
-	var found bool
+func makeRequest(msg *Message) error {
 	var err error
-	if _, ok := methods.Media[msg.fm.method]; ok {
-		for i := 0; i < len(msg.fm.mh.storage) && !found; i++ {
-			if msg.fm.mh.storage[i] != nil {
-				found = true
-			}
-		}
-		if !found {
-			err = code14()
-		}
-	}
-	return err
-}
-
-func makeRequest(msg *Message, tgr *interface{}) error {
-	var err error
-	var object string
 	var shouldSkip [5]bool
 	// chat part must be skipped by default
 	// it isn't skipped now, because of tests
@@ -410,18 +276,6 @@ func makeRequest(msg *Message, tgr *interface{}) error {
 
 	msg.fm.buf = bytes.NewBuffer(nil)
 	msg.fm.writer = multipart.NewWriter(msg.fm.buf)
-
-	if err = preMediaCheck(msg); err == nil {
-		if msg.fm.mh.amount > 0 {
-			mediaMethod(msg, tgr)
-		} else {
-			shouldSkip[0] = true
-		}
-		if err = guessMethod(msg, tgr); err == nil {
-			err = requiredMessage(msg, tgr, object)
-		}
-
-	}
 
 	for i := 0; (i < len(doPlan)) && (err == nil); i++ {
 		if !shouldSkip[i] {
@@ -435,6 +289,9 @@ func makeRequest(msg *Message, tgr *interface{}) error {
 		} else {
 			err = msg.fm.writer.Close()
 		}
+	}
+	if msg.fm.contentType == "" {
+		msg.fm.contentType = "application/json"
 	}
 	return err
 }
@@ -524,9 +381,10 @@ func distributorTelegramResponse(msg *Message, t *types.TelegramResponse) {
 		}
 	}
 	if t.Result.Chat != nil {
-		msg.fm.ch.response = *t.Result.Chat
+		msg.fm.g.chat = *t.Result.Chat
 	}
 	if t.Result.From != nil {
+		msg.fm.g.user = *t.Result.From
 		msg.fm.inf.response = *t.Result.From
 	}
 	if msg.fm.loc != nil {
@@ -541,27 +399,39 @@ func distributorTelegramResponse(msg *Message, t *types.TelegramResponse) {
 			msg.fm.con.response = *t.Result.Contact
 		}
 	}
+	msg.fm.g.msgID = t.Result.MessageID
+	msg.fm.g.date = t.Result.Date
+	msg.fm.g.status = t.Ok
 	msg.fm.inf.responseMessageIDs = append(msg.fm.inf.responseMessageIDs, t.Result.MessageID)
 }
 
-func responseDecoder(msg *Message, tgr interface{}) error {
+func responseDecoder(msg *Message) error {
 	var err error
-	switch t := tgr.(type) {
+	switch t := msg.fm.tgr.(type) {
 	case *types.TelegramMediaGroup:
 		if t.ErrorCode != 0 {
 			err = fmerrors.TelegramError(t.ErrorCode, t.Description)
+			if msg.fm.g != nil {
+				msg.fm.g.status, msg.fm.g.errorCode, msg.fm.g.errorMsg = t.Ok, t.ErrorCode, t.Description
+			}
 		} else {
 			distributorTelegram(msg, t)
 		}
 	case *types.TelegramResponse:
 		if t.ErrorCode != 0 {
 			err = fmerrors.TelegramError(t.ErrorCode, t.Description)
+			if msg.fm.g != nil {
+				msg.fm.g.status, msg.fm.g.errorCode, msg.fm.g.errorMsg = t.Ok, t.ErrorCode, t.Description
+			}
 		} else {
 			distributorTelegramResponse(msg, t)
 		}
 	case *types.TelegramMessageIDs:
 		if t.ErrorCode != 0 {
 			err = fmerrors.TelegramError(t.ErrorCode, t.Description)
+			if msg.fm.g != nil {
+				msg.fm.g.status, msg.fm.g.errorCode, msg.fm.g.errorMsg = t.Ok, t.ErrorCode, t.Description
+			}
 		} else {
 			msg.fm.inf.responseMessageIDs = make([]int, len(t.Result))
 			for i, v := range t.Result {
@@ -572,7 +442,7 @@ func responseDecoder(msg *Message, tgr interface{}) error {
 	return err
 }
 
-func sendRequest(msg *Message, tgr interface{}) error {
+func sendRequest(msg *Message) error {
 	var resp *http.Response
 	var body []byte
 
@@ -604,11 +474,11 @@ func sendRequest(msg *Message, tgr interface{}) error {
 
 				fmt.Println(string(body))
 
-				err = json.Unmarshal(body, tgr)
+				err = json.Unmarshal(body, msg.fm.tgr)
 				if err != nil {
 					err = fmerrors.CantUnmarshal(err)
 				} else {
-					err = responseDecoder(msg, tgr)
+					err = responseDecoder(msg)
 				}
 			}
 		}
@@ -621,14 +491,13 @@ func sendRequest(msg *Message, tgr interface{}) error {
 // about the message sent. For example: if you want to send a photo, this structure will have data about it from Telegram (id, size, etc.)
 func (msg *Message) Send() (interface{}, error) {
 	var err error
-	var tgr interface{}
 
-	if err = makeRequest(msg, &tgr); err == nil {
-		if tgr == nil {
+	if err = makeRequest(msg); err == nil {
+		if msg.fm.tgr == nil {
 			panic("!~")
 		}
-		err = sendRequest(msg, tgr)
+		err = sendRequest(msg)
 	}
 
-	return tgr, err
+	return msg.fm.tgr, err
 }
