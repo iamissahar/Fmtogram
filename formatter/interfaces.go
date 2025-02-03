@@ -26,8 +26,14 @@ type IGet interface {
 	Bot() types.User
 	Date() int
 	MessageID() int
+	MessageIDs() []int
 	Replyed() IGet
 	ForwardOrigin() types.MessageOrigin
+	Photo() []types.PhotoSize
+	Audio() types.Audio
+	Document() types.Document
+	Video() types.Video
+	Animation() types.Animation
 }
 
 type IPhoto interface {
@@ -97,10 +103,13 @@ type IVideo interface {
 
 	// Call it, if the caption must be shown above the message media (only if you copy a message that has Media Type). Ignored if a new caption isn't specified.
 	WriteShowCaptionAboveMedia() error
+
 	WriteSupportsStreaming() error
-	WriteThumbnailStorage(path string) error
-	WriteThumbnailTelegram(thumbnailID string) error
-	WriteThumbnailInternet(URL string) error
+
+	WriteThumbnail(path string) error
+
+	WriteThumbnailID(thimbnailID string) error
+
 	WriteWidth(width int) error
 
 	// You can call this function after calling Send(). It returns you a structure with some data about the video you just sent
@@ -129,9 +138,11 @@ type IAudio interface {
 	WriteParseMode(parsemode string) error
 
 	WritePerformer(performer string) error
-	WriteThumbnailStorage(path string) error
-	WriteThumbnailTelegram(thumbnailID string) error
-	WriteThumbnailInternet(URL string) error
+
+	WriteThumbnail(path string) error
+
+	WriteThumbnailID(thimbnailID string) error
+
 	WriteTitle(title string) error
 
 	// You can call this function after calling Send(). It returns you a structure with some data about the audio you just sent
@@ -159,9 +170,9 @@ type IDocument interface {
 	// Receives spicific kind of string. Adds some opportunity to transform the text-message. There are 3 options: types.HTML, types.Markdown and...
 	WriteParseMode(parsemode string) error
 
-	WriteThumbnailStorage(path string) error
-	WriteThumbnailTelegram(thumbnailID string) error
-	WriteThumbnailInternet(URL string) error
+	WriteThumbnail(path string) error
+
+	WriteThumbnailID(thimbnailID string) error
 
 	// You can call this function after calling Send(). It returns you a structure with some data about the document you just sent
 	GetResponse() types.Document
@@ -187,13 +198,10 @@ type IAnimation interface {
 	WriteHeight(height int) error
 
 	// Receives a path of an animation
-	WriteThumbnailStorage(path string) error
+	WriteThumbnail(path string) error
 
 	// Receives a Telegram ID of an animation
-	WriteThumbnailTelegram(thumbnailID string) error
-
-	// Receives an URL-link of an animation
-	WriteThumbnailInternet(URL string) error
+	WriteThumbnailID(thumbnailID string) error
 
 	// Doesn't recieve anything. If the function was called, the photo will be blured
 	WriteHasSpoiler() error
@@ -236,13 +244,10 @@ type IVideoNote interface {
 	WriteLength(length int) error
 
 	// Receives a path of a thumbnail of voice-note
-	WriteThumbnailStorage(path string) error
+	WriteThumbnail(path string) error
 
 	// Receives a Telegram ID of a thumbnail
-	WriteThumbnailTelegram(thumbnailID string) error
-
-	// Receives an URL-link of a thumbnail
-	WriteThumbnailInternet(URL string) error
+	WriteThumbnailID(thumbnailID string) error
 
 	// You can call this function after calling Send(). It returns you a structure with some data about the video-note you just sent
 	GetResponse() types.VideoNote

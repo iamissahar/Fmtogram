@@ -30,15 +30,11 @@ func (tc *testcase) begining(t *testing.T) {
 	if err = tc.ch.WriteChatID(738070596); err != nil {
 		t.Fatal(err)
 	}
-	if !tc.withoutBCon {
-		if err = tc.ch.WriteBusinessConnectionID("BusinessConnectionID"); err != nil {
-			t.Fatal(err)
-		}
+	if err = tc.ch.WriteBusinessConnectionID("BusinessConnectionID"); err != nil {
+		t.Fatal(err)
 	}
-	if !tc.withoutThreads {
-		if err = tc.prm.WriteMessageThreadID(1111); err != nil {
-			t.Fatal(err)
-		}
+	if err = tc.prm.WriteMessageThreadID(1111); err != nil {
+		t.Fatal(err)
 	}
 }
 
@@ -121,7 +117,7 @@ func createRpKBAndData(btns []formatter.IReplyButton) []interface{} {
 		btns[4].WriteRequestUsers, btns[5].WriteWebApp}
 }
 
-func (tc *testcase) replyKb(t *testing.T) {
+func (*testcase) replyKb(tc *testcase, t *testing.T) {
 	var btn, btn1, btn2, btn3, btn4, btn5 formatter.IReplyButton
 	var err error
 	kb := tc.msg.NewKeyboard()
@@ -190,7 +186,7 @@ func setInKb(set []int, btns []formatter.IInlineButton, kb formatter.IKeyboard, 
 	}
 }
 
-func (tc *testcase) inlineKb(t *testing.T) {
+func (*testcase) inlineKb(tc *testcase, t *testing.T) {
 	var btn, btn1, btn2, btn3, btn4, btn5, btn6 formatter.IInlineButton
 	var err error
 	kb := tc.msg.NewKeyboard()
@@ -203,7 +199,6 @@ func (tc *testcase) inlineKb(t *testing.T) {
 		addString(nil, btns[i], 1, t)
 		switch ff := f.(type) {
 		case func(string) error:
-			t.Log(data[j])
 			if err = ff(data[j]); err != nil {
 				t.Fatal(err)
 			}
@@ -230,7 +225,7 @@ func (tc *testcase) inlineKb(t *testing.T) {
 	send(tc.msg, t)
 }
 
-func (tc *testcase) forceKb(t *testing.T) {
+func (*testcase) forceKb(tc *testcase, t *testing.T) {
 	kb := tc.msg.NewKeyboard()
 	frp, err := kb.WriteForceReply()
 	if err != nil {

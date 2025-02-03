@@ -398,6 +398,12 @@ type get struct {
 	bot       types.User
 	date      int
 	msgID     int
+	msgIDs    []int
 	replyed   *get
 	msgOrigin types.MessageOrigin
+	photo     []types.PhotoSize
+	audio     types.Audio
+	document  types.Document
+	video     types.Video
+	anim      types.Animation
 }

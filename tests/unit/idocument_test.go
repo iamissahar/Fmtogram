@@ -54,16 +54,12 @@ func putWriteDocumentParseMode(doctc docTestContainer, doc formatter.IDocument, 
 	return &documentT{doctc.name, doctc.inputStr[i], nil, doc.WriteParseMode, doctc.isExpectedErr[i], doctc.codeErr[i]}
 }
 
-func putWriteDocumentThumbnailStorage(doctc docTestContainer, doc formatter.IDocument, i int) *documentT {
-	return &documentT{doctc.name, doctc.inputStr[i], nil, doc.WriteThumbnailStorage, doctc.isExpectedErr[i], doctc.codeErr[i]}
+func putWriteDocumentThumbnail(doctc docTestContainer, doc formatter.IDocument, i int) *documentT {
+	return &documentT{doctc.name, doctc.inputStr[i], nil, doc.WriteThumbnail, doctc.isExpectedErr[i], doctc.codeErr[i]}
 }
 
-func putWriteDocumentThumbnailTelegram(doctc docTestContainer, doc formatter.IDocument, i int) *documentT {
-	return &documentT{doctc.name, doctc.inputStr[i], nil, doc.WriteThumbnailTelegram, doctc.isExpectedErr[i], doctc.codeErr[i]}
-}
-
-func putWriteDocumentThumbnailInternet(doctc docTestContainer, doc formatter.IDocument, i int) *documentT {
-	return &documentT{doctc.name, doctc.inputStr[i], nil, doc.WriteThumbnailInternet, doctc.isExpectedErr[i], doctc.codeErr[i]}
+func putWriteDocumentThumbnailID(doctc docTestContainer, doc formatter.IDocument, i int) *documentT {
+	return &documentT{doctc.name, doctc.inputStr[i], nil, doc.WriteThumbnailID, doctc.isExpectedErr[i], doctc.codeErr[i]}
 }
 
 func (doctc *docTestContainer) writeDocumentStorage() {
@@ -132,31 +128,22 @@ func (doctc *docTestContainer) writeParseMode() {
 	doctc.buildF = putWriteDocumentParseMode
 }
 
-func (doctc *docTestContainer) writeThumbnailStorage() {
-	doctc.name = "(IDocument).WriteThumbnailStorage"
+func (doctc *docTestContainer) writeThumbnail() {
+	doctc.name = "(IDocument).WriteThumbnail"
 	doctc.inputStr = []string{"../media_test/tel-aviv.jpg", "", "../media_test/sound.mp3", "../media_test/tel-aviv.jpg", "../media_test/tel-aviv.jpg"}
 	doctc.isExpectedErr = []bool{false, true, true, false, true}
 	doctc.codeErr = []string{"", "20", "12", "", "10"}
 	doctc.amount, doctc.until = 5, 3
-	doctc.buildF = putWriteDocumentThumbnailStorage
+	doctc.buildF = putWriteDocumentThumbnail
 }
 
-func (doctc *docTestContainer) writeThumbnailTelegram() {
-	doctc.name = "(IDocument).WriteThumbnailTelegram"
-	doctc.inputStr = []string{"ASL:KDKAOL:SLK:@#$!:L", "", "A:LSKDKL:ASK:DLASKL:DASD", ")()*()#I@!K:OLAS:KLDAS:L"}
+func (doctc *docTestContainer) writeThumbnailID() {
+	doctc.name = "(IDocument).WriteThumbnail"
+	doctc.inputStr = []string{".:KLKL:ASK:LDKL:ASD:KLK:LL:KKL:SAHJDAHSDGHAD", "", "ASDKJKJASDHJKASDJ", ".asdaasfaDJKLASJHKDA"}
 	doctc.isExpectedErr = []bool{false, true, false, true}
 	doctc.codeErr = []string{"", "20", "", "10"}
 	doctc.amount, doctc.until = 4, 2
-	doctc.buildF = putWriteDocumentThumbnailTelegram
-}
-
-func (doctc *docTestContainer) writeThumbnailInternet() {
-	doctc.name = "(IDocument).WriteThumbnailInternet"
-	doctc.inputStr = []string{"https://youtube.com", "", "https://youtube.com", ")()*()#I@!K:OLAS:KLDAS:L"}
-	doctc.isExpectedErr = []bool{false, true, false, true}
-	doctc.codeErr = []string{"", "20", "", "10"}
-	doctc.amount, doctc.until = 4, 2
-	doctc.buildF = putWriteDocumentThumbnailInternet
+	doctc.buildF = putWriteDocumentThumbnailID
 }
 
 func (doc *documentT) callStrF(testedF func(string) error, t *testing.T) {
@@ -284,23 +271,16 @@ func TestWriteDocumentParseMode(t *testing.T) {
 	mainDocumentLogic(msg, *doctc, t)
 }
 
-func TestWriteDocumentThumbnailStorage(t *testing.T) {
+func TestWriteDocumentThumbnail(t *testing.T) {
 	vdtc := new(docTestContainer)
-	vdtc.writeThumbnailStorage()
+	vdtc.writeThumbnail()
 	msg := formatter.CreateEmpltyMessage()
 	mainDocumentLogic(msg, *vdtc, t)
 }
 
-func TestWriteDocumentThumbnailTelegram(t *testing.T) {
+func TestWriteDocumentThumbnailID(t *testing.T) {
 	vdtc := new(docTestContainer)
-	vdtc.writeThumbnailTelegram()
-	msg := formatter.CreateEmpltyMessage()
-	mainDocumentLogic(msg, *vdtc, t)
-}
-
-func TestWriteDocumentThumbnailInternet(t *testing.T) {
-	vdtc := new(docTestContainer)
-	vdtc.writeThumbnailInternet()
+	vdtc.writeThumbnailID()
 	msg := formatter.CreateEmpltyMessage()
 	mainDocumentLogic(msg, *vdtc, t)
 }

@@ -34,6 +34,8 @@ const (
 	// 	(formatter.IParameters).WriteDisableNotification() [Optional]
 	// 	(formatter.IParameters).WriteProtectContent() [Optional]
 	// 	(formatter.IParameters).WriteMessageID() [Required]
+	// Get the results here:
+	// 	(formatter.IGet).MessageID()
 	ForwardMessage string = "forwardMessage"
 
 	// Use this method to forward multiple messages of any kind. If some of the specified
@@ -49,6 +51,8 @@ const (
 	// 	(formatter.IParameters).WriteMessageIDs() [Required]
 	// 	(formatter.IParameters).WriteDisableNotification() [Optional]
 	// 	(formatter.IParameters).WriteProtectContent() [Optional]
+	// Get the results here:
+	// 	(formatter.IGet).MessageIDs()
 	ForwardMessages string = "forwardMessages"
 
 	// Use this method to copy messages of any kind. Service messages, paid media messages,
@@ -68,6 +72,8 @@ const (
 	// 	(formatter.IParameters).WriteAllowPaidBroadcast() [Optional]
 	// 	(formatter.IParameters).WriteReplyParameters() [Optional]
 	// 	(formatter.IKeyboard).WriteReply() or (formatter.IKeyboard).WriteInline() or (formatter.IKeyboard).WriteForceReply() [Optional]
+	// Get the results here:
+	// 	(formatter.IGet).MessageID()
 	CopyMessage string = "copyMessage"
 
 	// Use this method to copy messages of any kind. If some of the specified messages can't be found or copied,
@@ -80,6 +86,8 @@ const (
 	// 	(formatter.IParameters).WriteDisableNotification() [Optional]
 	// 	(formatter.IParameters).WriteProtectContent() [Optional]
 	// 	(formatter.IParameters).WriteRemoveCaption() [Optional]
+	// Get the results here:
+	// 	(formatter.IGet).MessageIDs()
 	CopyMessages string = "copyMessages"
 
 	// Use this method to send photos. Might be used by default. Just mention a photo in Message structure.
@@ -99,6 +107,13 @@ const (
 	// 	(formatter.IParameters).WriteMessageEffectID() [Optional]
 	// 	(formatter.IParameters).WriteReplyParameters() [Optional]
 	// 	(formatter.IKeyboard).WriteReply() or (formatter.IKeyboard).WriteInline() or (formatter.IKeyboard).WriteForceReply() [Optional]
+	// Get the results here:
+	// 	(formatter.IGet).MessageID()
+	// 	(formatter.IGet).Bot()
+	// 	(formatter.IGet).Chat()
+	// 	(formatter.IGet).Date()
+	// 	(formatter.IGet).Photo()
+	// 	(formatter.IGet).Replyed()
 	Photo string = "sendPhoto"
 
 	// Use this method to send audio files, if you want Telegram clients to display them in the music player.
@@ -122,6 +137,13 @@ const (
 	// 	(formatter.IParameters).WriteMessageEffectID() [Optional]
 	// 	(formatter.IParameters).WriteReplyParameters() [Optional]
 	// 	(formatter.IKeyboard).WriteReply() or (formatter.IKeyboard).WriteInline() or (formatter.IKeyboard).WriteForceReply() [Optional]
+	// Get the results here:
+	// 	(formatter.IGet).MessageID()
+	// 	(formatter.IGet).Bot()
+	// 	(formatter.IGet).Chat()
+	// 	(formatter.IGet).Date()
+	// 	(formatter.IGet).Audio()
+	// 	(formatter.IGet).Replyed()
 	Audio string = "sendAudio"
 
 	// Use this method to send general files.
@@ -141,6 +163,13 @@ const (
 	// 	(formatter.IParameters).WriteMessageEffectID() [Optional]
 	// 	(formatter.IParameters).WriteReplyParameters() [Optional]
 	// 	(formatter.IKeyboard).WriteReply() or (formatter.IKeyboard).WriteInline() or (formatter.IKeyboard).WriteForceReply() [Optional]
+	// Get the results here:
+	// 	(formatter.IGet).MessageID()
+	// 	(formatter.IGet).Bot()
+	// 	(formatter.IGet).Chat()
+	// 	(formatter.IGet).Date()
+	// 	(formatter.IGet).Document()
+	// 	(formatter.IGet).Replyed()
 	Document string = "sendDocument"
 
 	// Use this method to send video files, Telegram clients support MPEG4 videos (other formats may be sent as Document).
@@ -165,6 +194,13 @@ const (
 	// 	(formatter.IParameters).WriteMessageEffectID() [Optional]
 	// 	(formatter.IParameters).WriteReplyParameters() [Optional]
 	// 	(formatter.IKeyboard).WriteReply() or (formatter.IKeyboard).WriteInline() or (formatter.IKeyboard).WriteForceReply() [Optional]
+	// Get the results here:
+	// 	(formatter.IGet).MessageID()
+	// 	(formatter.IGet).Bot()
+	// 	(formatter.IGet).Chat()
+	// 	(formatter.IGet).Date()
+	// 	(formatter.IGet).Video()
+	// 	(formatter.IGet).Replyed()
 	Video string = "sendVideo"
 
 	// Use this method to send animation files (GIF or H.264/MPEG-4 AVC video without sound).
@@ -188,6 +224,13 @@ const (
 	// 	(formatter.IParameters).WriteMessageEffectID() [Optional]
 	// 	(formatter.IParameters).WriteReplyParameters() [Optional]
 	// 	(formatter.IKeyboard).WriteReply() or (formatter.IKeyboard).WriteInline() or (formatter.IKeyboard).WriteForceReply() [Optional]
+	// Get the results here:
+	// 	(formatter.IGet).MessageID()
+	// 	(formatter.IGet).Bot()
+	// 	(formatter.IGet).Chat()
+	// 	(formatter.IGet).Date()
+	// 	(formatter.IGet).Animation()
+	// 	(formatter.IGet).Replyed()
 	Animation string = "sendAnimation"
 
 	// Use this method to send audio files, if you want Telegram clients to display the file

@@ -77,10 +77,10 @@ func (reg *RegTable) NewIndex() (newIndex int) {
 	return newIndex
 }
 
-func GetUpdates(tg *types.Telegram, offset *int) error {
+func GetUpdates(tg *types.Telegram, offset *int, botID string) error {
 	url := fmt.Sprint(
 		types.TelegramAPI,
-		fmt.Sprintf("bot%s", types.BotID), "/",
+		fmt.Sprintf("bot%s", botID), "/",
 		"getUpdates", "?", "limit=1", "&", fmt.Sprintf("offset=%d", *offset-1))
 	body, err := sendRequest(bytes.NewBuffer(nil), url, "application/json", "GET")
 	if err == nil {
@@ -90,11 +90,11 @@ func GetUpdates(tg *types.Telegram, offset *int) error {
 	return err
 }
 
-func GetOffset(offset *int) error {
+func GetOffset(offset *int, botID string) error {
 	tg := new(types.Telegram)
 	url := fmt.Sprint(
 		types.TelegramAPI,
-		fmt.Sprintf("bot%s", types.BotID), "/",
+		fmt.Sprintf("bot%s", botID), "/",
 		"getUpdates", "?", "limit=1")
 	body, err := sendRequest(bytes.NewBuffer(nil), url, "application/json", "GET")
 	if err == nil {

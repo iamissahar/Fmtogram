@@ -14,12 +14,12 @@ import (
 
 var StartFunc func(*types.Telegram, *types.Telegram, *formatter.Message)
 
-func firstStep(offset *int) {
+func firstStep(offset *int, botID string) {
 	logs.GetOffset()
 
-	err := executer.GetOffset(offset)
+	err := executer.GetOffset(offset, botID)
 	for err != nil {
-		err = executer.GetOffset(offset)
+		err = executer.GetOffset(offset, botID)
 		time.Sleep(time.Second / 10)
 	}
 
@@ -43,12 +43,12 @@ func queue(reg *executer.RegTable, tg *types.Telegram, chatID int, index *int) {
 	}
 }
 
-func pullResponse(reg *executer.RegTable) {
+func pullResponse(reg *executer.RegTable, botID string, startFunc func(*types.Telegram, *types.Telegram, *formatter.Message)) {
 	var offset int
-	firstStep(&offset)
+	firstStep(&offset, botID)
 	for {
 		tg := new(types.Telegram)
-		err := executer.GetUpdates(tg, &offset)
+		err := executer.GetUpdates(tg, &offset, botID)
 		if len(tg.Result) != 0 && err == nil {
 			logs.FoundSomeIformation()
 
@@ -56,7 +56,7 @@ func pullResponse(reg *executer.RegTable) {
 			index := reg.Seeker(chatID)
 
 			queue(reg, tg, chatID, &index)
-			go worker(reg.Reg[index].Chu, reg.Reg[index].Chb)
+			go worker(reg.Reg[index].Chu, reg.Reg[index].Chb, botID, startFunc)
 
 			offset = offset + 1
 		} else if err != nil {
@@ -66,7 +66,7 @@ func pullResponse(reg *executer.RegTable) {
 	}
 }
 
-func worker(input chan *types.Telegram, returned chan *types.Telegram) {
+func worker(input chan *types.Telegram, returned chan *types.Telegram, botID string, startFunc func(*types.Telegram, *types.Telegram, *formatter.Message)) {
 	tg := new(types.Telegram)
 	tgReturned := new(types.Telegram)
 
@@ -79,8 +79,8 @@ func worker(input chan *types.Telegram, returned chan *types.Telegram) {
 			logs.ReturnedIsEmply()
 		}
 		logs.CallDeveloperFunc()
-		mes := formatter.CreateMessage(tg)
-		StartFunc(tg, tgReturned, mes)
+		mes := formatter.CreateMessage(tg, botID)
+		startFunc(tg, tgReturned, mes)
 	}
 }
 
@@ -90,5 +90,10 @@ func Start() {
 	logs.TurnOn()
 
 	reg := new(executer.RegTable)
-	pullResponse(reg)
+	pullResponse(reg, types.BotID, StartFunc)
+}
+
+func ListenTo(botID string, startFunc func(*types.Telegram, *types.Telegram, *formatter.Message)) {
+	reg := new(executer.RegTable)
+	go pullResponse(reg, botID, startFunc)
 }

@@ -66,16 +66,12 @@ func putWritePerformer(at audiotest, ad formatter.IAudio, i int) *audio {
 	return &audio{at.name, at.inputStr[i], 0, nil, ad.WritePerformer, at.isExpectedErr[i], at.codeErr[i]}
 }
 
-func putWriteThumbnailStorage(at audiotest, ad formatter.IAudio, i int) *audio {
-	return &audio{at.name, at.inputStr[i], 0, nil, ad.WriteThumbnailStorage, at.isExpectedErr[i], at.codeErr[i]}
+func putWriteThumbnail(at audiotest, ad formatter.IAudio, i int) *audio {
+	return &audio{at.name, at.inputStr[i], 0, nil, ad.WriteThumbnail, at.isExpectedErr[i], at.codeErr[i]}
 }
 
-func putWriteThumbnailTelegram(at audiotest, ad formatter.IAudio, i int) *audio {
-	return &audio{at.name, at.inputStr[i], 0, nil, ad.WriteThumbnailTelegram, at.isExpectedErr[i], at.codeErr[i]}
-}
-
-func putWriteThumbnailInternet(at audiotest, ad formatter.IAudio, i int) *audio {
-	return &audio{at.name, at.inputStr[i], 0, nil, ad.WriteThumbnailInternet, at.isExpectedErr[i], at.codeErr[i]}
+func putWriteThumbnailID(at audiotest, ad formatter.IAudio, i int) *audio {
+	return &audio{at.name, at.inputStr[i], 0, nil, ad.WriteThumbnailID, at.isExpectedErr[i], at.codeErr[i]}
 }
 
 func putWriteTitle(at audiotest, ad formatter.IAudio, i int) *audio {
@@ -158,31 +154,22 @@ func (t *audiotest) writePerformer() {
 	t.buildF = putWritePerformer
 }
 
-func (t *audiotest) writeThumbnailStorage() {
-	t.name = "(IAudio).WriteThumbnailStorage"
+func (t *audiotest) writeThumbnail() {
+	t.name = "(IAudio).WriteThumbnail"
 	t.inputStr = []string{"../media_test/tel-aviv.jpg", "", "../media_test/sound.mp3", "../media_test/tel-aviv.jpg", "../media_test/tel-aviv.jpg"}
 	t.isExpectedErr = []bool{false, true, true, false, true}
 	t.codeErr = []string{"", "20", "12", "", "10"}
 	t.amount, t.until = 5, 3
-	t.buildF = putWriteThumbnailStorage
+	t.buildF = putWriteThumbnail
 }
 
-func (t *audiotest) writeThumbnailTelegram() {
-	t.name = "(IAudio).WriteThumbnailTelegram"
-	t.inputStr = []string{"ASL:KDKAOL:SLK:@#$!:L", "", "A:LSKDKL:ASK:DLASKL:DASD", ")()*()#I@!K:OLAS:KLDAS:L"}
+func (t *audiotest) writeThumbnailID() {
+	t.name = "(IAudio).WriteThumbnail"
+	t.inputStr = []string{"AO:KSDKLASLDK:LAKSDA", "", "ASL:KDKL:ASD:KLASDASD", "A:OLD:IOLASOIP:FDIKOA:KLKL::KOL"}
 	t.isExpectedErr = []bool{false, true, false, true}
 	t.codeErr = []string{"", "20", "", "10"}
 	t.amount, t.until = 4, 2
-	t.buildF = putWriteThumbnailTelegram
-}
-
-func (t *audiotest) writeThumbnailInternet() {
-	t.name = "(IAudio).WriteThumbnailInternet"
-	t.inputStr = []string{"https://youtube.com", "", "https://youtube.com", ")()*()#I@!K:OLAS:KLDAS:L"}
-	t.isExpectedErr = []bool{false, true, false, true}
-	t.codeErr = []string{"", "20", "", "10"}
-	t.amount, t.until = 4, 2
-	t.buildF = putWriteThumbnailInternet
+	t.buildF = putWriteThumbnailID
 }
 
 func (t *audiotest) writeTitle() {
@@ -326,23 +313,16 @@ func TestAudioWritePerformer(t *testing.T) {
 	mainAudioLogic(msg, *at, t)
 }
 
-func TestAudioWriteThumbnailStorage(t *testing.T) {
+func TestAudioWriteThumbnail(t *testing.T) {
 	at := new(audiotest)
-	at.writeThumbnailStorage()
+	at.writeThumbnail()
 	msg := formatter.CreateEmpltyMessage()
 	mainAudioLogic(msg, *at, t)
 }
 
-func TestAudioWriteThumbnailTelegram(t *testing.T) {
+func TestAudioWriteThumbnailID(t *testing.T) {
 	at := new(audiotest)
-	at.writeThumbnailTelegram()
-	msg := formatter.CreateEmpltyMessage()
-	mainAudioLogic(msg, *at, t)
-}
-
-func TestAudioWriteThumbnailInternet(t *testing.T) {
-	at := new(audiotest)
-	at.writeThumbnailInternet()
+	at.writeThumbnailID()
 	msg := formatter.CreateEmpltyMessage()
 	mainAudioLogic(msg, *at, t)
 }

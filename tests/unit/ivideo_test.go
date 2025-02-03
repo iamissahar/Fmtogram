@@ -72,16 +72,12 @@ func putWriteVideoSupportStreaming(vdtc vdTestContainer, vd formatter.IVideo, i 
 	return &videoT{vdtc.name, "", 0, nil, vd.WriteSupportsStreaming, vdtc.isExpectedErr[i], vdtc.codeErr[i]}
 }
 
-func putWriteVideoThumbnailStorage(vdtc vdTestContainer, vd formatter.IVideo, i int) *videoT {
-	return &videoT{vdtc.name, vdtc.inputStr[i], 0, nil, vd.WriteThumbnailStorage, vdtc.isExpectedErr[i], vdtc.codeErr[i]}
+func putWriteVideoThumbnail(vdtc vdTestContainer, vd formatter.IVideo, i int) *videoT {
+	return &videoT{vdtc.name, vdtc.inputStr[i], 0, nil, vd.WriteThumbnail, vdtc.isExpectedErr[i], vdtc.codeErr[i]}
 }
 
-func putWriteVideoThumbnailTelegram(vdtc vdTestContainer, vd formatter.IVideo, i int) *videoT {
-	return &videoT{vdtc.name, vdtc.inputStr[i], 0, nil, vd.WriteThumbnailTelegram, vdtc.isExpectedErr[i], vdtc.codeErr[i]}
-}
-
-func putWriteVideoThumbnailInternet(vdtc vdTestContainer, vd formatter.IVideo, i int) *videoT {
-	return &videoT{vdtc.name, vdtc.inputStr[i], 0, nil, vd.WriteThumbnailInternet, vdtc.isExpectedErr[i], vdtc.codeErr[i]}
+func putWriteVideoThumbnailID(vdtc vdTestContainer, vd formatter.IVideo, i int) *videoT {
+	return &videoT{vdtc.name, vdtc.inputStr[i], 0, nil, vd.WriteThumbnailID, vdtc.isExpectedErr[i], vdtc.codeErr[i]}
 }
 
 func putWriteVideoWidth(vdtc vdTestContainer, vd formatter.IVideo, i int) *videoT {
@@ -188,31 +184,22 @@ func (vdtc *vdTestContainer) writeSupportStreaming() {
 	vdtc.buildF = putWriteVideoSupportStreaming
 }
 
-func (vdtc *vdTestContainer) writeThumbnailStorage() {
-	vdtc.name = "(IVideo).WriteThumbnailStorage"
+func (vdtc *vdTestContainer) writeThumbnail() {
+	vdtc.name = "(IVideo).WriteThumbnail"
 	vdtc.inputStr = []string{"../media_test/tel-aviv.jpg", "", "../media_test/sound.mp3", "../media_test/tel-aviv.jpg", "../media_test/tel-aviv.jpg"}
 	vdtc.isExpectedErr = []bool{false, true, true, false, true}
 	vdtc.codeErr = []string{"", "20", "12", "", "10"}
 	vdtc.amount, vdtc.until = 5, 3
-	vdtc.buildF = putWriteVideoThumbnailStorage
+	vdtc.buildF = putWriteVideoThumbnail
 }
 
-func (vdtc *vdTestContainer) writeThumbnailTelegram() {
-	vdtc.name = "(IVideo).WriteThumbnailTelegram"
-	vdtc.inputStr = []string{"ASL:KDKAOL:SLK:@#$!:L", "", "A:LSKDKL:ASK:DLASKL:DASD", ")()*()#I@!K:OLAS:KLDAS:L"}
+func (vdtc *vdTestContainer) writeThumbnailID() {
+	vdtc.name = "(IVideo).WriteThumbnail"
+	vdtc.inputStr = []string{"AS:LKDAKL:SD:KLASD", "", "SDK:LASKLJDJKLASKLGJAKLSJD", "something"}
 	vdtc.isExpectedErr = []bool{false, true, false, true}
 	vdtc.codeErr = []string{"", "20", "", "10"}
 	vdtc.amount, vdtc.until = 4, 2
-	vdtc.buildF = putWriteVideoThumbnailTelegram
-}
-
-func (vdtc *vdTestContainer) writeThumbnailInternet() {
-	vdtc.name = "(IVideo).WriteThumbnailInternet"
-	vdtc.inputStr = []string{"https://youtube.com", "", "https://youtube.com", ")()*()#I@!K:OLAS:KLDAS:L"}
-	vdtc.isExpectedErr = []bool{false, true, false, true}
-	vdtc.codeErr = []string{"", "20", "", "10"}
-	vdtc.amount, vdtc.until = 4, 2
-	vdtc.buildF = putWriteVideoThumbnailInternet
+	vdtc.buildF = putWriteVideoThumbnailID
 }
 
 func (vdtc *vdTestContainer) writeWidth() {
@@ -392,23 +379,16 @@ func TestWriteVideoSupportStreaming(t *testing.T) {
 	mainVideoLogic(msg, *vdtc, t)
 }
 
-func TestWriteVideoThumbnailStorage(t *testing.T) {
+func TestWriteVideoThumbnail(t *testing.T) {
 	vdtc := new(vdTestContainer)
-	vdtc.writeThumbnailStorage()
+	vdtc.writeThumbnail()
 	msg := formatter.CreateEmpltyMessage()
 	mainVideoLogic(msg, *vdtc, t)
 }
 
-func TestWriteVideoThumbnailTelegram(t *testing.T) {
+func TestWriteVideoThumbnailID(t *testing.T) {
 	vdtc := new(vdTestContainer)
-	vdtc.writeThumbnailTelegram()
-	msg := formatter.CreateEmpltyMessage()
-	mainVideoLogic(msg, *vdtc, t)
-}
-
-func TestWriteVideoThumbnailInternet(t *testing.T) {
-	vdtc := new(vdTestContainer)
-	vdtc.writeThumbnailInternet()
+	vdtc.writeThumbnailID()
 	msg := formatter.CreateEmpltyMessage()
 	mainVideoLogic(msg, *vdtc, t)
 }

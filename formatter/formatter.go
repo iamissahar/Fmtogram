@@ -11,16 +11,16 @@ import (
 
 	"github.com/l1qwie/Fmtogram/fmerrors"
 	"github.com/l1qwie/Fmtogram/formatter/methods"
-	"github.com/l1qwie/Fmtogram/testbotdata"
 	"github.com/l1qwie/Fmtogram/types"
 )
 
-func CreateMessage(tg *types.Telegram) *Message {
+func CreateMessage(tg *types.Telegram, botID string) *Message {
 	m := new(Message)
 	m.fm = new(formatter)
 	m.fm.ch = &chat{ID: tg.Result[0].Message.Chat.ID}
 	m.fm.inf = &information{}
 	m.fm.mh = &mediaHolder{}
+	m.fm.token = botID
 	return m
 }
 
@@ -30,6 +30,7 @@ func CreateEmpltyMessage() *Message {
 	m.fm.ch = &chat{}
 	m.fm.inf = &information{}
 	m.fm.mh = &mediaHolder{}
+	m.fm.token = types.BotID
 	return m
 }
 
@@ -376,7 +377,9 @@ func distributorTelegramResponse(msg *Message, t *types.TelegramResponse) {
 					}
 				}
 			case *voice:
-				m.response = *t.Result.Voice
+				if t.Result.Voice != nil {
+					m.response = *t.Result.Voice
+				}
 			}
 		}
 	}
@@ -446,11 +449,13 @@ func sendRequest(msg *Message) error {
 	var resp *http.Response
 	var body []byte
 
-	log.Print(msg.fm.buf.String())
+	if msg.fm.contentType == "application/json" {
+		log.Print(msg.fm.buf.String())
+	}
 	log.Print(msg.fm.method)
 	// log.Print(msg.fm.contentType)
 
-	url := fmt.Sprint(types.TelegramAPI, "bot", testbotdata.Token, "/", msg.fm.method)
+	url := fmt.Sprint(types.TelegramAPI, "bot", msg.fm.token, "/", msg.fm.method)
 
 	req, err := http.NewRequest("POST", url, msg.fm.buf)
 	req.Header.Set("Content-Type", msg.fm.contentType)

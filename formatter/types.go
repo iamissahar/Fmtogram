@@ -34,6 +34,7 @@ type formatter struct {
 	notchange   bool
 	g           *get
 	tgr         interface{}
+	token       string
 }
 
 type Message struct {

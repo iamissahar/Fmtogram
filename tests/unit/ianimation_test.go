@@ -49,16 +49,12 @@ func putWriteAnimationHeight(antc anTestContainer, an formatter.IAnimation, i in
 	return &animationT{antc.name, "", antc.inputInt[i], an.WriteHeight, antc.isExpectedErr[i], antc.codeErr[i]}
 }
 
-func putWriteAnimationThumbnailStorage(antc anTestContainer, an formatter.IAnimation, i int) *animationT {
-	return &animationT{antc.name, antc.inputStr[i], 0, an.WriteThumbnailStorage, antc.isExpectedErr[i], antc.codeErr[i]}
+func putWriteAnimationThumbnail(antc anTestContainer, an formatter.IAnimation, i int) *animationT {
+	return &animationT{antc.name, antc.inputStr[i], 0, an.WriteThumbnail, antc.isExpectedErr[i], antc.codeErr[i]}
 }
 
-func putWriteAnimationThumbnailTelegram(antc anTestContainer, an formatter.IAnimation, i int) *animationT {
-	return &animationT{antc.name, antc.inputStr[i], 0, an.WriteThumbnailTelegram, antc.isExpectedErr[i], antc.codeErr[i]}
-}
-
-func putWriteAnimationThumbnailInternet(antc anTestContainer, an formatter.IAnimation, i int) *animationT {
-	return &animationT{antc.name, antc.inputStr[i], 0, an.WriteThumbnailInternet, antc.isExpectedErr[i], antc.codeErr[i]}
+func putWriteAnimationThumbnailID(antc anTestContainer, an formatter.IAnimation, i int) *animationT {
+	return &animationT{antc.name, antc.inputStr[i], 0, an.WriteThumbnailID, antc.isExpectedErr[i], antc.codeErr[i]}
 }
 
 func putWriteAnimationHasSpoiler(antc anTestContainer, an formatter.IAnimation, i int) *animationT {
@@ -119,31 +115,22 @@ func (antc *anTestContainer) writeHeight() {
 	antc.buildF = putWriteAnimationHeight
 }
 
-func (antc *anTestContainer) writeThumbnailStorage() {
-	antc.name = "(IAnimation).WriteThumbnailStorage"
+func (antc *anTestContainer) writeThumbnail() {
+	antc.name = "(IAnimation).WriteThumbnail"
 	antc.inputStr = []string{"../media_test/tel-aviv.jpg", "", "../media_test/sound.mp3", "../media_test/tel-aviv.jpg", "../media_test/tel-aviv.jpg"}
 	antc.isExpectedErr = []bool{false, true, true, false, true}
 	antc.codeErr = []string{"", "20", "12", "", "10"}
 	antc.amount, antc.until = 5, 3
-	antc.buildF = putWriteAnimationThumbnailStorage
+	antc.buildF = putWriteAnimationThumbnail
 }
 
-func (antc *anTestContainer) writeThumbnailTelegram() {
-	antc.name = "(IAnimation).WriteThumbnailTelegram"
+func (antc *anTestContainer) writeThumbnailID() {
+	antc.name = "(IAnimation).WriteThumbnail"
 	antc.inputStr = []string{"ASL:KDKAOL:SLK:@#$!:L", "", "A:LSKDKL:ASK:DLASKL:DASD", ")()*()#I@!K:OLAS:KLDAS:L"}
 	antc.isExpectedErr = []bool{false, true, false, true}
 	antc.codeErr = []string{"", "20", "", "10"}
 	antc.amount, antc.until = 4, 2
-	antc.buildF = putWriteAnimationThumbnailTelegram
-}
-
-func (antc *anTestContainer) writeThumbnailInternet() {
-	antc.name = "(IAnimation).WriteThumbnailInternet"
-	antc.inputStr = []string{"https://youtube.com", "", "https://youtube.com", ")()*()#I@!K:OLAS:KLDAS:L"}
-	antc.isExpectedErr = []bool{false, true, false, true}
-	antc.codeErr = []string{"", "20", "", "10"}
-	antc.amount, antc.until = 4, 2
-	antc.buildF = putWriteAnimationThumbnailInternet
+	antc.buildF = putWriteAnimationThumbnailID
 }
 
 func (antc *anTestContainer) writeHasSpoiler() {
@@ -274,21 +261,14 @@ func TestWriteAnimationHeight(t *testing.T) {
 
 func TestWriteAnimationThumbnailStorage(t *testing.T) {
 	antc := new(anTestContainer)
-	antc.writeThumbnailStorage()
+	antc.writeThumbnail()
 	msg := formatter.CreateEmpltyMessage()
 	mainAnimationLogic(msg, *antc, t)
 }
 
 func TestWriteAnimationThumbnailTelegram(t *testing.T) {
 	antc := new(anTestContainer)
-	antc.writeThumbnailTelegram()
-	msg := formatter.CreateEmpltyMessage()
-	mainAnimationLogic(msg, *antc, t)
-}
-
-func TestWriteAnimationThumbnailInternet(t *testing.T) {
-	antc := new(anTestContainer)
-	antc.writeThumbnailInternet()
+	antc.writeThumbnailID()
 	msg := formatter.CreateEmpltyMessage()
 	mainAnimationLogic(msg, *antc, t)
 }

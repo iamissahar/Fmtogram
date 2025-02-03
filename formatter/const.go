@@ -1,10 +1,5 @@
 package formatter
 
-import (
-	"github.com/l1qwie/Fmtogram/formatter/methods"
-	"github.com/l1qwie/Fmtogram/types"
-)
-
 const (
 	Storage               int    = 1
 	Telegram              int    = 2
@@ -171,6 +166,3 @@ var Currencies = map[string]Currency{
 	"ZAR": {18.75, 187492.35},
 	"XTR": {},
 }
-
-var structForMethods = map[string]interface{}{methods.Message: &types.TelegramResponse{},
-	methods.ForwardMessage: &types.TelegramResponse{}}

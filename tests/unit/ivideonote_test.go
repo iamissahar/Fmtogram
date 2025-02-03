@@ -45,16 +45,12 @@ func putWriteVideoNoteLength(vdntc vdnTestContainer, vdn formatter.IVideoNote, i
 	return &videonoteT{vdntc.name, "", vdntc.inputInt[i], vdn.WriteLength, vdntc.isExpectedErr[i], vdntc.codeErr[i]}
 }
 
-func putWriteVideoNoteThumbnailStorage(vdntc vdnTestContainer, vdn formatter.IVideoNote, i int) *videonoteT {
-	return &videonoteT{vdntc.name, vdntc.inputStr[i], 0, vdn.WriteThumbnailStorage, vdntc.isExpectedErr[i], vdntc.codeErr[i]}
+func putWriteVideoNoteThumbnail(vdntc vdnTestContainer, vdn formatter.IVideoNote, i int) *videonoteT {
+	return &videonoteT{vdntc.name, vdntc.inputStr[i], 0, vdn.WriteThumbnail, vdntc.isExpectedErr[i], vdntc.codeErr[i]}
 }
 
-func putWriteVideoNoteThumbnailTelegram(vdntc vdnTestContainer, vdn formatter.IVideoNote, i int) *videonoteT {
-	return &videonoteT{vdntc.name, vdntc.inputStr[i], 0, vdn.WriteThumbnailTelegram, vdntc.isExpectedErr[i], vdntc.codeErr[i]}
-}
-
-func putWriteVideoNoteThumbnailInternet(vdntc vdnTestContainer, vdn formatter.IVideoNote, i int) *videonoteT {
-	return &videonoteT{vdntc.name, vdntc.inputStr[i], 0, vdn.WriteThumbnailInternet, vdntc.isExpectedErr[i], vdntc.codeErr[i]}
+func putWriteVideoNoteThumbnailID(vdntc vdnTestContainer, vdn formatter.IVideoNote, i int) *videonoteT {
+	return &videonoteT{vdntc.name, vdntc.inputStr[i], 0, vdn.WriteThumbnailID, vdntc.isExpectedErr[i], vdntc.codeErr[i]}
 }
 
 func (vdntc *vdnTestContainer) writeVideoNoteStorage() {
@@ -102,31 +98,22 @@ func (vdntc *vdnTestContainer) writeLength() {
 	vdntc.buildF = putWriteVideoNoteLength
 }
 
-func (vdntc *vdnTestContainer) writeThumbnailStorage() {
-	vdntc.name = "(IVideoNote).WriteThumbnailStorage"
+func (vdntc *vdnTestContainer) writeThumbnail() {
+	vdntc.name = "(IVideoNote).WriteThumbnail"
 	vdntc.inputStr = []string{"../media_test/tel-aviv.jpg", "", "../media_test/sound.mp3", "../media_test/tel-aviv.jpg", "../media_test/tel-aviv.jpg"}
 	vdntc.isExpectedErr = []bool{false, true, true, false, true}
 	vdntc.codeErr = []string{"", "20", "12", "", "10"}
 	vdntc.amount, vdntc.until = 5, 3
-	vdntc.buildF = putWriteVideoNoteThumbnailStorage
+	vdntc.buildF = putWriteVideoNoteThumbnail
 }
 
-func (vdntc *vdnTestContainer) writeThumbnailTelegram() {
-	vdntc.name = "(IVideoNote).WriteThumbnailTelegram"
+func (vdntc *vdnTestContainer) writeThumbnailID() {
+	vdntc.name = "(IVideoNote).WriteThumbnailID"
 	vdntc.inputStr = []string{"ASL:KDKAOL:SLK:@#$!:L", "", "A:LSKDKL:ASK:DLASKL:DASD", ")()*()#I@!K:OLAS:KLDAS:L"}
 	vdntc.isExpectedErr = []bool{false, true, false, true}
 	vdntc.codeErr = []string{"", "20", "", "10"}
 	vdntc.amount, vdntc.until = 4, 2
-	vdntc.buildF = putWriteVideoNoteThumbnailTelegram
-}
-
-func (vdntc *vdnTestContainer) writeThumbnailInternet() {
-	vdntc.name = "(IVideoNote).WriteThumbnailInternet"
-	vdntc.inputStr = []string{"https://youtube.com", "", "https://youtube.com", ")()*()#I@!K:OLAS:KLDAS:L"}
-	vdntc.isExpectedErr = []bool{false, true, false, true}
-	vdntc.codeErr = []string{"", "20", "", "10"}
-	vdntc.amount, vdntc.until = 4, 2
-	vdntc.buildF = putWriteVideoNoteThumbnailInternet
+	vdntc.buildF = putWriteVideoNoteThumbnailID
 }
 
 func (vdn *videonoteT) callStrF(testedF func(string) error, t *testing.T) {
@@ -225,23 +212,16 @@ func TestWriteVideoNoteLength(t *testing.T) {
 	mainVideoNoteLogic(msg, *vdntc, t)
 }
 
-func TestWriteVideoNoteThumbnailStorage(t *testing.T) {
+func TestWriteVideoNoteThumbnail(t *testing.T) {
 	vdntc := new(vdnTestContainer)
-	vdntc.writeThumbnailStorage()
+	vdntc.writeThumbnail()
 	msg := formatter.CreateEmpltyMessage()
 	mainVideoNoteLogic(msg, *vdntc, t)
 }
 
-func TestWriteVideoNoteThumbnailTelegram(t *testing.T) {
+func TestWriteVideoNoteThumbnailID(t *testing.T) {
 	vdntc := new(vdnTestContainer)
-	vdntc.writeThumbnailTelegram()
-	msg := formatter.CreateEmpltyMessage()
-	mainVideoNoteLogic(msg, *vdntc, t)
-}
-
-func TestWriteVideoNoteThumbnailInternet(t *testing.T) {
-	vdntc := new(vdnTestContainer)
-	vdntc.writeThumbnailInternet()
+	vdntc.writeThumbnailID()
 	msg := formatter.CreateEmpltyMessage()
 	mainVideoNoteLogic(msg, *vdntc, t)
 }

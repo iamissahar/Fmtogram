@@ -277,36 +277,24 @@ func (vd *video) WriteVideoInternet(video string) error {
 	return err
 }
 
-func (vd *video) WriteThumbnailStorage(thumbnail string) error {
+func (vd *video) WriteThumbnail(thumbnail string) error {
 	var err error
 	if err = checkStringValue(thumbnail, vd.Thumbnail); err == nil {
 		if err = isThumbnailCorrectType(thumbnail); err == nil {
 			vd.thumbnailGottenFrom = Storage
 			vd.Thumbnail = thumbnail
-			logs.DataWrittenSuccessfully(interfaceVideo, "Thumbnail From Storage")
+			logs.DataWrittenSuccessfully(interfaceVideo, "Thumbnail")
 		}
 	}
 	return err
 }
 
-func (vd *video) WriteThumbnailTelegram(thumbnail string) error {
+func (vd *video) WriteThumbnailID(thumbnailID string) error {
 	var err error
-	if err = checkStringValue(thumbnail, vd.Thumbnail); err == nil {
+	if err = checkStringValue(thumbnailID, vd.Thumbnail); err == nil {
 		vd.thumbnailGottenFrom = Telegram
-		vd.Thumbnail = thumbnail
-		logs.DataWrittenSuccessfully(interfaceVideo, "Thumbnail From Telegram")
-
-	}
-	return err
-}
-
-func (vd *video) WriteThumbnailInternet(thumbnail string) error {
-	var err error
-	if err = checkStringValue(thumbnail, vd.Thumbnail); err == nil {
-		vd.thumbnailGottenFrom = Internet
-		vd.Thumbnail = thumbnail
-		logs.DataWrittenSuccessfully(interfaceVideo, "Thumbnail From Internet")
-
+		vd.Thumbnail = thumbnailID
+		logs.DataWrittenSuccessfully(interfaceVideo, "Thumbnail ID")
 	}
 	return err
 }
@@ -434,34 +422,24 @@ func (ad *audio) WriteAudioInternet(audio string) error {
 	return err
 }
 
-func (ad *audio) WriteThumbnailStorage(thumbnail string) error {
+func (ad *audio) WriteThumbnail(thumbnail string) error {
 	var err error
 	if err = checkStringValue(thumbnail, ad.Thumbnail); err == nil {
 		if err = isThumbnailCorrectType(thumbnail); err == nil {
 			ad.thumbnailGottenFrom = Storage
 			ad.Thumbnail = thumbnail
-			logs.DataWrittenSuccessfully(interfaceVideo, "Thumbnail From Storage")
+			logs.DataWrittenSuccessfully(interfaceAudio, "Thumbnail")
 		}
 	}
 	return err
 }
 
-func (ad *audio) WriteThumbnailTelegram(thumbnail string) error {
+func (ad *audio) WriteThumbnailID(thumbnailID string) error {
 	var err error
-	if err = checkStringValue(thumbnail, ad.Thumbnail); err == nil {
+	if err = checkStringValue(thumbnailID, ad.Thumbnail); err == nil {
 		ad.thumbnailGottenFrom = Telegram
-		ad.Thumbnail = thumbnail
-		logs.DataWrittenSuccessfully(interfaceVideo, "Thumbnail From Telegram")
-	}
-	return err
-}
-
-func (ad *audio) WriteThumbnailInternet(thumbnail string) error {
-	var err error
-	if err = checkStringValue(thumbnail, ad.Thumbnail); err == nil {
-		ad.thumbnailGottenFrom = Internet
-		ad.Thumbnail = thumbnail
-		logs.DataWrittenSuccessfully(interfaceVideo, "Thumbnail From Internet")
+		ad.Thumbnail = thumbnailID
+		logs.DataWrittenSuccessfully(interfaceAudio, "Thumbnail ID")
 	}
 	return err
 }
@@ -554,34 +532,24 @@ func (dc *document) WriteDocumentInternet(document string) error {
 	return err
 }
 
-func (dc *document) WriteThumbnailStorage(thumbnail string) error {
+func (dc *document) WriteThumbnail(thumbnail string) error {
 	var err error
 	if err = checkStringValue(thumbnail, dc.Thumbnail); err == nil {
 		if err = isThumbnailCorrectType(thumbnail); err == nil {
 			dc.thumbnailGottenFrom = Storage
 			dc.Thumbnail = thumbnail
-			logs.DataWrittenSuccessfully(interfaceDocument, "Thumbnail From Storage")
+			logs.DataWrittenSuccessfully(interfaceDocument, "Thumbnail")
 		}
 	}
 	return err
 }
 
-func (dc *document) WriteThumbnailTelegram(thumbnail string) error {
+func (dc *document) WriteThumbnailID(thumbnailID string) error {
 	var err error
-	if err = checkStringValue(thumbnail, dc.Thumbnail); err == nil {
+	if err = checkStringValue(thumbnailID, dc.Thumbnail); err == nil {
 		dc.thumbnailGottenFrom = Telegram
-		dc.Thumbnail = thumbnail
-		logs.DataWrittenSuccessfully(interfaceDocument, "Thumbnail From Telegram")
-	}
-	return err
-}
-
-func (dc *document) WriteThumbnailInternet(thumbnail string) error {
-	var err error
-	if err = checkStringValue(thumbnail, dc.Thumbnail); err == nil {
-		dc.thumbnailGottenFrom = Internet
-		dc.Thumbnail = thumbnail
-		logs.DataWrittenSuccessfully(interfaceDocument, "Thumbnail From Internet")
+		dc.Thumbnail = thumbnailID
+		logs.DataWrittenSuccessfully(interfaceDocument, "Thumbnail ID")
 	}
 	return err
 }
@@ -687,34 +655,24 @@ func (an *animation) WriteHeight(height int) error {
 	return err
 }
 
-func (an *animation) WriteThumbnailStorage(thumbnail string) error {
+func (an *animation) WriteThumbnail(thumbnail string) error {
 	var err error
 	if err = checkStringValue(thumbnail, an.Thumbnail); err == nil {
 		if err = isThumbnailCorrectType(thumbnail); err == nil {
 			an.thumbnailGottenFrom = Storage
 			an.Thumbnail = thumbnail
-			logs.DataWrittenSuccessfully(interfaceAnimation, "Thumbnail From Storage")
+			logs.DataWrittenSuccessfully(interfaceAnimation, "Thumbnail")
 		}
 	}
 	return err
 }
 
-func (an *animation) WriteThumbnailTelegram(thumbnail string) error {
+func (an *animation) WriteThumbnailID(thumbnail string) error {
 	var err error
 	if err = checkStringValue(thumbnail, an.Thumbnail); err == nil {
 		an.thumbnailGottenFrom = Telegram
 		an.Thumbnail = thumbnail
-		logs.DataWrittenSuccessfully(interfaceAnimation, "Thumbnail From Telegram")
-	}
-	return err
-}
-
-func (an *animation) WriteThumbnailInternet(thumbnail string) error {
-	var err error
-	if err = checkStringValue(thumbnail, an.Thumbnail); err == nil {
-		an.thumbnailGottenFrom = Internet
-		an.Thumbnail = thumbnail
-		logs.DataWrittenSuccessfully(interfaceAnimation, "Thumbnail From Internet")
+		logs.DataWrittenSuccessfully(interfaceAnimation, "Thumbnail ID")
 	}
 	return err
 }
@@ -829,34 +787,24 @@ func (vdn *videonote) WriteLength(length int) error {
 	return err
 }
 
-func (vdn *videonote) WriteThumbnailStorage(thumbnail string) error {
+func (vdn *videonote) WriteThumbnail(thumbnail string) error {
 	var err error
 	if err = checkStringValue(thumbnail, vdn.Thumbnail); err == nil {
 		if err = isThumbnailCorrectType(thumbnail); err == nil {
 			vdn.thumbnailGottenFrom = Storage
 			vdn.Thumbnail = thumbnail
-			logs.DataWrittenSuccessfully(interfaceVideoNote, "Thumbnail From Storage")
+			logs.DataWrittenSuccessfully(interfaceVideoNote, "Thumbnail")
 		}
 	}
 	return err
 }
 
-func (vdn *videonote) WriteThumbnailTelegram(thumbnailID string) error {
+func (vdn *videonote) WriteThumbnailID(thumbnailID string) error {
 	var err error
 	if err = checkStringValue(thumbnailID, vdn.Thumbnail); err == nil {
 		vdn.thumbnailGottenFrom = Telegram
 		vdn.Thumbnail = thumbnailID
-		logs.DataWrittenSuccessfully(interfaceVideoNote, "Thumbnail From Telegram")
-	}
-	return err
-}
-
-func (vdn *videonote) WriteThumbnailInternet(URL string) error {
-	var err error
-	if err = checkStringValue(URL, vdn.Thumbnail); err == nil {
-		vdn.thumbnailGottenFrom = Internet
-		vdn.Thumbnail = URL
-		logs.DataWrittenSuccessfully(interfaceVideoNote, "Thumbnail From Internet")
+		logs.DataWrittenSuccessfully(interfaceVideoNote, "Thumbnail ID")
 	}
 	return err
 }
@@ -1813,6 +1761,7 @@ func (inf *information) WriteString(text string) error {
 	var err error
 	if err = checkStringValue(text, inf.Text); err == nil {
 		inf.Text = text
+		inf.Caption = text
 		logs.DataWrittenSuccessfully(interfaceParam, "Text")
 	}
 	return err
@@ -1871,6 +1820,7 @@ func (inf *information) WriteEntities(entities []*types.MessageEntity) error {
 	var err error
 	if err = checkEntities(entities, inf.Entities); err == nil {
 		inf.Entities = entities
+		inf.CaptionEntities = entities
 		logs.DataWrittenSuccessfully(interfaceParam, "Entities")
 	}
 	return err

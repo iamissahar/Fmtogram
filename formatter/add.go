@@ -316,15 +316,17 @@ func (msg *Message) AddParameters(param IParameters) error {
 	if p, ok := param.(*information); ok {
 		if isDefaultParams(msg.fm.inf) {
 			msg.fm.inf = p
-			if p.StarCount != 0 {
-				msg.fm.method = methods.PaidMedia
-			} else if p.Emoji != "" {
-				msg.fm.method = methods.Dice
-			} else if p.Action != "" {
-				msg.fm.method = methods.ChatAction
-			} else {
-				msg.fm.method = methods.Message
-				msg.fm.tgr = new(types.TelegramResponse)
+			if msg.fm.method == "" {
+				if p.StarCount != 0 {
+					msg.fm.method = methods.PaidMedia
+				} else if p.Emoji != "" {
+					msg.fm.method = methods.Dice
+				} else if p.Action != "" {
+					msg.fm.method = methods.ChatAction
+				} else {
+					msg.fm.method = methods.Message
+					msg.fm.tgr = new(types.TelegramResponse)
+				}
 			}
 			logs.InterfaceSaved(interfaceParam)
 		} else {
@@ -377,19 +379,15 @@ func (msg *Message) AddKeyboard(kb IKeyboard) error {
 
 func (msg *Message) AddMethod(method string) error {
 	var err error
-	if data, ok := structForMethods[method]; ok {
-		if (msg.fm.method == methods.ForwardMessage) || (msg.fm.method == methods.CopyMessage) {
-			msg.fm.tgr = new(types.TelegramResponse)
-		} else if (msg.fm.method == methods.ForwardMessages) || (msg.fm.method == methods.CopyMessages) {
-			msg.fm.tgr = new(types.TelegramMessageIDs)
-		}
-		msg.fm.method = method
-		msg.fm.tgr = &data
-		msg.fm.notchange = true
-		logs.MethodSaved(method)
-	} else {
-		err = code20()
+
+	if (method == methods.ForwardMessage) || (method == methods.CopyMessage) {
+		msg.fm.tgr = new(types.TelegramResponse)
+	} else if (method == methods.ForwardMessages) || (method == methods.CopyMessages) {
+		msg.fm.tgr = new(types.TelegramMessageIDs)
 	}
+	msg.fm.method = method
+	msg.fm.notchange = true
+	logs.MethodSaved(method)
 	return err
 }
 
