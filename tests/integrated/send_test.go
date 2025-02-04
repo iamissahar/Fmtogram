@@ -10,9 +10,9 @@ import (
 var parsemode = []string{types.HTML, types.Markdown, types.MarkdownV2}
 var photodata = []string{"../media/tel-aviv.jpg", "AgACAgIAAxkDAAIQOmeVLmLOfKYAAacYIhF6AAERhIoVlSYAAhjzMRvJOKlIR8eAgDzDgJIBAAMCAANtAAM2BA",
 	"https://www.aljazeera.com/wp-content/uploads/2025/01/AFP__20250120__36UX28A__v2__HighRes__TopshotUsPoliticsTrumpInauguration-1737420954.jpg?w=770&resize=770,513"}
-var audiodata = []string{"../media/sound.mp3", "CQACAgIAAxkDAAIWMWeae5skCEHVkdMbRIpPjCq21Dy1AAJKYAACl1nYSCgEe8j3dX6LNgQ",
-	"https://pixabay.com/music/pop-alan-amjad-tiktok-music-audio-167245/"}
-var docdata = []string{"../media/Resume.pdf", "BAACAgIAAxkDAAIW12eanLFdH2bFfvzdbi00FVHIKdZWAAKxYQACl1nYSHmBK0TM_zmxNgQ",
+var audiodata = []string{"../media/sound.mp3", "CQACAgIAAxUHZ6IojQe818oNFe4bl9lH23Up7X0AAtVlAALmFxlJU-d8VdX3MFM2BA",
+	"https://pixabay.com/music/download/vlog-music-beat-trailer-showreel-promo-background-intro-theme-274290.mp3"}
+var docdata = []string{"../media/Resume.pdf", "BQACAgIAAxUHZ6Imx1aO5DIjSTDxSNIM5Sx8F5AAArhlAALmFxlJ4tfoQKuqKkE2BA",
 	"https://www.aljazeera.com/wp-content/uploads/2025/01/AFP__20250120__36UX28A__v2__HighRes__TopshotUsPoliticsTrumpInauguration-1737420954.jpg?w=770&resize=770,513"}
 var videodata = []string{"../media/black.mp4", "BAACAgIAAxkDAAIT-GeWRcV86dcv9CKSUWigMceO6OnTAALVYwACyTixSIm8GQnP7rn3NgQ",
 	"https://www.pexels.com/download/video/6646588/"}
@@ -23,11 +23,24 @@ var voicedata = []string{"../media/dimaJOSKAproNATO.ogg", "AwACAgIAAxkDAAIXd2ehC
 var videoNdata = []string{"../media/black.mp4", "BAACAgIAAxkDAAIX02ehEJZfVRFXkXTl8wLAQJ5AXH41AALWYgAC5hcJSX6PBZ_I_kmPNgQ",
 	"https://www.pexels.com/download/video/6646588/"}
 
-var thumbaudio = []string{"../media/tel-aviv.jpg", "AAMCAgADGQMAAhYxZ5p7myQIQdWR0xtEik-MKrbUPLUAAkpgAAKXWdhIKAR7yPd1fosBAAdtAAM2BA"}
-var thumbdoc = []string{"../media/tel-aviv.jpg", "AAMCAgADGQMAAhaKZ5qbT-uHhMTs-5D0CV-eKAvS7loAAoxhAAKXWdhIYJvF_Lk5TTMBAAdtAAM2BA"}
+var thumbaudio = []string{"../media/tel-aviv.jpg", "AAMCAgADFQdnoiiNB7zXyg0V7huX2UfbdSntfQAC1WUAAuYXGUlT53xV1fcwUwEAB20AAzYE"}
+var thumbdoc = []string{"../media/tel-aviv.jpg", "AAMCAgADFQdnoibHVo7kMiNJMPFI0gzlLHwXkAACuGUAAuYXGUni1-hAq6oqQQEAB20AAzYE"}
 var thumbvideo = []string{"../media/tel-aviv.jpg", "AAMCAgADGQMAAhbXZ5qcsV0fZsV-_N1uLTQVUcgp1lYAArFhAAKXWdhIeYErRMz_ObEBAAdtAAM2BA"}
 var thumbanim = []string{"../media/tel-aviv.jpg", "AAMCAgADGQMAAhctZ6EG3D8YEomM5ZQZQy6x4svmKWkAAv1hAALmFwlJmXYl1kwk0DwBAAdtAAM2BA"}
 var thumbvideoN = []string{"../media/tel-aviv.jpg", "AAMCAgADGQMAAhfTZ6EQll9VEVeRdOXzAsBAnkBcfjUAAtZiAALmFwlJfo8Fn8j-SY8BAAdtAAM2BA"}
+
+type mediagroup struct {
+	amout     int
+	photos    []formatter.IPhoto
+	videos    []formatter.IVideo
+	audios    []formatter.IAudio
+	documents []formatter.IDocument
+	phFunc    func(formatter.IPhoto) []func(string) error
+	vdFunc    func(formatter.IVideo) []func(string) error
+	adFunc    func(formatter.IAudio) []func(string) error
+	docFunc   func(formatter.IDocument) []func(string) error
+	all       bool
+}
 
 type testcase struct {
 	msg           *formatter.Message
@@ -42,6 +55,7 @@ type testcase struct {
 	vc            formatter.IVoice
 	vdn           formatter.IVideoNote
 	loc           formatter.ILocation
+	mg            *mediagroup
 	addMedia      func(*testcase, *testing.T)
 	mediaF        func(*testcase) []func(string) error
 	mediadata     []string
@@ -53,6 +67,7 @@ type testcase struct {
 	code          [3]int
 	errmsg        [3]string
 	withoutString bool
+	paid          bool
 }
 
 func photoArr(tc *testcase) []func(string) error {
@@ -150,6 +165,11 @@ func (tc *testcase) sendMediaReq(t *testing.T) {
 	for i := 0; i < 3; i++ {
 		test := new(testcase)
 		test.init()
+		if tc.paid {
+			if err = test.prm.WriteStarCount(31); err != nil {
+				t.Fatal(err)
+			}
+		}
 		if err = tc.mediaF(test)[i](tc.mediadata[i]); err != nil {
 			t.Fatal(err)
 		}
@@ -157,6 +177,9 @@ func (tc *testcase) sendMediaReq(t *testing.T) {
 			t.Fatal(err)
 		}
 		if err = test.msg.AddChat(test.ch); err != nil {
+			t.Fatal(err)
+		}
+		if err = test.msg.AddParameters(test.prm); err != nil {
 			t.Fatal(err)
 		}
 		tc.addMedia(test, t)
@@ -173,6 +196,11 @@ func (tc *testcase) sendMediaAll(t *testing.T) {
 		for j := 0; j < 4; j++ {
 			tcc := new(testcase)
 			tcc.init()
+			if tc.paid {
+				if err = tcc.prm.WriteStarCount(31); err != nil {
+					t.Fatal(err)
+				}
+			}
 			if !tc.withoutString {
 				if err = tcc.prm.WriteString("there's a string"); err != nil {
 					t.Fatal(err)
@@ -701,31 +729,666 @@ func TestVideoNote(t *testing.T) {
 	t.Run("All", videoNAll)
 }
 
-func addPaidMedia(tc *testcase, t *testing.T, i int, photo bool) {
-	var err error
-	if photo {
-		if err = tc.msg.AddPhoto(tc.ph); err != nil {
-			t.Fatal(err)
+func paidPhReq(t *testing.T) {
+	tc := new(testcase)
+	tc.addMedia = addPhoto
+	tc.mediaF = photoArr
+	tc.mediadata = photodata
+	tc.paid = true
+	tc.sendMediaReq(t)
+}
+
+func paidVdReq(t *testing.T) {
+	tc := new(testcase)
+	tc.addMedia = addVideo
+	tc.mediaF = videoArr
+	tc.mediadata = videodata
+	tc.paid = true
+	tc.sendMediaReq(t)
+}
+
+func paidReq(t *testing.T) {
+	t.Run("Photo", paidPhReq)
+	t.Run("Video", paidVdReq)
+}
+
+func paidPhAll(t *testing.T) {
+	tc := new(testcase)
+	tc.addMedia = addPhoto
+	tc.mediaF = photoArr
+	tc.mediadata = photodata
+	tc.paid = true
+	tc.common = photoCommon
+	for i := 0; i < 3; i++ {
+		if i == 0 {
+			t.Log("Test Photo With Inline Keyboard")
+			tc.kbF = tc.inlineKb
+		} else if i == 1 {
+			t.Log("Test Photo With ReplyMarkup Keyboard")
+			tc.kbF = tc.replyKb
+		} else {
+			t.Log("Test Photo With ForceReply Keyboard")
+			tc.kbF = tc.forceKb
 		}
-	} else {
-		if err = tc.msg.AddVideo(tc.vd); err != nil {
-			t.Fatal(err)
-		}
+		tc.sendMediaAll(t)
 	}
 }
 
-func paidReq(t *testing.T) {}
+func paidVdAll(t *testing.T) {
+	tc := new(testcase)
+	tc.addMedia = addVideo
+	tc.mediaF = videoArr
+	tc.mediadata = videodata
+	tc.common = videoCommon
+	tc.thumb = true
+	tc.paid = true
+	tc.thumbnailF = videoThumb
+	tc.thumbdata = thumbvideo
+	for i := 0; i < 3; i++ {
+		if i == 0 {
+			t.Log("Test Video With Inline Keyboard")
+			tc.kbF = tc.inlineKb
+		} else if i == 1 {
+			t.Log("Test Video With ReplyMarkup Keyboard")
+			tc.kbF = tc.replyKb
+		} else {
+			t.Log("Test Video With ForceReply Keyboard")
+			tc.kbF = tc.forceKb
+		}
+		tc.sendMediaAll(t)
+	}
+}
 
-func paidAll(t *testing.T) {}
+func paidAll(t *testing.T) {
+	t.Run("Photo", paidPhAll)
+	t.Run("Video", paidVdAll)
+}
 
 func TestPaidMedia(t *testing.T) {
 	t.Run("Req", paidReq)
 	t.Run("All", paidAll)
 }
 
-func mediaReq(t *testing.T) {}
+func addMediaInGroup(tc *testcase, obj []int, q int, t *testing.T) {
+	const photo, video, audio, document = 0, 1, 2, 3
+	var p, v, a, d, justcounter int
+	var err error
+	for i := 0; i < tc.mg.amout; i++ {
+		if obj[i] == photo {
+			tc.mg.photos[p] = tc.msg.NewPhoto()
+			if err = tc.mg.phFunc(tc.mg.photos[p])[q](photodata[q]); err != nil {
+				t.Fatal(err)
+			}
+			if tc.mg.all {
+				mgPhotoAll(tc.mg.photos[p], &justcounter, t)
+			}
+			if err = tc.msg.AddPhoto(tc.mg.photos[p]); err != nil {
+				t.Fatal(err)
+			}
+			p++
+		} else if obj[i] == video {
+			tc.mg.videos[v] = tc.msg.NewVideo()
+			if err = tc.mg.vdFunc(tc.mg.videos[v])[q](videodata[q]); err != nil {
+				t.Fatal(err)
+			}
+			if tc.mg.all {
+				mgVideoAll(tc.mg.videos[v], &justcounter, q, t)
+			}
+			if err = tc.msg.AddVideo(tc.mg.videos[v]); err != nil {
+				t.Fatal(err)
+			}
+			v++
+		} else if obj[i] == audio {
+			tc.mg.audios[a] = tc.msg.NewAudio()
+			if err = tc.mg.adFunc(tc.mg.audios[a])[q](audiodata[q]); err != nil {
+				t.Fatal(err)
+			}
+			if tc.mg.all {
+				mgAudioAll(tc.mg.audios[a], &justcounter, q, t)
+			}
+			if err = tc.msg.AddAudio(tc.mg.audios[a]); err != nil {
+				t.Fatal(err)
+			}
+			a++
+		} else {
+			tc.mg.documents[d] = tc.msg.NewDocument()
+			if err = tc.mg.docFunc(tc.mg.documents[d])[q](docdata[q]); err != nil {
+				t.Fatal(err)
+			}
+			if tc.mg.all {
+				mgDocumentAll(tc.mg.documents[d], &justcounter, q, t)
+			}
+			if err = tc.msg.AddDocument(tc.mg.documents[d]); err != nil {
+				t.Fatal(err)
+			}
+			d++
+		}
+	}
+}
 
-func mediaAll(t *testing.T) {}
+func photoF(ph formatter.IPhoto) []func(string) error {
+	return []func(string) error{ph.WritePhotoStorage, ph.WritePhotoTelegram, ph.WritePhotoInternet}
+}
+
+func videoF(vd formatter.IVideo) []func(string) error {
+	return []func(string) error{vd.WriteVideoStorage, vd.WriteVideoTelegram, vd.WriteVideoInternet}
+}
+
+func documentF(doc formatter.IDocument) []func(string) error {
+	return []func(string) error{doc.WriteDocumentStorage, doc.WriteDocumentTelegram, doc.WriteDocumentInternet}
+}
+
+func audioF(ad formatter.IAudio) []func(string) error {
+	return []func(string) error{ad.WriteAudioStorage, ad.WriteAudioTelegram, ad.WriteAudioInternet}
+}
+
+func mediaPhReq(t *testing.T) {
+	var err error
+	var obj []int
+	for i := 0; i < 3; i++ {
+		for j := 0; j < 2; j++ {
+			tc := new(testcase)
+			tc.mg = new(mediagroup)
+			if j == 0 {
+				tc.mg.amout = 3
+				obj = make([]int, tc.mg.amout)
+			} else {
+				tc.mg.amout = 10
+				obj = make([]int, tc.mg.amout)
+			}
+			tc.init()
+			tc.mg.phFunc = photoF
+			tc.mg.photos = make([]formatter.IPhoto, tc.mg.amout)
+			addMediaInGroup(tc, obj, i, t)
+			if err = tc.ch.WriteChatID(738070596); err != nil {
+				t.Fatal(err)
+			}
+			if err = tc.msg.AddChat(tc.ch); err != nil {
+				t.Fatal(err)
+			}
+			send(tc.msg, t)
+			if code, msg := tc.get.Error(); (code != tc.code[i]) && (msg != tc.errmsg[i]) {
+				t.Fatal(msg)
+			}
+		}
+	}
+}
+
+func mediaVdReq(t *testing.T) {
+	var err error
+	var obj []int
+	for i := 0; i < 3; i++ {
+		for j := 0; j < 2; j++ {
+			tc := new(testcase)
+			tc.mg = new(mediagroup)
+			if j == 0 {
+				tc.mg.amout = 3
+				obj = make([]int, tc.mg.amout)
+			} else {
+				tc.mg.amout = 10
+				obj = make([]int, tc.mg.amout)
+			}
+			for k := range obj {
+				obj[k] = 1
+			}
+			tc.init()
+			tc.mg.vdFunc = videoF
+			tc.mg.videos = make([]formatter.IVideo, tc.mg.amout)
+			addMediaInGroup(tc, obj, i, t)
+			if err = tc.ch.WriteChatID(738070596); err != nil {
+				t.Fatal(err)
+			}
+			if err = tc.msg.AddChat(tc.ch); err != nil {
+				t.Fatal(err)
+			}
+			send(tc.msg, t)
+			if code, msg := tc.get.Error(); (code != tc.code[i]) && (msg != tc.errmsg[i]) {
+				t.Fatal(msg)
+			}
+		}
+	}
+}
+
+func mediaPhVdReq(t *testing.T) {
+	var err error
+	var obj []int
+	for i := 0; i < 3; i++ {
+		for j := 0; j < 2; j++ {
+			tc := new(testcase)
+			tc.mg = new(mediagroup)
+			if j == 0 {
+				tc.mg.amout = 4
+				obj = make([]int, tc.mg.amout)
+			} else {
+				tc.mg.amout = 10
+				obj = make([]int, tc.mg.amout)
+			}
+			for k := range obj {
+				if k%2 == 0 {
+					obj[k] = 1
+				}
+			}
+			tc.init()
+			tc.mg.vdFunc = videoF
+			tc.mg.phFunc = photoF
+			tc.mg.videos = make([]formatter.IVideo, tc.mg.amout/2)
+			tc.mg.photos = make([]formatter.IPhoto, tc.mg.amout/2)
+			addMediaInGroup(tc, obj, i, t)
+			if err = tc.ch.WriteChatID(738070596); err != nil {
+				t.Fatal(err)
+			}
+			if err = tc.msg.AddChat(tc.ch); err != nil {
+				t.Fatal(err)
+			}
+			send(tc.msg, t)
+			if code, msg := tc.get.Error(); (code != tc.code[i]) && (msg != tc.errmsg[i]) {
+				t.Fatal(msg)
+			}
+		}
+	}
+}
+
+func mediaDocReq(t *testing.T) {
+	var err error
+	var obj []int
+	for i := 0; i < 3; i++ {
+		for j := 0; j < 2; j++ {
+			tc := new(testcase)
+			tc.mg = new(mediagroup)
+			if j == 0 {
+				tc.mg.amout = 3
+				obj = make([]int, tc.mg.amout)
+			} else {
+				tc.mg.amout = 10
+				obj = make([]int, tc.mg.amout)
+			}
+			for k := range obj {
+				obj[k] = 3
+			}
+			tc.init()
+			tc.mg.docFunc = documentF
+			tc.mg.documents = make([]formatter.IDocument, tc.mg.amout)
+			addMediaInGroup(tc, obj, i, t)
+			if err = tc.ch.WriteChatID(738070596); err != nil {
+				t.Fatal(err)
+			}
+			if err = tc.msg.AddChat(tc.ch); err != nil {
+				t.Fatal(err)
+			}
+			send(tc.msg, t)
+			if code, msg := tc.get.Error(); (code != tc.code[i]) && (msg != tc.errmsg[i]) {
+				t.Fatal(msg)
+			}
+		}
+	}
+}
+
+func mediaAdReq(t *testing.T) {
+	var err error
+	var obj []int
+	for i := 0; i < 3; i++ {
+		for j := 0; j < 2; j++ {
+			tc := new(testcase)
+			tc.mg = new(mediagroup)
+			if j == 0 {
+				tc.mg.amout = 3
+				obj = make([]int, tc.mg.amout)
+			} else {
+				tc.mg.amout = 10
+				obj = make([]int, tc.mg.amout)
+			}
+			for k := range obj {
+				obj[k] = 2
+			}
+			tc.init()
+			tc.mg.adFunc = audioF
+			tc.mg.audios = make([]formatter.IAudio, tc.mg.amout)
+			addMediaInGroup(tc, obj, i, t)
+			if err = tc.ch.WriteChatID(738070596); err != nil {
+				t.Fatal(err)
+			}
+			if err = tc.msg.AddChat(tc.ch); err != nil {
+				t.Fatal(err)
+			}
+			send(tc.msg, t)
+			if code, msg := tc.get.Error(); (code != tc.code[i]) && (msg != tc.errmsg[i]) {
+				t.Fatal(msg)
+			}
+		}
+	}
+}
+
+func mediaReq(t *testing.T) {
+	t.Run("Photo", mediaPhReq)
+	t.Run("Video", mediaVdReq)
+	t.Run("TogetherPhVd", mediaPhVdReq)
+	t.Run("Document", mediaDocReq)
+	t.Run("Audio", mediaAdReq)
+}
+
+func mediaGroupCommon(tc *testcase, t *testing.T) {
+	var err error
+	if err = tc.ch.WriteChatID(738070596); err != nil {
+		t.Fatal(err)
+	}
+	if err = tc.prm.WriteDisableNotification(); err != nil {
+		t.Fatal(err)
+	}
+	if err = tc.prm.WriteProtectContent(); err != nil {
+		t.Fatal(err)
+	}
+	if err = tc.prm.WriteMessageEffectID("5107584321108051014"); err != nil {
+		t.Fatal(err)
+	}
+	if err = tc.prm.WriteReplyParameters(&types.ReplyParameters{MessageID: 3966, ChatID: 738070596}); err != nil {
+		t.Fatal(err)
+	}
+	if err = tc.msg.AddChat(tc.ch); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func mgPhotoAll(ph formatter.IPhoto, q *int, t *testing.T) {
+	var err error
+	if err = ph.WriteCaption("there's a string"); err != nil {
+		t.Fatal(err)
+	}
+	if *q == 3 {
+		if err = ph.WriteCaptionEntities([]*types.MessageEntity{{Offset: 1, Length: 4, Type: "italic"}}); err != nil {
+			t.Fatal(err)
+		}
+	} else if *q >= 0 {
+		if err = ph.WriteParseMode(parsemode[*q]); err != nil {
+			t.Fatal(err)
+		}
+	}
+	if err = ph.WriteShowCaptionAboveMedia(); err != nil {
+		t.Fatal(err)
+	}
+	if err = ph.WriteHasSpoiler(); err != nil {
+		t.Fatal(err)
+	}
+	*q++
+	if *q > 3 {
+		*q = 0
+	}
+}
+
+func mgVideoAll(vd formatter.IVideo, q *int, majorq int, t *testing.T) {
+	var err error
+	if err = vd.WriteCaption("there's a string"); err != nil {
+		t.Fatal(err)
+	}
+	if *q == 3 {
+		if err = vd.WriteCaptionEntities([]*types.MessageEntity{{Offset: 1, Length: 4, Type: "italic"}}); err != nil {
+			t.Fatal(err)
+		}
+	} else if *q >= 0 {
+		if err = vd.WriteParseMode(parsemode[*q]); err != nil {
+			t.Fatal(err)
+		}
+	}
+	if err = vd.WriteWidth(22); err != nil {
+		t.Fatal(err)
+	}
+	if err = vd.WriteHeight(22); err != nil {
+		t.Fatal(err)
+	}
+	if err = vd.WriteDuration(4); err != nil {
+		t.Fatal(err)
+	}
+	if err = vd.WriteSupportsStreaming(); err != nil {
+		t.Fatal(err)
+	}
+	if err = vd.WriteShowCaptionAboveMedia(); err != nil {
+		t.Fatal(err)
+	}
+	if err = vd.WriteHasSpoiler(); err != nil {
+		t.Fatal(err)
+	}
+	if majorq == 0 {
+		if err = vd.WriteThumbnail(thumbvideo[0]); err != nil {
+			t.Fatal(err)
+		}
+	} else if majorq == 1 {
+		if err = vd.WriteThumbnailID(thumbvideo[1]); err != nil {
+			t.Fatal(err)
+		}
+	}
+	*q++
+	if *q > 3 {
+		*q = 0
+	}
+}
+
+func mgDocumentAll(dc formatter.IDocument, q *int, majorq int, t *testing.T) {
+	var err error
+	if err = dc.WriteCaption("there's a string"); err != nil {
+		t.Fatal(err)
+	}
+	if *q == 3 {
+		if err = dc.WriteCaptionEntities([]*types.MessageEntity{{Offset: 1, Length: 4, Type: "italic"}}); err != nil {
+			t.Fatal(err)
+		}
+	} else if *q >= 0 {
+		if err = dc.WriteParseMode(parsemode[*q]); err != nil {
+			t.Fatal(err)
+		}
+	}
+	if majorq == 0 {
+		if err = dc.WriteThumbnail(thumbdoc[0]); err != nil {
+			t.Fatal(err)
+		}
+	} else if majorq == 1 {
+		if err = dc.WriteThumbnailID(thumbdoc[1]); err != nil {
+			t.Fatal(err)
+		}
+	}
+	if err = dc.WriteDisableContentTypeDetection(); err != nil {
+		t.Fatal(err)
+	}
+	*q++
+	if *q > 3 {
+		*q = 0
+	}
+}
+
+func mgAudioAll(ad formatter.IAudio, q *int, majorq int, t *testing.T) {
+	var err error
+	if err = ad.WriteCaption("there's a string"); err != nil {
+		t.Fatal(err)
+	}
+	if *q == 3 {
+		if err = ad.WriteCaptionEntities([]*types.MessageEntity{{Offset: 1, Length: 4, Type: "italic"}}); err != nil {
+			t.Fatal(err)
+		}
+	} else if *q >= 0 {
+		if err = ad.WriteParseMode(parsemode[*q]); err != nil {
+			t.Fatal(err)
+		}
+	}
+	if majorq == 0 {
+		if err = ad.WriteThumbnail(thumbaudio[0]); err != nil {
+			t.Fatal(err)
+		}
+	} else if majorq == 1 {
+		if err = ad.WriteThumbnailID(thumbaudio[1]); err != nil {
+			t.Fatal(err)
+		}
+	}
+	if err = ad.WriteDuration(22); err != nil {
+		t.Fatal(err)
+	}
+	if err = ad.WritePerformer("Me Myself & I"); err != nil {
+		t.Fatal(err)
+	}
+	if err = ad.WriteTitle("The Cool Song"); err != nil {
+		t.Fatal(err)
+	}
+	*q++
+	if *q > 3 {
+		*q = 0
+	}
+}
+
+func mediaPhAll(t *testing.T) {
+	var obj []int
+	for i := 0; i < 3; i++ {
+		for j := 0; j < 2; j++ {
+			tc := new(testcase)
+			tc.mg = new(mediagroup)
+			if j == 0 {
+				tc.mg.amout = 3
+				obj = make([]int, tc.mg.amout)
+			} else {
+				tc.mg.amout = 10
+				obj = make([]int, tc.mg.amout)
+			}
+			tc.init()
+			tc.mg.phFunc = photoF
+			tc.mg.all = true
+			tc.mg.photos = make([]formatter.IPhoto, tc.mg.amout)
+			addMediaInGroup(tc, obj, i, t)
+			mediaGroupCommon(tc, t)
+			send(tc.msg, t)
+			if code, msg := tc.get.Error(); (code != tc.code[i]) && (msg != tc.errmsg[i]) {
+				t.Fatal(msg)
+			}
+		}
+	}
+}
+
+func mediaVdAll(t *testing.T) {
+	var obj []int
+	for i := 0; i < 3; i++ {
+		for j := 0; j < 2; j++ {
+			tc := new(testcase)
+			tc.mg = new(mediagroup)
+			if j == 0 {
+				tc.mg.amout = 3
+				obj = make([]int, tc.mg.amout)
+			} else {
+				tc.mg.amout = 10
+				obj = make([]int, tc.mg.amout)
+			}
+			for k := range obj {
+				obj[k] = 1
+			}
+			tc.init()
+			tc.mg.vdFunc = videoF
+			tc.mg.all = true
+			tc.mg.videos = make([]formatter.IVideo, tc.mg.amout)
+			addMediaInGroup(tc, obj, i, t)
+			mediaGroupCommon(tc, t)
+			send(tc.msg, t)
+			if code, msg := tc.get.Error(); (code != tc.code[i]) && (msg != tc.errmsg[i]) {
+				t.Fatal(msg)
+			}
+		}
+	}
+}
+
+func mediaPhVdAll(t *testing.T) {
+	var obj []int
+	for i := 0; i < 3; i++ {
+		for j := 0; j < 2; j++ {
+			tc := new(testcase)
+			tc.mg = new(mediagroup)
+			if j == 0 {
+				tc.mg.amout = 4
+				obj = make([]int, tc.mg.amout)
+			} else {
+				tc.mg.amout = 10
+				obj = make([]int, tc.mg.amout)
+			}
+			for k := range obj {
+				if k%2 == 0 {
+					obj[k] = 1
+				}
+			}
+			tc.init()
+			tc.mg.all = true
+			tc.mg.vdFunc = videoF
+			tc.mg.phFunc = photoF
+			tc.mg.videos = make([]formatter.IVideo, tc.mg.amout/2)
+			tc.mg.photos = make([]formatter.IPhoto, tc.mg.amout/2)
+			addMediaInGroup(tc, obj, i, t)
+			mediaGroupCommon(tc, t)
+			send(tc.msg, t)
+			if code, msg := tc.get.Error(); (code != tc.code[i]) && (msg != tc.errmsg[i]) {
+				t.Fatal(msg)
+			}
+		}
+	}
+}
+
+func mediaDocAll(t *testing.T) {
+	var obj []int
+	for i := 0; i < 3; i++ {
+		for j := 0; j < 2; j++ {
+			tc := new(testcase)
+			tc.mg = new(mediagroup)
+			if j == 0 {
+				tc.mg.amout = 3
+				obj = make([]int, tc.mg.amout)
+			} else {
+				tc.mg.amout = 10
+				obj = make([]int, tc.mg.amout)
+			}
+			for k := range obj {
+				obj[k] = 3
+			}
+			tc.init()
+			tc.mg.docFunc = documentF
+			tc.mg.all = true
+			tc.mg.documents = make([]formatter.IDocument, tc.mg.amout)
+			addMediaInGroup(tc, obj, i, t)
+			mediaGroupCommon(tc, t)
+			send(tc.msg, t)
+			if code, msg := tc.get.Error(); (code != tc.code[i]) && (msg != tc.errmsg[i]) {
+				t.Fatal(msg)
+			}
+		}
+	}
+}
+
+func mediaAdAll(t *testing.T) {
+	var obj []int
+	for i := 0; i < 3; i++ {
+		for j := 0; j < 2; j++ {
+			tc := new(testcase)
+			tc.mg = new(mediagroup)
+			if j == 0 {
+				tc.mg.amout = 3
+				obj = make([]int, tc.mg.amout)
+			} else {
+				tc.mg.amout = 10
+				obj = make([]int, tc.mg.amout)
+			}
+			for k := range obj {
+				obj[k] = 2
+			}
+			tc.init()
+			tc.mg.adFunc = audioF
+			tc.mg.all = true
+			tc.mg.audios = make([]formatter.IAudio, tc.mg.amout)
+			addMediaInGroup(tc, obj, i, t)
+			mediaGroupCommon(tc, t)
+			send(tc.msg, t)
+			if code, msg := tc.get.Error(); (code != tc.code[i]) && (msg != tc.errmsg[i]) {
+				t.Fatal(msg)
+			}
+		}
+	}
+}
+
+func mediaAll(t *testing.T) {
+	t.Run("Photo", mediaPhAll)
+	t.Run("Video", mediaVdAll)
+	t.Run("TogetherPhVd", mediaPhVdAll)
+	t.Run("Document", mediaDocAll)
+	t.Run("Audio", mediaAdAll)
+}
 
 func TestMediaGroup(t *testing.T) {
 	t.Run("Req", mediaReq)

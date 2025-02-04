@@ -61,3 +61,35 @@ func (g *get) Video() types.Video {
 func (g *get) Animation() types.Animation {
 	return g.anim
 }
+
+func (g *get) Voice() types.Voice {
+	return g.voice
+}
+
+func (g *get) VideoNote() types.VideoNote {
+	return g.vdn
+}
+
+func (g *get) PaidMedia() types.PaidMedia {
+	return g.paid
+}
+
+func (g *get) MediaGroupID() int {
+	return g.mg.id
+}
+
+func (g *get) Photos() [][]types.PhotoSize {
+	return g.mg.photos
+}
+
+func (g *get) Videos() []types.Video {
+	return g.mg.videos
+}
+
+func (g *get) Audios() []types.Audio {
+	return g.mg.audios
+}
+
+func (g *get) Documents() []types.Document {
+	return g.mg.docs
+}

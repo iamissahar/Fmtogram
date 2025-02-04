@@ -34,6 +34,14 @@ type IGet interface {
 	Document() types.Document
 	Video() types.Video
 	Animation() types.Animation
+	Voice() types.Voice
+	VideoNote() types.VideoNote
+	PaidMedia() types.PaidMedia
+	MediaGroupID() int
+	Photos() [][]types.PhotoSize
+	Videos() []types.Video
+	Audios() []types.Audio
+	Documents() []types.Document
 }
 
 type IPhoto interface {

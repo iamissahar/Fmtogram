@@ -16,12 +16,14 @@ func (msg *Message) AddPhoto(ph IPhoto) error {
 					if p.gottenFrom == Storage {
 						msg.fm.mh.atLeastOnce = true
 					}
-					if msg.fm.mh.i == 0 {
-						msg.fm.method = methods.Photo
-						msg.fm.tgr = new(types.TelegramResponse)
-					} else {
-						msg.fm.method = methods.MediaGroup
-						msg.fm.tgr = new(types.TelegramMediaGroup)
+					if msg.fm.method == "" || msg.fm.method == methods.Photo {
+						if msg.fm.mh.i == 0 {
+							msg.fm.method = methods.Photo
+							msg.fm.tgr = new(types.TelegramResponse)
+						} else {
+							msg.fm.method = methods.MediaGroup
+							msg.fm.tgr = new(types.TelegramMediaGroup)
+						}
 					}
 					msg.fm.mh.storage[msg.fm.mh.i] = p
 					msg.fm.mh.i++
@@ -52,12 +54,14 @@ func (msg *Message) AddVideo(vd IVideo) error {
 					if v.videoGottenFrom == Storage || v.thumbnailGottenFrom == Storage {
 						msg.fm.mh.atLeastOnce = true
 					}
-					if msg.fm.mh.i == 0 {
-						msg.fm.method = methods.Video
-						msg.fm.tgr = new(types.TelegramResponse)
-					} else {
-						msg.fm.method = methods.MediaGroup
-						msg.fm.tgr = new(types.TelegramMediaGroup)
+					if msg.fm.method == "" || msg.fm.method == methods.Video {
+						if msg.fm.mh.i == 0 {
+							msg.fm.method = methods.Video
+							msg.fm.tgr = new(types.TelegramResponse)
+						} else {
+							msg.fm.method = methods.MediaGroup
+							msg.fm.tgr = new(types.TelegramMediaGroup)
+						}
 					}
 					msg.fm.mh.storage[msg.fm.mh.i] = v
 					msg.fm.mh.i++
@@ -316,17 +320,16 @@ func (msg *Message) AddParameters(param IParameters) error {
 	if p, ok := param.(*information); ok {
 		if isDefaultParams(msg.fm.inf) {
 			msg.fm.inf = p
-			if msg.fm.method == "" {
-				if p.StarCount != 0 {
-					msg.fm.method = methods.PaidMedia
-				} else if p.Emoji != "" {
-					msg.fm.method = methods.Dice
-				} else if p.Action != "" {
-					msg.fm.method = methods.ChatAction
-				} else {
-					msg.fm.method = methods.Message
-					msg.fm.tgr = new(types.TelegramResponse)
-				}
+			if p.StarCount != 0 {
+				msg.fm.method = methods.PaidMedia
+				msg.fm.tgr = new(types.TelegramResponse)
+			} else if p.Emoji != "" {
+				msg.fm.method = methods.Dice
+			} else if p.Action != "" {
+				msg.fm.method = methods.ChatAction
+			} else if msg.fm.method == "" {
+				msg.fm.method = methods.Message
+				msg.fm.tgr = new(types.TelegramResponse)
 			}
 			logs.InterfaceSaved(interfaceParam)
 		} else {

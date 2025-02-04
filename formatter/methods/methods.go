@@ -130,7 +130,7 @@ const (
 	// 	(formatter.IAudio).WriteDuration() [Optional]
 	// 	(formatter.IAudio).WritePerformer() [Optional]
 	// 	(formatter.IAudio).WriteTitle() [Optional]
-	// 	(formatter.IAudio).WriteThumbnailStorage(), (formatter.IAudio).WriteThumbnailTelegram() or (formatter.IAudio).WriteThumbnailInternet() [Optional]
+	// 	(formatter.IAudio).WriteThumbnail() or (formatter.IAudio).WriteThumbnailID() [Optional]
 	// 	(formatter.IParameters).WriteDisableNotification() [Optional]
 	// 	(formatter.IParameters).WriteProtectContent() [Optional]
 	// 	(formatter.IParameters).WriteAllowPaidBroadcast() [Optional]
@@ -152,7 +152,7 @@ const (
 	// 	(formatter.IChat).WriteChatID or (formatter.IChat).WriteChatName() [Required]
 	// 	(formatter.IParameters).WriteMessageThreadID() [Optional]
 	// 	(formatter.IDocument).WriteDocumentStorage(), (formatter.IDocument).WriteDocumentTelegram() or (formatter.IDocument).WriteDocumentInternet() [Required]
-	// 	(formatter.IDocument).WriteThumbnailStorage(), (formatter.IDocument).WriteThumbnailTelegram() or (formatter.IDocument).WriteThumbnailInternet() [Optional]
+	// 	(formatter.IDocument).WriteThumbnail() or (formatter.IDocument).WriteThumbnailID() [Optional]
 	// 	(formatter.IParameters).WriteString() [Optional]
 	// 	(formatter.IParameters).WriteParseMode() [Optional]
 	// 	(formatter.IParameters).WriteEntities() [Optional]
@@ -181,7 +181,7 @@ const (
 	// 	(formatter.IVideo).WriteDuration() [Optional]
 	// 	(formatter.IVideo).WriteWidth() [Optional]
 	// 	(formatter.IVideo).WriteHeight() [Optional]
-	// 	(formatter.IVideo).WriteThumbnailStorage(), (formatter.IVideo).WriteThumbnailTelegram() or (formatter.IVideo).WriteThumbnailInternet() [Optional]
+	// 	(formatter.IVideo).WriteThumbnail() or (formatter.IVideo).WriteThumbnailID()  [Optional]
 	// 	(formatter.IParameters).WriteString() [Optional]
 	// 	(formatter.IParameters).WriteParseMode() [Optional]
 	// 	(formatter.IParameters).WriteEntities() [Optional]
@@ -212,7 +212,7 @@ const (
 	// 	(formatter.IAnimation).WriteDuration() [Optional]
 	// 	(formatter.IAnimation).WriteWidth() [Optional]
 	// 	(formatter.IAnimation).WriteHeight() [Optional]
-	// 	(formatter.IAnimation).WriteThumbnailStorage(), (formatter.IAnimation).WriteThumbnailTelegram() or (formatter.IAnimation).WriteThumbnailInternet() [Optional]
+	// 	(formatter.IAnimation).WriteThumbnail() or (formatter.IAnimation).WriteThumbnailID()  [Optional]
 	// 	(formatter.IParameters).WriteString() [Optional]
 	// 	(formatter.IParameters).WriteParseMode() [Optional]
 	// 	(formatter.IParameters).WriteEntities() [Optional]
@@ -251,6 +251,13 @@ const (
 	// 	(formatter.IParameters).WriteMessageEffectID() [Optional]
 	// 	(formatter.IParameters).WriteReplyParameters() [Optional]
 	// 	(formatter.IKeyboard).WriteReply() or (formatter.IKeyboard).WriteInline() or (formatter.IKeyboard).WriteForceReply() [Optional]
+	// Get the results here:
+	// 	(formatter.IGet).MessageID()
+	// 	(formatter.IGet).Bot()
+	// 	(formatter.IGet).Chat()
+	// 	(formatter.IGet).Date()
+	// 	(formatter.IGet).Voice()
+	// 	(formatter.IGet).Replyed()
 	Voice string = "sendVoice"
 
 	// Telegram clients support rounded square MPEG4 videos of up to 1 minute long. Use this method to send video messages. Parameters:
@@ -260,13 +267,20 @@ const (
 	// 	(formatter.IVideoNote).WriteVideoNoteStorage(), (formatter.IVideoNote).WriteVideoNoteTelegram() or (formatter.IVideoNote).WriteVideoNoteInternet() [Required]
 	// 	(formatter.IVideoNote).WriteDuration() [Optional]
 	// 	(formatter.IVideoNote).WriteLength() [Optional]
-	// 	(formatter.IVideoNote).WriteThumbnailStorage(), (formatter.IVideoNote).WriteThumbnailTelegram() or (formatter.IVideoNote).WriteThumbnailInternet() [Optional]
+	// 	(formatter.IVideoNote).WriteThumbnail() or (formatter.IVideoNote).WriteThumbnailID() [Optional]
 	// 	(formatter.IParameters).WriteDisableNotification() [Optional]
 	// 	(formatter.IParameters).WriteProtectContent() [Optional]
 	// 	(formatter.IParameters).WriteAllowPaidBroadcast() [Optional]
 	// 	(formatter.IParameters).WriteMessageEffectID() [Optional]
 	// 	(formatter.IParameters).WriteReplyParameters() [Optional]
 	// 	(formatter.IKeyboard).WriteReply() or (formatter.IKeyboard).WriteInline() or (formatter.IKeyboard).WriteForceReply() [Optional]
+	// Get the results here:
+	// 	(formatter.IGet).MessageID()
+	// 	(formatter.IGet).Bot()
+	// 	(formatter.IGet).Chat()
+	// 	(formatter.IGet).Date()
+	// 	(formatter.IGet).VideoNote()
+	// 	(formatter.IGet).Replyed()
 	VideoNote string = "sendVideoNote"
 
 	// Use this method to send paid media. Paid media can be only (formatter.IPhoto) or (formatter.IVideo). Also, the fields of methods.Photo
@@ -285,15 +299,22 @@ const (
 	// 	(formatter.IParameters).WriteAllowPaidBroadcast() [Optional]
 	// 	(formatter.IParameters).WriteReplyParameters() [Optional]
 	// 	(formatter.IKeyboard).WriteReply() or (formatter.IKeyboard).WriteInline() or (formatter.IKeyboard).WriteForceReply() [Optional]
-	// Next a few parameters depend on what you're sending. If you're sending a photo(s):
+	// Next a few parameters depend on what you're sending. If you're sending a photo:
 	// 	(formatter.IPhoto).WritePhotoStorage(), (formatter.IPhoto).WritePhotoTelegram() or (formatter.IPhoto).WritePhotoInternet() [Required]
-	// If you're sending a video(s):
+	// If you're sending a video:
 	// 	(formatter.IVideo).WriteVideoStorage(), (formatter.IVideo).WriteVideoTelegram() or (formatter.IVideo).WriteVideoInternet() [Required]
-	// 	(formatter.IVideo).WriteThumbnailStorage(), (formatter.IVideo).WriteThumbnailTelegram() or (formatter.IVideo).WriteThumbnailInternet() [Optional]
+	// 	(formatter.IVideo).WriteThumbnail() or (formatter.IVideo).WriteThumbnailID() [Optional]
 	// 	(formatter.IVideo).WriteWidth() [Optional]
 	// 	(formatter.IVideo).WriteHeight() [Optional]
 	// 	(formatter.IVideo).WriteDuration() [Optional]
 	// 	(formatter.IVideo).WriteSupportsStreaming() [Optional]
+	// Get the results here:
+	// 	(formatter.IGet).MessageID()
+	// 	(formatter.IGet).Bot()
+	// 	(formatter.IGet).Chat()
+	// 	(formatter.IGet).Date()
+	// 	(formatter.IGet).PaidMedia()
+	// 	(formatter.IGet).Replyed()
 	PaidMedia string = "sendPaidMedia"
 
 	// Use this method to send a group of photos, videos, documents or audios as an album.
@@ -315,7 +336,7 @@ const (
 	// 	(formatter.IPhoto).WriteHasSpoiler() [Optional]
 	// If you're going to send videos:
 	//	(formatter.IVideo).WriteVideoStorage(), (formatter.IVideo).WriteVideoTelegram() or (formatter.IVideo).WriteVideoInternet() [Required]
-	// 	(formatter.IVideo).WriteThumbnailStorage(), (formatter.IVideo).WriteThumbnailTelegram() or (formatter.IVideo).WriteThumbnailInternet() [Optional]
+	// 	(formatter.IVideo).WriteThumbnail() or (formatter.IVideo).WriteThumbnailID() [Optional]
 	// 	(formatter.IVideo).WriteCaption() [Optional]
 	// 	(formatter.IVideo).WriteParseMode() [Optional]
 	// 	(formatter.IVideo).WriteCaptionEntities() [Optional]
@@ -327,7 +348,7 @@ const (
 	// 	(formatter.IVideo).WriteHasSpoiler() [Optional]
 	// If you're going to send documents:
 	// 	(formatter.IDocument).WriteDocumentStorage(), (formatter.IDocument).WriteDocumentTelegram() or (formatter.IDocument).WriteDocumentInternet() [Required]
-	// 	(formatter.IDocument).WriteThumbnailStorage(), (formatter.IDocument).WriteThumbnailTelegram() or (formatter.IDocument).WriteThumbnailInternet() [Optional]
+	// 	(formatter.IDocument).WriteThumbnail() or (formatter.IDocument).WriteThumbnailID() [Optional]
 	// 	(formatter.IDocument).WriteCaption() [Optional]
 	// 	(formatter.IDocument).WriteParseMode() [Optional]
 	// 	(formatter.IDocument).WriteCaptionEntities() [Optional]
@@ -340,6 +361,17 @@ const (
 	// 	(formatter.IAudio).WriteDuration() [Optional]
 	// 	(formatter.IAudio).WritePerformer() [Optional]
 	// 	(formatter.IAudio).WriteTitle() [Optional]
+	// Get the results here:
+	// 	(formatter.IGet).MessageIDs()
+	// 	(formatter.IGet).MediaGroupID()
+	// 	(formatter.IGet).Bot()
+	// 	(formatter.IGet).Chat()
+	// 	(formatter.IGet).Date()
+	// 	(formatter.IGet).Photos()
+	// 	(formatter.IGet).Videos()
+	// 	(formatter.IGet).Audios()
+	// 	(formatter.IGet).Documents()
+	// 	(formatter.IGet).Replyed()
 	MediaGroup string = "sendMediaGroup"
 
 	// Use this method to send point on the map. Parameters:
@@ -1095,7 +1127,7 @@ const (
 	// atch the format of the stickers in the set. Parameters:
 	// 	(formatter.ISticker).WriteSetName() [Required]
 	// 	(formatter.IParameters).WriteUserID() [Required]
-	// 	(formatter.ISticker).WriteThumbnailStorage(), 	(formatter.ISticker).WriteThumbnailTelegram() or (formatter.ISticker).WriteThumbnailInternet() [Optional]
+	// 	(formatter.ISticker).WriteThumbnail() or (formatter.ISticker).WriteThumbnailID() [Optional]
 	//	(formatter.ISticker).WriteThumbnailFormat() [Optional]
 	SetStickerSetThumbnail string = "setStickerSetThumbnail"
 

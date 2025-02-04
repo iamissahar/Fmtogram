@@ -389,6 +389,14 @@ type game struct {
 	DisableEditMessage bool   `json:"disable_edit_message,omitempty"`
 }
 
+type mediagroup struct {
+	id     int
+	photos [][]types.PhotoSize
+	videos []types.Video
+	audios []types.Audio
+	docs   []types.Document
+}
+
 type get struct {
 	status    bool
 	errorCode int
@@ -406,4 +414,8 @@ type get struct {
 	document  types.Document
 	video     types.Video
 	anim      types.Animation
+	voice     types.Voice
+	vdn       types.VideoNote
+	paid      types.PaidMedia
+	mg        *mediagroup
 }
