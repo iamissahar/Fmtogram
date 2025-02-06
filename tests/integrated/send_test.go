@@ -1,11 +1,15 @@
 package integrated
 
 import (
+	"math/rand"
 	"testing"
 
 	"github.com/l1qwie/Fmtogram/formatter"
+	"github.com/l1qwie/Fmtogram/testbotdata"
 	"github.com/l1qwie/Fmtogram/types"
 )
+
+const photo, video, audio, document, together = 0, 1, 2, 3, 4
 
 var parsemode = []string{types.HTML, types.Markdown, types.MarkdownV2}
 var photodata = []string{"../media/tel-aviv.jpg", "AgACAgIAAxkDAAIQOmeVLmLOfKYAAacYIhF6AAERhIoVlSYAAhjzMRvJOKlIR8eAgDzDgJIBAAMCAANtAAM2BA",
@@ -55,6 +59,8 @@ type testcase struct {
 	vc            formatter.IVoice
 	vdn           formatter.IVideoNote
 	loc           formatter.ILocation
+	con           formatter.IContact
+	poll          formatter.IPoll
 	mg            *mediagroup
 	addMedia      func(*testcase, *testing.T)
 	mediaF        func(*testcase) []func(string) error
@@ -253,7 +259,7 @@ func photoCommon(tc *testcase, t *testing.T) {
 	if err = tc.prm.WriteMessageEffectID("5107584321108051014"); err != nil {
 		t.Fatal(err)
 	}
-	if err = tc.prm.WriteReplyParameters(&types.ReplyParameters{MessageID: 3966, ChatID: 738070596}); err != nil {
+	if err = tc.prm.WriteReplyParameters(&types.ReplyParameters{MessageID: testbotdata.MessageID[types.BotID], ChatID: 738070596}); err != nil {
 		t.Fatal(err)
 	}
 	if err = tc.ch.WriteChatID(738070596); err != nil {
@@ -324,7 +330,7 @@ func audioCommon(tc *testcase, t *testing.T) {
 	if err = tc.prm.WriteMessageEffectID("5107584321108051014"); err != nil {
 		t.Fatal(err)
 	}
-	if err = tc.prm.WriteReplyParameters(&types.ReplyParameters{MessageID: 3966, ChatID: 738070596}); err != nil {
+	if err = tc.prm.WriteReplyParameters(&types.ReplyParameters{MessageID: testbotdata.MessageID[types.BotID], ChatID: 738070596}); err != nil {
 		t.Fatal(err)
 	}
 	if err = tc.msg.AddChat(tc.ch); err != nil {
@@ -390,7 +396,7 @@ func documentCommon(tc *testcase, t *testing.T) {
 	if err = tc.prm.WriteMessageEffectID("5107584321108051014"); err != nil {
 		t.Fatal(err)
 	}
-	if err = tc.prm.WriteReplyParameters(&types.ReplyParameters{MessageID: 3966, ChatID: 738070596}); err != nil {
+	if err = tc.prm.WriteReplyParameters(&types.ReplyParameters{MessageID: testbotdata.MessageID[types.BotID], ChatID: 738070596}); err != nil {
 		t.Fatal(err)
 	}
 	if err = tc.msg.AddChat(tc.ch); err != nil {
@@ -470,7 +476,7 @@ func videoCommon(tc *testcase, t *testing.T) {
 	if err = tc.prm.WriteMessageEffectID("5107584321108051014"); err != nil {
 		t.Fatal(err)
 	}
-	if err = tc.prm.WriteReplyParameters(&types.ReplyParameters{MessageID: 3966, ChatID: 738070596}); err != nil {
+	if err = tc.prm.WriteReplyParameters(&types.ReplyParameters{MessageID: testbotdata.MessageID[types.BotID], ChatID: 738070596}); err != nil {
 		t.Fatal(err)
 	}
 	if err = tc.msg.AddChat(tc.ch); err != nil {
@@ -547,7 +553,7 @@ func animCommon(tc *testcase, t *testing.T) {
 	if err = tc.prm.WriteMessageEffectID("5107584321108051014"); err != nil {
 		t.Fatal(err)
 	}
-	if err = tc.prm.WriteReplyParameters(&types.ReplyParameters{MessageID: 3966, ChatID: 738070596}); err != nil {
+	if err = tc.prm.WriteReplyParameters(&types.ReplyParameters{MessageID: testbotdata.MessageID[types.BotID], ChatID: 738070596}); err != nil {
 		t.Fatal(err)
 	}
 	if err = tc.msg.AddChat(tc.ch); err != nil {
@@ -615,7 +621,7 @@ func voiceCommon(tc *testcase, t *testing.T) {
 	if err = tc.prm.WriteMessageEffectID("5107584321108051014"); err != nil {
 		t.Fatal(err)
 	}
-	if err = tc.prm.WriteReplyParameters(&types.ReplyParameters{MessageID: 3966, ChatID: 738070596}); err != nil {
+	if err = tc.prm.WriteReplyParameters(&types.ReplyParameters{MessageID: testbotdata.MessageID[types.BotID], ChatID: 738070596}); err != nil {
 		t.Fatal(err)
 	}
 	if err = tc.msg.AddChat(tc.ch); err != nil {
@@ -680,7 +686,7 @@ func videoNCommon(tc *testcase, t *testing.T) {
 	if err = tc.prm.WriteMessageEffectID("5107584321108051014"); err != nil {
 		t.Fatal(err)
 	}
-	if err = tc.prm.WriteReplyParameters(&types.ReplyParameters{MessageID: 3966, ChatID: 738070596}); err != nil {
+	if err = tc.prm.WriteReplyParameters(&types.ReplyParameters{MessageID: testbotdata.MessageID[types.BotID], ChatID: 738070596}); err != nil {
 		t.Fatal(err)
 	}
 	if err = tc.msg.AddChat(tc.ch); err != nil {
@@ -807,285 +813,6 @@ func paidAll(t *testing.T) {
 func TestPaidMedia(t *testing.T) {
 	t.Run("Req", paidReq)
 	t.Run("All", paidAll)
-}
-
-func addMediaInGroup(tc *testcase, obj []int, q int, t *testing.T) {
-	const photo, video, audio, document = 0, 1, 2, 3
-	var p, v, a, d, justcounter int
-	var err error
-	for i := 0; i < tc.mg.amout; i++ {
-		if obj[i] == photo {
-			tc.mg.photos[p] = tc.msg.NewPhoto()
-			if err = tc.mg.phFunc(tc.mg.photos[p])[q](photodata[q]); err != nil {
-				t.Fatal(err)
-			}
-			if tc.mg.all {
-				mgPhotoAll(tc.mg.photos[p], &justcounter, t)
-			}
-			if err = tc.msg.AddPhoto(tc.mg.photos[p]); err != nil {
-				t.Fatal(err)
-			}
-			p++
-		} else if obj[i] == video {
-			tc.mg.videos[v] = tc.msg.NewVideo()
-			if err = tc.mg.vdFunc(tc.mg.videos[v])[q](videodata[q]); err != nil {
-				t.Fatal(err)
-			}
-			if tc.mg.all {
-				mgVideoAll(tc.mg.videos[v], &justcounter, q, t)
-			}
-			if err = tc.msg.AddVideo(tc.mg.videos[v]); err != nil {
-				t.Fatal(err)
-			}
-			v++
-		} else if obj[i] == audio {
-			tc.mg.audios[a] = tc.msg.NewAudio()
-			if err = tc.mg.adFunc(tc.mg.audios[a])[q](audiodata[q]); err != nil {
-				t.Fatal(err)
-			}
-			if tc.mg.all {
-				mgAudioAll(tc.mg.audios[a], &justcounter, q, t)
-			}
-			if err = tc.msg.AddAudio(tc.mg.audios[a]); err != nil {
-				t.Fatal(err)
-			}
-			a++
-		} else {
-			tc.mg.documents[d] = tc.msg.NewDocument()
-			if err = tc.mg.docFunc(tc.mg.documents[d])[q](docdata[q]); err != nil {
-				t.Fatal(err)
-			}
-			if tc.mg.all {
-				mgDocumentAll(tc.mg.documents[d], &justcounter, q, t)
-			}
-			if err = tc.msg.AddDocument(tc.mg.documents[d]); err != nil {
-				t.Fatal(err)
-			}
-			d++
-		}
-	}
-}
-
-func photoF(ph formatter.IPhoto) []func(string) error {
-	return []func(string) error{ph.WritePhotoStorage, ph.WritePhotoTelegram, ph.WritePhotoInternet}
-}
-
-func videoF(vd formatter.IVideo) []func(string) error {
-	return []func(string) error{vd.WriteVideoStorage, vd.WriteVideoTelegram, vd.WriteVideoInternet}
-}
-
-func documentF(doc formatter.IDocument) []func(string) error {
-	return []func(string) error{doc.WriteDocumentStorage, doc.WriteDocumentTelegram, doc.WriteDocumentInternet}
-}
-
-func audioF(ad formatter.IAudio) []func(string) error {
-	return []func(string) error{ad.WriteAudioStorage, ad.WriteAudioTelegram, ad.WriteAudioInternet}
-}
-
-func mediaPhReq(t *testing.T) {
-	var err error
-	var obj []int
-	for i := 0; i < 3; i++ {
-		for j := 0; j < 2; j++ {
-			tc := new(testcase)
-			tc.mg = new(mediagroup)
-			if j == 0 {
-				tc.mg.amout = 3
-				obj = make([]int, tc.mg.amout)
-			} else {
-				tc.mg.amout = 10
-				obj = make([]int, tc.mg.amout)
-			}
-			tc.init()
-			tc.mg.phFunc = photoF
-			tc.mg.photos = make([]formatter.IPhoto, tc.mg.amout)
-			addMediaInGroup(tc, obj, i, t)
-			if err = tc.ch.WriteChatID(738070596); err != nil {
-				t.Fatal(err)
-			}
-			if err = tc.msg.AddChat(tc.ch); err != nil {
-				t.Fatal(err)
-			}
-			send(tc.msg, t)
-			if code, msg := tc.get.Error(); (code != tc.code[i]) && (msg != tc.errmsg[i]) {
-				t.Fatal(msg)
-			}
-		}
-	}
-}
-
-func mediaVdReq(t *testing.T) {
-	var err error
-	var obj []int
-	for i := 0; i < 3; i++ {
-		for j := 0; j < 2; j++ {
-			tc := new(testcase)
-			tc.mg = new(mediagroup)
-			if j == 0 {
-				tc.mg.amout = 3
-				obj = make([]int, tc.mg.amout)
-			} else {
-				tc.mg.amout = 10
-				obj = make([]int, tc.mg.amout)
-			}
-			for k := range obj {
-				obj[k] = 1
-			}
-			tc.init()
-			tc.mg.vdFunc = videoF
-			tc.mg.videos = make([]formatter.IVideo, tc.mg.amout)
-			addMediaInGroup(tc, obj, i, t)
-			if err = tc.ch.WriteChatID(738070596); err != nil {
-				t.Fatal(err)
-			}
-			if err = tc.msg.AddChat(tc.ch); err != nil {
-				t.Fatal(err)
-			}
-			send(tc.msg, t)
-			if code, msg := tc.get.Error(); (code != tc.code[i]) && (msg != tc.errmsg[i]) {
-				t.Fatal(msg)
-			}
-		}
-	}
-}
-
-func mediaPhVdReq(t *testing.T) {
-	var err error
-	var obj []int
-	for i := 0; i < 3; i++ {
-		for j := 0; j < 2; j++ {
-			tc := new(testcase)
-			tc.mg = new(mediagroup)
-			if j == 0 {
-				tc.mg.amout = 4
-				obj = make([]int, tc.mg.amout)
-			} else {
-				tc.mg.amout = 10
-				obj = make([]int, tc.mg.amout)
-			}
-			for k := range obj {
-				if k%2 == 0 {
-					obj[k] = 1
-				}
-			}
-			tc.init()
-			tc.mg.vdFunc = videoF
-			tc.mg.phFunc = photoF
-			tc.mg.videos = make([]formatter.IVideo, tc.mg.amout/2)
-			tc.mg.photos = make([]formatter.IPhoto, tc.mg.amout/2)
-			addMediaInGroup(tc, obj, i, t)
-			if err = tc.ch.WriteChatID(738070596); err != nil {
-				t.Fatal(err)
-			}
-			if err = tc.msg.AddChat(tc.ch); err != nil {
-				t.Fatal(err)
-			}
-			send(tc.msg, t)
-			if code, msg := tc.get.Error(); (code != tc.code[i]) && (msg != tc.errmsg[i]) {
-				t.Fatal(msg)
-			}
-		}
-	}
-}
-
-func mediaDocReq(t *testing.T) {
-	var err error
-	var obj []int
-	for i := 0; i < 3; i++ {
-		for j := 0; j < 2; j++ {
-			tc := new(testcase)
-			tc.mg = new(mediagroup)
-			if j == 0 {
-				tc.mg.amout = 3
-				obj = make([]int, tc.mg.amout)
-			} else {
-				tc.mg.amout = 10
-				obj = make([]int, tc.mg.amout)
-			}
-			for k := range obj {
-				obj[k] = 3
-			}
-			tc.init()
-			tc.mg.docFunc = documentF
-			tc.mg.documents = make([]formatter.IDocument, tc.mg.amout)
-			addMediaInGroup(tc, obj, i, t)
-			if err = tc.ch.WriteChatID(738070596); err != nil {
-				t.Fatal(err)
-			}
-			if err = tc.msg.AddChat(tc.ch); err != nil {
-				t.Fatal(err)
-			}
-			send(tc.msg, t)
-			if code, msg := tc.get.Error(); (code != tc.code[i]) && (msg != tc.errmsg[i]) {
-				t.Fatal(msg)
-			}
-		}
-	}
-}
-
-func mediaAdReq(t *testing.T) {
-	var err error
-	var obj []int
-	for i := 0; i < 3; i++ {
-		for j := 0; j < 2; j++ {
-			tc := new(testcase)
-			tc.mg = new(mediagroup)
-			if j == 0 {
-				tc.mg.amout = 3
-				obj = make([]int, tc.mg.amout)
-			} else {
-				tc.mg.amout = 10
-				obj = make([]int, tc.mg.amout)
-			}
-			for k := range obj {
-				obj[k] = 2
-			}
-			tc.init()
-			tc.mg.adFunc = audioF
-			tc.mg.audios = make([]formatter.IAudio, tc.mg.amout)
-			addMediaInGroup(tc, obj, i, t)
-			if err = tc.ch.WriteChatID(738070596); err != nil {
-				t.Fatal(err)
-			}
-			if err = tc.msg.AddChat(tc.ch); err != nil {
-				t.Fatal(err)
-			}
-			send(tc.msg, t)
-			if code, msg := tc.get.Error(); (code != tc.code[i]) && (msg != tc.errmsg[i]) {
-				t.Fatal(msg)
-			}
-		}
-	}
-}
-
-func mediaReq(t *testing.T) {
-	t.Run("Photo", mediaPhReq)
-	t.Run("Video", mediaVdReq)
-	t.Run("TogetherPhVd", mediaPhVdReq)
-	t.Run("Document", mediaDocReq)
-	t.Run("Audio", mediaAdReq)
-}
-
-func mediaGroupCommon(tc *testcase, t *testing.T) {
-	var err error
-	if err = tc.ch.WriteChatID(738070596); err != nil {
-		t.Fatal(err)
-	}
-	if err = tc.prm.WriteDisableNotification(); err != nil {
-		t.Fatal(err)
-	}
-	if err = tc.prm.WriteProtectContent(); err != nil {
-		t.Fatal(err)
-	}
-	if err = tc.prm.WriteMessageEffectID("5107584321108051014"); err != nil {
-		t.Fatal(err)
-	}
-	if err = tc.prm.WriteReplyParameters(&types.ReplyParameters{MessageID: 3966, ChatID: 738070596}); err != nil {
-		t.Fatal(err)
-	}
-	if err = tc.msg.AddChat(tc.ch); err != nil {
-		t.Fatal(err)
-	}
 }
 
 func mgPhotoAll(ph formatter.IPhoto, q *int, t *testing.T) {
@@ -1231,89 +958,139 @@ func mgAudioAll(ad formatter.IAudio, q *int, majorq int, t *testing.T) {
 	}
 }
 
-func mediaPhAll(t *testing.T) {
+func addMediaInGroup(tc *testcase, obj []int, q int, t *testing.T) {
+	var p, v, a, d, justcounter int
+	var err error
+	for i := 0; i < tc.mg.amout; i++ {
+		if obj[i] == photo {
+			tc.mg.photos[p] = tc.msg.NewPhoto()
+			if err = tc.mg.phFunc(tc.mg.photos[p])[q](photodata[q]); err != nil {
+				t.Fatal(err)
+			}
+			if tc.mg.all {
+				mgPhotoAll(tc.mg.photos[p], &justcounter, t)
+			}
+			if err = tc.msg.AddPhoto(tc.mg.photos[p]); err != nil {
+				t.Fatal(err)
+			}
+			p++
+		} else if obj[i] == video {
+			tc.mg.videos[v] = tc.msg.NewVideo()
+			if err = tc.mg.vdFunc(tc.mg.videos[v])[q](videodata[q]); err != nil {
+				t.Fatal(err)
+			}
+			if tc.mg.all {
+				mgVideoAll(tc.mg.videos[v], &justcounter, q, t)
+			}
+			if err = tc.msg.AddVideo(tc.mg.videos[v]); err != nil {
+				t.Fatal(err)
+			}
+			v++
+		} else if obj[i] == audio {
+			tc.mg.audios[a] = tc.msg.NewAudio()
+			if err = tc.mg.adFunc(tc.mg.audios[a])[q](audiodata[q]); err != nil {
+				t.Fatal(err)
+			}
+			if tc.mg.all {
+				mgAudioAll(tc.mg.audios[a], &justcounter, q, t)
+			}
+			if err = tc.msg.AddAudio(tc.mg.audios[a]); err != nil {
+				t.Fatal(err)
+			}
+			a++
+		} else {
+			tc.mg.documents[d] = tc.msg.NewDocument()
+			if err = tc.mg.docFunc(tc.mg.documents[d])[q](docdata[q]); err != nil {
+				t.Fatal(err)
+			}
+			if tc.mg.all {
+				mgDocumentAll(tc.mg.documents[d], &justcounter, q, t)
+			}
+			if err = tc.msg.AddDocument(tc.mg.documents[d]); err != nil {
+				t.Fatal(err)
+			}
+			d++
+		}
+	}
+}
+
+func photoF(ph formatter.IPhoto) []func(string) error {
+	return []func(string) error{ph.WritePhotoStorage, ph.WritePhotoTelegram, ph.WritePhotoInternet}
+}
+
+func videoF(vd formatter.IVideo) []func(string) error {
+	return []func(string) error{vd.WriteVideoStorage, vd.WriteVideoTelegram, vd.WriteVideoInternet}
+}
+
+func documentF(doc formatter.IDocument) []func(string) error {
+	return []func(string) error{doc.WriteDocumentStorage, doc.WriteDocumentTelegram, doc.WriteDocumentInternet}
+}
+
+func audioF(ad formatter.IAudio) []func(string) error {
+	return []func(string) error{ad.WriteAudioStorage, ad.WriteAudioTelegram, ad.WriteAudioInternet}
+}
+
+func mediaGroupData(tc *testcase, obj []int, objtype int) {
+	var tp int
+	if objtype == photo {
+		tc.mg.phFunc = photoF
+		tc.mg.photos = make([]formatter.IPhoto, tc.mg.amout)
+	} else if objtype == video {
+		tp = video
+		tc.mg.vdFunc = videoF
+		tc.mg.videos = make([]formatter.IVideo, tc.mg.amout)
+	} else if objtype == audio {
+		tp = audio
+		tc.mg.adFunc = audioF
+		tc.mg.audios = make([]formatter.IAudio, tc.mg.amout)
+	} else if objtype == together {
+		tc.mg.vdFunc = videoF
+		tc.mg.phFunc = photoF
+		tc.mg.videos = make([]formatter.IVideo, tc.mg.amout/2)
+		tc.mg.photos = make([]formatter.IPhoto, tc.mg.amout/2)
+	} else {
+		tp = document
+		tc.mg.docFunc = documentF
+		tc.mg.documents = make([]formatter.IDocument, tc.mg.amout)
+	}
+	for k := range obj {
+		if objtype == together {
+			if k%2 == 0 {
+				obj[k] = video
+			}
+		} else {
+			obj[k] = tp
+		}
+	}
+}
+
+func mediaGroup(all bool, objtype int, t *testing.T) {
+	var err error
 	var obj []int
 	for i := 0; i < 3; i++ {
 		for j := 0; j < 2; j++ {
 			tc := new(testcase)
 			tc.mg = new(mediagroup)
 			if j == 0 {
-				tc.mg.amout = 3
+				tc.mg.amout = 2
 				obj = make([]int, tc.mg.amout)
 			} else {
 				tc.mg.amout = 10
 				obj = make([]int, tc.mg.amout)
 			}
 			tc.init()
-			tc.mg.phFunc = photoF
-			tc.mg.all = true
-			tc.mg.photos = make([]formatter.IPhoto, tc.mg.amout)
+			mediaGroupData(tc, obj, objtype)
 			addMediaInGroup(tc, obj, i, t)
-			mediaGroupCommon(tc, t)
-			send(tc.msg, t)
-			if code, msg := tc.get.Error(); (code != tc.code[i]) && (msg != tc.errmsg[i]) {
-				t.Fatal(msg)
-			}
-		}
-	}
-}
-
-func mediaVdAll(t *testing.T) {
-	var obj []int
-	for i := 0; i < 3; i++ {
-		for j := 0; j < 2; j++ {
-			tc := new(testcase)
-			tc.mg = new(mediagroup)
-			if j == 0 {
-				tc.mg.amout = 3
-				obj = make([]int, tc.mg.amout)
+			if all {
+				mediaGroupCommon(tc, t)
 			} else {
-				tc.mg.amout = 10
-				obj = make([]int, tc.mg.amout)
-			}
-			for k := range obj {
-				obj[k] = 1
-			}
-			tc.init()
-			tc.mg.vdFunc = videoF
-			tc.mg.all = true
-			tc.mg.videos = make([]formatter.IVideo, tc.mg.amout)
-			addMediaInGroup(tc, obj, i, t)
-			mediaGroupCommon(tc, t)
-			send(tc.msg, t)
-			if code, msg := tc.get.Error(); (code != tc.code[i]) && (msg != tc.errmsg[i]) {
-				t.Fatal(msg)
-			}
-		}
-	}
-}
-
-func mediaPhVdAll(t *testing.T) {
-	var obj []int
-	for i := 0; i < 3; i++ {
-		for j := 0; j < 2; j++ {
-			tc := new(testcase)
-			tc.mg = new(mediagroup)
-			if j == 0 {
-				tc.mg.amout = 4
-				obj = make([]int, tc.mg.amout)
-			} else {
-				tc.mg.amout = 10
-				obj = make([]int, tc.mg.amout)
-			}
-			for k := range obj {
-				if k%2 == 0 {
-					obj[k] = 1
+				if err = tc.ch.WriteChatID(738070596); err != nil {
+					t.Fatal(err)
+				}
+				if err = tc.msg.AddChat(tc.ch); err != nil {
+					t.Fatal(err)
 				}
 			}
-			tc.init()
-			tc.mg.all = true
-			tc.mg.vdFunc = videoF
-			tc.mg.phFunc = photoF
-			tc.mg.videos = make([]formatter.IVideo, tc.mg.amout/2)
-			tc.mg.photos = make([]formatter.IPhoto, tc.mg.amout/2)
-			addMediaInGroup(tc, obj, i, t)
-			mediaGroupCommon(tc, t)
 			send(tc.msg, t)
 			if code, msg := tc.get.Error(); (code != tc.code[i]) && (msg != tc.errmsg[i]) {
 				t.Fatal(msg)
@@ -1322,72 +1099,42 @@ func mediaPhVdAll(t *testing.T) {
 	}
 }
 
-func mediaDocAll(t *testing.T) {
-	var obj []int
-	for i := 0; i < 3; i++ {
-		for j := 0; j < 2; j++ {
-			tc := new(testcase)
-			tc.mg = new(mediagroup)
-			if j == 0 {
-				tc.mg.amout = 3
-				obj = make([]int, tc.mg.amout)
-			} else {
-				tc.mg.amout = 10
-				obj = make([]int, tc.mg.amout)
-			}
-			for k := range obj {
-				obj[k] = 3
-			}
-			tc.init()
-			tc.mg.docFunc = documentF
-			tc.mg.all = true
-			tc.mg.documents = make([]formatter.IDocument, tc.mg.amout)
-			addMediaInGroup(tc, obj, i, t)
-			mediaGroupCommon(tc, t)
-			send(tc.msg, t)
-			if code, msg := tc.get.Error(); (code != tc.code[i]) && (msg != tc.errmsg[i]) {
-				t.Fatal(msg)
-			}
-		}
-	}
+func mediaReq(t *testing.T) {
+	t.Run("Photo", func(t *testing.T) { mediaGroup(false, photo, t) })
+	t.Run("Video", func(t *testing.T) { mediaGroup(false, video, t) })
+	t.Run("TogetherPhVd", func(t *testing.T) { mediaGroup(false, together, t) })
+	t.Run("Document", func(t *testing.T) { mediaGroup(false, document, t) })
+	t.Run("Audio", func(t *testing.T) { mediaGroup(false, audio, t) })
 }
 
-func mediaAdAll(t *testing.T) {
-	var obj []int
-	for i := 0; i < 3; i++ {
-		for j := 0; j < 2; j++ {
-			tc := new(testcase)
-			tc.mg = new(mediagroup)
-			if j == 0 {
-				tc.mg.amout = 3
-				obj = make([]int, tc.mg.amout)
-			} else {
-				tc.mg.amout = 10
-				obj = make([]int, tc.mg.amout)
-			}
-			for k := range obj {
-				obj[k] = 2
-			}
-			tc.init()
-			tc.mg.adFunc = audioF
-			tc.mg.all = true
-			tc.mg.audios = make([]formatter.IAudio, tc.mg.amout)
-			addMediaInGroup(tc, obj, i, t)
-			mediaGroupCommon(tc, t)
-			send(tc.msg, t)
-			if code, msg := tc.get.Error(); (code != tc.code[i]) && (msg != tc.errmsg[i]) {
-				t.Fatal(msg)
-			}
-		}
+func mediaGroupCommon(tc *testcase, t *testing.T) {
+	var err error
+	if err = tc.ch.WriteChatID(738070596); err != nil {
+		t.Fatal(err)
+	}
+	if err = tc.prm.WriteDisableNotification(); err != nil {
+		t.Fatal(err)
+	}
+	if err = tc.prm.WriteProtectContent(); err != nil {
+		t.Fatal(err)
+	}
+	if err = tc.prm.WriteMessageEffectID("5107584321108051014"); err != nil {
+		t.Fatal(err)
+	}
+	if err = tc.prm.WriteReplyParameters(&types.ReplyParameters{MessageID: testbotdata.MessageID[types.BotID], ChatID: 738070596}); err != nil {
+		t.Fatal(err)
+	}
+	if err = tc.msg.AddChat(tc.ch); err != nil {
+		t.Fatal(err)
 	}
 }
 
 func mediaAll(t *testing.T) {
-	t.Run("Photo", mediaPhAll)
-	t.Run("Video", mediaVdAll)
-	t.Run("TogetherPhVd", mediaPhVdAll)
-	t.Run("Document", mediaDocAll)
-	t.Run("Audio", mediaAdAll)
+	t.Run("Photo", func(t *testing.T) { mediaGroup(true, photo, t) })
+	t.Run("Video", func(t *testing.T) { mediaGroup(true, video, t) })
+	t.Run("TogetherPhVd", func(t *testing.T) { mediaGroup(true, together, t) })
+	t.Run("Document", func(t *testing.T) { mediaGroup(true, document, t) })
+	t.Run("Audio", func(t *testing.T) { mediaGroup(true, audio, t) })
 }
 
 func TestMediaGroup(t *testing.T) {
@@ -1395,11 +1142,471 @@ func TestMediaGroup(t *testing.T) {
 	t.Run("All", mediaAll)
 }
 
-func locReq(t *testing.T) {}
+func locReq(t *testing.T) {
+	var err error
+	tc := new(testcase)
+	tc.init()
+	if err = tc.ch.WriteChatID(738070596); err != nil {
+		t.Fatal(err)
+	}
+	if err = tc.loc.WriteLatitude(31.7962236); err != nil {
+		t.Fatal(err)
+	}
+	if err = tc.loc.WriteLongitude(35.0194702); err != nil {
+		t.Fatal(err)
+	}
+	if err = tc.msg.AddLocation(tc.loc); err != nil {
+		t.Fatal(err)
+	}
+	if err = tc.msg.AddChat(tc.ch); err != nil {
+		t.Fatal(err)
+	}
+	send(tc.msg, t)
+	if code, msg := tc.get.Error(); code != 0 && msg != "" {
+		t.Fatal(msg)
+	}
+}
 
-func locAll(t *testing.T) {}
+func locAll(t *testing.T) {
+	var err error
+	for i := 0; i < 3; i++ {
+		tc := new(testcase)
+		tc.init()
+		var kb = [3]func(*testcase, *testing.T){tc.replyKb, tc.inlineKb, tc.forceKb}
+		if err = tc.ch.WriteChatID(738070596); err != nil {
+			t.Fatal(err)
+		}
+		if err = tc.loc.WriteLatitude(31.7962236); err != nil {
+			t.Fatal(err)
+		}
+		if err = tc.loc.WriteLongitude(35.0194702); err != nil {
+			t.Fatal(err)
+		}
+		if err = tc.loc.WriteHorizontalAccuracy(22); err != nil {
+			t.Fatal(err)
+		}
+		if err = tc.loc.WriteLivePeriod(0x7FFFFFFF); err != nil {
+			t.Fatal(err)
+		}
+		if err = tc.loc.WriteHeading(360); err != nil {
+			t.Fatal(err)
+		}
+		if err = tc.loc.WriteProximityAlertRadius(1); err != nil {
+			t.Fatal(err)
+		}
+		if err = tc.prm.WriteDisableNotification(); err != nil {
+			t.Fatal(err)
+		}
+		if err = tc.prm.WriteProtectContent(); err != nil {
+			t.Fatal(err)
+		}
+		if err = tc.prm.WriteMessageEffectID("5107584321108051014"); err != nil {
+			t.Fatal(err)
+		}
+		if err = tc.prm.WriteReplyParameters(&types.ReplyParameters{MessageID: testbotdata.MessageID[types.BotID], ChatID: 738070596}); err != nil {
+			t.Fatal(err)
+		}
+		if err = tc.msg.AddParameters(tc.prm); err != nil {
+			t.Fatal(err)
+		}
+		if err = tc.msg.AddLocation(tc.loc); err != nil {
+			t.Fatal(err)
+		}
+		if err = tc.msg.AddChat(tc.ch); err != nil {
+			t.Fatal(err)
+		}
+		kb[i](tc, t)
+		send(tc.msg, t)
+		if code, msg := tc.get.Error(); code != 0 && msg != "" {
+			t.Fatal(msg)
+		}
+	}
+}
 
 func TestLocation(t *testing.T) {
 	t.Run("Req", locReq)
 	t.Run("All", locAll)
+}
+
+func venReq(t *testing.T) {
+	var err error
+	tc := new(testcase)
+	tc.init()
+	if err = tc.ch.WriteChatID(738070596); err != nil {
+		t.Fatal(err)
+	}
+	if err = tc.loc.WriteLatitude(31.7962236); err != nil {
+		t.Fatal(err)
+	}
+	if err = tc.loc.WriteLongitude(35.0194702); err != nil {
+		t.Fatal(err)
+	}
+	if err = tc.loc.WriteTitle("The City Of The History"); err != nil {
+		t.Fatal(err)
+	}
+	if err = tc.loc.WriteAddress("Jerusalem"); err != nil {
+		t.Fatal(err)
+	}
+	if err = tc.msg.AddLocation(tc.loc); err != nil {
+		t.Fatal(err)
+	}
+	if err = tc.msg.AddChat(tc.ch); err != nil {
+		t.Fatal(err)
+	}
+	send(tc.msg, t)
+	if code, msg := tc.get.Error(); code != 0 && msg != "" {
+		t.Fatal(msg)
+	}
+}
+
+func venAll(t *testing.T) {
+	var err error
+	for i := 0; i < 3; i++ {
+		tc := new(testcase)
+		tc.init()
+		var kb = [3]func(*testcase, *testing.T){tc.replyKb, tc.inlineKb, tc.forceKb}
+		if err = tc.ch.WriteChatID(738070596); err != nil {
+			t.Fatal(err)
+		}
+		if err = tc.loc.WriteLatitude(31.7962236); err != nil {
+			t.Fatal(err)
+		}
+		if err = tc.loc.WriteLongitude(35.0194702); err != nil {
+			t.Fatal(err)
+		}
+		if err = tc.loc.WriteTitle("The City Of The History"); err != nil {
+			t.Fatal(err)
+		}
+		if err = tc.loc.WriteAddress("Jerusalem"); err != nil {
+			t.Fatal(err)
+		}
+		if err = tc.loc.WriteFoursquareID("44"); err != nil {
+			t.Fatal(err)
+		}
+		if err = tc.loc.WriteFoursquareType("arts_entertainment/default"); err != nil {
+			t.Fatal(err)
+		}
+		if err = tc.loc.WriteGooglePlaceID("AS:KLDKAL:SDK:LAK:LSL:"); err != nil {
+			t.Fatal(err)
+		}
+		if err = tc.loc.WriteGooglePlaceType("bank"); err != nil {
+			t.Fatal(err)
+		}
+		if err = tc.prm.WriteDisableNotification(); err != nil {
+			t.Fatal(err)
+		}
+		if err = tc.prm.WriteProtectContent(); err != nil {
+			t.Fatal(err)
+		}
+		if err = tc.prm.WriteMessageEffectID("5107584321108051014"); err != nil {
+			t.Fatal(err)
+		}
+		if err = tc.prm.WriteReplyParameters(&types.ReplyParameters{MessageID: testbotdata.MessageID[types.BotID], ChatID: 738070596}); err != nil {
+			t.Fatal(err)
+		}
+		if err = tc.msg.AddParameters(tc.prm); err != nil {
+			t.Fatal(err)
+		}
+		if err = tc.msg.AddLocation(tc.loc); err != nil {
+			t.Fatal(err)
+		}
+		if err = tc.msg.AddChat(tc.ch); err != nil {
+			t.Fatal(err)
+		}
+		kb[i](tc, t)
+		send(tc.msg, t)
+		if code, msg := tc.get.Error(); code != 0 && msg != "" {
+			t.Fatal(msg)
+		}
+	}
+}
+
+func TestVenue(t *testing.T) {
+	t.Run("Req", venReq)
+	t.Run("All", venAll)
+}
+
+func conReq(t *testing.T) {
+	var err error
+	tc := new(testcase)
+	tc.init()
+	if err = tc.ch.WriteChatID(738070596); err != nil {
+		t.Fatal(err)
+	}
+	if err = tc.con.WritePhoneNumber("0123422211"); err != nil {
+		t.Fatal(err)
+	}
+	if err = tc.con.WriteFirstName("Nathan"); err != nil {
+		t.Fatal(err)
+	}
+	if err = tc.msg.AddContact(tc.con); err != nil {
+		t.Fatal(err)
+	}
+	if err = tc.msg.AddChat(tc.ch); err != nil {
+		t.Fatal(err)
+	}
+	send(tc.msg, t)
+	if code, msg := tc.get.Error(); code != 0 && msg != "" {
+		t.Fatal(msg)
+	}
+}
+
+func conAll(t *testing.T) {
+	var err error
+	for i := 0; i < 3; i++ {
+		tc := new(testcase)
+		tc.init()
+		var kb = [3]func(*testcase, *testing.T){tc.replyKb, tc.inlineKb, tc.forceKb}
+		if err = tc.ch.WriteChatID(738070596); err != nil {
+			t.Fatal(err)
+		}
+		if err = tc.con.WritePhoneNumber("0123422211"); err != nil {
+			t.Fatal(err)
+		}
+		if err = tc.con.WriteFirstName("Nathan"); err != nil {
+			t.Fatal(err)
+		}
+		if err = tc.con.WriteLastName("Sahar"); err != nil {
+			t.Fatal(err)
+		}
+		if err = tc.con.WriteVCard("BEGIN:VCARD\nVERSION:4.0\nFN:Nathan Sahar\nN:Nathan;Simon;;;ing. jr,M.Sc.\nBDAY:--0203\nGENDER:M\nEMAIL;TYPE=work:nathan.sahar@proton.me\nEND:VCARD"); err != nil {
+			t.Fatal(err)
+		}
+		if err = tc.prm.WriteDisableNotification(); err != nil {
+			t.Fatal(err)
+		}
+		if err = tc.prm.WriteProtectContent(); err != nil {
+			t.Fatal(err)
+		}
+		if err = tc.prm.WriteMessageEffectID("5107584321108051014"); err != nil {
+			t.Fatal(err)
+		}
+		if err = tc.prm.WriteReplyParameters(&types.ReplyParameters{MessageID: testbotdata.MessageID[types.BotID], ChatID: 738070596}); err != nil {
+			t.Fatal(err)
+		}
+		if err = tc.msg.AddParameters(tc.prm); err != nil {
+			t.Fatal(err)
+		}
+		if err = tc.msg.AddContact(tc.con); err != nil {
+			t.Fatal(err)
+		}
+		if err = tc.msg.AddChat(tc.ch); err != nil {
+			t.Fatal(err)
+		}
+		kb[i](tc, t)
+		send(tc.msg, t)
+		if code, msg := tc.get.Error(); code != 0 && msg != "" {
+			t.Fatal(msg)
+		}
+	}
+}
+
+func TestContact(t *testing.T) {
+	t.Run("Req", conReq)
+	t.Run("All", conAll)
+}
+
+func pollReq(t *testing.T) {
+	var err error
+	tc := new(testcase)
+	tc.init()
+	if err = tc.ch.WriteChatID(738070596); err != nil {
+		t.Fatal(err)
+	}
+	if err = tc.poll.WriteQuestion("Am I good?"); err != nil {
+		t.Fatal(err)
+	}
+	if err = tc.poll.WriteOptions([]*types.PollOption{{Text: "Yes!"}, {Text: "No!"}}); err != nil {
+		t.Fatal(err)
+	}
+	if err = tc.msg.AddPoll(tc.poll); err != nil {
+		t.Fatal(err)
+	}
+	if err = tc.msg.AddChat(tc.ch); err != nil {
+		t.Fatal(err)
+	}
+	send(tc.msg, t)
+	if code, msg := tc.get.Error(); code != 0 && msg != "" {
+		t.Fatal(msg)
+	}
+}
+
+func pollAll(t *testing.T) {
+	var err error
+	for i := 0; i < 3; i++ {
+		for j := 0; j < 4; j++ {
+			for k := 0; k < 4; k++ {
+				tc := new(testcase)
+				tc.init()
+				var kb = [3]func(*testcase, *testing.T){tc.replyKb, tc.inlineKb, tc.forceKb}
+				if j == 3 {
+					if err = tc.poll.WriteQuestionEntities([]*types.MessageEntity{{Offset: 1, Length: 4, Type: "italic"}}); err != nil {
+						t.Fatal(err)
+					}
+				} else {
+					if err = tc.poll.WriteQuestionParseMode(parsemode[j]); err != nil {
+						t.Fatal(err)
+					}
+				}
+				if k == 3 {
+					if err = tc.poll.WriteExplanationEntities([]*types.MessageEntity{{Offset: 1, Length: 4, Type: "italic"}}); err != nil {
+						t.Fatal(err)
+					}
+				} else {
+					if err = tc.poll.WriteExplanationParseMode(parsemode[k]); err != nil {
+						t.Fatal(err)
+					}
+				}
+				if err = tc.ch.WriteChatID(738070596); err != nil {
+					t.Fatal(err)
+				}
+				if err = tc.poll.WriteQuestion("Am I good?"); err != nil {
+					t.Fatal(err)
+				}
+				if err = tc.poll.WriteOptions([]*types.PollOption{{Text: "Yes!", VoterCount: 66}, {Text: "No!", VoterCount: 12}}); err != nil {
+					t.Fatal(err)
+				}
+				if err = tc.poll.WriteAnonymous(false); err != nil {
+					t.Fatal(err)
+				}
+				if err = tc.poll.WriteType("quiz"); err != nil {
+					t.Fatal(err)
+				}
+				if err = tc.poll.WriteAllowMultipleAnswers(); err != nil {
+					t.Fatal(err)
+				}
+				if err = tc.poll.WriteCorrectOptionID("00"); err != nil {
+					t.Fatal(err)
+				}
+				if err = tc.poll.WriteOpenPeriod(300); err != nil {
+					t.Fatal(err)
+				}
+				if err = tc.prm.WriteDisableNotification(); err != nil {
+					t.Fatal(err)
+				}
+				if err = tc.prm.WriteProtectContent(); err != nil {
+					t.Fatal(err)
+				}
+				if err = tc.prm.WriteMessageEffectID("5107584321108051014"); err != nil {
+					t.Fatal(err)
+				}
+				if err = tc.prm.WriteReplyParameters(&types.ReplyParameters{MessageID: testbotdata.MessageID[types.BotID], ChatID: 738070596}); err != nil {
+					t.Fatal(err)
+				}
+				if err = tc.poll.WriteExplanation("Yes, I am"); err != nil {
+					t.Fatal(err)
+				}
+				if err = tc.msg.AddPoll(tc.poll); err != nil {
+					t.Fatal(err)
+				}
+				if err = tc.msg.AddChat(tc.ch); err != nil {
+					t.Fatal(err)
+				}
+				if err = tc.msg.AddParameters(tc.prm); err != nil {
+					t.Fatal(err)
+				}
+				kb[i](tc, t)
+				send(tc.msg, t)
+				if code, msg := tc.get.Error(); code != 0 && msg != "" {
+					t.Fatal(msg)
+				}
+			}
+		}
+	}
+}
+
+func TestPoll(t *testing.T) {
+	t.Run("Req", pollReq)
+	t.Run("All", pollAll)
+}
+
+func diceReq(t *testing.T) {
+	var err error
+	tc := new(testcase)
+	tc.init()
+	if err = tc.ch.WriteChatID(738070596); err != nil {
+		t.Fatal(err)
+	}
+	if err = tc.prm.WriteEmoji(types.Emojis[0]); err != nil {
+		t.Fatal(err)
+	}
+	if err = tc.msg.AddParameters(tc.prm); err != nil {
+		t.Fatal(err)
+	}
+	if err = tc.msg.AddChat(tc.ch); err != nil {
+		t.Fatal(err)
+	}
+	send(tc.msg, t)
+	if code, msg := tc.get.Error(); code != 0 && msg != "" {
+		t.Fatal(msg)
+	}
+}
+
+func diceAll(t *testing.T) {
+	var err error
+	for i := 0; i < 3; i++ {
+		tc := new(testcase)
+		tc.init()
+		var kb = [3]func(*testcase, *testing.T){tc.replyKb, tc.inlineKb, tc.forceKb}
+		if err = tc.ch.WriteChatID(738070596); err != nil {
+			t.Fatal(err)
+		}
+		if err = tc.prm.WriteEmoji(types.Emojis[rand.Intn(5)]); err != nil {
+			t.Fatal(err)
+		}
+		if err = tc.prm.WriteDisableNotification(); err != nil {
+			t.Fatal(err)
+		}
+		if err = tc.prm.WriteProtectContent(); err != nil {
+			t.Fatal(err)
+		}
+		if err = tc.prm.WriteMessageEffectID("5107584321108051014"); err != nil {
+			t.Fatal(err)
+		}
+		if err = tc.prm.WriteReplyParameters(&types.ReplyParameters{MessageID: testbotdata.MessageID[types.BotID], ChatID: 738070596}); err != nil {
+			t.Fatal(err)
+		}
+		if err = tc.msg.AddParameters(tc.prm); err != nil {
+			t.Fatal(err)
+		}
+		if err = tc.msg.AddChat(tc.ch); err != nil {
+			t.Fatal(err)
+		}
+		kb[i](tc, t)
+		send(tc.msg, t)
+		if code, msg := tc.get.Error(); code != 0 && msg != "" {
+			t.Fatal(msg)
+		}
+	}
+}
+
+func TestDice(t *testing.T) {
+	t.Run("Req", diceReq)
+	t.Run("All", diceAll)
+}
+
+func chactReq(t *testing.T) {
+	var err error
+	tc := new(testcase)
+	tc.init()
+	if err = tc.ch.WriteChatID(738070596); err != nil {
+		t.Fatal(err)
+	}
+	if err = tc.prm.WriteAction(types.Actions[rand.Intn(10)]); err != nil {
+		t.Fatal(err)
+	}
+	if err = tc.msg.AddParameters(tc.prm); err != nil {
+		t.Fatal(err)
+	}
+	if err = tc.msg.AddChat(tc.ch); err != nil {
+		t.Fatal(err)
+	}
+	send(tc.msg, t)
+	if code, msg := tc.get.Error(); code != 0 && msg != "" {
+		t.Fatal(msg)
+	}
+}
+
+func TestChatAction(t *testing.T) {
+	t.Run("Req", chactReq)
 }

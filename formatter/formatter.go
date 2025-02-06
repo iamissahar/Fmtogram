@@ -231,6 +231,9 @@ func othersPart(msg *Message) error {
 	if msg.fm.con != nil {
 		err = writeToBuf(msg, msg.fm.con)
 	}
+	if msg.fm.poll != nil {
+		err = writeToBuf(msg, msg.fm.poll)
+	}
 	return err
 }
 

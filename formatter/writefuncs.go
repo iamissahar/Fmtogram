@@ -35,6 +35,13 @@ func code5() error {
 	return err
 }
 
+func code07() error {
+	err := new(fmerrors.FME)
+	err.Code = 7
+	err.String = "method isn't available"
+	return err
+}
+
 func code10() error {
 	err := new(fmerrors.FME)
 	err.Code = 10
@@ -1059,10 +1066,10 @@ func (p *poll) WriteOptions(options []*types.PollOption) error {
 	return err
 }
 
-func (p *poll) WriteAnonymous() error {
+func (p *poll) WriteAnonymous(yesno bool) error {
 	var err error
-	if !p.IsAnonymous {
-		p.IsAnonymous = true
+	if p.IsAnonymous == nil {
+		p.IsAnonymous = &yesno
 		logs.SettedParam("Anonymous", interfacePoll, true)
 	} else {
 		err = code10()

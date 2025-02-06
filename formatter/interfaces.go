@@ -42,6 +42,12 @@ type IGet interface {
 	Videos() []types.Video
 	Audios() []types.Audio
 	Documents() []types.Document
+	Poll() types.Poll
+	Dice() types.Dice
+	ProfilePhotos() types.UserProfilePhotos
+	File() types.File
+	Stickers() []types.Sticker
+	Gifts() []types.Gift
 }
 
 type IPhoto interface {
@@ -331,7 +337,7 @@ type IPoll interface {
 	WriteOptions(options []*types.PollOption) error
 
 	// Call it only if the poll needs to be anonymous
-	WriteAnonymous() error
+	WriteAnonymous(yesno bool) error
 
 	// Receives a poll type, "quiz" or "regular"
 	WriteType(polltype string) error

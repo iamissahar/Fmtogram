@@ -93,3 +93,27 @@ func (g *get) Audios() []types.Audio {
 func (g *get) Documents() []types.Document {
 	return g.mg.docs
 }
+
+func (g *get) Poll() types.Poll {
+	return g.poll
+}
+
+func (g *get) Dice() types.Dice {
+	return g.dice
+}
+
+func (g *get) ProfilePhotos() types.UserProfilePhotos {
+	return g.uprph
+}
+
+func (g *get) File() types.File {
+	return g.file
+}
+
+func (g *get) Stickers() []types.Sticker {
+	return g.stickers
+}
+
+func (g *get) Gifts() []types.Gift {
+	return g.gifts
+}

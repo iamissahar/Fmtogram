@@ -267,6 +267,12 @@ type MaskPosition struct {
 	Scale  float64 `json:"scale"`
 }
 
+type GameHighScore struct {
+	Position int   `json:"position"`
+	User     *User `json:"user"`
+	Score    int   `json:"score"`
+}
+
 type Game struct {
 	Title        string           `json:"title"`
 	Description  string           `json:"description"`
@@ -489,4 +495,24 @@ type TelegramMessageIDs struct {
 	Error       *TelegramError `json:"error,omitempty"`
 	ErrorCode   int            `json:"error_code,omitempty"`
 	Description string         `json:"description,omitempty"`
+}
+
+type SimpleResponse struct {
+	Ok     bool `json:"ok"`
+	Result bool `json:"result"`
+}
+
+type UserProfilePhotosResponse struct {
+	Ok     bool               `json:"ok"`
+	Result *UserProfilePhotos `json:"result"`
+}
+
+type FileResponse struct {
+	Ok     bool  `json:"ok"`
+	Result *File `json:"result"`
+}
+
+type InviteLinkResponse struct {
+	Ok     bool            `json:"ok"`
+	Result *ChatInviteLink `json:"result"`
 }

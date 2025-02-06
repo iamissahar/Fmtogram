@@ -301,6 +301,7 @@ func (msg *Message) AddPoll(p IPoll) error {
 			if (pp.Question != "") && (pp.Options != nil) {
 				msg.fm.poll = pp
 				msg.fm.method = methods.Poll
+				msg.fm.tgr = new(types.TelegramResponse)
 				logs.InterfaceSaved(interfacePoll)
 			} else {
 				err = code21()
@@ -325,8 +326,10 @@ func (msg *Message) AddParameters(param IParameters) error {
 				msg.fm.tgr = new(types.TelegramResponse)
 			} else if p.Emoji != "" {
 				msg.fm.method = methods.Dice
+				msg.fm.tgr = new(types.TelegramResponse)
 			} else if p.Action != "" {
 				msg.fm.method = methods.ChatAction
+				msg.fm.tgr = new(types.SimpleResponse)
 			} else if msg.fm.method == "" {
 				msg.fm.method = methods.Message
 				msg.fm.tgr = new(types.TelegramResponse)
@@ -382,15 +385,70 @@ func (msg *Message) AddKeyboard(kb IKeyboard) error {
 
 func (msg *Message) AddMethod(method string) error {
 	var err error
-
-	if (method == methods.ForwardMessage) || (method == methods.CopyMessage) {
-		msg.fm.tgr = new(types.TelegramResponse)
-	} else if (method == methods.ForwardMessages) || (method == methods.CopyMessages) {
-		msg.fm.tgr = new(types.TelegramMessageIDs)
+	var ok bool
+	var data interface{}
+	if data, ok = simpleResponse[method]; ok {
+		msg.fm.tgr = data
+	} else if data, ok = messageResponse[method]; ok {
+		msg.fm.tgr = data
+	} else if data, ok = messageIDsReponse[method]; ok {
+		msg.fm.tgr = data
+	} else if data, ok = inviteLinkResponse[method]; ok {
+		msg.fm.tgr = data
+	} else if method == methods.UserProfilePhotos {
+		msg.fm.tgr = new(types.UserProfilePhotosResponse)
+	} else if (method == methods.File) || (method == methods.UploadSticker) {
+		msg.fm.tgr = new(types.FileResponse)
+	} else if method == methods.GetChat {
+		msg.fm.tgr = new(types.ChatFullInfoResponse)
+	} else if method == methods.GetAdmins {
+		msg.fm.tgr = new(types.ChatMembersResponse)
+	} else if method == methods.GetMember {
+		msg.fm.tgr = new(types.ChatMemberResponse)
+	} else if (method == methods.GetForumIconStickers) || (method == methods.GetEmojiStickers) {
+		msg.fm.tgr = new(types.StickersResponse)
+	} else if method == methods.CreateForumTopic {
+		msg.fm.tgr = new(types.ForumResponse)
+	} else if method == methods.GetUsersBoosts {
+		msg.fm.tgr = new(types.UserBoostsResponse)
+	} else if method == methods.GetBusinessConnection {
+		msg.fm.tgr = new(types.BusinessConResponse)
+	} else if method == methods.GetMyCommands {
+		msg.fm.tgr = new(types.BotCommandResponse)
+	} else if method == methods.GetMyName {
+		msg.fm.tgr = new(types.BotNameResponse)
+	} else if method == methods.GetMyDescription {
+		msg.fm.tgr = new(types.BotDescriptionResponse)
+	} else if method == methods.GetMyShortDescription {
+		msg.fm.tgr = new(types.BotShorDescriptionResponse)
+	} else if method == methods.GetChatMenuButton {
+		msg.fm.tgr = new(types.MenuButtonResponse)
+	} else if method == methods.GetMyDefaultAdministratorRights {
+		msg.fm.tgr = new(types.AdminRightResponse)
+	} else if method == methods.StopPoll {
+		msg.fm.tgr = new(types.PollResponse)
+	} else if method == methods.GetStickerSet {
+		msg.fm.tgr = new(types.StickerSetResponse)
+	} else if method == methods.GetAvailableGifts {
+		msg.fm.tgr = new(types.GiftsResponse)
+	} else if method == methods.AnswerWebAppQuery {
+		msg.fm.tgr = new(types.WepAppMsgResponse)
+	} else if method == methods.SavePreparedInlineMessage {
+		msg.fm.tgr = new(types.PreparedInlineMessageResponse)
+	} else if method == methods.CreateInvoiceLink {
+		msg.fm.tgr = new(types.StringResponse)
+	} else if method == methods.GetStarTransactions {
+		msg.fm.tgr = new(types.StarTransactionResponse)
+	} else if method == methods.GetGameHighScores {
+		msg.fm.tgr = new(types.GameHighScoresResponse)
+	} else {
+		err = code07()
 	}
-	msg.fm.method = method
-	msg.fm.notchange = true
-	logs.MethodSaved(method)
+	if err == nil {
+		msg.fm.method = method
+		msg.fm.notchange = true
+		logs.MethodSaved(method)
+	}
 	return err
 }
 

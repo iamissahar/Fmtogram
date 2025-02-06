@@ -101,6 +101,14 @@ type ChatPhoto struct {
 	BigFileUniqueID   string `json:"big_file_unique_id,omitempty"`
 }
 
+type StickerSet struct {
+	Name        string     `json:"name,omitempty"`
+	Title       string     `json:"title,omitempty"`
+	StickerType string     `json:"sticker_type,omitempty"`
+	Stickers    []Sticker  `json:"stickers,omitempty"`
+	Thumbnail   *PhotoSize `json:"thumbnail,omitempty"`
+}
+
 type Sticker struct {
 	FileID           string        `json:"file_id"`
 	FileUniqueID     string        `json:"file_unique_id"`

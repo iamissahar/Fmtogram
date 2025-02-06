@@ -390,6 +390,12 @@ const (
 	// 	(formatter.IParameters).WriteMessageEffectID() [Optional]
 	// 	(formatter.IParameters).WriteReplyParameters() [Optional]
 	// 	(formatter.IKeyboard).WriteReply() or (formatter.IKeyboard).WriteInline() or (formatter.IKeyboard).WriteForceReply() [Optional]
+	// Get the results here:
+	// 	(formatter.IGet).MessageID()
+	// 	(formatter.IGet).Bot()
+	// 	(formatter.IGet).Chat()
+	// 	(formatter.IGet).Date()
+	// 	(formatter.IGet).Replyed()
 	Location string = "sendLocation"
 
 	// Use this method to send information about a venue. Parameters:
@@ -410,6 +416,12 @@ const (
 	// 	(formatter.IParameters).WriteMessageEffectID() [Optional]
 	// 	(formatter.IParameters).WriteReplyParameters() [Optional]
 	// 	(formatter.IKeyboard).WriteReply() or (formatter.IKeyboard).WriteInline() or (formatter.IKeyboard).WriteForceReply() [Optional]
+	// Get the results here:
+	// 	(formatter.IGet).MessageID()
+	// 	(formatter.IGet).Bot()
+	// 	(formatter.IGet).Chat()
+	// 	(formatter.IGet).Date()
+	// 	(formatter.IGet).Replyed()
 	Venue string = "sendVenue"
 
 	// Use this method to send phone contacts. Parameters:
@@ -426,6 +438,12 @@ const (
 	// 	(formatter.IParameters).WriteMessageEffectID() [Optional]
 	// 	(formatter.IParameters).WriteReplyParameters() [Optional]
 	// 	(formatter.IKeyboard).WriteReply() or (formatter.IKeyboard).WriteInline() or (formatter.IKeyboard).WriteForceReply() [Optional]
+	// Get the results here:
+	// 	(formatter.IGet).MessageID()
+	// 	(formatter.IGet).Bot()
+	// 	(formatter.IGet).Chat()
+	// 	(formatter.IGet).Date()
+	// 	(formatter.IGet).Replyed()
 	Contact string = "sendContact"
 
 	// Use this method to send a native poll. Parameters:
@@ -452,19 +470,33 @@ const (
 	// 	(formatter.IParameters).WriteMessageEffectID() [Optional]
 	// 	(formatter.IParameters).WriteReplyParameters() [Optional]
 	// 	(formatter.IKeyboard).WriteReply() or (formatter.IKeyboard).WriteInline() or (formatter.IKeyboard).WriteForceReply() [Optional]
+	// Get the results here:
+	// 	(formatter.IGet).MessageID()
+	// 	(formatter.IGet).Bot()
+	// 	(formatter.IGet).Chat()
+	// 	(formatter.IGet).Date()
+	// 	(formatter.IGet).Poll()
+	// 	(formatter.IGet).Replyed()
 	Poll string = "sendPoll"
 
 	// Use this method to send an animated emoji that will display a random value. Parameters:
 	// 	(formatter.IChat).WriteBusinessConnectionID() [Optional]
 	// 	(formatter.IChat).WriteChatID or (formatter.IChat).WriteChatName() [Required]
 	// 	(formatter.IParameters).WriteMessageThreadID() [Optional]
-	// 	(formatter.IParameters).WriteEmoji() [Optional]
+	// 	(formatter.IParameters).WriteEmoji() [Required]
 	// 	(formatter.IParameters).WriteDisableNotification() [Optional]
 	// 	(formatter.IParameters).WriteProtectContent() [Optional]
 	// 	(formatter.IParameters).WriteAllowPaidBroadcast() [Optional]
 	// 	(formatter.IParameters).WriteMessageEffectID() [Optional]
 	// 	(formatter.IParameters).WriteReplyParameters() [Optional]
 	// 	(formatter.IKeyboard).WriteReply() or (formatter.IKeyboard).WriteInline() or (formatter.IKeyboard).WriteForceReply() [Optional]
+	// Get the results here:
+	// 	(formatter.IGet).MessageID()
+	// 	(formatter.IGet).Bot()
+	// 	(formatter.IGet).Chat()
+	// 	(formatter.IGet).Date()
+	// 	(formatter.IGet).Dice()
+	// 	(formatter.IGet).Replyed()
 	Dice string = "sendDice"
 
 	// Use this method when you need to tell the user that something is happening on
@@ -478,6 +510,8 @@ const (
 	// 	(formatter.IChat).WriteChatID or (formatter.IChat).WriteChatName() [Required]
 	// 	(formatter.IParameters).WriteMessageThreadID() [Optional]
 	// 	(formatter.IParameters).WriteAction() [Required]
+	// Get the results here:
+	// 	(formatter.IGet).Status()
 	ChatAction string = "sendChatAction"
 
 	// Use this method to change the chosen reactions on a message.
@@ -488,6 +522,8 @@ const (
 	// 	(formatter.IParameters).WriteMessageID() [Required]
 	// 	(formatter.IParameters).WriteReaction() [Optional]
 	// 	(formatter.IParameters).WriteReactionIsBig() [Optional]
+	// Get the results here:
+	// 	(formatter.IGet).Status()
 	MessageReaction string = "setMessageReaction"
 
 	// Use this method to get a list of profile pictures for a user. The file
@@ -497,7 +533,7 @@ const (
 	// 	(formatter.IParameters).WriteOffset() [Optional]
 	// 	(formatter.IParameters).WriteLimit() [Optional]
 	// Get the results here:
-	// 	(formatter.IParameters).GetProfilePhotos()
+	// 	(formatter.IGet).ProfilePhotos()
 	UserProfilePhotos string = "getUserProfilePhotos"
 
 	// Changes the emoji status for a given user that previously allowed the bot to manage
@@ -505,13 +541,16 @@ const (
 	// 	(formatter.IParameters).WriteUserID() [Required]
 	// 	(formatter.IParameters).WriteEmojiStatusCustomEmojiID() [Optional]
 	// 	(formatter.IParameters).WriteEmojiStatusExpirationDate() [Optional]
+	// Get the results here:
+	// 	(formatter.IGet).Status()
 	UserEmojiStatus string = "setUserEmojiStatus"
 
 	// Use this method to get basic information about a file and prepare it for downloading.
 	// For the moment, bots can download files of up to 20MB in size. Parameters:
 	// 	(formatter.IParameters).WriteFileID() [Required]
 	//  Get the results here:
-	// 	(formatter.IParameters).GetFile()
+	// Get the results here:
+	// 	(formatter.IGet).File()
 	File string = "getFile"
 
 	// Use this method to ban a user in a group, a supergroup or a channel.
@@ -522,6 +561,8 @@ const (
 	// 	(formatter.IParameters).WriteUserID() [Required]
 	// 	(formatter.IParameters).WriteUntilDate() [Optional]
 	// 	(formatter.IParameters).WriteRevokeMessages() [Optional]
+	// Get the results here:
+	// 	(formatter.IGet).Status()
 	BanMember string = "banChatMember"
 
 	// Use this method to unban a previously banned user in a supergroup or channel. The user
@@ -534,6 +575,8 @@ const (
 	// 	(formatter.IChat).WriteChatID() or (formatter.IChat).WriteChatName() [Required]
 	// 	(formatter.IParameters).WriteUserID() [Required]
 	// 	(formatter.IParameters).WriteOnlyIfBanned() [Optional]
+	// Get the results here:
+	// 	(formatter.IGet).Status()
 	UnbanMember string = "unbanChatMember"
 
 	// Use this method to restrict a user in a supergroup. The bot must be an administrator in the supergroup for
@@ -737,6 +780,10 @@ const (
 	// 	(formatter.IChat).WriteChatID() or (formatter.IChat).WriteChatName() [Required]
 	DeleteChatStickerSet string = "deleteChatStickerSet"
 
+	// No parameters. The results are here:
+	// 	(formatter.IGet).Stickers()
+	GetForumIconStickers string = "getForumTopicIconStickers"
+
 	// Use this method to create a topic in a forum supergroup chat. The bot must be an administrator in the chat
 	// for this to work and must have the types.ChatAdministratorRights.CanManageTopics administrator rights. Parameters:
 	// 	(formatter.IChat).WriteChatID() or (formatter.IChat).WriteChatName() [Required]
@@ -794,7 +841,7 @@ const (
 	// the chat for this to work and must have the types.ChatAdministratorRights.CanManageTopics administrator rights. The topic will be automatically unhidden if it was hidden.
 	// Parameters:
 	// 	(formatter.IChat).WriteChatID() or (formatter.IChat).WriteChatName() [Required]
-	ReopenGGeneralForum string = "reopenGeneralForumTopic"
+	ReopenGeneralForum string = "reopenGeneralForumTopic"
 
 	// Use this method to hide the 'General' topic in a forum supergroup chat. The bot must be an administrator in
 	// the chat for this to work and must have the types.ChatAdministratorRights.CanManageTopics administrator rights. The topic will be automatically closed if it was open.
@@ -1140,6 +1187,10 @@ const (
 	// 	(formatter.ISticker).WriteSetName()
 	DeleteStickerSet string = "deleteStickerSet"
 
+	// Has no parameters. Get the results here:
+	// 	(formatter.IGet).Gifts()
+	GetAvailableGifts string = "getAvailableGifts"
+
 	// Sends a gift to the given user. The gift can't be converted to Telegram Stars by the user. Parameters:
 	// 	(formatter.IParameters).WriteUserID() [Required]
 	// 	(formatter.ISticker).WriteGiftID() [Required]
@@ -1331,11 +1382,8 @@ const (
 	// 	(formatter.IChat).WriteChatID() [Optional]
 	// 	(formatter.IParameters).WriteMessageID() [Optional]
 	// 	(formatter.IParameters).WriteInlineMessageID() [Optional]
-	SetGameHighScores string = "getGameHighScores"
+	GetGameHighScores string = "getGameHighScores"
 )
-
-var Media = map[string]struct{}{Photo: {}, Audio: {}, Document: {},
-	Video: {}, MediaGroup: {}, Animation: {}, Voice: {}}
 
 var Lvl1 = []string{Message, Photo, Audio,
 	Document, Video, Animation,

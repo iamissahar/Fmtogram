@@ -133,7 +133,7 @@ type poll struct {
 	QuestionParsemode    string                 `json:"question_parse_mode,omitempty"`
 	QuestionEntities     []*types.MessageEntity `json:"question_entities,omitempty"`
 	Options              []*types.PollOption    `json:"options,omitempty"`
-	IsAnonymous          bool                   `json:"is_anonymous,omitempty"`
+	IsAnonymous          *bool                  `json:"is_anonymous,omitempty"`
 	Type                 string                 `json:"type,omitempty"`
 	AllowMultipleAnswers bool                   `json:"allows_multiple_answers,omitempty"`
 	CorrectOptionID      string                 `json:"correct_option_id,omitempty"`
@@ -418,4 +418,10 @@ type get struct {
 	vdn       types.VideoNote
 	paid      types.PaidMedia
 	mg        *mediagroup
+	poll      types.Poll
+	dice      types.Dice
+	uprph     types.UserProfilePhotos
+	file      types.File
+	stickers  []types.Sticker
+	gifts     []types.Gift
 }

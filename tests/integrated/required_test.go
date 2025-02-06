@@ -24,6 +24,9 @@ func (tc *testcase) init() {
 	tc.vc = tc.msg.NewVoice()
 	tc.vdn = tc.msg.NewVideoNote()
 	tc.get = tc.msg.NewIGet()
+	tc.loc = tc.msg.NewLocation()
+	tc.con = tc.msg.NewContact()
+	tc.poll = tc.msg.NewPoll()
 	types.DEBUG = true
 	logs.DebugOrInfo()
 }
@@ -480,7 +483,7 @@ func TestCopy(t *testing.T) {
 	t.Run("1Message", copyMessage)
 	t.Run("LotsMessages", copyMessages)
 }
-func TestMe(t *testing.T) {
+func TestMePlease(t *testing.T) {
 	var offset int
 	var err error
 	if err = executer.GetOffset(&offset, types.BotID); err != nil {
@@ -497,5 +500,6 @@ func TestMe(t *testing.T) {
 }
 
 func init() {
-	types.BotID = testbotdata.Token
+	// types.BotID = testbotdata.Token
+	types.BotID = testbotdata.Token2
 }
