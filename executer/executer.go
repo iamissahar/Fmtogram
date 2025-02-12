@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"os"
 
 	"github.com/l1qwie/Fmtogram/fmerrors"
 	"github.com/l1qwie/Fmtogram/types"
@@ -81,7 +82,8 @@ func GetUpdates(tg *types.Telegram, offset *int, botID string) error {
 	url := fmt.Sprint(
 		types.TelegramAPI,
 		fmt.Sprintf("bot%s", botID), "/",
-		"getUpdates", "?", "limit=1", "&", fmt.Sprintf("offset=%d", *offset-1))
+		"getUpdates", "?", "limit=10", "&", fmt.Sprintf("offset=%d", *offset-1),
+		"&", "timeout=30", "&", "allowed_updates=[]")
 	body, err := sendRequest(bytes.NewBuffer(nil), url, "application/json", "GET")
 	if err == nil {
 		fmt.Println(string(body))
@@ -123,4 +125,20 @@ func GetMe() (*types.GetMe, error) {
 		err = json.Unmarshal(body, getme)
 	}
 	return getme, err
+}
+
+func DownloadFile(filepath, savepath string) error {
+	var file *os.File
+	url := fmt.Sprint(
+		types.TelegramAPI,
+		fmt.Sprintf("file/bot%s", types.BotID), "/", filepath)
+	body, err := sendRequest(bytes.NewBuffer(nil), url, defaultType, "GET")
+	if err == nil {
+		file, err = os.Create(savepath)
+		if err == nil {
+			defer file.Close()
+			_, err = file.Write(body)
+		}
+	}
+	return err
 }

@@ -34,6 +34,7 @@ const (
 	// 	(formatter.IParameters).WriteDisableNotification() [Optional]
 	// 	(formatter.IParameters).WriteProtectContent() [Optional]
 	// 	(formatter.IParameters).WriteMessageID() [Required]
+	// 	(formatter.IParameters).WriteVideoStartTimestamp() [Optional]
 	// Get the results here:
 	// 	(formatter.IGet).MessageID()
 	ForwardMessage string = "forwardMessage"
@@ -71,6 +72,7 @@ const (
 	// 	(formatter.IParameters).WriteProtectContent() [Optional]
 	// 	(formatter.IParameters).WriteAllowPaidBroadcast() [Optional]
 	// 	(formatter.IParameters).WriteReplyParameters() [Optional]
+	// 	(formatter.IParameters).WriteVideoStartTimestamp() [Optional]
 	// 	(formatter.IKeyboard).WriteReply() or (formatter.IKeyboard).WriteInline() or (formatter.IKeyboard).WriteForceReply() [Optional]
 	// Get the results here:
 	// 	(formatter.IGet).MessageID()
@@ -182,6 +184,8 @@ const (
 	// 	(formatter.IVideo).WriteWidth() [Optional]
 	// 	(formatter.IVideo).WriteHeight() [Optional]
 	// 	(formatter.IVideo).WriteThumbnail() or (formatter.IVideo).WriteThumbnailID()  [Optional]
+	// 	(formatter.IVideo).WriteCoverStorage(), (formatter.IVideo).WriteCoverTelegram() or (formatter.IVideo).WriteCoverInternet() [Optional]
+	// 	(formatter.IParameters).WriteVideoStartTimestamp() [Optional]
 	// 	(formatter.IParameters).WriteString() [Optional]
 	// 	(formatter.IParameters).WriteParseMode() [Optional]
 	// 	(formatter.IParameters).WriteEntities() [Optional]
@@ -308,6 +312,8 @@ const (
 	// 	(formatter.IVideo).WriteHeight() [Optional]
 	// 	(formatter.IVideo).WriteDuration() [Optional]
 	// 	(formatter.IVideo).WriteSupportsStreaming() [Optional]
+	// 	(formatter.IVideo).WriteCoverStorage(), (formatter.IVideo).WriteCoverTelegram() or (formatter.IVideo).WriteCoverInternet() [Optional]
+	// 	(formatter.IParameters).WriteVideoStartTimestamp() [Optional]
 	// Get the results here:
 	// 	(formatter.IGet).MessageID()
 	// 	(formatter.IGet).Bot()
@@ -547,8 +553,7 @@ const (
 
 	// Use this method to get basic information about a file and prepare it for downloading.
 	// For the moment, bots can download files of up to 20MB in size. Parameters:
-	// 	(formatter.IParameters).WriteFileID() [Required]
-	//  Get the results here:
+	//	(formatter.IParameters).WriteFileID() [Required]
 	// Get the results here:
 	// 	(formatter.IGet).File()
 	File string = "getFile"
@@ -587,6 +592,8 @@ const (
 	// 	(formatter.IParameters).WritePermissions() [Required]
 	// 	(formatter.IParameters).WriteIndependentChatPermissions() [Optional]
 	// 	(formatter.IParameters).WriteUntilDate() [Optional]
+	// Get the results here:
+	// 	(formatter.IGet).Status()
 	RestrictMember string = "restrictChatMember"
 
 	// Use this method to promote or demote a user in a supergroup or a channel. The bot must be an administrator
@@ -595,12 +602,16 @@ const (
 	// 	(formatter.IChat).WriteChatID() or (formatter.IChat).WriteChatName() [Required]
 	// 	(formatter.IParameters).WriteUserID() [Required]
 	// 	(formatter.IParameters).WriteAdministratorRights() [Optional]
+	// Get the results here:
+	// 	(formatter.IGet).Status()
 	PromoteMember string = "promoteChatMember"
 
 	// Use this method to set a custom title for an administrator in a supergroup promoted by the bot. Parameters:
 	// 	(formatter.IChat).WriteChatID() or (formatter.IChat).WriteChatName() [Required]
 	// 	(formatter.IParameters).WriteUserID() [Required]
 	// 	(formatter.IParameters).WriteCustomTitle() [Required]
+	// Get the results here:
+	// 	(formatter.IGet).Status()
 	ChatAdministratorTitle string = "setChatAdministratorCustomTitle"
 
 	// Use this method to ban a channel chat in a supergroup or a channel. Until the chat is unbanned,
@@ -608,12 +619,16 @@ const (
 	// The bot must be an administrator in the supergroup or channel for this to work and must have the appropriate administrator rights. Parameters:
 	// 	(formatter.IChat).WriteChatID() or (formatter.IChat).WriteChatName() [Required]
 	// 	(formatter.IChat).WriteSenderChatID() [Required]
+	// Get the results here:
+	// 	(formatter.IGet).Status()
 	BanSenderChat string = "banChatSenderChat"
 
 	// Use this method to unban a previously banned channel chat in a supergroup or channel. The bot must be an administrator
 	// for this to work and must have the appropriate administrator rights. Parameters:
 	// 	(formatter.IChat).WriteChatID() or (formatter.IChat).WriteChatName() [Required]
 	// 	(formatter.IChat).WriteSenderChatID() [Required]
+	// Get the results here:
+	// 	(formatter.IGet).Status()
 	UnbanSenderChat string = "unbanChatSenderChat"
 
 	// Use this method to set default chat permissions for all members.
@@ -622,6 +637,8 @@ const (
 	// 	(formatter.IChat).WriteChatID() or (formatter.IChat).WriteChatName() [Required]
 	// 	(formatter.IParameters).WritePermissions() [Required]
 	// 	(formatter.IParameters).WriteIndependentChatPermissions() [Optional]
+	// Get the results here:
+	// 	(formatter.IGet).Status()
 	ChatPermissions string = "setChatPermissions"
 
 	// Use this method to generate a new primary invite link for a chat; any previously generated primary link is revoked.
@@ -629,6 +646,9 @@ const (
 	// 	(formatter.IChat).WriteChatID() or (formatter.IChat).WriteChatName() [Required]
 	// Get the results here:
 	// 	(formatter.IParameters).GetInviteLink()
+	// Get the results here:
+	// 	(formatter.IGet).Status()
+	// 	(formamtter.IGet).String()
 	ExportInviteLink string = "exportChatInviteLink"
 
 	// Use this method to create an additional invite link for a chat. The bot must be an administrator in the chat for this to work and must
@@ -639,7 +659,8 @@ const (
 	// 	(formatter.Ilink).WriteMemberLimit() [Optional]
 	// 	(formatter.Ilink).WriteJoinRequest() [Optional]
 	// Get the results here:
-	// 	(IParameters).GetNewInviteLink()
+	// 	(formatter.IGet).Status()
+	// 	(formatter.IGet).InviteLink()
 	CreateInviteLink string = "createChatInviteLink"
 
 	// Use this method to edit a non-primary invite link created by the bot. The bot must be an administrator in the chat for this to work
@@ -651,7 +672,8 @@ const (
 	// 	(formatter.Ilink).WriteMemberLimit() [Optional]
 	// 	(formatter.Ilink).WriteJoinRequest() [Optional]
 	// Get the results here:
-	// 	(IParameters).GetNewInviteLink()
+	// 	(formatter.IGet).Status()
+	// 	(formatter.IGet).InviteLink()
 	EditInviteLink string = "editChatInviteLink"
 
 	// Use this method to create a subscription invite link for a channel chat. The bot must have the types.ChatAdministratorRights.CanInviteUsers administrator rights.
@@ -661,7 +683,8 @@ const (
 	// 	(formatter.ILink).WriteSubscriptionPeriod() [Required]
 	// 	(formatter.ILink).WriteSubscriptionPrice() [Required]
 	// Get the results here:
-	// 	(IParameters).GetNewInviteLink()
+	// 	(formatter.IGet).Status()
+	// 	(formatter.IGet).InviteLink()
 	CreateSubInviteLink string = "createChatSubscriptionInviteLink"
 
 	// Use this method to edit a subscription invite link created by the bot. The bot must have the types.ChatAdministratorRights.CanInviteUsers administrator rights.
@@ -670,7 +693,8 @@ const (
 	// 	(formatter.Ilink).WriteInviteLink() [Required]
 	// 	(formatter.Ilink).WriteName() [Optional]
 	// Get the results here:
-	// 	(IParameters).GetNewInviteLink()
+	// 	(formatter.IGet).Status()
+	// 	(formatter.IGet).InviteLink()
 	EditSubInviteLink string = "editChatSubscriptionInviteLink"
 
 	// Use this method to revoke an invite link created by the bot. If the primary link is revoked, a new link is automatically generated.
@@ -678,42 +702,55 @@ const (
 	// 	(formatter.IChat).WriteChatID() or (formatter.IChat).WriteChatName() [Required]
 	// 	(formatter.Ilink).WriteInviteLink() [Required]
 	// Get the results here:
-	// 	(IParameters).GetNewInviteLink()
+	// 	(formatter.IGet).Status()
+	// 	(formatter.IGet).InviteLink()
 	RevokeInviteLink string = "revokeChatInviteLink"
 
 	// Use this method to approve a chat join request. The bot must be an administrator in the chat for this
 	// to work and must have the types.ChatAdministratorRights.CanInviteUsers administrator rights. Parameters:
 	// 	(formatter.IChat).WriteChatID() or (formatter.IChat).WriteChatName() [Required]
 	// 	(formmatter.IParameters).WriteUserID() [Required]
+	// Get the results here:
+	// 	(formatter.IGet).Status()
 	ApproveJoinReq string = "approveChatJoinRequest"
 
 	// Use this method to decline a chat join request. The bot must be an administrator in the
 	// chat for this to work and must have the types.ChatAdministratorRights.CanInviteUsers administrator rights. Parameters:
 	// 	(formatter.IChat).WriteChatID() or (formatter.IChat).WriteChatName() [Required]
 	// 	(formmatter.IParameters).WriteUserID() [Required]
+	// Get the results here:
+	// 	(formatter.IGet).Status()
 	DeclineJoinReq string = "declineChatJoinRequest"
 
 	// Use this method to set a new profile photo for the chat. Photos can't be changed for private chats. The bot must be an administrator in the
 	// chat for this to work and must have the appropriate administrator rights. Parameters:
 	// 	(formatter.IChat).WriteChatID() or (formatter.IChat).WriteChatName() [Required]
 	// 	(formatter.IPhoto).WritePhotoStorage() [Required]
+	// Get the results here:
+	// 	(formatter.IGet).Status()
 	SetChatPhoto string = "setChatPhoto"
 
 	// Use this method to delete a chat photo. Photos can't be changed for private chats. The bot must be an administrator in the chat for this
 	// to work and must have the appropriate administrator rights. Parameters:
 	// 	(formatter.IChat).WriteChatID() or (formatter.IChat).WriteChatName() [Required]
+	// Get the results here:
+	// 	(formatter.IGet).Status()
 	DeleteChatPhoto string = "deleteChatPhoto"
 
 	// Use this method to change the title of a chat. Titles can't be changed for private chats. The bot must be an administrator in the chat
 	// for this to work and must have the appropriate administrator rights. Parameters:
 	// 	(formatter.IChat).WriteChatID() or (formatter.IChat).WriteChatName() [Required]
 	// (formatter.IChat).WriteTitle() [Required]
+	// Get the results here:
+	// 	(formatter.IGet).Status()
 	ChatTitle string = "setChatTitle"
 
 	// Use this method to change the description of a group, a supergroup or a channel. The bot must be an administrator in the chat for
 	// this to work and must have the appropriate administrator rights. Parameters:
 	// 	(formatter.IChat).WriteChatID() or (formatter.IChat).WriteChatName() [Required]
 	// 	(formatter.IChat).WriteDescription() [Required]
+	// Get the results here:
+	// 	(formatter.IGet).Status()
 	ChatDescription string = "setChatDescription"
 
 	// Use this method to add a message to the list of pinned messages in a chat. If the chat is not a private chat,
@@ -723,6 +760,8 @@ const (
 	// 	(formatter.IChat).WriteChatID() or (formatter.IChat).WriteChatName() [Required]
 	// 	(formmatter.IParameters).WriteMessageID() [Required]
 	// 	(formatter.IParameters).WriteDisableNotification [Optional]
+	// Get the results here:
+	// 	(formatter.IGet).Status()
 	PinMessage string = "pinChatMessage"
 
 	// Use this method to remove a message from the list of pinned messages in a chat. If the chat is not a private chat,
@@ -731,34 +770,43 @@ const (
 	// 	(formatter.IChat).WriteBusinessConnectionID() [Optional]
 	// 	(formatter.IChat).WriteChatID() or (formatter.IChat).WriteChatName() [Required]
 	// 	(formmatter.IParameters).WriteMessageID() [Optional]
+	// Get the results here:
+	// 	(formatter.IGet).Status()
 	UnpinMessage string = "unpinChatMessage"
 
 	// Use this method to clear the list of pinned messages in a chat. If the chat is not a private chat,
 	// the bot must be an administrator in the chat for this to work and must have the types.ChatAdministratorRights.CanPinMessages
 	// administrator right in a supergroup or types.ChatAdministratorRights.CanEditMessages administrator right in a channel. Parameters:
 	// 	(formatter.IChat).WriteChatID() or (formatter.IChat).WriteChatName() [Required]
+	// Get the results here:
+	// 	(formatter.IGet).Status()
 	UnpinAll string = "unpinAllChatMessages"
 
 	// Use this method for your bot to leave a group, supergroup or channel. Parameters:
 	// 	(formatter.IChat).WriteChatID() or (formatter.IChat).WriteChatName() [Required]
+	// Get the results here:
+	// 	(formatter.IGet).Status()
 	LeaveChat string = "leaveChat"
 
 	// Use this method to get up-to-date information about the chat. Parameters:
 	// 	(formatter.IChat).WriteChatID() or (formatter.IChat).WriteChatName() [Required]
 	// Get the results here:
-	// 	(IChat).GetChat()
+	// 	(formatter.IGet).Status()
+	//	(formatter.IGet).ChatInfo()
 	GetChat string = "getChat"
 
 	// Use this method to get a list of administrators in a chat, which aren't bots. Parameters:
 	// 	(formatter.IChat).WriteChatID() or (formatter.IChat).WriteChatName() [Required]
 	// Get the results here:
-	// 	(IChat).GetMembers()
+	// 	(formatter.IGet).Status()
+	// 	(formatter.IGet).Members()
 	GetAdmins string = "getChatAdministrators"
 
 	// Use this method to get the number of members in a chat. Parameters:
 	// 	(formatter.IChat).WriteChatID() or (formatter.IChat).WriteChatName() [Required]
 	// Get the results here:
-	// 	(IChat).GetMembersAmount()
+	// 	(formatter.IGet).Status()
+	// 	(formatter.IGet).Integer()
 	GetMemberCount string = "getChatMemberCount"
 
 	// Use this method to get information about a member of a chat. The method is only guaranteed to work for other users if the
@@ -766,14 +814,17 @@ const (
 	// 	(formatter.IChat).WriteChatID() or (formatter.IChat).WriteChatName() [Required]
 	// 	(formatter.IParameters).WriteUserID() [Required]
 	// Get the results here:
-	// 	(IChat).GetMembers() [always zero element]
+	// 	(formatter.IGet).Status()
+	// 	(formatter.IGet).Members() [always zero element]
 	GetMember string = "getChatMember"
 
 	//Use this method to set a new group sticker set for a supergroup. The bot must be an administrator in the chat
 	// for this to work and must have the appropriate administrator rights. Parameters:
 	// 	(formatter.IChat).WriteChatID() or (formatter.IChat).WriteChatName() [Required]
 	// 	(formatter.ISticker).WriteSetName() [Required]
-	ChatStickerSet string = "getChatStickerSet"
+	// Get the results here:
+	// 	(formatter.IGet).Status()
+	ChatStickerSet string = "setChatStickerSet"
 
 	// Use this method to delete a group sticker set from a supergroup. The bot must be an administrator in the chat
 	// for this to work and must have the appropriate administrator rights. Parameters:
@@ -1193,6 +1244,7 @@ const (
 
 	// Sends a gift to the given user. The gift can't be converted to Telegram Stars by the user. Parameters:
 	// 	(formatter.IParameters).WriteUserID() [Required]
+	// 	(formatter.IChat).WriteChatID or (formatter.IChat).WriteChatName() [Optional]
 	// 	(formatter.ISticker).WriteGiftID() [Required]
 	// 	(formatter.ISticker).WritePayForUpgrade() [Optional]
 	// 	(formatter.IParameters).WriteString() [Optional]

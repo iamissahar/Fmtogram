@@ -50,6 +50,12 @@ type TransactionPartnerUser struct {
 	Gift               *Gift          `json:"gift,omitempty"`
 }
 
+type TransactionPartnerChat struct {
+	Type string `json:"type"`
+	Chat *Chat  `json:"chat"`
+	Gift *Gift  `json:"gift"`
+}
+
 type TransactionPartnerAffiliateProgram struct {
 	Type               string `json:"type"`
 	SponsorUser        *User  `json:"sponsor_user,omitempty"`
@@ -76,6 +82,7 @@ type TransactionPartnerOther struct {
 
 type TransactionPartner struct {
 	*TransactionPartnerUser
+	*TransactionPartnerChat
 	*TransactionPartnerAffiliateProgram
 	*TransactionPartnerFragment
 	*TransactionPartnerTelegramAds

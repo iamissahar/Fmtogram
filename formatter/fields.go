@@ -120,6 +120,15 @@ func (vd *video) multipartFields(writer *multipart.Writer, group *[]interface{},
 	if err == nil && vd.Thumbnail != "" {
 		err = addThumbnail(writer, vd.Thumbnail, vd.thumbnailGottenFrom)
 	}
+	if err == nil && vd.Cover != "" {
+		if vd.coverGottenFrom == Storage {
+			vd.Cover = fmt.Sprintf("attach://%s", vd.Cover)
+		}
+		field(writer, "cover", vd.Cover)
+	}
+	if err == nil && vd.StartTimestamp != nil {
+		field(writer, "start_timestamp", fmt.Sprintf("%d", *vd.StartTimestamp))
+	}
 	if err == nil && vd.Caption != "" {
 		err = field(writer, "caption", vd.Caption)
 	}

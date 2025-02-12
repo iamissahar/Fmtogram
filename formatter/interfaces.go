@@ -21,33 +21,39 @@ type kb interface {
 type IGet interface {
 	Status() bool
 	Error() (code int, msg string)
-	Chat() types.Chat
-	User() types.User
-	Bot() types.User
+	Chat() *types.Chat
+	Sender() *types.User
 	Date() int
 	MessageID() int
 	MessageIDs() []int
 	Replyed() IGet
-	ForwardOrigin() types.MessageOrigin
-	Photo() []types.PhotoSize
-	Audio() types.Audio
-	Document() types.Document
-	Video() types.Video
-	Animation() types.Animation
-	Voice() types.Voice
-	VideoNote() types.VideoNote
-	PaidMedia() types.PaidMedia
-	MediaGroupID() int
-	Photos() [][]types.PhotoSize
-	Videos() []types.Video
-	Audios() []types.Audio
-	Documents() []types.Document
-	Poll() types.Poll
-	Dice() types.Dice
-	ProfilePhotos() types.UserProfilePhotos
-	File() types.File
-	Stickers() []types.Sticker
-	Gifts() []types.Gift
+	ForwardOrigin() *types.MessageOrigin
+	Photo() []*types.PhotoSize
+	Audio() *types.Audio
+	Document() *types.Document
+	Video() *types.Video
+	Animation() *types.Animation
+	Voice() *types.Voice
+	VideoNote() *types.VideoNote
+	PaidMedia() *types.PaidMedia
+	MediaGroupID() string
+	Photos() [][]*types.PhotoSize
+	Videos() []*types.Video
+	Audios() []*types.Audio
+	Documents() []*types.Document
+	Poll() *types.Poll
+	Dice() *types.Dice
+	ProfilePhotos() *types.UserProfilePhotos
+	File() *types.File
+	Stickers() []*types.Sticker
+	Gifts() []*types.Gift
+	Message() *types.Message
+	String() string
+	InviteLink() *types.ChatInviteLink
+	ChatInfo() *types.ChatFullInfo
+	Members() []*types.ChatMember
+	Integer() *int
+	Forum() *types.ForumTopic
 }
 
 type IPhoto interface {
@@ -126,8 +132,11 @@ type IVideo interface {
 
 	WriteWidth(width int) error
 
-	// You can call this function after calling Send(). It returns you a structure with some data about the video you just sent
-	GetResponse() types.Video
+	WriteCoverStorage(path string) error
+
+	WriteCoverTelegram(coverID string) error
+
+	WriteCoverInternet(url string) error
 }
 
 type IAudio interface {
@@ -430,8 +439,6 @@ type IForum interface {
 	WriteIconColor(color int) error
 
 	WriteIconEmojiID(emojiID string) error
-
-	// GetForum() types.ForumTopic
 }
 
 type IBot interface {
@@ -651,7 +658,7 @@ type IParameters interface {
 	// An alert will be shown by the client instead of a notification at the top of the chat screen
 	WriteShowAlert() error
 
-	WriteURL(url string) error
+	WriteURL(botnickname, url string) error
 
 	// The maximum amount of time in seconds that the result of the callback query may be cached
 	// client-side. Telegram apps will support caching starting in version 3.14.
@@ -665,23 +672,7 @@ type IParameters interface {
 
 	WriteRemoveCaption() error
 
-	// You can call this function after calling Send(). It returns you a structure with some data about the user you just sent a message to
-	GetResponse() types.User
-
-	// Get() Get
-
-	// Call it after methods.ForwardMessages, methods.CopyMessage and methods.CopyMessages. In any other cases it returns nil
-	// GetMessageIDs() []int
-
-	// GetProfilePhotos() types.UserProfilePhotos
-
-	// GetFile() types.File
-
-	// GetInviteLink() string
-
-	// GetNewInviteLink() types.ChatInviteLink
-
-	// GetMessage() types.Message
+	WriteVideoStartTimestamp(seconds int) error
 }
 
 type IChat interface {
@@ -736,11 +727,11 @@ type ILink interface {
 	WriteExpireDate(date time.Duration) error
 
 	// The maximum number of users that can be members of the chat simultaneously after
-	// joining the chat via this invite link; 1-99999
+	// joining the chat via this invite link; 1-99999. Incompatible with (formatter.ILink).WriteJoinRequest()
 	WriteMemberLimit(limit int) error
 
 	// If users joining the chat via the link need to be approved by chat administrators.
-	// If called, member_limit can't be specified
+	// Incompatible with (formatter.ILink).WriteMemberLimit()
 	WriteJoinRequest() error
 
 	// The invite link to edit

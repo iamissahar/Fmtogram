@@ -19,10 +19,10 @@ func (msg *Message) AddPhoto(ph IPhoto) error {
 					if msg.fm.method == "" || msg.fm.method == methods.Photo {
 						if msg.fm.mh.i == 0 {
 							msg.fm.method = methods.Photo
-							msg.fm.tgr = new(types.TelegramResponse)
+							msg.fm.tgr = new(types.MessageResponse)
 						} else {
 							msg.fm.method = methods.MediaGroup
-							msg.fm.tgr = new(types.TelegramMediaGroup)
+							msg.fm.tgr = new(types.MediaGroupResponse)
 						}
 					}
 					msg.fm.mh.storage[msg.fm.mh.i] = p
@@ -57,10 +57,11 @@ func (msg *Message) AddVideo(vd IVideo) error {
 					if msg.fm.method == "" || msg.fm.method == methods.Video {
 						if msg.fm.mh.i == 0 {
 							msg.fm.method = methods.Video
-							msg.fm.tgr = new(types.TelegramResponse)
+							msg.fm.tgr = new(types.MessageResponse)
+							v.StartTimestamp = &msg.fm.inf.VideoStartTimestamp
 						} else {
 							msg.fm.method = methods.MediaGroup
-							msg.fm.tgr = new(types.TelegramMediaGroup)
+							msg.fm.tgr = new(types.MediaGroupResponse)
 						}
 					}
 					msg.fm.mh.storage[msg.fm.mh.i] = v
@@ -94,10 +95,10 @@ func (msg *Message) AddDocument(dc IDocument) error {
 					}
 					if msg.fm.mh.i == 0 {
 						msg.fm.method = methods.Document
-						msg.fm.tgr = new(types.TelegramResponse)
+						msg.fm.tgr = new(types.MessageResponse)
 					} else {
 						msg.fm.method = methods.MediaGroup
-						msg.fm.tgr = new(types.TelegramMediaGroup)
+						msg.fm.tgr = new(types.MediaGroupResponse)
 					}
 					msg.fm.mh.storage[msg.fm.mh.i] = d
 					msg.fm.mh.i++
@@ -129,7 +130,7 @@ func (msg *Message) AddAnimation(an IAnimation) error {
 						msg.fm.mh.atLeastOnce = true
 					}
 					msg.fm.method = methods.Animation
-					msg.fm.tgr = new(types.TelegramResponse)
+					msg.fm.tgr = new(types.MessageResponse)
 					msg.fm.mh.storage[msg.fm.mh.i] = a
 					msg.fm.mh.i++
 					msg.fm.mh.amount++
@@ -161,10 +162,10 @@ func (msg *Message) AddAudio(ad IAudio) error {
 					}
 					if msg.fm.mh.i == 0 {
 						msg.fm.method = methods.Audio
-						msg.fm.tgr = new(types.TelegramResponse)
+						msg.fm.tgr = new(types.MessageResponse)
 					} else {
 						msg.fm.method = methods.MediaGroup
-						msg.fm.tgr = new(types.TelegramMediaGroup)
+						msg.fm.tgr = new(types.MediaGroupResponse)
 					}
 					msg.fm.mh.storage[msg.fm.mh.i] = a
 					msg.fm.mh.i++
@@ -196,7 +197,7 @@ func (msg *Message) AddVoice(vc IVoice) error {
 						msg.fm.mh.atLeastOnce = true
 					}
 					msg.fm.method = methods.Voice
-					msg.fm.tgr = new(types.TelegramResponse)
+					msg.fm.tgr = new(types.MessageResponse)
 					msg.fm.mh.storage[msg.fm.mh.i] = v
 					msg.fm.mh.i++
 					msg.fm.mh.amount++
@@ -227,7 +228,7 @@ func (msg *Message) AddVideoNote(vdn IVideoNote) error {
 						msg.fm.mh.atLeastOnce = true
 					}
 					msg.fm.method = methods.VideoNote
-					msg.fm.tgr = new(types.TelegramResponse)
+					msg.fm.tgr = new(types.MessageResponse)
 					msg.fm.mh.storage[msg.fm.mh.i] = v
 					msg.fm.mh.i++
 					msg.fm.mh.amount++
@@ -259,7 +260,7 @@ func (msg *Message) AddLocation(loc ILocation) error {
 				} else {
 					msg.fm.method = methods.Venue
 				}
-				msg.fm.tgr = new(types.TelegramResponse)
+				msg.fm.tgr = new(types.MessageResponse)
 				logs.InterfaceSaved(interfaceLocation)
 			} else {
 				err = code21()
@@ -280,7 +281,7 @@ func (msg *Message) AddContact(con IContact) error {
 			if (c.PhoneNumber != "") && (c.FirstName != "") {
 				msg.fm.con = c
 				msg.fm.method = methods.Contact
-				msg.fm.tgr = new(types.TelegramResponse)
+				msg.fm.tgr = new(types.MessageResponse)
 				logs.InterfaceSaved(interfaceContact)
 			} else {
 				err = code21()
@@ -301,7 +302,7 @@ func (msg *Message) AddPoll(p IPoll) error {
 			if (pp.Question != "") && (pp.Options != nil) {
 				msg.fm.poll = pp
 				msg.fm.method = methods.Poll
-				msg.fm.tgr = new(types.TelegramResponse)
+				msg.fm.tgr = new(types.MessageResponse)
 				logs.InterfaceSaved(interfacePoll)
 			} else {
 				err = code21()
@@ -323,16 +324,16 @@ func (msg *Message) AddParameters(param IParameters) error {
 			msg.fm.inf = p
 			if p.StarCount != 0 {
 				msg.fm.method = methods.PaidMedia
-				msg.fm.tgr = new(types.TelegramResponse)
+				msg.fm.tgr = new(types.MessageResponse)
 			} else if p.Emoji != "" {
 				msg.fm.method = methods.Dice
-				msg.fm.tgr = new(types.TelegramResponse)
+				msg.fm.tgr = new(types.MessageResponse)
 			} else if p.Action != "" {
 				msg.fm.method = methods.ChatAction
 				msg.fm.tgr = new(types.SimpleResponse)
 			} else if msg.fm.method == "" {
 				msg.fm.method = methods.Message
-				msg.fm.tgr = new(types.TelegramResponse)
+				msg.fm.tgr = new(types.MessageResponse)
 			}
 			logs.InterfaceSaved(interfaceParam)
 		} else {
@@ -395,6 +396,8 @@ func (msg *Message) AddMethod(method string) error {
 		msg.fm.tgr = data
 	} else if data, ok = inviteLinkResponse[method]; ok {
 		msg.fm.tgr = data
+	} else if method == methods.MediaGroup {
+		msg.fm.tgr = new(types.MediaGroupResponse)
 	} else if method == methods.UserProfilePhotos {
 		msg.fm.tgr = new(types.UserProfilePhotosResponse)
 	} else if (method == methods.File) || (method == methods.UploadSticker) {
@@ -435,12 +438,14 @@ func (msg *Message) AddMethod(method string) error {
 		msg.fm.tgr = new(types.WepAppMsgResponse)
 	} else if method == methods.SavePreparedInlineMessage {
 		msg.fm.tgr = new(types.PreparedInlineMessageResponse)
-	} else if method == methods.CreateInvoiceLink {
+	} else if method == methods.ExportInviteLink || method == methods.CreateInvoiceLink {
 		msg.fm.tgr = new(types.StringResponse)
 	} else if method == methods.GetStarTransactions {
 		msg.fm.tgr = new(types.StarTransactionResponse)
 	} else if method == methods.GetGameHighScores {
 		msg.fm.tgr = new(types.GameHighScoresResponse)
+	} else if method == methods.GetMemberCount {
+		msg.fm.tgr = new(types.IntResponse)
 	} else {
 		err = code07()
 	}

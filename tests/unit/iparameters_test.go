@@ -237,6 +237,11 @@ func putParamWriteErrors(prmtc prmTestContainer, prm formatter.IParameters, p *p
 	p.errors = prmtc.inputErr[i]
 }
 
+func putWriteVideoStartTimestamp(prmtc prmTestContainer, prm formatter.IParameters, p *paramsT, i int) {
+	p.testedFunc = prm.WriteVideoStartTimestamp
+	p.integer = prmtc.inputInt[i]
+}
+
 func (prmtc *prmTestContainer) writeDisableNotification() {
 	prmtc.name = "(IParameters).WriteDisableNotification"
 	prmtc.isExpectedErr = []bool{false, false, true}
@@ -540,10 +545,11 @@ func (prmtc *prmTestContainer) writeOnlyIfBanned() {
 }
 
 func (prmtc *prmTestContainer) writePermissions() {
+	var b = false
 	prmtc.name = "(IParameters).WritePermissions"
-	prmtc.inputPermis = []*types.ChatPermissions{{CanSendMessages: true},
+	prmtc.inputPermis = []*types.ChatPermissions{{CanSendMessages: &b},
 		nil,
-		{CanSendMessages: true}, {CanSendMessages: true}}
+		{CanSendMessages: &b}, {CanSendMessages: &b}}
 	prmtc.isExpectedErr = []bool{false, true, false, true}
 	prmtc.codeErr = []string{"", "20", "", "10"}
 	prmtc.amount, prmtc.until = 4, 2
@@ -559,10 +565,11 @@ func (prmtc *prmTestContainer) writeIndependentChatPermissions() {
 }
 
 func (prmtc *prmTestContainer) writeAdministratorRights() {
+	var b bool
 	prmtc.name = "(IParameters).WriteAdministratorRights"
-	prmtc.inputAdmin = []*types.ChatAdministratorRights{{IsAnonymous: true},
+	prmtc.inputAdmin = []*types.ChatAdministratorRights{{IsAnonymous: &b},
 		nil,
-		{IsAnonymous: true}, {IsAnonymous: true}}
+		{IsAnonymous: &b}, {IsAnonymous: &b}}
 	prmtc.isExpectedErr = []bool{false, true, false, true}
 	prmtc.codeErr = []string{"", "20", "", "10"}
 	prmtc.amount, prmtc.until = 4, 2
@@ -638,6 +645,15 @@ func (prmtc *prmTestContainer) writeErrors() {
 	prmtc.codeErr = []string{"", "20", "5", "", "10"}
 	prmtc.amount, prmtc.until = 5, 3
 	prmtc.buildF = putParamWriteErrors
+}
+
+func (prmtc *prmTestContainer) writeVideoStartTimestamp() {
+	prmtc.name = "(IVideo).WriteStartTimestamp()"
+	prmtc.inputInt = []int{23131, 0, -1231231, 893828, 22}
+	prmtc.isExpectedErr = []bool{false, true, false, true}
+	prmtc.codeErr = []string{"", "20", "20", "", "10"}
+	prmtc.amount, prmtc.until = 5, 3
+	prmtc.buildF = putWriteVideoStartTimestamp
 }
 
 func (prm *paramsT) startTest(part string, i int, t *testing.T) {
@@ -978,6 +994,13 @@ func TestParamWriteInlineMessageID(t *testing.T) {
 func TestParamWriteErrors(t *testing.T) {
 	prmtc := new(prmTestContainer)
 	prmtc.writeErrors()
+	msg := formatter.CreateEmpltyMessage()
+	mainParametersLogic(msg, *prmtc, t)
+}
+
+func TestVideoStartTimestamp(t *testing.T) {
+	prmtc := new(prmTestContainer)
+	prmtc.writeVideoStartTimestamp()
 	msg := formatter.CreateEmpltyMessage()
 	mainParametersLogic(msg, *prmtc, t)
 }

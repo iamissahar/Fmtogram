@@ -84,6 +84,18 @@ func putWriteVideoWidth(vdtc vdTestContainer, vd formatter.IVideo, i int) *video
 	return &videoT{vdtc.name, "", vdtc.inputInt[i], nil, vd.WriteWidth, vdtc.isExpectedErr[i], vdtc.codeErr[i]}
 }
 
+func putWriteCoverStorage(vdtc vdTestContainer, vd formatter.IVideo, i int) *videoT {
+	return &videoT{vdtc.name, vdtc.inputStr[i], 0, nil, vd.WriteCoverStorage, vdtc.isExpectedErr[i], vdtc.codeErr[i]}
+}
+
+func putWriteCoverTelegram(vdtc vdTestContainer, vd formatter.IVideo, i int) *videoT {
+	return &videoT{vdtc.name, vdtc.inputStr[i], 0, nil, vd.WriteCoverTelegram, vdtc.isExpectedErr[i], vdtc.codeErr[i]}
+}
+
+func putWriteCoverInternet(vdtc vdTestContainer, vd formatter.IVideo, i int) *videoT {
+	return &videoT{vdtc.name, vdtc.inputStr[i], 0, nil, vd.WriteCoverInternet, vdtc.isExpectedErr[i], vdtc.codeErr[i]}
+}
+
 func (vdtc *vdTestContainer) writeVideoStorage() {
 	vdtc.name = "(IVideo).WriteVideoStorage"
 	vdtc.inputStr = []string{"../media_test/black.mp4", "", "../media_test/sound.mp3", "../media_test/musk.mp4", "../media_test/black.mp4"}
@@ -209,6 +221,33 @@ func (vdtc *vdTestContainer) writeWidth() {
 	vdtc.codeErr = []string{"", "20", "", "20", "", "10"}
 	vdtc.amount, vdtc.until = 6, 4
 	vdtc.buildF = putWriteVideoWidth
+}
+
+func (vdtc *vdTestContainer) writeCoverStorage() {
+	vdtc.name = "(IVideo).WriteCoverStorage()"
+	vdtc.inputStr = []string{"ASKL:DKL:ASDKL:A", "", "ASL:DA", "KSDKLKSD"}
+	vdtc.isExpectedErr = []bool{false, true, false, true}
+	vdtc.codeErr = []string{"", "20", "", "10"}
+	vdtc.amount, vdtc.until = 4, 2
+	vdtc.buildF = putWriteCoverStorage
+}
+
+func (vdtc *vdTestContainer) writeCoverTelegram() {
+	vdtc.name = "(IVideo).WriteCoverTelegram()"
+	vdtc.inputStr = []string{"ASKL:DKL:ASDKL:A", "", "ASL:DA", "KSDKLKSD"}
+	vdtc.isExpectedErr = []bool{false, true, false, true}
+	vdtc.codeErr = []string{"", "20", "", "10"}
+	vdtc.amount, vdtc.until = 4, 2
+	vdtc.buildF = putWriteCoverTelegram
+}
+
+func (vdtc *vdTestContainer) writeCoverInternet() {
+	vdtc.name = "(IVideo).WriteCoverInternet()"
+	vdtc.inputStr = []string{"ASKL:DKL:ASDKL:A", "", "ASL:DA", "KSDKLKSD"}
+	vdtc.isExpectedErr = []bool{false, true, false, true}
+	vdtc.codeErr = []string{"", "20", "", "10"}
+	vdtc.amount, vdtc.until = 4, 2
+	vdtc.buildF = putWriteCoverInternet
 }
 
 func (vd *videoT) callStrF(testedF func(string) error, t *testing.T) {
@@ -396,6 +435,27 @@ func TestWriteVideoThumbnailID(t *testing.T) {
 func TestWriteVideoWidth(t *testing.T) {
 	vdtc := new(vdTestContainer)
 	vdtc.writeWidth()
+	msg := formatter.CreateEmpltyMessage()
+	mainVideoLogic(msg, *vdtc, t)
+}
+
+func TestWriteCoverStorage(t *testing.T) {
+	vdtc := new(vdTestContainer)
+	vdtc.writeCoverStorage()
+	msg := formatter.CreateEmpltyMessage()
+	mainVideoLogic(msg, *vdtc, t)
+}
+
+func TestWriteCoverTelegram(t *testing.T) {
+	vdtc := new(vdTestContainer)
+	vdtc.writeCoverTelegram()
+	msg := formatter.CreateEmpltyMessage()
+	mainVideoLogic(msg, *vdtc, t)
+}
+
+func TestWriteCoverInternet(t *testing.T) {
+	vdtc := new(vdTestContainer)
+	vdtc.writeCoverInternet()
 	msg := formatter.CreateEmpltyMessage()
 	mainVideoLogic(msg, *vdtc, t)
 }

@@ -10,6 +10,7 @@ import (
 )
 
 const photo, video, audio, document, together = 0, 1, 2, 3, 4
+const link string = "https://t.me/+azuTu6sZ5CBjNzA6"
 
 var parsemode = []string{types.HTML, types.Markdown, types.MarkdownV2}
 var photodata = []string{"../media/tel-aviv.jpg", "AgACAgIAAxkDAAIQOmeVLmLOfKYAAacYIhF6AAERhIoVlSYAAhjzMRvJOKlIR8eAgDzDgJIBAAMCAANtAAM2BA",
@@ -61,6 +62,9 @@ type testcase struct {
 	loc           formatter.ILocation
 	con           formatter.IContact
 	poll          formatter.IPoll
+	link          formatter.ILink
+	st            formatter.ISticker
+	fr            formatter.IForum
 	mg            *mediagroup
 	addMedia      func(*testcase, *testing.T)
 	mediaF        func(*testcase) []func(string) error

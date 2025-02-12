@@ -1,8 +1,6 @@
 package formatter
 
 import (
-	"time"
-
 	"github.com/l1qwie/Fmtogram/types"
 )
 
@@ -33,8 +31,11 @@ type video struct {
 	Duration              int                    `json:"duration,omitempty"`
 	SupportsStreaming     bool                   `json:"supports_streaming,omitempty"`
 	HasSpoiler            bool                   `json:"has_spoiler,omitempty"`
+	Cover                 string                 `json:"cover,omitempty"`
+	StartTimestamp        *int                   `json:"start_timestamp,omitempty"`
 	videoGottenFrom       int
 	thumbnailGottenFrom   int
+	coverGottenFrom       int
 	response              types.Video
 }
 
@@ -173,9 +174,9 @@ type sticker struct {
 }
 
 type forum struct {
-	Name        string `json:"name,omitempty"`
-	IconColor   int    `json:"icon_color,omitempty"`
-	IconEmojiID string `json:"icon_custom_emoji_id,omitempty"`
+	Name        string  `json:"name,omitempty"`
+	IconColor   int     `json:"icon_color,omitempty"`
+	IconEmojiID *string `json:"icon_custom_emoji_id,omitempty"`
 }
 
 type information struct {
@@ -202,15 +203,15 @@ type information struct {
 	ReactionIsBig              bool                           `json:"is_big,omitempty"`
 	Offset                     int                            `json:"offset,omitempty"`
 	Limit                      int                            `json:"limit,omitempty"`
-	EmojiStatusCustomEmojiID   string                         `json:"emoji_status_custom_emoji_id,omitempty"`
+	EmojiStatusCustomEmojiID   *string                        `json:"emoji_status_custom_emoji_id,omitempty"`
 	EmojiStatusExpirationDate  int                            `json:"emoji_status_expiration_date,omitempty"`
 	FileID                     string                         `json:"file_id,omitempty"`
-	UntilDate                  time.Duration                  `json:"until_date,omitempty"`
+	UntilDate                  int64                          `json:"until_date,omitempty"`
 	RevokeMessages             bool                           `json:"revoke_messages,omitempty"`
 	OnlyIfBanned               bool                           `json:"only_if_banned,omitempty"`
 	Permissions                *types.ChatPermissions         `json:"permissions,omitempty"`
 	IndependentChatPermissions bool                           `json:"use_independent_chat_permissions,omitempty"`
-	AdminRights                *types.ChatAdministratorRights `json:",omitempty"`
+	AdminRights                *types.ChatAdministratorRights `json:"rights,omitempty"`
 	CustomTitle                string                         `json:"custom_title,omitempty"`
 	UserID                     int                            `json:"user_id,omitempty"`
 	CallBackQueryID            string                         `json:"callback_query_id,omitempty"`
@@ -223,8 +224,22 @@ type information struct {
 	GiftEntities               []*types.MessageEntity         `json:"text_entities,omitempty"`
 	Description                string                         `json:"custom_description,omitempty"`
 	RemoveCaption              bool                           `json:"remove_caption,omitempty"`
-	response                   types.User
-	responseMessageIDs         []int
+	IsAnonymous                *bool                          `json:"is_anonymous,omitempty"`
+	CanManageChat              *bool                          `json:"can_manage_chat,omitempty"`
+	CanDeleteMessages          *bool                          `json:"can_delete_messages,omitempty"`
+	CanManageVideoChats        *bool                          `json:"can_manage_video_chats,omitempty"`
+	CanRestrictMembers         *bool                          `json:"can_restrict_members,omitempty"`
+	CanPromoteMembers          *bool                          `json:"can_promote_members,omitempty"`
+	CanChangeInfo              *bool                          `json:"can_change_info,omitempty"`
+	CanInviteUsers             *bool                          `json:"can_invite_users,omitempty"`
+	CanPostStories             *bool                          `json:"can_post_stories,omitempty"`
+	CanEditStories             *bool                          `json:"can_edit_stories,omitempty"`
+	CanDeleteStories           *bool                          `json:"can_delete_stories,omitempty"`
+	CanPostMessages            *bool                          `json:"can_post_messages,omitempty"`
+	CanEditMessages            *bool                          `json:"can_edit_messages,omitempty"`
+	CanPinMessages             *bool                          `json:"can_pin_messages,omitempty"`
+	CanManageTopics            *bool                          `json:"can_manage_topics,omitempty"`
+	VideoStartTimestamp        int                            `json:"video_start_timestamp,omitempty"`
 }
 
 type chat struct {
@@ -238,13 +253,13 @@ type chat struct {
 }
 
 type link struct {
-	Name               string        `json:"name,omitempty"`
-	ExpireDate         time.Duration `json:"expire_date,omitempty"`
-	MemberLimit        int           `json:"member_limit,omitempty"`
-	JoinRequest        bool          `json:"creates_join_request,omitempty"`
-	InviteLink         string        `json:"invite_link,omitempty"`
-	SubscriptionPeriod int           `json:"subscription_period,omitempty"`
-	SubscriptionPrice  int           `json:"subscription_price,omitempty"`
+	Name               string `json:"name,omitempty"`
+	ExpireDate         int64  `json:"expire_date,omitempty"`
+	MemberLimit        int    `json:"member_limit,omitempty"`
+	JoinRequest        bool   `json:"creates_join_request,omitempty"`
+	InviteLink         string `json:"invite_link,omitempty"`
+	SubscriptionPeriod int    `json:"subscription_period,omitempty"`
+	SubscriptionPrice  int    `json:"subscription_price,omitempty"`
 }
 
 type bot struct {
@@ -390,38 +405,44 @@ type game struct {
 }
 
 type mediagroup struct {
-	id     int
-	photos [][]types.PhotoSize
-	videos []types.Video
-	audios []types.Audio
-	docs   []types.Document
+	id     string
+	photos [][]*types.PhotoSize
+	videos []*types.Video
+	audios []*types.Audio
+	docs   []*types.Document
 }
 
 type get struct {
 	status    bool
 	errorCode int
 	errorMsg  string
-	chat      types.Chat
-	user      types.User
-	bot       types.User
+	chat      *types.Chat
+	sender    *types.User
 	date      int
 	msgID     int
 	msgIDs    []int
 	replyed   *get
-	msgOrigin types.MessageOrigin
-	photo     []types.PhotoSize
-	audio     types.Audio
-	document  types.Document
-	video     types.Video
-	anim      types.Animation
-	voice     types.Voice
-	vdn       types.VideoNote
-	paid      types.PaidMedia
+	msgOrigin *types.MessageOrigin
+	photo     []*types.PhotoSize
+	audio     *types.Audio
+	document  *types.Document
+	video     *types.Video
+	anim      *types.Animation
+	voice     *types.Voice
+	vdn       *types.VideoNote
+	paid      *types.PaidMedia
 	mg        *mediagroup
-	poll      types.Poll
-	dice      types.Dice
-	uprph     types.UserProfilePhotos
-	file      types.File
-	stickers  []types.Sticker
-	gifts     []types.Gift
+	poll      *types.Poll
+	dice      *types.Dice
+	uprph     *types.UserProfilePhotos
+	file      *types.File
+	stickers  []*types.Sticker
+	gifts     []*types.Gift
+	msg       *types.Message
+	str       string
+	invlink   *types.ChatInviteLink
+	chatinfo  *types.ChatFullInfo
+	members   []*types.ChatMember
+	integer   *int
+	forum     *types.ForumTopic
 }

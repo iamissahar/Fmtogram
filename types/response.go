@@ -104,3 +104,59 @@ type GameHighScoresResponse struct {
 	Ok     bool             `json:"ok"`
 	Result []*GameHighScore `json:"result"`
 }
+
+type Error struct {
+	Ok          bool   `json:"ok"`
+	ErrorCode   int    `json:"error_code"`
+	Description string `json:"description"`
+}
+
+type Telegram struct {
+	Ok     bool      `json:"ok"`
+	Result []*Update `json:"result,omitempty"`
+}
+
+type GetMe struct {
+	Ok     bool  `json:"ok"`
+	Result *User `json:"result,omitempty"`
+}
+
+type MessageResponse struct {
+	Ok     bool     `json:"ok"`
+	Result *Message `json:"result,omitempty"`
+}
+
+type MediaGroupResponse struct {
+	Ok     bool       `json:"ok"`
+	Result []*Message `json:"result,omitempty"`
+}
+
+type MessageIDsResponse struct {
+	Ok     bool         `json:"ok"`
+	Result []*MessageID `json:"result,omitempty"`
+}
+
+type SimpleResponse struct {
+	Ok     bool `json:"ok"`
+	Result bool `json:"result"`
+}
+
+type UserProfilePhotosResponse struct {
+	Ok     bool               `json:"ok"`
+	Result *UserProfilePhotos `json:"result"`
+}
+
+type FileResponse struct {
+	Ok     bool  `json:"ok"`
+	Result *File `json:"result"`
+}
+
+type InviteLinkResponse struct {
+	Ok     bool            `json:"ok"`
+	Result *ChatInviteLink `json:"result"`
+}
+
+type IntResponse struct {
+	Ok     bool `json:"ok"`
+	Result int  `json:"result"`
+}

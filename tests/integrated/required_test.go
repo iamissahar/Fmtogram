@@ -27,6 +27,9 @@ func (tc *testcase) init() {
 	tc.loc = tc.msg.NewLocation()
 	tc.con = tc.msg.NewContact()
 	tc.poll = tc.msg.NewPoll()
+	tc.link = tc.msg.NewLink()
+	tc.st = tc.msg.NewSticker()
+	tc.fr = tc.msg.NewForum()
 	types.DEBUG = true
 	logs.DebugOrInfo()
 }
@@ -483,6 +486,9 @@ func TestCopy(t *testing.T) {
 	t.Run("1Message", copyMessage)
 	t.Run("LotsMessages", copyMessages)
 }
+
+var callbackID string
+
 func TestMePlease(t *testing.T) {
 	var offset int
 	var err error
@@ -500,6 +506,6 @@ func TestMePlease(t *testing.T) {
 }
 
 func init() {
-	// types.BotID = testbotdata.Token
-	types.BotID = testbotdata.Token2
+	types.BotID = testbotdata.Token
+	// types.BotID = testbotdata.Token2
 }

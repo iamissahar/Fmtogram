@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/l1qwie/Fmtogram/fmerrors"
 	"github.com/l1qwie/Fmtogram/logs"
 	"github.com/l1qwie/Fmtogram/types"
 )
@@ -12,76 +11,6 @@ import (
 type emojich struct {
 	permissibleQuantity int
 	amount              int
-}
-
-func code01() error {
-	err := new(fmerrors.FME)
-	err.Code = 1
-	err.String = "there isnt a place to put a data in"
-	return err
-}
-
-func code3() error {
-	err := new(fmerrors.FME)
-	err.Code = 3
-	err.String = "media holder is full"
-	return err
-}
-
-func code5() error {
-	err := new(fmerrors.FME)
-	err.Code = 5
-	err.String = "incorrect data in an input slice"
-	return err
-}
-
-func code07() error {
-	err := new(fmerrors.FME)
-	err.Code = 7
-	err.String = "method isn't available"
-	return err
-}
-
-func code10() error {
-	err := new(fmerrors.FME)
-	err.Code = 10
-	err.String = "the data is already present"
-	return err
-}
-
-func code12() error {
-	err := new(fmerrors.FME)
-	err.Code = 12
-	err.String = "incorrect type of file"
-	return err
-}
-
-func code20() error {
-	err := new(fmerrors.FME)
-	err.Code = 20
-	err.String = "incorrect input data"
-	return err
-}
-
-func code21() error {
-	err := new(fmerrors.FME)
-	err.Code = 21
-	err.String = "missed required data"
-	return err
-}
-
-func code25() error {
-	err := new(fmerrors.FME)
-	err.Code = 25
-	err.String = "incompatible data"
-	return err
-}
-
-func code54() error {
-	err := new(fmerrors.FME)
-	err.Code = 54
-	err.String = "isn't allowed to be united with others"
-	return err
 }
 
 func checkCaption(caption, cell string) error {
@@ -393,8 +322,34 @@ func (vd *video) WriteHasSpoiler() error {
 	return err
 }
 
-func (vd *video) GetResponse() types.Video {
-	return vd.response
+func (vd *video) WriteCoverStorage(path string) error {
+	var err error
+	if err = checkStringValue(path, vd.Cover); err == nil {
+		vd.Cover = path
+		vd.coverGottenFrom = Storage
+		logs.DataWrittenSuccessfully(interfaceVideo, "Cover From Storage")
+	}
+	return err
+}
+
+func (vd *video) WriteCoverTelegram(coverID string) error {
+	var err error
+	if err = checkStringValue(coverID, vd.Cover); err == nil {
+		vd.Cover = coverID
+		vd.coverGottenFrom = Telegram
+		logs.DataWrittenSuccessfully(interfaceVideo, "Cover From Telegram")
+	}
+	return err
+}
+
+func (vd *video) WriteCoverInternet(url string) error {
+	var err error
+	if err = checkStringValue(url, vd.Cover); err == nil {
+		vd.Cover = url
+		vd.coverGottenFrom = Internet
+		logs.DataWrittenSuccessfully(interfaceVideo, "Cover From The Internet")
+	}
+	return err
 }
 
 func (ad *audio) WriteAudioStorage(audio string) error {
@@ -1223,7 +1178,7 @@ func (l *link) WriteExpireDate(date time.Duration) error {
 	var err error
 	if date > 0 {
 		if l.ExpireDate == 0 {
-			l.ExpireDate = date
+			l.ExpireDate = time.Now().Unix() + int64(date.Seconds())
 			logs.DataWrittenSuccessfully(interfaceLink, "Expire Date")
 		} else {
 			err = code10()
@@ -1236,26 +1191,34 @@ func (l *link) WriteExpireDate(date time.Duration) error {
 
 func (l *link) WriteMemberLimit(limit int) error {
 	var err error
-	if limit > 0 && limit <= 99999 {
-		if l.MemberLimit == 0 {
-			l.MemberLimit = limit
-			logs.DataWrittenSuccessfully(interfaceLink, "Member Limit")
+	if !l.JoinRequest {
+		if limit > 0 && limit <= 99999 {
+			if l.MemberLimit == 0 {
+				l.MemberLimit = limit
+				logs.DataWrittenSuccessfully(interfaceLink, "Member Limit")
+			} else {
+				err = code10()
+			}
 		} else {
-			err = code10()
+			err = code20()
 		}
 	} else {
-		err = code20()
+		err = code25()
 	}
 	return err
 }
 
 func (l *link) WriteJoinRequest() error {
 	var err error
-	if !l.JoinRequest {
-		l.JoinRequest = true
-		logs.SettedParam("Join Request", interfaceLink, true)
+	if l.MemberLimit == 0 {
+		if !l.JoinRequest {
+			l.JoinRequest = true
+			logs.SettedParam("Join Request", interfaceLink, true)
+		} else {
+			err = code10()
+		}
 	} else {
-		err = code10()
+		err = code25()
 	}
 	return err
 }
@@ -1615,9 +1578,11 @@ func (f *forum) WriteIconColor(color int) error {
 
 func (f *forum) WriteIconEmojiID(emojiID string) error {
 	var err error
-	if err = checkStringValue(emojiID, f.IconEmojiID); err == nil {
-		f.IconEmojiID = emojiID
+	if f.IconEmojiID == nil {
+		f.IconEmojiID = &emojiID
 		logs.DataWrittenSuccessfully(interfaceForum, "Icon Emoji ID")
+	} else {
+		err = code10()
 	}
 	return err
 }
@@ -2088,9 +2053,11 @@ func (inf *information) WriteLimit(limit int) error {
 
 func (inf *information) WriteEmojiStatusCustomEmojiID(emojiID string) error {
 	var err error
-	if err = checkStringValue(emojiID, inf.EmojiStatusCustomEmojiID); err == nil {
-		inf.EmojiStatusCustomEmojiID = emojiID
+	if inf.EmojiStatusCustomEmojiID == nil {
+		inf.EmojiStatusCustomEmojiID = &emojiID
 		logs.DataWrittenSuccessfully(interfaceParam, "Emoji Status Custom Emoji ID")
+	} else {
+		err = code10()
 	}
 	return err
 }
@@ -2117,7 +2084,7 @@ func (inf *information) WriteUntilDate(date time.Duration) error {
 	var err error
 	if date > 0 {
 		if inf.UntilDate == 0 {
-			inf.UntilDate = date
+			inf.UntilDate = time.Now().Unix() + int64(date.Seconds())
 			logs.DataWrittenSuccessfully(interfaceParam, "Until Date")
 		} else {
 			err = code10()
@@ -2237,10 +2204,10 @@ func (inf *information) WriteShowAlert() error {
 	return err
 }
 
-func (inf *information) WriteURL(url string) error {
+func (inf *information) WriteURL(botnickname, url string) error {
 	var err error
 	if err = checkStringValue(url, inf.Url); err == nil {
-		inf.Url = url
+		inf.Url = fmt.Sprintf("t.me/%s?start=%s", botnickname, url)
 		logs.DataWrittenSuccessfully(interfaceParam, "URL")
 	}
 	return err
@@ -2314,25 +2281,22 @@ func (inf *information) WriteRemoveCaption() error {
 	return err
 }
 
-func (inf *information) GetResponse() types.User {
-	return inf.response
-}
-
-func (inf *information) GetMessageIDs() []int {
-	return inf.responseMessageIDs
+func (inf *information) WriteVideoStartTimestamp(seconds int) error {
+	var err error
+	if err = checkIntegerValue(seconds, inf.VideoStartTimestamp); err == nil {
+		inf.VideoStartTimestamp = seconds
+		logs.DataWrittenSuccessfully(interfaceParam, "Video Start Timestamp")
+	}
+	return err
 }
 
 func (ch *chat) WriteChatID(chatID int) error {
 	var err error
-	if chatID > 0 {
-		if ch.ID == nil {
-			ch.ID = chatID
-			logs.DataWrittenSuccessfully(interfaceChat, "Chat ID")
-		} else {
-			err = code10()
-		}
+	if ch.ID == nil {
+		ch.ID = chatID
+		logs.DataWrittenSuccessfully(interfaceChat, "Chat ID")
 	} else {
-		err = code20()
+		err = code10()
 	}
 	return err
 }
