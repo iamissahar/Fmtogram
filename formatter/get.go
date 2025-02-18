@@ -141,3 +141,23 @@ func (g *get) Integer() *int {
 func (g *get) Forum() *types.ForumTopic {
 	return g.forum
 }
+
+func (g *get) Boosts() []*types.ChatBoost {
+	return g.boosts
+}
+
+func (g *get) BusinessConnection() *types.BusinessConnection {
+	return g.bconn
+}
+
+func (g *get) Commands() []*types.BotCommand {
+	return g.botcomm
+}
+
+func (g *get) MenuButton() *types.MenuButton {
+	return g.menuButton
+}
+
+func (g *get) AdminRights() *types.ChatAdministratorRights {
+	return g.admin
+}

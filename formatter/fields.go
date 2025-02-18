@@ -404,36 +404,24 @@ func (*videonote) uniqueConst() int {
 	return constVideoNote
 }
 
-func (st *sticker) multipartFields(writer *multipart.Writer, group *[]interface{}, i int, input bool) error {
+func (st *sticker) multipartFields(writer *multipart.Writer, group *[]interface{}, i int, multistickers bool) error {
 	var err error
 	var body []byte
-	if input {
+	if multistickers {
 		if st.stickerGottenFrom == Storage {
 			err = writeFileToMultipart(writer, st.Sticker, st.Sticker)
 			st.Sticker = fmt.Sprintf("attach://%s", st.Sticker)
+		} else {
+			err = field(writer, "sticker", st.Sticker)
 		}
 	} else {
-		if st.stickerGottenFrom != Storage {
-			err = field(writer, "sticker", st.Sticker)
-		} else {
-			err = writeFileToMultipart(writer, "sticker", st.Sticker)
-		}
+		err = writeFileToMultipart(writer, "sticker", st.Sticker)
 	}
 	if err == nil && st.Emoji != "" {
 		err = field(writer, "emoji", st.Emoji)
 	}
-	if err == nil && st.Format != "" {
+	if err == nil && st.StickerFormat != "" {
 		err = field(writer, "sticker_format", st.Format)
-		err = field(writer, "format", st.Format)
-	}
-	if err == nil && st.StickerType != "" {
-		err = field(writer, "sticker_type", st.Format)
-	}
-	if err == nil && st.NeedsRepainting {
-		err = field(writer, "needs_repainting", "True")
-	}
-	if err == nil && st.Name != "" {
-		err = field(writer, "name", st.Name)
 	}
 	if err == nil && st.OldSticker != "" {
 		err = field(writer, "old_sticker", st.OldSticker)
@@ -456,8 +444,8 @@ func (st *sticker) multipartFields(writer *multipart.Writer, group *[]interface{
 	if err == nil && st.Thumbnail != "" {
 		err = addThumbnail(writer, st.Thumbnail, st.thumbnailGottenFrom)
 	}
-	if err == nil && st.ThumbnailFormat != "" {
-		err = field(writer, "format", st.ThumbnailFormat)
+	if err == nil && st.Format != "" {
+		err = field(writer, "format", st.Format)
 	}
 	if group != nil {
 		(*group)[i] = st
@@ -465,10 +453,10 @@ func (st *sticker) multipartFields(writer *multipart.Writer, group *[]interface{
 	return err
 }
 
-func putGroup(writer *multipart.Writer, group []interface{}) error {
-	mediaJSON, err := json.Marshal(group)
-	if err == nil && len(mediaJSON) != 0 {
-		err = writer.WriteField("media", string(mediaJSON))
+func putGroup(writer *multipart.Writer, group []interface{}, groupname string) error {
+	body, err := json.Marshal(group)
+	if err == nil && len(body) != 0 {
+		err = writer.WriteField(groupname, string(body))
 	}
 	return err
 }
@@ -486,6 +474,15 @@ func (inf *information) multipartFields(writer *multipart.Writer) error {
 	var body []byte
 	if inf.MessageThreadID != 0 {
 		err = field(writer, "message_thread_id", fmt.Sprint(inf.MessageThreadID))
+	}
+	if err == nil && inf.SetName != "" {
+		err = field(writer, "name", inf.SetName)
+	}
+	if err == nil && inf.SetTitle != "" {
+		err = field(writer, "title", inf.SetTitle)
+	}
+	if err == nil && inf.NeedsRepainting {
+		err = field(writer, "needs_repainting", "True")
 	}
 	if err == nil && inf.StarCount != 0 {
 		err = field(writer, "star_count", fmt.Sprintf("%d", inf.StarCount))

@@ -475,9 +475,13 @@ func (msg *Message) AddLink(alink ILink) error {
 func (msg *Message) AddSticker(st ISticker) error {
 	var err error
 	if s, ok := st.(*sticker); ok {
-		if msg.fm.sticker == nil {
+		if msg.fm.sticker.storage[msg.fm.sticker.i] == nil {
 			if (s.Sticker != "") || (s.SetName != "") {
-				msg.fm.sticker = s
+				if s.stickerGottenFrom == Storage {
+					msg.fm.sticker.atLeastOnce = true
+				}
+				msg.fm.sticker.storage[msg.fm.sticker.i] = s
+				msg.fm.sticker.i++
 				if s.GiftID != "" {
 					msg.fm.method = methods.Gift
 				} else {
@@ -515,8 +519,14 @@ func (msg *Message) AddBot(b IBot) error {
 	var err error
 	if bb, ok := b.(*bot); ok {
 		if msg.fm.bot == nil {
-			msg.fm.bot = bb
-			logs.InterfaceSaved(interfaceBot)
+			if ((bb.Name != nil) && (*bb.Name == "" && bb.Language == nil)) ||
+				((bb.Description != nil) && (*bb.Description == "" && bb.Language == nil)) ||
+				((bb.ShortDescription != nil) && (*bb.ShortDescription == "" && bb.Language == nil)) {
+				err = code25()
+			} else {
+				msg.fm.bot = bb
+				logs.InterfaceSaved(interfaceBot)
+			}
 		} else {
 			err = code10()
 		}

@@ -27,6 +27,8 @@ var voicedata = []string{"../media/dimaJOSKAproNATO.ogg", "AwACAgIAAxkDAAIXd2ehC
 	"https://s33.aconvert.com/convert/p3r68-cdx67/0ye4j-z7u9r.ogg"}
 var videoNdata = []string{"../media/black.mp4", "BAACAgIAAxkDAAIX02ehEJZfVRFXkXTl8wLAQJ5AXH41AALWYgAC5hcJSX6PBZ_I_kmPNgQ",
 	"https://www.pexels.com/download/video/6646588/"}
+var stickerdata = []string{"../media/sticker.webp", "CAACAgIAAxkDAAIgAmezKoICMX7mpaH9tc2DQmVAlrMdAAJlZAACtNeZSeB_i54M8zfCNgQ",
+	"https://www.gstatic.com/webp/gallery/1.webp"}
 
 var thumbaudio = []string{"../media/tel-aviv.jpg", "AAMCAgADFQdnoiiNB7zXyg0V7huX2UfbdSntfQAC1WUAAuYXGUlT53xV1fcwUwEAB20AAzYE"}
 var thumbdoc = []string{"../media/tel-aviv.jpg", "AAMCAgADFQdnoibHVo7kMiNJMPFI0gzlLHwXkAACuGUAAuYXGUni1-hAq6oqQQEAB20AAzYE"}
@@ -65,6 +67,7 @@ type testcase struct {
 	link          formatter.ILink
 	st            formatter.ISticker
 	fr            formatter.IForum
+	bot           formatter.IBot
 	mg            *mediagroup
 	addMedia      func(*testcase, *testing.T)
 	mediaF        func(*testcase) []func(string) error
@@ -108,6 +111,10 @@ func videoNArr(tc *testcase) []func(string) error {
 	return []func(string) error{tc.vdn.WriteVideoNoteStorage, tc.vdn.WriteVideoNoteTelegram, tc.vdn.WriteVideoNoteInternet}
 }
 
+func stickerArr(tc *testcase) []func(string) error {
+	return []func(string) error{tc.st.WriteStickerStorage, tc.st.WriteStickerTelegram, tc.st.WriteStickerInternet}
+}
+
 func addPhoto(tc *testcase, t *testing.T) {
 	if err := tc.msg.AddPhoto(tc.ph); err != nil {
 		t.Fatal(err)
@@ -146,6 +153,12 @@ func addVoice(tc *testcase, t *testing.T) {
 
 func addVideoNote(tc *testcase, t *testing.T) {
 	if err := tc.msg.AddVideoNote(tc.vdn); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func addSticker(tc *testcase, t *testing.T) {
+	if err := tc.msg.AddSticker(tc.st); err != nil {
 		t.Fatal(err)
 	}
 }
@@ -1613,4 +1626,66 @@ func chactReq(t *testing.T) {
 
 func TestChatAction(t *testing.T) {
 	t.Run("Req", chactReq)
+}
+
+func stickerCommon(tc *testcase, t *testing.T) {
+	var err error
+	if err = tc.ch.WriteChatID(738070596); err != nil {
+		t.Fatal(err)
+	}
+	if err = tc.st.WriteAssociatedEmoji("😁"); err != nil {
+		t.Fatal(err)
+	}
+	if err = tc.prm.WriteDisableNotification(); err != nil {
+		t.Fatal(err)
+	}
+	if err = tc.prm.WriteProtectContent(); err != nil {
+		t.Fatal(err)
+	}
+	if err = tc.prm.WriteMessageEffectID("5107584321108051014"); err != nil {
+		t.Fatal(err)
+	}
+	if err = tc.prm.WriteReplyParameters(&types.ReplyParameters{MessageID: testbotdata.MessageID[types.BotID], ChatID: 738070596}); err != nil {
+		t.Fatal(err)
+	}
+	if err = tc.msg.AddChat(tc.ch); err != nil {
+		t.Fatal(err)
+	}
+	if err = tc.msg.AddParameters(tc.prm); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func stickerReq(t *testing.T) {
+	tc := new(testcase)
+	tc.addMedia = addSticker
+	tc.mediaF = stickerArr
+	tc.mediadata = stickerdata
+	tc.sendMediaReq(t)
+}
+
+func stickerAll(t *testing.T) {
+	tc := new(testcase)
+	tc.addMedia = addSticker
+	tc.mediaF = stickerArr
+	tc.mediadata = stickerdata
+	tc.common = stickerCommon
+	for i := 0; i < 3; i++ {
+		if i == 0 {
+			t.Log("Test Sticker With Inline Keyboard")
+			tc.kbF = tc.inlineKb
+		} else if i == 1 {
+			t.Log("Test Sticker With ReplyMarkup Keyboard")
+			tc.kbF = tc.replyKb
+		} else {
+			t.Log("Test Sticker With ForceReply Keyboard")
+			tc.kbF = tc.forceKb
+		}
+		tc.sendMediaAll(t)
+	}
+}
+
+func TestSticker(t *testing.T) {
+	t.Run("Req", stickerReq)
+	t.Run("All", stickerAll)
 }

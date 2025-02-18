@@ -14,7 +14,6 @@ type photo struct {
 	ShowCaptionAboveMedia bool                   `json:"show_caption_above_media,omitempty"`
 	HasSpoiler            bool                   `json:"has_spoiler,omitempty"`
 	gottenFrom            int
-	response              [4]types.PhotoSize
 }
 
 type video struct {
@@ -36,7 +35,6 @@ type video struct {
 	videoGottenFrom       int
 	thumbnailGottenFrom   int
 	coverGottenFrom       int
-	response              types.Video
 }
 
 type audio struct {
@@ -52,7 +50,6 @@ type audio struct {
 	Title               string                 `json:"title,omitempty"`
 	audioGottenFrom     int
 	thumbnailGottenFrom int
-	response            types.Audio
 }
 
 type document struct {
@@ -80,7 +77,6 @@ type animation struct {
 	HasSpoiler          bool   `json:"has_spoiler,omitempty"`
 	animationGottenFrom int
 	thumbnailGottenFrom int
-	response            types.Animation
 }
 
 type voice struct {
@@ -89,7 +85,6 @@ type voice struct {
 	Voice      string `json:"voice,omitempty"`
 	Duration   int    `json:"duration,omitempty"`
 	gottenFrom int
-	response   types.Voice
 }
 
 type videonote struct {
@@ -101,7 +96,6 @@ type videonote struct {
 	Thumbnail           string `json:"thumbnail,omitempty"`
 	videoGottenFrom     int
 	thumbnailGottenFrom int
-	response            types.VideoNote
 }
 
 type location struct {
@@ -117,7 +111,6 @@ type location struct {
 	FoursquareType       string  `json:"foursquare_type,omitempty"`
 	GooglePlaceID        string  `json:"google_place_id,omitempty"`
 	GooglePlaceType      string  `json:"google_place_type,omitempty"`
-	response             types.Venue
 }
 
 type contact struct {
@@ -126,7 +119,6 @@ type contact struct {
 	LastName    string `json:"last_name,omitempty"`
 	UserID      int    `json:"user_id,omitempty"`
 	Vcard       string `json:"vcard,omitempty"`
-	response    types.Contact
 }
 
 type poll struct {
@@ -144,30 +136,24 @@ type poll struct {
 	OpenPeriod           int                    `json:"open_period,omitempty"`
 	CloseDate            int                    `json:"close_date,omitempty"`
 	IsClosed             bool                   `json:"is_closed,omitempty"`
-	response             types.Poll
 }
 
 type sticker struct {
 	SetName             string              `json:"sticker_set_name,omitempty"`
-	Sticker             string              `jsno:"sticker"`
-	Stickers            [50]string          `json:"stickers"`
-	Name                string              `json:"name"`
-	Emoji               string              `json:"emoji"`
-	Emojies             []string            `json:"emoji_list"`
-	EmojiID             string              `json:"custom_emoji_id"`
-	EmojiIDs            []string            `json:"custom_emoji_ids"`
-	Format              string              `json:"sticker_format"`
-	Title               string              `json:"title"`
-	StickerType         string              `json:"sticker_type"`
-	NeedsRepainting     bool                `json:"needs_repainting"`
-	Position            string              `json:"position"`
-	OldSticker          string              `json:"old_sticker"`
-	Keywords            []string            `json:"keywords"`
-	MaskPosition        *types.MaskPosition `json:"mask_position"`
-	Thumbnail           string              `json:"thumbnail"`
-	ThumbnailFormat     string              `json:"format"`
-	GiftID              string              `json:"gift_id"`
-	PayForUpgrade       bool                `json:"pay_for_upgrade"`
+	Sticker             string              `json:"sticker,omitempty"`
+	Emoji               string              `json:"emoji,omitempty"`
+	Emojies             []string            `json:"emoji_list,omitempty"`
+	EmojiID             string              `json:"custom_emoji_id,omitempty"`
+	EmojiIDs            []string            `json:"custom_emoji_ids,omitempty"`
+	StickerFormat       string              `json:"sticker_format,omitempty"`
+	Position            string              `json:"position,omitempty"`
+	OldSticker          string              `json:"old_sticker,omitempty"`
+	Keywords            []string            `json:"keywords,omitempty"`
+	MaskPosition        *types.MaskPosition `json:"mask_position,omitempty"`
+	Thumbnail           string              `json:"thumbnail,omitempty"`
+	Format              string              `json:"format,omitempty"`
+	GiftID              string              `json:"gift_id,omitempty"`
+	PayForUpgrade       bool                `json:"pay_for_upgrade,omitempty"`
 	stickerGottenFrom   int
 	thumbnailGottenFrom int
 	thumbnailType       string
@@ -240,6 +226,10 @@ type information struct {
 	CanPinMessages             *bool                          `json:"can_pin_messages,omitempty"`
 	CanManageTopics            *bool                          `json:"can_manage_topics,omitempty"`
 	VideoStartTimestamp        int                            `json:"video_start_timestamp,omitempty"`
+	SetName                    string                         `json:"name,omitempty"`
+	SetTitle                   string                         `json:"title,omitempty"`
+	StickerType                string                         `json:"sticker_type,omitempty"`
+	NeedsRepainting            bool                           `json:"needs_repainting,omitempty"`
 }
 
 type chat struct {
@@ -249,7 +239,6 @@ type chat struct {
 	SenderChatID         int         `json:"sender_chat_id,omitempty"`
 	Title                string      `json:"title,omitempty"`
 	Description          string      `json:"description,omitempty"`
-	response             types.Chat
 }
 
 type link struct {
@@ -265,10 +254,10 @@ type link struct {
 type bot struct {
 	Commands         []*types.BotCommand            `json:"commands,omitempty"`
 	Scope            *types.BotCommandScope         `json:"scope,omitempty"`
-	Language         string                         `json:"language_code,omitempty"`
-	Name             string                         `json:"name,omitempty"`
-	Description      string                         `json:"description,omitempty"`
-	ShortDescription string                         `json:"short_description,omitempty"`
+	Language         *string                        `json:"language_code,omitempty"`
+	Name             *string                        `json:"name,omitempty"`
+	Description      *string                        `json:"description,omitempty"`
+	ShortDescription *string                        `json:"short_description,omitempty"`
 	MenuButtom       *types.MenuButton              `json:"menu_button,omitempty"`
 	Rights           *types.ChatAdministratorRights `json:"rights,omitempty"`
 	ForChannels      bool                           `json:"for_channels,omitempty"`
@@ -413,36 +402,42 @@ type mediagroup struct {
 }
 
 type get struct {
-	status    bool
-	errorCode int
-	errorMsg  string
-	chat      *types.Chat
-	sender    *types.User
-	date      int
-	msgID     int
-	msgIDs    []int
-	replyed   *get
-	msgOrigin *types.MessageOrigin
-	photo     []*types.PhotoSize
-	audio     *types.Audio
-	document  *types.Document
-	video     *types.Video
-	anim      *types.Animation
-	voice     *types.Voice
-	vdn       *types.VideoNote
-	paid      *types.PaidMedia
-	mg        *mediagroup
-	poll      *types.Poll
-	dice      *types.Dice
-	uprph     *types.UserProfilePhotos
-	file      *types.File
-	stickers  []*types.Sticker
-	gifts     []*types.Gift
-	msg       *types.Message
-	str       string
-	invlink   *types.ChatInviteLink
-	chatinfo  *types.ChatFullInfo
-	members   []*types.ChatMember
-	integer   *int
-	forum     *types.ForumTopic
+	status     bool
+	errorCode  int
+	errorMsg   string
+	chat       *types.Chat
+	sender     *types.User
+	date       int
+	msgID      int
+	msgIDs     []int
+	replyed    *get
+	msgOrigin  *types.MessageOrigin
+	photo      []*types.PhotoSize
+	audio      *types.Audio
+	document   *types.Document
+	video      *types.Video
+	anim       *types.Animation
+	voice      *types.Voice
+	vdn        *types.VideoNote
+	paid       *types.PaidMedia
+	mg         *mediagroup
+	poll       *types.Poll
+	dice       *types.Dice
+	uprph      *types.UserProfilePhotos
+	file       *types.File
+	stickers   []*types.Sticker
+	gifts      []*types.Gift
+	msg        *types.Message
+	str        string
+	invlink    *types.ChatInviteLink
+	chatinfo   *types.ChatFullInfo
+	members    []*types.ChatMember
+	integer    *int
+	forum      *types.ForumTopic
+	boosts     []*types.ChatBoost
+	bconn      *types.BusinessConnection
+	botcomm    []*types.BotCommand
+	menuButton *types.MenuButton
+	admin      *types.ChatAdministratorRights
+	stickerset *types.StickerSet
 }

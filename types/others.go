@@ -402,24 +402,10 @@ type ReplyParameters struct {
 	QuotePosition            int              `json:"quote_position,omitempty"`
 }
 
-type MenuButtonCommands struct {
-	Type string `json:"type"`
-}
-
-type MenuButtonWebApp struct {
+type MenuButton struct {
 	Type   string      `json:"type"`
 	Text   string      `json:"text"`
 	WebApp *WebAppInfo `json:"web_app"`
-}
-
-type MenuButtonDefault struct {
-	Type string `json:"type"`
-}
-
-type MenuButton struct {
-	*MenuButtonCommands
-	*MenuButtonWebApp
-	*MenuButtonDefault
 }
 
 type Update struct {

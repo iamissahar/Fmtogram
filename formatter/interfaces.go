@@ -54,6 +54,11 @@ type IGet interface {
 	Members() []*types.ChatMember
 	Integer() *int
 	Forum() *types.ForumTopic
+	Boosts() []*types.ChatBoost
+	BusinessConnection() *types.BusinessConnection
+	Commands() []*types.BotCommand
+	MenuButton() *types.MenuButton
+	AdminRights() *types.ChatAdministratorRights
 }
 
 type IPhoto interface {
@@ -91,9 +96,6 @@ type IPhoto interface {
 
 	// Doesn't recieve anything. If the function was called, the photo will be blured
 	WriteHasSpoiler() error
-
-	// You can call this function after calling Send(). It returns you an array with some data about the photo you just sent. 4 is the biggest amount of data. Sometimes there might be nil
-	GetResponse() [4]types.PhotoSize
 }
 
 type IVideo interface {
@@ -167,9 +169,6 @@ type IAudio interface {
 	WriteThumbnailID(thimbnailID string) error
 
 	WriteTitle(title string) error
-
-	// You can call this function after calling Send(). It returns you a structure with some data about the audio you just sent
-	GetResponse() types.Audio
 }
 
 type IDocument interface {
@@ -196,9 +195,6 @@ type IDocument interface {
 	WriteThumbnail(path string) error
 
 	WriteThumbnailID(thimbnailID string) error
-
-	// You can call this function after calling Send(). It returns you a structure with some data about the document you just sent
-	GetResponse() types.Document
 }
 
 type IAnimation interface {
@@ -228,9 +224,6 @@ type IAnimation interface {
 
 	// Doesn't recieve anything. If the function was called, the photo will be blured
 	WriteHasSpoiler() error
-
-	// You can call this function after calling Send(). It returns you a structure with some data about the animation you just sent
-	GetResponse() types.Animation
 }
 
 type IVoice interface {
@@ -245,9 +238,6 @@ type IVoice interface {
 
 	// Duration of sent voice in seconds
 	WriteDuration(duration int) error
-
-	// You can call this function after calling Send(). It returns you a structure with some data about the voice you just sent
-	GetResponse() types.Voice
 }
 
 type IVideoNote interface {
@@ -271,9 +261,6 @@ type IVideoNote interface {
 
 	// Receives a Telegram ID of a thumbnail
 	WriteThumbnailID(thumbnailID string) error
-
-	// You can call this function after calling Send(). It returns you a structure with some data about the video-note you just sent
-	GetResponse() types.VideoNote
 }
 
 type ILocation interface {
@@ -314,8 +301,6 @@ type ILocation interface {
 
 	// Google Places type of the venue. (See https://developers.google.com/maps/documentation/places/web-service/supported_types)
 	WriteGooglePlaceType(googlePlaceType string) error
-
-	GetResponse() types.Venue
 }
 
 type IContact interface {
@@ -330,8 +315,6 @@ type IContact interface {
 
 	// Recieves additional data about the contact in the form of a vCard, 0-2048 bytes. What vCard is: https://en.wikipedia.org/wiki/VCard
 	WriteVCard(vcard string) error
-
-	GetResponse() types.Contact
 }
 
 type IPoll interface {
@@ -373,14 +356,9 @@ type IPoll interface {
 
 	// Call it only if the poll needs to be immediately closed. This can be useful for poll preview.
 	WriteClosed() error
-
-	GetResponse() types.Poll
 }
 
 type ISticker interface {
-	// Name of the sticker set to be set as the group sticker set
-	WriteSetName(name string) error
-
 	WriteStickerStorage(path string) error
 
 	WriteStickerTelegram(stickerID string) error
@@ -396,12 +374,6 @@ type ISticker interface {
 	WriteEmojiIDs(emojiIDs []string) error
 
 	WriteFormat(format string) error
-
-	WriteTitle(title string) error
-
-	WriteStickerType(stickertype string) error
-
-	WriteNeedsRepainting() error
 
 	// New sticker position in the set, zero-based
 	WritePosition(pos string) error
@@ -424,10 +396,6 @@ type ISticker interface {
 	WriteGiftID(giftID string) error
 
 	WritePayForUpgrade() error
-
-	// GetSet() types.StickerSet
-
-	// GetStickers() []types.Sticker
 }
 
 type IForum interface {
@@ -464,18 +432,6 @@ type IBot interface {
 	WriteRights(rights *types.ChatAdministratorRights) error
 
 	WriteForChannels() error
-
-	// GetCommands() types.BotCommand
-
-	// GetName() string
-
-	// GetDescription() string
-
-	// GetShortDescription() string
-
-	// GetMenuButtonI() types.MenuButton
-
-	// GetAdminRights() types.ChatAdministratorRights
 }
 
 type IResult interface {
@@ -545,10 +501,6 @@ type IInlineMode interface {
 	WriteAllowGroupChats() error
 
 	WriteAllowChannelChats() error
-
-	GetSentWebAppMessage() types.SentWebAppMessage
-
-	GetPreparedInlineMessage() types.PreparedInlineMessage
 }
 
 type IParameters interface {
@@ -673,6 +625,14 @@ type IParameters interface {
 	WriteRemoveCaption() error
 
 	WriteVideoStartTimestamp(seconds int) error
+
+	WriteSetName(name string) error
+
+	WriteSetTitle(title string) error
+
+	WriteStickerType(stickertype string) error
+
+	WriteNeedsRepainting() error
 }
 
 type IChat interface {
@@ -704,19 +664,6 @@ type IChat interface {
 
 	// New chat description, 0-255 characters
 	WriteDescription(description string) error
-
-	// You can call this function after calling Send(). It returns you a structure with some data about the chat you just sent a message to
-	GetResponse() types.Chat
-
-	// GetChat() types.ChatFullInfo
-
-	// GetMembers() []types.ChatMember
-
-	// GetMemberAmount() int
-
-	// GetUsersBoosts() types.UserChatBoosts
-
-	// GetBusinessConnection() types.BusinessConnection
 }
 
 type ILink interface {
@@ -952,12 +899,6 @@ type IPayment interface {
 	WriteTelegramPaymentChargeID(id string) error
 
 	WriteIsCanceled() error
-
-	// GetInvoiceLink() string
-
-	// GetStarTransactions() types.StarTransactions
-
-	// GetUpdate() types.Update
 }
 
 type IGame interface {

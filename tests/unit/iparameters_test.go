@@ -242,6 +242,25 @@ func putWriteVideoStartTimestamp(prmtc prmTestContainer, prm formatter.IParamete
 	p.integer = prmtc.inputInt[i]
 }
 
+func putSetName(prmtc prmTestContainer, prm formatter.IParameters, p *paramsT, i int) {
+	p.testedFunc = prm.WriteSetName
+	p.str = prmtc.inputStr[i]
+}
+
+func putSetTitle(prmtc prmTestContainer, prm formatter.IParameters, p *paramsT, i int) {
+	p.testedFunc = prm.WriteSetTitle
+	p.str = prmtc.inputStr[i]
+}
+
+func putStikerType(prmtc prmTestContainer, prm formatter.IParameters, p *paramsT, i int) {
+	p.testedFunc = prm.WriteStickerType
+	p.str = prmtc.inputStr[i]
+}
+
+func putNeedsRepainting(prmtc prmTestContainer, prm formatter.IParameters, p *paramsT, i int) {
+	p.testedFunc = prm.WriteNeedsRepainting
+}
+
 func (prmtc *prmTestContainer) writeDisableNotification() {
 	prmtc.name = "(IParameters).WriteDisableNotification"
 	prmtc.isExpectedErr = []bool{false, false, true}
@@ -648,12 +667,47 @@ func (prmtc *prmTestContainer) writeErrors() {
 }
 
 func (prmtc *prmTestContainer) writeVideoStartTimestamp() {
-	prmtc.name = "(IVideo).WriteStartTimestamp()"
+	prmtc.name = "(IParameters).WriteStartTimestamp()"
 	prmtc.inputInt = []int{23131, 0, -1231231, 893828, 22}
 	prmtc.isExpectedErr = []bool{false, true, false, true}
 	prmtc.codeErr = []string{"", "20", "20", "", "10"}
 	prmtc.amount, prmtc.until = 5, 3
 	prmtc.buildF = putWriteVideoStartTimestamp
+}
+
+func (prmtc *prmTestContainer) writeSetName() {
+	prmtc.name = "(IParameters).WriteSetName()"
+	prmtc.inputStr = []string{"K:LASDKASKL:DAK:LSD", "", "Name", "there isn't a name"}
+	prmtc.isExpectedErr = []bool{false, true, false, true}
+	prmtc.codeErr = []string{"", "20", "", "10"}
+	prmtc.amount, prmtc.until = 4, 2
+	prmtc.buildF = putSetName
+}
+
+func (prmtc *prmTestContainer) writeSetTitle() {
+	prmtc.name = "(IParameters).WriteTitle()"
+	prmtc.inputStr = []string{"static", "", ":", strings.Repeat("h", 64), strings.Repeat("h", 65), "asdasd", "asdkljalksd"}
+	prmtc.isExpectedErr = []bool{false, true, false, false, true, false, true}
+	prmtc.codeErr = []string{"", "20", "", "", "20", "", "10"}
+	prmtc.amount, prmtc.until = 7, 5
+	prmtc.buildF = putSetTitle
+}
+
+func (prmtc *prmTestContainer) writeStickerType() {
+	prmtc.name = "(ISticker).WriteStickerType()"
+	prmtc.inputStr = []string{"regular", "mask", "custom_emoji", "", ":", "a;lsdl;kasdl;aadasd", "custom_emoji", "custom_emoji"}
+	prmtc.isExpectedErr = []bool{false, false, false, true, true, true, false, true}
+	prmtc.codeErr = []string{"", "", "", "20", "20", "20", "", "10"}
+	prmtc.amount, prmtc.until = 8, 6
+	prmtc.buildF = putStikerType
+}
+
+func (prmtc *prmTestContainer) writeNeedsRepainting() {
+	prmtc.name = "(ISticker).WriteNeedsRepainting()"
+	prmtc.isExpectedErr = []bool{false, false, true}
+	prmtc.codeErr = []string{"", "", "10"}
+	prmtc.amount, prmtc.until = 3, 1
+	prmtc.buildF = putNeedsRepainting
 }
 
 func (prm *paramsT) startTest(part string, i int, t *testing.T) {
@@ -1001,6 +1055,34 @@ func TestParamWriteErrors(t *testing.T) {
 func TestVideoStartTimestamp(t *testing.T) {
 	prmtc := new(prmTestContainer)
 	prmtc.writeVideoStartTimestamp()
+	msg := formatter.CreateEmpltyMessage()
+	mainParametersLogic(msg, *prmtc, t)
+}
+
+func TestSetName(t *testing.T) {
+	prmtc := new(prmTestContainer)
+	prmtc.writeSetName()
+	msg := formatter.CreateEmpltyMessage()
+	mainParametersLogic(msg, *prmtc, t)
+}
+
+func TestSetTitle(t *testing.T) {
+	prmtc := new(prmTestContainer)
+	prmtc.writeSetTitle()
+	msg := formatter.CreateEmpltyMessage()
+	mainParametersLogic(msg, *prmtc, t)
+}
+
+func TestStickerWriteStickerType(t *testing.T) {
+	prmtc := new(prmTestContainer)
+	prmtc.writeStickerType()
+	msg := formatter.CreateEmpltyMessage()
+	mainParametersLogic(msg, *prmtc, t)
+}
+
+func TestStickerWriteNeedsRepainting(t *testing.T) {
+	prmtc := new(prmTestContainer)
+	prmtc.writeNeedsRepainting()
 	msg := formatter.CreateEmpltyMessage()
 	mainParametersLogic(msg, *prmtc, t)
 }

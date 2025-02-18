@@ -1,6 +1,7 @@
 package integrated
 
 import (
+	"math/rand"
 	"os"
 	"testing"
 	"time"
@@ -1237,6 +1238,171 @@ func TestAnswerCallBack(t *testing.T) {
 	}
 	send(tc.msg, t)
 	if code, msg := tc.get.Error(); code != 400 && msg != "Bad Request: query is too old and response timeout expired or query ID is invalid" {
+		t.Fatal(msg)
+	}
+}
+
+func TestGetBoosts(t *testing.T) {
+	var err error
+	tc := new(testcase)
+	tc.init()
+	if err = tc.ch.WriteChatID(-1002309471573); err != nil {
+		t.Fatal(err)
+	}
+	if err = tc.prm.WriteUserID(8033103339); err != nil {
+		t.Fatal(err)
+	}
+	if err = tc.msg.AddChat(tc.ch); err != nil {
+		t.Fatal(err)
+	}
+	if err = tc.msg.AddParameters(tc.prm); err != nil {
+		t.Fatal(err)
+	}
+	if err = tc.msg.AddMethod(methods.GetUsersBoosts); err != nil {
+		t.Fatal(err)
+	}
+	send(tc.msg, t)
+	if code, msg := tc.get.Error(); code != 0 && msg != "" {
+		t.Fatal(msg)
+	}
+}
+
+func TestSetCommands(t *testing.T) {
+	var err error
+	tc := new(testcase)
+	tc.init()
+	if err = tc.bot.WriteCommands([]*types.BotCommand{{"/start", "Hello!"}, {"/help", "Help me!"}}); err != nil {
+		t.Fatal(err)
+	}
+	if err = tc.bot.WriteScope(&types.BotCommandScope{Type: "default"}); err != nil {
+		t.Fatal(err)
+	}
+	if err = tc.bot.WriteLanguage("en"); err != nil {
+		t.Fatal(err)
+	}
+	if err = tc.msg.AddMethod(methods.SetMyCommands); err != nil {
+		t.Fatal(err)
+	}
+	if err = tc.msg.AddBot(tc.bot); err != nil {
+		t.Fatal(err)
+	}
+	send(tc.msg, t)
+	if code, msg := tc.get.Error(); code != 0 && msg != "" {
+		t.Fatal(msg)
+	}
+}
+
+func TestGetCommands(t *testing.T) {
+	var err error
+	tc := new(testcase)
+	tc.init()
+	if err = tc.bot.WriteLanguage("en"); err != nil {
+		t.Fatal(err)
+	}
+	if err = tc.msg.AddBot(tc.bot); err != nil {
+		t.Fatal(err)
+	}
+	if err = tc.msg.AddMethod(methods.GetMyCommands); err != nil {
+		t.Fatal(err)
+	}
+	send(tc.msg, t)
+	if code, msg := tc.get.Error(); code != 0 && msg != "" {
+		t.Fatal(msg)
+	}
+	if com := tc.get.Commands(); com == nil {
+		t.Fatal("the response shouldn't be nil")
+	} else {
+		t.Log(com)
+	}
+}
+
+func TestSetName(t *testing.T) {
+	var err error
+	tc := new(testcase)
+	tc.init()
+	if err = tc.bot.WriteName("Cute"); err != nil {
+		t.Fatal(err)
+	}
+	if err = tc.msg.AddBot(tc.bot); err != nil {
+		t.Fatal(err)
+	}
+	if err = tc.msg.AddMethod(methods.SetMyName); err != nil {
+		t.Fatal(err)
+	}
+	send(tc.msg, t)
+	if code, msg := tc.get.Error(); code != 0 && msg != "" {
+		t.Fatal(msg)
+	}
+}
+
+func TestGetName(t *testing.T) {
+	var err error
+	tc := new(testcase)
+	tc.init()
+	if err = tc.msg.AddMethod(methods.GetMyName); err != nil {
+		t.Fatal(err)
+	}
+	send(tc.msg, t)
+	if code, msg := tc.get.Error(); code != 0 && msg != "" {
+		t.Fatal(msg)
+	}
+	if name := tc.get.String(); name == "" {
+		t.Fatal("response souldn't be empty")
+	} else {
+		t.Log(name)
+	}
+}
+
+func TestCeateSet(t *testing.T) {
+	var emojies = []string{"😁", "😢", "😊", "😄", "😝", "😉", "🙈", "😜", "😞"}
+	var keywords = []string{"Regular", "cool", "bad", "nothing", "etc"}
+	var err error
+	tc := new(testcase)
+	tc.init()
+	if err = tc.prm.WriteUserID(738070596); err != nil {
+		t.Fatal(err)
+	}
+	if err = tc.prm.WriteSetName("random_name_112323_by_secondtestbotforb_bot"); err != nil {
+		t.Fatal(err)
+	}
+	if err = tc.prm.WriteSetTitle("ITB"); err != nil {
+		t.Fatal(err)
+	}
+	for i := 0; i < 2; i++ {
+		st := tc.msg.NewSticker()
+		// if i/2 == 0 {
+		if err = st.WriteStickerStorage(stickerdata[0]); err != nil {
+			t.Fatal(err)
+		}
+		// } else {
+		// if err = st.WriteStickerTelegram(stickerdata[1]); err != nil {
+		// 	t.Fatal(err)
+		// }
+		// }
+		if err = st.WriteFormat("static"); err != nil {
+			t.Fatal(err)
+		}
+		if err = st.WriteAssociatedEmojies([]string{emojies[rand.Intn(len(emojies)-1)]}); err != nil {
+			t.Fatal(err)
+		}
+		if err = st.WriteKeywords([]string{keywords[rand.Intn(len(keywords)-1)]}); err != nil {
+			t.Fatal(err)
+		}
+		if err = tc.msg.AddSticker(st); err != nil {
+			t.Fatal(err)
+		}
+	}
+	if err = tc.prm.WriteStickerType("regular"); err != nil {
+		t.Fatal(err)
+	}
+	if err = tc.msg.AddParameters(tc.prm); err != nil {
+		t.Fatal(err)
+	}
+	if err = tc.msg.AddMethod(methods.CreateNewStickerSet); err != nil {
+		t.Fatal(err)
+	}
+	send(tc.msg, t)
+	if code, msg := tc.get.Error(); code != 0 && msg != "" {
 		t.Fatal(msg)
 	}
 }

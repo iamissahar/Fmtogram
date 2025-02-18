@@ -829,6 +829,8 @@ const (
 	// Use this method to delete a group sticker set from a supergroup. The bot must be an administrator in the chat
 	// for this to work and must have the appropriate administrator rights. Parameters:
 	// 	(formatter.IChat).WriteChatID() or (formatter.IChat).WriteChatName() [Required]
+	// Get the results here:
+	// 	(formatter.IGet).Status()
 	DeleteChatStickerSet string = "deleteChatStickerSet"
 
 	// No parameters. The results are here:
@@ -842,7 +844,8 @@ const (
 	// 	(formatter.IForum).WriteIconColor() [Optional]
 	// 	(formatter.IForum).WriteIconEmojiID() [Optional]
 	// Get the results here:
-	// 	(formatter.IForum).GetForum()
+	// 	(formatter.IGet).Status()
+	// 	(formatter.IGet)..Forum()
 	CreateForumTopic string = "createForumTopic"
 
 	// Use this method to edit name and icon of a topic in a forum supergroup chat. The bot must be an administrator in the chat
@@ -851,63 +854,85 @@ const (
 	// 	(formatter.IParameters).WriteMessageThreadID() [Required]
 	// 	(formatter.IForum).WriteName()  [Optional]
 	// 	(formatter.IForum).WriteIconEmojiID() [Optional]
+	// Get the results here:
+	// 	(formatter.IGet).Status()
 	EditForumTopic string = "editForumTopic"
 
 	// Use this method to close an open topic in a forum supergroup chat. The bot must be an administrator in the chat
 	// for this to work and must have the types.ChatAdministratorRights.CanManageTopics administrator rights. Parameters:
 	// 	(formatter.IChat).WriteChatID() or (formatter.IChat).WriteChatName() [Required]
 	// 	(formatter.IParameters).WriteMessageThreadID() [Required]
+	// Get the results here:
+	// 	(formatter.IGet).Status()
 	CloseForumTopic string = "closeForumTopic"
 
 	// Use this method to reopen a closed topic in a forum supergroup chat. The bot must be an administrator in the chat
 	// for this to work and must have the types.ChatAdministratorRights.CanManageTopics administrator rights. Parameters:
 	// 	(formatter.IChat).WriteChatID() or (formatter.IChat).WriteChatName() [Required]
 	// 	(formatter.IParameters).WriteMessageThreadID() [Required]
+	// Get the results here:
+	// 	(formatter.IGet).Status()
 	ReopenForumTopic string = "reopenForumTopic"
 
 	// Use this method to delete a forum topic along with all its messages in a forum supergroup chat.
 	// The bot must be an administrator in the chat for this to work and must have the types.ChatAdministratorRights.CanDeleteMessages administrator rights. Parameters:
 	// 	(formatter.IChat).WriteChatID() or (formatter.IChat).WriteChatName() [Required]
 	// 	(formatter.IParameters).WriteMessageThreadID() [Required]
+	// Get the results here:
+	// 	(formatter.IGet).Status()
 	DeleteForumTopic string = "deleteForumTopic"
 
 	// Use this method to clear the list of pinned messages in a forum topic. The bot must be an administrator in the chat for this
 	// to work and must have the types.ChatAdministratorRights.CanPinMessages administrator right in the supergroup. Parameters:
 	// 	(formatter.IChat).WriteChatID() or (formatter.IChat).WriteChatName() [Required]
 	// 	(formatter.IParameters).WriteMessageThreadID() [Required]
+	// Get the results here:
+	// 	(formatter.IGet).Status()
 	UnpinAllForumMessages string = "unpinAllForumTopicMessages"
 
 	// Use this method to edit the name of the 'General' topic in a forum supergroup chat. The bot must be an administrator in
 	// the chat for this to work and must have the types.ChatAdministratorRights.CanManageTopics administrator rights. Parameters:
 	// 	(formatter.IChat).WriteChatID() or (formatter.IChat).WriteChatName() [Required]
 	// 	(formatter.IForum).WriteName() [Required]
+	// Get the results here:
+	// 	(formatter.IGet).Status()
 	EditGeneralForum string = "editGeneralForumTopic"
 
 	// Use this method to close an open 'General' topic in a forum supergroup chat. The bot must be an administrator in
 	// the chat for this to work and must have the types.ChatAdministratorRights.CanManageTopics administrator rights. Parameters:
 	// 	(formatter.IChat).WriteChatID() or (formatter.IChat).WriteChatName() [Required]
+	// Get the results here:
+	// 	(formatter.IGet).Status()
 	CloseGeneralForum string = "closeGeneralForumTopic"
 
 	// Use this method to reopen a closed 'General' topic in a forum supergroup chat. The bot must be an administrator in
 	// the chat for this to work and must have the types.ChatAdministratorRights.CanManageTopics administrator rights. The topic will be automatically unhidden if it was hidden.
 	// Parameters:
 	// 	(formatter.IChat).WriteChatID() or (formatter.IChat).WriteChatName() [Required]
+	// Get the results here:
+	// 	(formatter.IGet).Status()
 	ReopenGeneralForum string = "reopenGeneralForumTopic"
 
 	// Use this method to hide the 'General' topic in a forum supergroup chat. The bot must be an administrator in
 	// the chat for this to work and must have the types.ChatAdministratorRights.CanManageTopics administrator rights. The topic will be automatically closed if it was open.
 	// Parameters:
 	// 	(formatter.IChat).WriteChatID() or (formatter.IChat).WriteChatName() [Required]
+	// Get the results here:
+	// 	(formatter.IGet).Status()
 	HideGeneralForum string = "hideGeneralForumTopic"
 
 	// Use this method to unhide the 'General' topic in a forum supergroup chat.The bot must be an administrator in
 	// the chat for this to work and must have the types.ChatAdministratorRights.CanManageTopics administrator rights. Parameters:
 	// 	(formatter.IChat).WriteChatID() or (formatter.IChat).WriteChatName() [Required]
+	// Get the results here:
+	// 	(formatter.IGet).Status()
 	UnhideGeneralForum string = "unhideGeneralForumTopic"
 
 	// Use this method to clear the list of pinned messages in a General forum topic. The bot must be an administrator in the chat for this
 	// to work and must have the types.ChatAdministratorRights.CanPinMessages administrator right in the supergroup. Parameters:
 	// 	(formatter.IChat).WriteChatID() or (formatter.IChat).WriteChatName() [Required]
+	// Get the results here:
+	// 	(formatter.IGet).Status()
 	UnpinAllGeneralForumMessages string = "unpinAllGeneralForumTopicMessages"
 
 	// Use this method to send answers to callback queries sent from inline keyboards. The answer will be displayed to the user as a notification at the top of the chat screen or as an alert. Parameters:
@@ -916,95 +941,119 @@ const (
 	// 	(formatter.IParameters).WriteShowAlert() [Optional]
 	// 	(formatter.IParameters).WriteURL() [Optional]
 	// 	(formatter.IParameters).CacheTime() [Optional]
+	// Get the results here:
+	// 	(formatter.IGet).Status()
 	AnswerCallbackQuery string = "answerCallbackQuery"
 
 	// Use this method to get the list of boosts added to a chat by a user. Requires administrator rights in the chat. Parameters:
 	// 	(formatter.IChat).WriteChatID() or (formatter.IChat).WriteChatName() [Required]
 	// 	(formatter.IParameters).WriteUserID() [Required]
 	// Get the results here:
-	// 	(IChat).GetUsersBoosts()
+	// 	(formatter.IGet).Status()
+	// 	(formatter.IGet).Boosts()
 	GetUsersBoosts string = "getUserChatBoosts"
 
 	// Use this method to get information about the connection of the bot with a business account. Parameters:
 	// 	(formatter.IChat).WriteBusinessConnectionID() [Required]
 	// Get the results here:
-	// 	(formatter.IChat).GetBusinessConnection()
+	// 	(formatter.IGet).Status()
+	// 	(formatter.IGet).BusinessConnection()
 	GetBusinessConnection string = "getBusinessConnection"
 
 	// Use this method to change the list of the bot's commands. Parameters:
 	// 	(formatter.IBot).WriteCommands() [Required]
 	// 	(formatter.IBot).WriteScope() [Optional]
 	// 	(formatter.IBot).WriteLanguage() [Optional]
+	// Get the results here:
+	// 	(formatter.IGet).Status()
 	SetMyCommands string = "setMyCommands"
 
 	// Use this method to delete the list of the bot's commands for the given scope and user language.
 	// After deletion, higher level commands will be shown to affected users. Parameters:
 	// 	(formatter.IBot).WriteScope() [Optional]
 	// 	(formatter.IBot).WriteLanguage() [Optional]
+	// Get the results here:
+	// 	(formatter.IGet).Status()
 	DeleteMyCommands string = "deleteMyCommands"
 
 	// Use this method to get the current list of the bot's commands for the given scope and user language. Parameters:
 	// 	(formatter.IBot).WriteScope() [Optional]
 	// 	(formatter.IBot).WriteLanguage() [Optional]
 	// Get the results here:
-	// 	(formatter.IBot).GetCommands()
+	// 	(formatter.IGet).Status()
+	// 	(fotmatter.IGet).Commands()
 	GetMyCommands string = "getMyCommands"
 
 	// Use this method to change the bot's name. Parameters:
 	// 	(formatter.IBot).WriteName() [Optional]
 	// 	(formatter.IBot).WriteLanguage() [Optional]
+	// Get the results here:
+	// 	(formatter.IGet).Status()
 	SetMyName string = "setMyName"
 
 	// Use this method to get the current bot name for the given user language. Parameters:
 	// 	(formatter.IBot).WriteLanguage() [Optional]
 	// Get the results here:
-	// 	(formatter.IBot).GetName()
+	// 	(formatter.IGet).Status()
+	// 	(formatter.IGet).String()
 	GetMyName string = "getMyName"
 
 	// Use this method to change the bot's description, which is shown in the chat with the bot if the chat is empty. Parameters:
 	// 	(formatter.IBot).WriteDescription() [Optional]
 	// 	(formatter.IBot).WriteLanguage() [Optional]
+	// Get the results here:
+	// 	(formatter.IGet).Status()
 	SetMyDescription string = "setMyDescription"
 
 	// Use this method to get the current bot description for the given user language. Parameters:
 	// 	(formatter.IBot).WriteLanguage() [Optional]
 	// Get the results here:
-	// 	(formatter.IBot).GetDescription()
+	// 	(formatter.IGet).Status()
+	// 	(formatter.IGet).String()
 	GetMyDescription string = "getMyDescription"
 
 	// Use this method to change the bot's short description, which is shown on the bot's profile page and is sent together with the link when users share the bot.
 	// Parameters:
 	// 	(formatter.IBot).WriteShortDescription() [Optional]
 	// 	(formatter.IBot).WriteLanguage() [Optional]
+	// Get the results here:
+	// 	(formatter.IGet).Status()
 	SetMyShortDescription string = "setMyShortDescription"
 
 	// Use this method to get the current bot short description for the given user language. Parameters:
 	// 	(formatter.IBot).WriteLanguage() [Optional]
 	// Get the results here:
-	// 	(formatter.IBot).GetShortDescription()
+	// 	(formatter.IGet).Status()
+	// 	(formatter.IGet).String()
 	GetMyShortDescription string = "getMyShortDescription"
 
 	// Use this method to change the bot's menu button in a private chat, or the default menu button. Parameters:
 	// 	(formatter.IChat).WriteChatID() [Optional]
 	// 	(formatter.IBot).WriteMenuButton() [Optional]
+	// Get the results here:
+	// 	(formatter.IGet).Status()
 	SetChatMenuButton string = "setChatMenuButton"
 
 	// Use this method to get the current value of the bot's menu button in a private chat, or the default menu button. Parameters:
 	// 	(formatter.IChat).WriteChatID() [Optional]
-	// Get the resutls here:
-	// 	(formatter.IBot).GetMenuButton()
+	// Get the results here:
+	// 	(formatter.IGet).Status()
+	// 	(formatter.IGet).MenuButton()
 	GetChatMenuButton string = "getChatMenuButton"
 
 	// Use this method to change the default administrator rights requested by the bot when it's added as an administrator to groups or channels.
 	// These rights will be suggested to users, but they are free to modify the list before adding the bot. Parameters:
 	// 	(formatter.IBot).WriteRights() [Optional]
 	// 	(formatter.IBot).WriteForChannels() [Optional]
+	// Get the results here:
+	// 	(formatter.IGet).Status()
 	SetMyDefaultAdminRights string = "setMyDefaultAdministratorRights"
 
 	// Use this method to get the current default administrator rights of the bot. Parameters:
 	// 	(formatter.IBot).WriteForChannels() [Optional]
-	// Get the resutls here:
-	// 	(formatter.IBot).GetAdminRights()
+	// Get the results here:
+	// 	(formatter.IGet).Status()
+	// 	(formatter.IGet).AdminRights()
 	GetMyDefaultAdministratorRights string = "getMyDefaultAdministratorRights"
 
 	// Use this method to edit text and game messages.Note that business messages that were not sent by the bot and
@@ -1018,8 +1067,11 @@ const (
 	// 	(formatter.IParameters).WriteEntities() [Optional]
 	// 	(formatter.IParameters).WriteLinkPreviewOptions() [Optional]
 	// 	and a keyboard: (formatter.IKeyboard).WriteInline() [Optional]
-	// Get the resutls here:
-	// 	(formatter.IParameters).GetMessage()
+	// If the edited message is not an inline message call these to get the resutls:
+	// 	(formatter.IGet).Status()
+	// 	(formatter.IGet).Message()
+	// otherwise:
+	// 	(formatter.IGet).Status()
 	EditText string = "editMessageText"
 
 	// Use this method to edit captions of messages. Note that business messages that were not sent by the bot and do not
@@ -1033,8 +1085,11 @@ const (
 	// 	(formatter.IParameters).WriteEntities() [Optional]
 	// 	(formatter.IParameters).WriteShowCaptionAboveMedia() [Optional]
 	// 	and a keyboard: (formatter.IKeyboard).WriteInline() [Optional]
-	// Get the resutls here:
-	// 	(formatter.IParameters).GetMessage()
+	// If the edited message is not an inline message call these to get the resutls:
+	// 	(formatter.IGet).Status()
+	// 	(formatter.IGet).Message()
+	// otherwise:
+	// 	(formatter.IGet).Status()
 	EditCaption string = "editMessageCaption"
 
 	// Use this method to edit animation, audio, document, photo, or video messages, or to add media to
@@ -1049,8 +1104,11 @@ const (
 	// 	(formatter.IParameters).WriteInlineMessageID() [Optional]
 	// 	any media: (formatter.IPhoto), (formatter.IVideo), (formatter.IAudio), (formatter.IDocument) or (formatter.IAnimation) [Required]
 	// 	and a keyboard: (formatter.IKeyboard).WriteInline() [Optional]
-	// Get the resutls here:
-	// 	(formatter.IParameters).GetMessage()
+	// If the edited message is not an inline message call these to get the resutls:
+	// 	(formatter.IGet).Status()
+	// 	(formatter.IGet).Message()
+	// otherwise:
+	// 	(formatter.IGet).Status()
 	EditMedia string = "editMessageMedia"
 
 	// Use this method to edit live location messages. A location can be edited until its (formatter.ILocation).WriteLivePeriod() expires or
@@ -1066,8 +1124,11 @@ const (
 	// 	(formatter.ILocation).WriteHeading() [Optional]
 	// 	(formatter.ILocation).WriteProximityAlertRadius() [Optional]
 	// 	and a keyboard: (formatter.IKeyboard).WriteInline() [Optional]
-	// Get the resutls here:
-	// 	(formatter.IParameters).GetMessage()
+	// If the edited message is not an inline message call these to get the resutls:
+	// 	(formatter.IGet).Status()
+	// 	(formatter.IGet).Message()
+	// otherwise:
+	// 	(formatter.IGet).Status()
 	EditLiveLocation string = "editMessageLiveLocation"
 
 	// Use this method to stop updating a live location message before data you put in (formatter.ILocation).WriteLivePeriod() expires. Parameters:
@@ -1076,8 +1137,11 @@ const (
 	// 	(formatter.IParameters).WriteMessageID() [Optional]
 	// 	(formatter.IParameters).WriteInlineMessageID() [Optional]
 	// 	and a keyboard: (formatter.IKeyboard).WriteInline() [Optional]
-	// Get the resutls here:
-	// 	(formatter.IParameters).GetMessage()
+	// If the edited message is not an inline message call these to get the resutls:
+	// 	(formatter.IGet).Status()
+	// 	(formatter.IGet).Message()
+	// otherwise:
+	// 	(formatter.IGet).Status()
 	StopLiveLocation string = "stopMessageLiveLocation"
 
 	// Use this method to edit only the reply markup of messages. Note that business messages that were not sent by the bot and do
@@ -1087,8 +1151,11 @@ const (
 	// 	(formatter.IParameters).WriteMessageID() [Optional]
 	// 	(formatter.IParameters).WriteInlineMessageID() [Optional]
 	// 	and a keyboard: (formatter.IKeyboard).WriteInline() [Optional]
-	// Get the resutls here:
-	// 	(formatter.IParameters).GetMessage()
+	// If the edited message is not an inline message call these to get the resutls:
+	// 	(formatter.IGet).Status()
+	// 	(formatter.IGet).Message()
+	// otherwise:
+	// 	(formatter.IGet).Status()
 	EditReplyMarkup string = "editMessageReplyMarkup"
 
 	// Use this method to stop a poll which was sent by the bot. Parameters:
@@ -1096,6 +1163,9 @@ const (
 	// 	(formatter.IChat).WriteChatID() or (formatter.IChat).WriteChatName() [Required]
 	// 	(formatter.IParameters).WriteMessageID() [Required]
 	// 	and a keyboard: (formatter.IKeyboard).WriteInline() [Optional]
+	// Get the results here:
+	// 	(formatter.IGet).Status()
+	// 	(formatter.IGet).Poll()
 	StopPoll string = "stopPoll"
 
 	// Use this method to delete a message, including service messages, with the following limitations:
@@ -1110,11 +1180,15 @@ const (
 	// Parameters:
 	// 	(formatter.IChat).WriteChatID() or (formatter.IChat).WriteChatName() [Required]
 	// 	(formatter.IParameters).WriteMessageID() [Required]
+	// Get the results here:
+	// 	(formatter.IGet).Status()
 	DeleteMessage string = "deleteMessage"
 
 	// Use this method to delete multiple messages simultaneously. If some of the specified messages can't be found, they are skipped. Parameters:
 	// 	(formatter.IChat).WriteChatID() or (formatter.IChat).WriteChatName() [Required]
 	// 	(formatter.IParameters).WriteMessageIDs() [Required]
+	// Get the results here:
+	// 	(formatter.IGet).Status()
 	DeleteMessages string = "deleteMessages"
 
 	// Use this method to send static .WEBP, animated .TGS, or video .WEBM stickers. Parameters:
@@ -1130,7 +1204,14 @@ const (
 	// 	(formatter.IParameters).WriteReplyParameters() [Optional]
 	// 	and a keyboard: (formatter.IKeyboard).WriteReply(), (formatter.IKeyboard).WriteInline() or (formatter.IKeyboard).WriteForceReply() [Optional]
 	// Get the results here:
-	// 	(formatter.IParameters).GetMessage()
+	// 	(formatter.IGet).MessageID()
+	// 	(formatter.IGet).Bot()
+	// 	(formatter.IGet).Chat()
+	// 	(formatter.IGet).Date()
+	// 	(formatter.IGet).Sticker()
+	// 	(formatter.IGet).Replyed()
+	// or get the all results:
+	// 	(formatter.IGet).Message()
 	Sticker string = "sendSticker"
 
 	// Use this method to get a sticker set. Parameters:

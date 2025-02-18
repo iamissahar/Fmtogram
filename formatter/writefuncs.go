@@ -177,10 +177,6 @@ func (ph *photo) WriteHasSpoiler() error {
 	return err
 }
 
-func (ph *photo) GetResponse() [4]types.PhotoSize {
-	return ph.response
-}
-
 func (vd *video) WriteVideoStorage(video string) error {
 	var err error
 	if err = checkStringValue(video, vd.Video); err == nil {
@@ -460,10 +456,6 @@ func (ad *audio) WriteTitle(title string) error {
 	return err
 }
 
-func (ad *audio) GetResponse() types.Audio {
-	return ad.response
-}
-
 func (dc *document) WriteDocumentStorage(document string) error {
 	var err error
 	if err = checkStringValue(document, dc.Document); err == nil {
@@ -650,10 +642,6 @@ func (an *animation) WriteHasSpoiler() error {
 	return err
 }
 
-func (an *animation) GetResponse() types.Animation {
-	return an.response
-}
-
 func (vc *voice) WriteVoiceStorage(voice string) error {
 	var err error
 	if err = checkStringValue(voice, vc.Voice); err == nil {
@@ -693,10 +681,6 @@ func (vc *voice) WriteDuration(duration int) error {
 		logs.DataWrittenSuccessfully(interfaceVoice, "Duration")
 	}
 	return err
-}
-
-func (vc *voice) GetResponse() types.Voice {
-	return vc.response
 }
 
 func (vdn *videonote) WriteVideoNoteStorage(videonote string) error {
@@ -770,11 +754,6 @@ func (vdn *videonote) WriteThumbnailID(thumbnailID string) error {
 	}
 	return err
 }
-
-func (vdn *videonote) GetResponse() types.VideoNote {
-	return vdn.response
-}
-
 func (loc *location) WriteLatitude(lat float64) error {
 	var err error
 	if (lat >= -90) && (lat <= 90) {
@@ -919,10 +898,6 @@ func (loc *location) WriteGooglePlaceType(googlePlaceType string) error {
 	return err
 }
 
-func (loc *location) GetResponse() types.Venue {
-	return loc.response
-}
-
 func (c *contact) WritePhoneNumber(phone string) error {
 	var err error
 	if err = checkStringValue(phone, c.PhoneNumber); err == nil {
@@ -957,10 +932,6 @@ func (c *contact) WriteVCard(vcard string) error {
 		logs.DataWrittenSuccessfully(interfaceContact, "vCard")
 	}
 	return err
-}
-
-func (c *contact) GetResponse() types.Contact {
-	return c.response
 }
 
 func (p *poll) WriteQuestion(question string) error {
@@ -1153,10 +1124,6 @@ func (p *poll) WriteClosed() error {
 	return err
 }
 
-func (p *poll) GetResponse() types.Poll {
-	return p.response
-}
-
 func (l *link) WriteName(name string) error {
 	var err error
 	n := len([]rune(name))
@@ -1262,15 +1229,6 @@ func (l *link) WriteSubscriptionPrice(price int) error {
 	return err
 }
 
-func (st *sticker) WriteSetName(name string) error {
-	var err error
-	if err = checkStringValue(name, st.SetName); err == nil {
-		st.SetName = name
-		logs.DataWrittenSuccessfully(interfaceSticker, "Set Name")
-	}
-	return err
-}
-
 func (st *sticker) WriteStickerStorage(path string) error {
 	var err error
 	if err = checkStringValue(path, st.Sticker); err == nil {
@@ -1366,7 +1324,7 @@ func (st *sticker) WriteFormat(format string) error {
 	var err error
 	if format == "static" || format == "animated" || format == "video" {
 		if st.Format == "" {
-			st.Format = format
+			st.Format, st.StickerFormat = format, format
 			logs.DataWrittenSuccessfully(interfaceSticker, "Format")
 		} else {
 			err = code10()
@@ -1377,28 +1335,12 @@ func (st *sticker) WriteFormat(format string) error {
 	return err
 }
 
-func (st *sticker) WriteTitle(title string) error {
-	var err error
-	t := len([]rune(title))
-	if t > 0 && t <= 64 {
-		if st.Title == "" {
-			st.Title = title
-			logs.DataWrittenSuccessfully(interfaceSticker, "Title")
-		} else {
-			err = code10()
-		}
-	} else {
-		err = code20()
-	}
-	return err
-}
-
-func (st *sticker) WriteStickerType(stickertype string) error {
+func (inf *information) WriteStickerType(stickertype string) error {
 	var err error
 	if stickertype == "regular" || stickertype == "mask" || stickertype == "custom_emoji" {
-		if st.StickerType == "" {
-			st.StickerType = stickertype
-			logs.DataWrittenSuccessfully(interfaceSticker, "Sticker Type")
+		if inf.StickerType == "" {
+			inf.StickerType = stickertype
+			logs.DataWrittenSuccessfully(interfaceParam, "Sticker Type")
 		} else {
 			err = code10()
 		}
@@ -1408,11 +1350,11 @@ func (st *sticker) WriteStickerType(stickertype string) error {
 	return err
 }
 
-func (st *sticker) WriteNeedsRepainting() error {
+func (inf *information) WriteNeedsRepainting() error {
 	var err error
-	if !st.NeedsRepainting {
-		st.NeedsRepainting = true
-		logs.SettedParam("Needs Repainting", interfaceSticker, true)
+	if !inf.NeedsRepainting {
+		inf.NeedsRepainting = true
+		logs.SettedParam("Needs Repainting", interfaceParam, true)
 	} else {
 		err = code10()
 	}
@@ -1515,8 +1457,8 @@ func (st *sticker) WriteThumbnailFormat(format string) error {
 	if (format == "static" && (st.thumbnailType == ".WEBP/.PNG" || st.thumbnailType == "")) ||
 		(format == "animated" && (st.thumbnailType == ".TGS" || st.thumbnailType == "")) ||
 		(format == "video" && (st.thumbnailType == ".WEBM" || st.thumbnailType == "")) {
-		if st.ThumbnailFormat == "" {
-			st.ThumbnailFormat = format
+		if st.Format == "" {
+			st.Format = format
 			logs.DataWrittenSuccessfully(interfaceSticker, "Thumbnail Format")
 		} else {
 			err = code10()
@@ -1628,8 +1570,8 @@ func (b *bot) WriteLanguage(lang string) error {
 	var err error
 	l := len([]rune(lang))
 	if l == 0 || l == 2 {
-		if b.Language == "" {
-			b.Language = lang
+		if b.Language == nil {
+			b.Language = &lang
 			logs.DataWrittenSuccessfully(interfaceBot, "Language")
 		} else {
 			err = code10()
@@ -1644,8 +1586,8 @@ func (b *bot) WriteName(name string) error {
 	var err error
 	n := len([]rune(name))
 	if n >= 0 && n <= 64 {
-		if b.Name == "" {
-			b.Name = name
+		if b.Name == nil {
+			b.Name = &name
 			logs.DataWrittenSuccessfully(interfaceBot, "Name")
 		} else {
 			err = code10()
@@ -1660,8 +1602,8 @@ func (b *bot) WriteDescription(description string) error {
 	var err error
 	d := len([]rune(description))
 	if d >= 0 && d <= 512 {
-		if b.Description == "" {
-			b.Description = description
+		if b.Description == nil {
+			b.Description = &description
 			logs.DataWrittenSuccessfully(interfaceBot, "Description")
 		} else {
 			err = code10()
@@ -1676,8 +1618,8 @@ func (b *bot) WriteShortDescription(description string) error {
 	var err error
 	d := len([]rune(description))
 	if d >= 0 && d <= 120 {
-		if b.ShortDescription == "" {
-			b.ShortDescription = description
+		if b.ShortDescription == nil {
+			b.ShortDescription = &description
 			logs.DataWrittenSuccessfully(interfaceBot, "Description")
 		} else {
 			err = code10()
@@ -2290,6 +2232,31 @@ func (inf *information) WriteVideoStartTimestamp(seconds int) error {
 	return err
 }
 
+func (inf *information) WriteSetName(name string) error {
+	var err error
+	if err = checkStringValue(name, inf.SetName); err == nil {
+		inf.SetName = name
+		logs.DataWrittenSuccessfully(interfaceParam, "Sticker Set Name")
+	}
+	return err
+}
+
+func (inf *information) WriteSetTitle(title string) error {
+	var err error
+	t := len([]rune(title))
+	if t > 0 && t <= 64 {
+		if inf.SetTitle == "" {
+			inf.SetTitle = title
+			logs.DataWrittenSuccessfully(interfaceParam, "Sticker Set Title")
+		} else {
+			err = code10()
+		}
+	} else {
+		err = code20()
+	}
+	return err
+}
+
 func (ch *chat) WriteChatID(chatID int) error {
 	var err error
 	if ch.ID == nil {
@@ -2453,10 +2420,6 @@ func (in *inline) Set(plan []int) error {
 		err = code20()
 	}
 	return err
-}
-
-func (ch *chat) GetResponse() types.Chat {
-	return ch.response
 }
 
 func (in *inline) NewButton(line, pos int) (IInlineButton, error) {

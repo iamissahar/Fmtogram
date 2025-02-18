@@ -12,6 +12,12 @@ type mediaHolder struct {
 	atLeastOnce bool
 }
 
+type stickerHolder struct {
+	storage     [50]*sticker
+	i           int
+	atLeastOnce bool
+}
+
 type formatter struct {
 	inf         *information
 	ch          *chat
@@ -20,7 +26,7 @@ type formatter struct {
 	con         *contact
 	poll        *poll
 	link        *link
-	sticker     *sticker
+	sticker     *stickerHolder
 	forum       *forum
 	bot         *bot
 	inlinemode  *inlinemode

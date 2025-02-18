@@ -30,6 +30,7 @@ func (tc *testcase) init() {
 	tc.link = tc.msg.NewLink()
 	tc.st = tc.msg.NewSticker()
 	tc.fr = tc.msg.NewForum()
+	tc.bot = tc.msg.NewBot()
 	types.DEBUG = true
 	logs.DebugOrInfo()
 }

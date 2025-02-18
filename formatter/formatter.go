@@ -19,6 +19,7 @@ func CreateMessage(tg *types.Telegram, botID string) *Message {
 	m.fm.ch = &chat{ID: tg.Result[0].Message.Chat.ID}
 	m.fm.inf = &information{}
 	m.fm.mh = &mediaHolder{}
+	m.fm.sticker = &stickerHolder{}
 	m.fm.token = botID
 	return m
 }
@@ -29,8 +30,59 @@ func CreateEmpltyMessage() *Message {
 	m.fm.ch = &chat{}
 	m.fm.inf = &information{}
 	m.fm.mh = &mediaHolder{}
+	m.fm.sticker = &stickerHolder{}
 	m.fm.token = types.BotID
 	return m
+}
+
+func uniqueMedia(msg *Message) error {
+	var err error
+	var mediajson []byte
+	if msg.fm.mh.atLeastOnce {
+		if err = msg.fm.mh.storage[msg.fm.mh.i-1].multipartFields(msg.fm.writer, nil, 0, false); err == nil {
+			msg.fm.contentType = msg.fm.writer.FormDataContentType()
+		}
+	} else {
+		if mediajson, err = msg.fm.mh.storage[msg.fm.mh.i-1].jsonFileds(); err == nil {
+			msg.fm.buf.Write(mediajson)
+		}
+	}
+	return err
+}
+
+func mediaGroup(msg *Message) error {
+	var (
+		err    error
+		jsbody []byte
+	)
+	group := make([]interface{}, msg.fm.mh.amount)
+	mediaMap := make(map[string]interface{}, 1)
+	if !msg.fm.mh.atLeastOnce {
+		for i := 0; i < len(msg.fm.mh.storage); i++ {
+
+			if msg.fm.mh.storage[i] != nil {
+				group[i] = msg.fm.mh.storage[i]
+			}
+		}
+
+		mediaMap["media"] = group
+		jsbody, err = json.Marshal(mediaMap)
+		if err == nil {
+			msg.fm.buf.Write(jsbody)
+		}
+	} else {
+
+		for i := 0; i < len(msg.fm.mh.storage) && err == nil; i++ {
+			if msg.fm.mh.storage[i] != nil {
+				err = msg.fm.mh.storage[i].multipartFields(msg.fm.writer, &group, i, true)
+			}
+		}
+		if err == nil {
+			err = putGroup(msg.fm.writer, group, "media")
+		}
+		msg.fm.contentType = msg.fm.writer.FormDataContentType()
+	}
+	return err
 }
 
 func mediaPart(msg *Message) error {
@@ -48,7 +100,7 @@ func mediaPart(msg *Message) error {
 func messagePart(msg *Message) error {
 	var err error
 	var bytes []byte
-	if msg.fm.mh.atLeastOnce {
+	if msg.fm.mh.atLeastOnce || msg.fm.sticker.atLeastOnce {
 		err = msg.fm.inf.multipartFields(msg.fm.writer)
 	} else {
 		if msg.fm.method == methods.PromoteMember {
@@ -82,7 +134,7 @@ func keyboardPart(msg *Message) error {
 	var err error
 	var bytes []byte
 	if msg.fm.kb != nil {
-		if msg.fm.mh.atLeastOnce {
+		if msg.fm.mh.atLeastOnce || msg.fm.sticker.atLeastOnce {
 			err = msg.fm.kb.multipartFields(msg.fm.writer)
 		} else {
 			if bytes, err = msg.fm.kb.jsonFields(); err == nil {
@@ -98,7 +150,7 @@ func chatPart(msg *Message) error {
 	var err error
 	var bytes []byte
 
-	if msg.fm.mh.atLeastOnce {
+	if msg.fm.mh.atLeastOnce || msg.fm.sticker.atLeastOnce {
 		err = msg.fm.ch.multipartFields(msg.fm.writer)
 	} else {
 		if bytes, err = msg.fm.ch.createJson(); err == nil {
@@ -150,6 +202,54 @@ func othersPart(msg *Message) error {
 	return err
 }
 
+func uniqueSticker(msg *Message) error {
+	var err error
+	if msg.fm.sticker.atLeastOnce {
+		err = msg.fm.sticker.storage[0].multipartFields(msg.fm.writer, nil, 0, false)
+	} else {
+		err = writeToBuf(msg, msg.fm.sticker.storage[0])
+	}
+	return err
+}
+
+func arrayOfStickers(msg *Message, group, finalHolder *[]interface{}, stickerMap *map[string]interface{}) error {
+	const stickers string = "stickers"
+	var err error
+	for i := 0; i < msg.fm.sticker.i; i++ {
+		st := msg.fm.sticker.storage[i]
+		if msg.fm.sticker.atLeastOnce {
+			err = msg.fm.sticker.storage[i].multipartFields(msg.fm.writer, group, i, true)
+		} else {
+			(*finalHolder)[i] = st
+		}
+
+	}
+	if err == nil {
+		if msg.fm.sticker.atLeastOnce {
+			err = putGroup(msg.fm.writer, *group, stickers)
+			msg.fm.contentType = msg.fm.writer.FormDataContentType()
+		} else {
+			(*stickerMap)[stickers] = finalHolder
+			err = writeToBuf(msg, stickerMap)
+		}
+	}
+	return err
+}
+
+func stickerPart(msg *Message) error {
+	var err error
+	group := make([]interface{}, msg.fm.sticker.i)
+	finalHolder := make([]interface{}, msg.fm.sticker.i)
+	stickerMap := make(map[string]interface{}, 1)
+
+	if msg.fm.method == methods.Sticker {
+		err = uniqueSticker(msg)
+	} else {
+		err = arrayOfStickers(msg, &group, &finalHolder, &stickerMap)
+	}
+	return err
+}
+
 func uniteEverything(msg *Message) error {
 	var err error
 	var mergedJSON []byte
@@ -186,8 +286,8 @@ func uniteEverything(msg *Message) error {
 
 func makeRequest(msg *Message) error {
 	var err error
-	var shouldSkip [5]bool
-	bypass := [5]func(*Message) error{mediaPart, messagePart, keyboardPart, chatPart, othersPart}
+	var shouldSkip [6]bool
+	bypass := [6]func(*Message) error{mediaPart, messagePart, keyboardPart, chatPart, othersPart, stickerPart}
 
 	msg.fm.buf = bytes.NewBuffer(nil)
 	msg.fm.writer = multipart.NewWriter(msg.fm.buf)
@@ -199,7 +299,7 @@ func makeRequest(msg *Message) error {
 	}
 
 	if err == nil {
-		if !msg.fm.mh.atLeastOnce {
+		if !msg.fm.mh.atLeastOnce && !msg.fm.sticker.atLeastOnce {
 			err = uniteEverything(msg)
 		} else {
 			err = msg.fm.writer.Close()
@@ -217,17 +317,19 @@ func handlerMessage(msg *Message, t *types.MessageResponse) {
 	msg.fm.g.sender = t.Result.From
 	msg.fm.g.date = t.Result.Date
 	msg.fm.g.chat = t.Result.Chat
-	msg.fm.g.replyed = &get{chat: t.Result.ReplyToMessage.Chat, sender: t.Result.From,
-		date: t.Result.ReplyToMessage.Date, msgID: t.Result.ReplyToMessage.MessageID,
-		msgOrigin: t.Result.ReplyToMessage.ForwardOrigin, photo: t.Result.ReplyToMessage.Photo,
-		audio: t.Result.ReplyToMessage.Audio, document: t.Result.ReplyToMessage.Document,
-		video: t.Result.ReplyToMessage.Video, anim: t.Result.ReplyToMessage.Animation,
-		voice: t.Result.ReplyToMessage.Voice, vdn: t.Result.ReplyToMessage.VideoNote,
-		poll: t.Result.ReplyToMessage.Poll, dice: t.Result.ReplyToMessage.Dice}
-	if t.Result.ReplyToMessage.PaidMedia != nil {
-		msg.fm.g.replyed.paid = t.Result.ReplyToMessage.PaidMedia.PaidMedia[0]
-		if t.Result.PaidMedia != nil {
-			msg.fm.g.paid = t.Result.PaidMedia.PaidMedia[0]
+	if t.Result.ReplyToMessage != nil {
+		msg.fm.g.replyed = &get{chat: t.Result.ReplyToMessage.Chat, sender: t.Result.From,
+			date: t.Result.ReplyToMessage.Date, msgID: t.Result.ReplyToMessage.MessageID,
+			msgOrigin: t.Result.ReplyToMessage.ForwardOrigin, photo: t.Result.ReplyToMessage.Photo,
+			audio: t.Result.ReplyToMessage.Audio, document: t.Result.ReplyToMessage.Document,
+			video: t.Result.ReplyToMessage.Video, anim: t.Result.ReplyToMessage.Animation,
+			voice: t.Result.ReplyToMessage.Voice, vdn: t.Result.ReplyToMessage.VideoNote,
+			poll: t.Result.ReplyToMessage.Poll, dice: t.Result.ReplyToMessage.Dice}
+		if t.Result.ReplyToMessage.PaidMedia != nil {
+			msg.fm.g.replyed.paid = t.Result.ReplyToMessage.PaidMedia.PaidMedia[0]
+			if t.Result.PaidMedia != nil {
+				msg.fm.g.paid = t.Result.PaidMedia.PaidMedia[0]
+			}
 		}
 	}
 	msg.fm.g.msgOrigin = t.Result.ForwardOrigin
@@ -240,6 +342,9 @@ func handlerMessage(msg *Message, t *types.MessageResponse) {
 	msg.fm.g.vdn = t.Result.VideoNote
 	msg.fm.g.poll = t.Result.Poll
 	msg.fm.g.dice = t.Result.Dice
+	if t.Result.Sticker != nil {
+		msg.fm.g.stickers = []*types.Sticker{t.Result.Sticker}
+	}
 	msg.fm.g.msg = t.Result
 }
 
@@ -317,20 +422,52 @@ func responseDecoder(msg *Message) error {
 		msg.fm.g.status = t.Ok
 		msg.fm.g.forum = t.Result
 	case *types.UserBoostsResponse:
-		// msg.fm.g.status = t.Ok
-		// msg.fm.g. = t.Result
+		msg.fm.g.status = t.Ok
+		if t.Result != nil {
+			msg.fm.g.boosts = t.Result.Boosts
+		}
 	case *types.BusinessConResponse:
+		msg.fm.g.status = t.Ok
+		msg.fm.g.bconn = t.Result
 	case *types.BotCommandResponse:
+		msg.fm.g.status = t.Ok
+		msg.fm.g.botcomm = t.Result
 	case *types.BotNameResponse:
+		msg.fm.g.status = t.Ok
+		if t.Result != nil {
+			msg.fm.g.str = t.Result.Name
+		}
 	case *types.BotDescriptionResponse:
+		msg.fm.g.status = t.Ok
+		if t.Result != nil {
+			msg.fm.g.str = t.Result.Description
+		}
 	case *types.BotShorDescriptionResponse:
+		msg.fm.g.status = t.Ok
+		if t.Result != nil {
+			msg.fm.g.str = t.Result.ShortDescription
+		}
 	case *types.MenuButtonResponse:
+		msg.fm.g.status = t.Ok
+		msg.fm.g.menuButton = t.Result
 	case *types.AdminRightResponse:
+		msg.fm.g.status = t.Ok
+		msg.fm.g.admin = t.Result
 	case *types.PollResponse:
+		msg.fm.g.status = t.Ok
+		msg.fm.g.poll = t.Result
 	case *types.StickerSetResponse:
+		msg.fm.g.status = t.Ok
+		msg.fm.g.stickerset = t.Result
 	case *types.GiftsResponse:
+		msg.fm.g.status = t.Ok
+		// msg.fm.g.gift = t.Result
 	case *types.WepAppMsgResponse:
+		msg.fm.g.status = t.Ok
+		// msg.fm.g.wepappmsg = t.Result
 	case *types.PreparedInlineMessageResponse:
+		msg.fm.g.status = t.Ok
+		// msg.fm.g.inmsg = t.Result
 	case *types.StringResponse:
 		msg.fm.g.status = t.Ok
 		msg.fm.g.str = t.Result
@@ -338,7 +475,11 @@ func responseDecoder(msg *Message) error {
 		msg.fm.g.status = t.Ok
 		msg.fm.g.integer = &t.Result
 	case *types.StarTransactionResponse:
+		msg.fm.g.status = t.Ok
+		// msg.fm.g.startrans = t.Result
 	case *types.GameHighScoresResponse:
+		msg.fm.g.status = t.Ok
+		// msg.fm.g.score = t.Result
 	}
 	return err
 }

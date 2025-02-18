@@ -36,8 +36,8 @@ type BusinessConResponse struct {
 }
 
 type BotCommandResponse struct {
-	Ok     bool        `json:"ok"`
-	Result *BotCommand `json:"result"`
+	Ok     bool          `json:"ok"`
+	Result []*BotCommand `json:"result"`
 }
 
 type BotNameResponse struct {

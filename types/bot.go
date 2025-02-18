@@ -7,46 +7,10 @@ type ForumTopic struct {
 	IconCustomEmojiID string `json:"icon_custom_emoji_id,omitempty"`
 }
 
-type BotCommandScopeDefault struct {
-	Type string `json:"type"`
-}
-
-type BotCommandScopeAllPrivateChats struct {
-	Type string `json:"type"`
-}
-
-type BotCommandScopeAllGroupChats struct {
-	Type string `json:"type"`
-}
-
-type BotCommandScopeAllChatAdministrators struct {
-	Type string `json:"type"`
-}
-
-type BotCommandScopeChat struct {
-	Type   string `json:"type"`
-	ChatID string `json:"chat_id"`
-}
-
-type BotCommandScopeChatAdministrators struct {
-	Type   string `json:"type"`
-	ChatID string `json:"chat_id"`
-}
-
-type BotCommandScopeChatMember struct {
-	Type   string `json:"type"`
-	ChatID string `json:"chat_id"`
-	UserID int    `json:"user_id"`
-}
-
 type BotCommandScope struct {
-	BotCommandScopeDefault               *BotCommandScopeDefault
-	BotCommandScopeAllPrivateChats       *BotCommandScopeAllPrivateChats
-	BotCommandScopeAllGroupChats         *BotCommandScopeAllGroupChats
-	BotCommandScopeAllChatAdministrators *BotCommandScopeAllChatAdministrators
-	BotCommandScopeChat                  *BotCommandScopeChat
-	BotCommandScopeChatAdministrators    *BotCommandScopeChatAdministrators
-	BotCommandScopeChatMember            *BotCommandScopeChatMember
+	Type   string  `json:"type"`
+	ChatID *string `json:"chat_id,omitempty"`
+	UserID *int    `json:"user_id,omitempty"`
 }
 
 type BotName struct {

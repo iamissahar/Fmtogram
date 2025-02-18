@@ -35,11 +35,6 @@ func (sttc *stTestContainer) defaultStikerT(i int) *stickerT {
 	return &stickerT{name: sttc.name, isExpectedErr: sttc.isExpectedErr[i], codeErr: sttc.codeErr[i]}
 }
 
-func (sttc *stTestContainer) sentName(st formatter.ISticker, s *stickerT, i int) {
-	s.testedFunc = st.WriteSetName
-	s.str = sttc.inputStr[i]
-}
-
 func (sttc *stTestContainer) stickerStorage(st formatter.ISticker, s *stickerT, i int) {
 	s.testedFunc = st.WriteStickerStorage
 	s.str = sttc.inputStr[i]
@@ -78,20 +73,6 @@ func (sttc *stTestContainer) emojiIDs(st formatter.ISticker, s *stickerT, i int)
 func (sttc *stTestContainer) stickerFormat(st formatter.ISticker, s *stickerT, i int) {
 	s.testedFunc = st.WriteFormat
 	s.str = sttc.inputStr[i]
-}
-
-func (sttc *stTestContainer) stikerTitle(st formatter.ISticker, s *stickerT, i int) {
-	s.testedFunc = st.WriteTitle
-	s.str = sttc.inputStr[i]
-}
-
-func (sttc *stTestContainer) stikerType(st formatter.ISticker, s *stickerT, i int) {
-	s.testedFunc = st.WriteStickerType
-	s.str = sttc.inputStr[i]
-}
-
-func (sttc *stTestContainer) needsRepainting(st formatter.ISticker, s *stickerT, i int) {
-	s.testedFunc = st.WriteNeedsRepainting
 }
 
 func (sttc *stTestContainer) position(st formatter.ISticker, s *stickerT, i int) {
@@ -137,15 +118,6 @@ func (sttc *stTestContainer) thumbnailFormat(st formatter.ISticker, s *stickerT,
 func (sttc *stTestContainer) giftID(st formatter.ISticker, s *stickerT, i int) {
 	s.testedFunc = st.WriteGiftID
 	s.str = sttc.inputStr[i]
-}
-
-func (sttc *stTestContainer) writeSetName() {
-	sttc.name = "(ISticker).WriteSetName()"
-	sttc.inputStr = []string{"K:LASDKASKL:DAK:LSD", "", "Name", "there isn't a name"}
-	sttc.isExpectedErr = []bool{false, true, false, true}
-	sttc.codeErr = []string{"", "20", "", "10"}
-	sttc.amount, sttc.until = 4, 2
-	sttc.buildF = sttc.sentName
 }
 
 func (sttc *stTestContainer) writeStickerStorage() {
@@ -218,32 +190,6 @@ func (sttc *stTestContainer) writeFormat() {
 	sttc.codeErr = []string{"", "20", "", "", "20", "", "10"}
 	sttc.amount, sttc.until = 7, 5
 	sttc.buildF = sttc.stickerFormat
-}
-
-func (sttc *stTestContainer) writeTitle() {
-	sttc.name = "(ISticker).WriteTitle()"
-	sttc.inputStr = []string{"static", "", ":", strings.Repeat("h", 64), strings.Repeat("h", 65), "asdasd", "asdkljalksd"}
-	sttc.isExpectedErr = []bool{false, true, false, false, true, false, true}
-	sttc.codeErr = []string{"", "20", "", "", "20", "", "10"}
-	sttc.amount, sttc.until = 7, 5
-	sttc.buildF = sttc.stikerTitle
-}
-
-func (sttc *stTestContainer) writeStickerType() {
-	sttc.name = "(ISticker).WriteStickerType()"
-	sttc.inputStr = []string{"regular", "mask", "custom_emoji", "", ":", "a;lsdl;kasdl;aadasd", "custom_emoji", "custom_emoji"}
-	sttc.isExpectedErr = []bool{false, false, false, true, true, true, false, true}
-	sttc.codeErr = []string{"", "", "", "20", "20", "20", "", "10"}
-	sttc.amount, sttc.until = 8, 6
-	sttc.buildF = sttc.stikerType
-}
-
-func (sttc *stTestContainer) writeNeedsRepainting() {
-	sttc.name = "(ISticker).WriteNeedsRepainting()"
-	sttc.isExpectedErr = []bool{false, false, true}
-	sttc.codeErr = []string{"", "", "10"}
-	sttc.amount, sttc.until = 3, 1
-	sttc.buildF = sttc.needsRepainting
 }
 
 func (sttc *stTestContainer) writePosition() {
@@ -397,13 +343,6 @@ func (sttc *stTestContainer) mainLogic(msg *formatter.Message, t *testing.T) {
 	doubleCheck(doublecontainer, t)
 }
 
-func TestStickerWriteSetName(t *testing.T) {
-	sttc := new(stTestContainer)
-	sttc.writeSetName()
-	msg := formatter.CreateEmpltyMessage()
-	sttc.mainLogic(msg, t)
-}
-
 func TestStickerWriteStickerStorage(t *testing.T) {
 	sttc := new(stTestContainer)
 	sttc.writeStickerStorage()
@@ -456,27 +395,6 @@ func TestStickerWriteEmojiIDs(t *testing.T) {
 func TestStickerWroteFormat(t *testing.T) {
 	sttc := new(stTestContainer)
 	sttc.writeFormat()
-	msg := formatter.CreateEmpltyMessage()
-	sttc.mainLogic(msg, t)
-}
-
-func TestStickerWriteTitle(t *testing.T) {
-	sttc := new(stTestContainer)
-	sttc.writeTitle()
-	msg := formatter.CreateEmpltyMessage()
-	sttc.mainLogic(msg, t)
-}
-
-func TestStickerWriteStickerType(t *testing.T) {
-	sttc := new(stTestContainer)
-	sttc.writeStickerType()
-	msg := formatter.CreateEmpltyMessage()
-	sttc.mainLogic(msg, t)
-}
-
-func TestStickerWriteNeedsRepainting(t *testing.T) {
-	sttc := new(stTestContainer)
-	sttc.writeNeedsRepainting()
 	msg := formatter.CreateEmpltyMessage()
 	sttc.mainLogic(msg, t)
 }
