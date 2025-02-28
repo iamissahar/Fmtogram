@@ -264,7 +264,6 @@ var messageResponse = map[string]*types.MessageResponse{methods.Message: new(typ
 }
 
 var messageIDsReponse = map[string]*types.MessageIDsResponse{methods.ForwardMessages: new(types.MessageIDsResponse),
-	methods.CopyMessage:  new(types.MessageIDsResponse),
 	methods.CopyMessages: new(types.MessageIDsResponse),
 }
 

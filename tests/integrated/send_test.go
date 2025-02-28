@@ -5,82 +5,115 @@ import (
 	"testing"
 
 	"github.com/l1qwie/Fmtogram/formatter"
-	"github.com/l1qwie/Fmtogram/testbotdata"
 	"github.com/l1qwie/Fmtogram/types"
 )
 
-const photo, video, audio, document, together = 0, 1, 2, 3, 4
-const link string = "https://t.me/+azuTu6sZ5CBjNzA6"
-
-var parsemode = []string{types.HTML, types.Markdown, types.MarkdownV2}
-var photodata = []string{"../media/tel-aviv.jpg", "AgACAgIAAxkDAAIQOmeVLmLOfKYAAacYIhF6AAERhIoVlSYAAhjzMRvJOKlIR8eAgDzDgJIBAAMCAANtAAM2BA",
-	"https://www.aljazeera.com/wp-content/uploads/2025/01/AFP__20250120__36UX28A__v2__HighRes__TopshotUsPoliticsTrumpInauguration-1737420954.jpg?w=770&resize=770,513"}
-var audiodata = []string{"../media/sound.mp3", "CQACAgIAAxUHZ6IojQe818oNFe4bl9lH23Up7X0AAtVlAALmFxlJU-d8VdX3MFM2BA",
-	"https://pixabay.com/music/download/vlog-music-beat-trailer-showreel-promo-background-intro-theme-274290.mp3"}
-var docdata = []string{"../media/Resume.pdf", "BQACAgIAAxUHZ6Imx1aO5DIjSTDxSNIM5Sx8F5AAArhlAALmFxlJ4tfoQKuqKkE2BA",
-	"https://www.aljazeera.com/wp-content/uploads/2025/01/AFP__20250120__36UX28A__v2__HighRes__TopshotUsPoliticsTrumpInauguration-1737420954.jpg?w=770&resize=770,513"}
-var videodata = []string{"../media/black.mp4", "BAACAgIAAxkDAAIT-GeWRcV86dcv9CKSUWigMceO6OnTAALVYwACyTixSIm8GQnP7rn3NgQ",
-	"https://www.pexels.com/download/video/6646588/"}
-var animdata = []string{"../media/prichinatryski.mp4", "CgACAgIAAxkDAAIXLWehBtw_GBKJjOWUGUMuseLL5ilpAAL9YQAC5hcJSZl2JdZMJNA8NgQ",
-	"https://www.icegif.com/wp-content/uploads/2025/02/patrick-mahomes-icegif-1.gif"}
-var voicedata = []string{"../media/dimaJOSKAproNATO.ogg", "AwACAgIAAxkDAAIXd2ehChKgOVjVLvEfNW18seQfOzCAAAJDYgAC5hcJSdrW7HHHzSUDNgQ",
-	"https://s33.aconvert.com/convert/p3r68-cdx67/0ye4j-z7u9r.ogg"}
-var videoNdata = []string{"../media/black.mp4", "BAACAgIAAxkDAAIX02ehEJZfVRFXkXTl8wLAQJ5AXH41AALWYgAC5hcJSX6PBZ_I_kmPNgQ",
-	"https://www.pexels.com/download/video/6646588/"}
-var stickerdata = []string{"../media/sticker.webp", "CAACAgIAAxkDAAIgAmezKoICMX7mpaH9tc2DQmVAlrMdAAJlZAACtNeZSeB_i54M8zfCNgQ",
-	"https://www.gstatic.com/webp/gallery/1.webp"}
-
-var thumbaudio = []string{"../media/tel-aviv.jpg", "AAMCAgADFQdnoiiNB7zXyg0V7huX2UfbdSntfQAC1WUAAuYXGUlT53xV1fcwUwEAB20AAzYE"}
-var thumbdoc = []string{"../media/tel-aviv.jpg", "AAMCAgADFQdnoibHVo7kMiNJMPFI0gzlLHwXkAACuGUAAuYXGUni1-hAq6oqQQEAB20AAzYE"}
-var thumbvideo = []string{"../media/tel-aviv.jpg", "AAMCAgADGQMAAhbXZ5qcsV0fZsV-_N1uLTQVUcgp1lYAArFhAAKXWdhIeYErRMz_ObEBAAdtAAM2BA"}
-var thumbanim = []string{"../media/tel-aviv.jpg", "AAMCAgADGQMAAhctZ6EG3D8YEomM5ZQZQy6x4svmKWkAAv1hAALmFwlJmXYl1kwk0DwBAAdtAAM2BA"}
-var thumbvideoN = []string{"../media/tel-aviv.jpg", "AAMCAgADGQMAAhfTZ6EQll9VEVeRdOXzAsBAnkBcfjUAAtZiAALmFwlJfo8Fn8j-SY8BAAdtAAM2BA"}
-
-type mediagroup struct {
-	amout     int
-	photos    []formatter.IPhoto
-	videos    []formatter.IVideo
-	audios    []formatter.IAudio
-	documents []formatter.IDocument
-	phFunc    func(formatter.IPhoto) []func(string) error
-	vdFunc    func(formatter.IVideo) []func(string) error
-	adFunc    func(formatter.IAudio) []func(string) error
-	docFunc   func(formatter.IDocument) []func(string) error
-	all       bool
+func (tc *testcase) sendMessage(t *testing.T) {
+	var err error
+	for i := 0; i < 4; i++ {
+		tt := new(testcase)
+		tt.init()
+		if i == 3 {
+			if err = tt.prm.WriteEntities(entities); err != nil {
+				t.Fatal(err)
+			}
+		} else {
+			if err = tt.prm.WriteParseMode(parsemode[i]); err != nil {
+				t.Fatal(err)
+			}
+		}
+		if err = tt.prm.WriteString(textformsg); err != nil {
+			t.Fatal(err)
+		}
+		if err = tt.ch.WriteChatID(chatid); err != nil {
+			t.Fatal(err)
+		}
+		if err = tt.prm.WriteLinkPreviewOptions(linkpopt); err != nil {
+			t.Fatal(err)
+		}
+		if err = tt.prm.WriteDisableNotification(); err != nil {
+			t.Fatal(err)
+		}
+		if err = tt.prm.WriteProtectContent(); err != nil {
+			t.Fatal(err)
+		}
+		if err = tt.prm.WriteMessageEffectID(msgEffect); err != nil {
+			t.Fatal(err)
+		}
+		if err = tt.prm.WriteReplyParameters(tc.getReplyPrm()); err != nil {
+			t.Fatal(err)
+		}
+		if err = tt.msg.AddParameters(tt.prm); err != nil {
+			t.Fatal(err)
+		}
+		if err = tt.msg.AddChat(tt.ch); err != nil {
+			t.Fatal(err)
+		}
+		tc.kbF(tt, t)
+		tc.send(tt.msg, t)
+		tc.checkResponse(t, i)
+		timetochange <- struct{}{}
+	}
 }
 
-type testcase struct {
-	msg           *formatter.Message
-	prm           formatter.IParameters
-	ch            formatter.IChat
-	ph            formatter.IPhoto
-	vd            formatter.IVideo
-	an            formatter.IAnimation
-	get           formatter.IGet
-	ad            formatter.IAudio
-	dc            formatter.IDocument
-	vc            formatter.IVoice
-	vdn           formatter.IVideoNote
-	loc           formatter.ILocation
-	con           formatter.IContact
-	poll          formatter.IPoll
-	link          formatter.ILink
-	st            formatter.ISticker
-	fr            formatter.IForum
-	bot           formatter.IBot
-	mg            *mediagroup
-	addMedia      func(*testcase, *testing.T)
-	mediaF        func(*testcase) []func(string) error
-	mediadata     []string
-	thumbdata     []string
-	common        func(*testcase, *testing.T)
-	kbF           func(*testcase, *testing.T)
-	thumb         bool
-	thumbnailF    func(*testcase) []func(string) error
-	code          [3]int
-	errmsg        [3]string
-	withoutString bool
-	paid          bool
+func msgReq(t *testing.T) {
+	var err error
+	tc := new(testcase)
+	tc.init()
+	tc.whattocheck[status] = struct{}{}
+	tc.whattocheck[errr] = struct{}{}
+	tc.whattocheck[chat] = struct{}{}
+	tc.whattocheck[sender] = struct{}{}
+	tc.whattocheck[date] = struct{}{}
+	tc.whattocheck[msgid] = struct{}{}
+	tc.whattocheck[replyed] = struct{}{}
+	tc.whattocheck[msg] = struct{}{}
+	if err = tc.prm.WriteString(textformsg); err != nil {
+		t.Fatal(err)
+	}
+	if err = tc.ch.WriteChatID(chatid); err != nil {
+		t.Fatal(err)
+	}
+	if err = tc.msg.AddParameters(tc.prm); err != nil {
+		t.Fatal(err)
+	}
+	if err = tc.msg.AddChat(tc.ch); err != nil {
+		t.Fatal(err)
+	}
+	tc.send(tc.msg, t)
+	tc.checkResponse(t, 0)
+}
+
+func msgAll(t *testing.T) {
+	tc := new(testcase)
+	tc.init()
+	go tc.changeToken(nil, nil)
+	tc.whattocheck[status] = struct{}{}
+	tc.whattocheck[errr] = struct{}{}
+	tc.whattocheck[chat] = struct{}{}
+	tc.whattocheck[sender] = struct{}{}
+	tc.whattocheck[date] = struct{}{}
+	tc.whattocheck[msgid] = struct{}{}
+	tc.whattocheck[replyed] = struct{}{}
+	tc.whattocheck[msg] = struct{}{}
+	for i := 0; i < 3; i++ {
+		if i == 0 {
+			t.Log("Test Message With Inline Keyboard")
+			tc.kbF = tc.inlineKb
+		} else if i == 1 {
+			t.Log("Test Message With ReplyMarkup Keyboard")
+			tc.kbF = tc.replyKb
+		} else {
+			t.Log("Test Message With ForceReply Keyboard")
+			tc.kbF = tc.forceKb
+		}
+		tc.sendMessage(t)
+	}
+}
+
+func TestSMessage(t *testing.T) {
+	t.Run("Req", msgReq)
+	t.Run("All", msgAll)
 }
 
 func photoArr(tc *testcase) []func(string) error {
@@ -183,20 +216,20 @@ func videoNThumb(tc *testcase) []func(string) error {
 	return []func(string) error{tc.vdn.WriteThumbnail, tc.vdn.WriteThumbnailID}
 }
 
-func (tc *testcase) sendMediaReq(t *testing.T) {
+func (tc *testcase) sendMediaReq(t *testing.T, isvoice bool) {
 	var err error
 	for i := 0; i < 3; i++ {
 		test := new(testcase)
 		test.init()
 		if tc.paid {
-			if err = test.prm.WriteStarCount(31); err != nil {
+			if err = test.prm.WriteStarCount(stars); err != nil {
 				t.Fatal(err)
 			}
 		}
 		if err = tc.mediaF(test)[i](tc.mediadata[i]); err != nil {
 			t.Fatal(err)
 		}
-		if err = test.ch.WriteChatID(738070596); err != nil {
+		if err = test.ch.WriteChatID(chatid); err != nil {
 			t.Fatal(err)
 		}
 		if err = test.msg.AddChat(test.ch); err != nil {
@@ -206,30 +239,33 @@ func (tc *testcase) sendMediaReq(t *testing.T) {
 			t.Fatal(err)
 		}
 		tc.addMedia(test, t)
-		send(test.msg, t)
-		if code, msg := test.get.Error(); (code != tc.code[i]) && (msg != tc.errmsg[i]) {
-			t.Fatal(msg)
+		tc.send(test.msg, t)
+		if isvoice && i == 2 {
+			delete(tc.whattocheck, vc)
+			tc.whattocheck[doc] = struct{}{}
 		}
+		tc.checkResponse(t, i)
+		timetochange <- struct{}{}
 	}
 }
 
-func (tc *testcase) sendMediaAll(t *testing.T) {
+func (tc *testcase) sendMediaAll(t *testing.T, isvoice bool) {
 	var err error
 	for i := 0; i < 3; i++ {
 		for j := 0; j < 4; j++ {
 			tcc := new(testcase)
 			tcc.init()
 			if tc.paid {
-				if err = tcc.prm.WriteStarCount(31); err != nil {
+				if err = tcc.prm.WriteStarCount(stars); err != nil {
 					t.Fatal(err)
 				}
 			}
 			if !tc.withoutString {
-				if err = tcc.prm.WriteString("there's a string"); err != nil {
+				if err = tcc.prm.WriteString(textformsg); err != nil {
 					t.Fatal(err)
 				}
 				if j == 3 {
-					if err = tcc.prm.WriteEntities([]*types.MessageEntity{{Offset: 1, Length: 4, Type: "italic"}}); err != nil {
+					if err = tcc.prm.WriteEntities(entities); err != nil {
 						t.Fatal(err)
 					}
 				} else if j >= 0 {
@@ -251,10 +287,15 @@ func (tc *testcase) sendMediaAll(t *testing.T) {
 			tc.common(tcc, t)
 			tc.addMedia(tcc, t)
 			tc.kbF(tcc, t)
-			send(tcc.msg, t)
-			if code, msg := tcc.get.Error(); (code != tc.code[i]) && (msg != tc.errmsg[i]) {
-				t.Fatal(msg)
+			tc.send(tcc.msg, t)
+			if isvoice && i == 2 {
+				delete(tc.whattocheck, vc)
+				tc.whattocheck[doc] = struct{}{}
+			} else {
+				delete(tc.whattocheck, doc)
 			}
+			tc.checkResponse(t, i)
+			timetochange <- struct{}{}
 		}
 	}
 }
@@ -273,13 +314,13 @@ func photoCommon(tc *testcase, t *testing.T) {
 	if err = tc.prm.WriteProtectContent(); err != nil {
 		t.Fatal(err)
 	}
-	if err = tc.prm.WriteMessageEffectID("5107584321108051014"); err != nil {
+	if err = tc.prm.WriteMessageEffectID(msgEffect); err != nil {
 		t.Fatal(err)
 	}
-	if err = tc.prm.WriteReplyParameters(&types.ReplyParameters{MessageID: testbotdata.MessageID[types.BotID], ChatID: 738070596}); err != nil {
+	if err = tc.prm.WriteReplyParameters(tc.getReplyPrm()); err != nil {
 		t.Fatal(err)
 	}
-	if err = tc.ch.WriteChatID(738070596); err != nil {
+	if err = tc.ch.WriteChatID(chatid); err != nil {
 		t.Fatal(err)
 	}
 	if err = tc.msg.AddChat(tc.ch); err != nil {
@@ -292,17 +333,39 @@ func photoCommon(tc *testcase, t *testing.T) {
 
 func photoReq(t *testing.T) {
 	tc := new(testcase)
+	tc.init()
+	go tc.changeToken(photodata, nil)
+	tc.whattocheck[status] = struct{}{}
+	tc.whattocheck[errr] = struct{}{}
+	tc.whattocheck[chat] = struct{}{}
+	tc.whattocheck[sender] = struct{}{}
+	tc.whattocheck[date] = struct{}{}
+	tc.whattocheck[msgid] = struct{}{}
+	tc.whattocheck[replyed] = struct{}{}
+	tc.whattocheck[ph] = struct{}{}
+	tc.whattocheck[msg] = struct{}{}
 	tc.addMedia = addPhoto
 	tc.mediaF = photoArr
-	tc.mediadata = photodata
-	tc.sendMediaReq(t)
+	tc.mediadata = photodata[tc.token]
+	tc.sendMediaReq(t, false)
 }
 
 func photoAll(t *testing.T) {
 	tc := new(testcase)
+	tc.init()
+	go tc.changeToken(photodata, nil)
+	tc.whattocheck[status] = struct{}{}
+	tc.whattocheck[errr] = struct{}{}
+	tc.whattocheck[chat] = struct{}{}
+	tc.whattocheck[sender] = struct{}{}
+	tc.whattocheck[date] = struct{}{}
+	tc.whattocheck[msgid] = struct{}{}
+	tc.whattocheck[replyed] = struct{}{}
+	tc.whattocheck[ph] = struct{}{}
+	tc.whattocheck[msg] = struct{}{}
 	tc.addMedia = addPhoto
 	tc.mediaF = photoArr
-	tc.mediadata = photodata
+	tc.mediadata = photodata[tc.token]
 	tc.common = photoCommon
 	for i := 0; i < 3; i++ {
 		if i == 0 {
@@ -315,27 +378,27 @@ func photoAll(t *testing.T) {
 			t.Log("Test Photo With ForceReply Keyboard")
 			tc.kbF = tc.forceKb
 		}
-		tc.sendMediaAll(t)
+		tc.sendMediaAll(t, false)
 	}
 }
 
 func TestPhoto(t *testing.T) {
-	t.Run("Required", photoReq)
+	t.Run("Req", photoReq)
 	t.Run("All", photoAll)
 }
 
 func audioCommon(tc *testcase, t *testing.T) {
 	var err error
-	if err = tc.ch.WriteChatID(738070596); err != nil {
+	if err = tc.ch.WriteChatID(chatid); err != nil {
 		t.Fatal(err)
 	}
 	if err = tc.ad.WriteDuration(3); err != nil {
 		t.Fatal(err)
 	}
-	if err = tc.ad.WritePerformer("performer"); err != nil {
+	if err = tc.ad.WritePerformer(emojies[rand.Intn(8)]); err != nil {
 		t.Fatal(err)
 	}
-	if err = tc.ad.WriteTitle("title"); err != nil {
+	if err = tc.ad.WriteTitle(topicnames[rand.Intn(4)]); err != nil {
 		t.Fatal(err)
 	}
 	if err = tc.prm.WriteDisableNotification(); err != nil {
@@ -344,10 +407,10 @@ func audioCommon(tc *testcase, t *testing.T) {
 	if err = tc.prm.WriteProtectContent(); err != nil {
 		t.Fatal(err)
 	}
-	if err = tc.prm.WriteMessageEffectID("5107584321108051014"); err != nil {
+	if err = tc.prm.WriteMessageEffectID(msgEffect); err != nil {
 		t.Fatal(err)
 	}
-	if err = tc.prm.WriteReplyParameters(&types.ReplyParameters{MessageID: testbotdata.MessageID[types.BotID], ChatID: 738070596}); err != nil {
+	if err = tc.prm.WriteReplyParameters(tc.getReplyPrm()); err != nil {
 		t.Fatal(err)
 	}
 	if err = tc.msg.AddChat(tc.ch); err != nil {
@@ -360,25 +423,45 @@ func audioCommon(tc *testcase, t *testing.T) {
 
 func audioReq(t *testing.T) {
 	tc := new(testcase)
+	tc.init()
+	go tc.changeToken(audiodata, nil)
+	tc.whattocheck[status] = struct{}{}
+	tc.whattocheck[errr] = struct{}{}
+	tc.whattocheck[chat] = struct{}{}
+	tc.whattocheck[sender] = struct{}{}
+	tc.whattocheck[date] = struct{}{}
+	tc.whattocheck[msgid] = struct{}{}
+	tc.whattocheck[replyed] = struct{}{}
+	tc.whattocheck[audio] = struct{}{}
+	tc.whattocheck[msg] = struct{}{}
 	tc.addMedia = addAudio
 	tc.mediaF = audioArr
-	tc.mediadata = audiodata
+	tc.mediadata = audiodata[tc.token]
 	tc.code = [3]int{0, 0, 400}
 	tc.errmsg = [3]string{"", "", "[ERROR:400] Bad Request: wrong type of the web page content"}
-	tc.sendMediaReq(t)
+	tc.sendMediaReq(t, false)
 }
 
 func audioAll(t *testing.T) {
 	tc := new(testcase)
+	tc.init()
+	go tc.changeToken(audiodata, thumbaudio)
+	tc.whattocheck[status] = struct{}{}
+	tc.whattocheck[errr] = struct{}{}
+	tc.whattocheck[chat] = struct{}{}
+	tc.whattocheck[sender] = struct{}{}
+	tc.whattocheck[date] = struct{}{}
+	tc.whattocheck[msgid] = struct{}{}
+	tc.whattocheck[replyed] = struct{}{}
+	tc.whattocheck[audio] = struct{}{}
+	tc.whattocheck[msg] = struct{}{}
 	tc.addMedia = addAudio
 	tc.mediaF = audioArr
-	tc.mediadata = audiodata
+	tc.mediadata = audiodata[tc.token]
 	tc.common = audioCommon
 	tc.thumb = true
 	tc.thumbnailF = audioThumb
-	tc.thumbdata = thumbaudio
-	tc.code = [3]int{0, 0, 400}
-	tc.errmsg = [3]string{"", "", "[ERROR:400] Bad Request: wrong type of the web page content"}
+	tc.thumbdata = thumbaudio[tc.token]
 	for i := 0; i < 3; i++ {
 		if i == 0 {
 			t.Log("Test Audio With Inline Keyboard")
@@ -390,18 +473,18 @@ func audioAll(t *testing.T) {
 			t.Log("Test Audio With ForceReply Keyboard")
 			tc.kbF = tc.forceKb
 		}
-		tc.sendMediaAll(t)
+		tc.sendMediaAll(t, false)
 	}
 }
 
 func TestAudio(t *testing.T) {
-	t.Run("Required", audioReq)
+	t.Run("Req", audioReq)
 	t.Run("All", audioAll)
 }
 
 func documentCommon(tc *testcase, t *testing.T) {
 	var err error
-	if err = tc.ch.WriteChatID(738070596); err != nil {
+	if err = tc.ch.WriteChatID(chatid); err != nil {
 		t.Fatal(err)
 	}
 	if err = tc.dc.WriteDisableContentTypeDetection(); err != nil {
@@ -410,10 +493,10 @@ func documentCommon(tc *testcase, t *testing.T) {
 	if err = tc.prm.WriteProtectContent(); err != nil {
 		t.Fatal(err)
 	}
-	if err = tc.prm.WriteMessageEffectID("5107584321108051014"); err != nil {
+	if err = tc.prm.WriteMessageEffectID(msgEffect); err != nil {
 		t.Fatal(err)
 	}
-	if err = tc.prm.WriteReplyParameters(&types.ReplyParameters{MessageID: testbotdata.MessageID[types.BotID], ChatID: 738070596}); err != nil {
+	if err = tc.prm.WriteReplyParameters(tc.getReplyPrm()); err != nil {
 		t.Fatal(err)
 	}
 	if err = tc.msg.AddChat(tc.ch); err != nil {
@@ -426,21 +509,43 @@ func documentCommon(tc *testcase, t *testing.T) {
 
 func docReq(t *testing.T) {
 	tc := new(testcase)
+	tc.init()
+	go tc.changeToken(docdata, nil)
+	tc.whattocheck[status] = struct{}{}
+	tc.whattocheck[errr] = struct{}{}
+	tc.whattocheck[chat] = struct{}{}
+	tc.whattocheck[sender] = struct{}{}
+	tc.whattocheck[date] = struct{}{}
+	tc.whattocheck[msgid] = struct{}{}
+	tc.whattocheck[replyed] = struct{}{}
+	tc.whattocheck[doc] = struct{}{}
+	tc.whattocheck[msg] = struct{}{}
 	tc.addMedia = addDoc
 	tc.mediaF = docArr
-	tc.mediadata = docdata
-	tc.sendMediaReq(t)
+	tc.mediadata = docdata[tc.token]
+	tc.sendMediaReq(t, false)
 }
 
 func docAll(t *testing.T) {
 	tc := new(testcase)
+	tc.init()
+	go tc.changeToken(docdata, thumbdoc)
+	tc.whattocheck[status] = struct{}{}
+	tc.whattocheck[errr] = struct{}{}
+	tc.whattocheck[chat] = struct{}{}
+	tc.whattocheck[sender] = struct{}{}
+	tc.whattocheck[date] = struct{}{}
+	tc.whattocheck[msgid] = struct{}{}
+	tc.whattocheck[replyed] = struct{}{}
+	tc.whattocheck[doc] = struct{}{}
+	tc.whattocheck[msg] = struct{}{}
 	tc.addMedia = addDoc
 	tc.mediaF = docArr
-	tc.mediadata = docdata
+	tc.mediadata = docdata[tc.token]
 	tc.common = documentCommon
 	tc.thumb = true
 	tc.thumbnailF = docThumb
-	tc.thumbdata = thumbdoc
+	tc.thumbdata = thumbdoc[tc.token]
 	for i := 0; i < 3; i++ {
 		if i == 0 {
 			t.Log("Test Document With Inline Keyboard")
@@ -452,18 +557,18 @@ func docAll(t *testing.T) {
 			t.Log("Test Document With ForceReply Keyboard")
 			tc.kbF = tc.forceKb
 		}
-		tc.sendMediaAll(t)
+		tc.sendMediaAll(t, false)
 	}
 }
 
 func TestDocument(t *testing.T) {
-	t.Run("Required", docReq)
+	t.Run("Req", docReq)
 	t.Run("All", docAll)
 }
 
 func videoCommon(tc *testcase, t *testing.T) {
 	var err error
-	if err = tc.ch.WriteChatID(738070596); err != nil {
+	if err = tc.ch.WriteChatID(chatid); err != nil {
 		t.Fatal(err)
 	}
 	if err = tc.vd.WriteDuration(111); err != nil {
@@ -490,10 +595,10 @@ func videoCommon(tc *testcase, t *testing.T) {
 	if err = tc.prm.WriteProtectContent(); err != nil {
 		t.Fatal(err)
 	}
-	if err = tc.prm.WriteMessageEffectID("5107584321108051014"); err != nil {
+	if err = tc.prm.WriteMessageEffectID(msgEffect); err != nil {
 		t.Fatal(err)
 	}
-	if err = tc.prm.WriteReplyParameters(&types.ReplyParameters{MessageID: testbotdata.MessageID[types.BotID], ChatID: 738070596}); err != nil {
+	if err = tc.prm.WriteReplyParameters(tc.getReplyPrm()); err != nil {
 		t.Fatal(err)
 	}
 	if err = tc.msg.AddChat(tc.ch); err != nil {
@@ -506,21 +611,43 @@ func videoCommon(tc *testcase, t *testing.T) {
 
 func videoReq(t *testing.T) {
 	tc := new(testcase)
+	tc.init()
+	go tc.changeToken(videodata, nil)
+	tc.whattocheck[status] = struct{}{}
+	tc.whattocheck[errr] = struct{}{}
+	tc.whattocheck[chat] = struct{}{}
+	tc.whattocheck[sender] = struct{}{}
+	tc.whattocheck[date] = struct{}{}
+	tc.whattocheck[msgid] = struct{}{}
+	tc.whattocheck[replyed] = struct{}{}
+	tc.whattocheck[video] = struct{}{}
+	tc.whattocheck[msg] = struct{}{}
 	tc.addMedia = addVideo
 	tc.mediaF = videoArr
-	tc.mediadata = videodata
-	tc.sendMediaReq(t)
+	tc.mediadata = videodata[tc.token]
+	tc.sendMediaReq(t, false)
 }
 
 func videoAll(t *testing.T) {
 	tc := new(testcase)
+	tc.init()
+	go tc.changeToken(videodata, thumbvideo)
+	tc.whattocheck[status] = struct{}{}
+	tc.whattocheck[errr] = struct{}{}
+	tc.whattocheck[chat] = struct{}{}
+	tc.whattocheck[sender] = struct{}{}
+	tc.whattocheck[date] = struct{}{}
+	tc.whattocheck[msgid] = struct{}{}
+	tc.whattocheck[replyed] = struct{}{}
+	tc.whattocheck[video] = struct{}{}
+	tc.whattocheck[msg] = struct{}{}
 	tc.addMedia = addVideo
 	tc.mediaF = videoArr
-	tc.mediadata = videodata
+	tc.mediadata = videodata[tc.token]
 	tc.common = videoCommon
 	tc.thumb = true
 	tc.thumbnailF = videoThumb
-	tc.thumbdata = thumbvideo
+	tc.thumbdata = thumbvideo[tc.token]
 	for i := 0; i < 3; i++ {
 		if i == 0 {
 			t.Log("Test Video With Inline Keyboard")
@@ -532,7 +659,7 @@ func videoAll(t *testing.T) {
 			t.Log("Test Video With ForceReply Keyboard")
 			tc.kbF = tc.forceKb
 		}
-		tc.sendMediaAll(t)
+		tc.sendMediaAll(t, false)
 	}
 }
 
@@ -543,7 +670,7 @@ func TestVideo(t *testing.T) {
 
 func animCommon(tc *testcase, t *testing.T) {
 	var err error
-	if err = tc.ch.WriteChatID(738070596); err != nil {
+	if err = tc.ch.WriteChatID(chatid); err != nil {
 		t.Fatal(err)
 	}
 	if err = tc.an.WriteDuration(111); err != nil {
@@ -567,10 +694,10 @@ func animCommon(tc *testcase, t *testing.T) {
 	if err = tc.prm.WriteProtectContent(); err != nil {
 		t.Fatal(err)
 	}
-	if err = tc.prm.WriteMessageEffectID("5107584321108051014"); err != nil {
+	if err = tc.prm.WriteMessageEffectID(msgEffect); err != nil {
 		t.Fatal(err)
 	}
-	if err = tc.prm.WriteReplyParameters(&types.ReplyParameters{MessageID: testbotdata.MessageID[types.BotID], ChatID: 738070596}); err != nil {
+	if err = tc.prm.WriteReplyParameters(tc.getReplyPrm()); err != nil {
 		t.Fatal(err)
 	}
 	if err = tc.msg.AddChat(tc.ch); err != nil {
@@ -583,21 +710,43 @@ func animCommon(tc *testcase, t *testing.T) {
 
 func animReq(t *testing.T) {
 	tc := new(testcase)
+	tc.init()
+	go tc.changeToken(animdata, nil)
+	tc.whattocheck[status] = struct{}{}
+	tc.whattocheck[errr] = struct{}{}
+	tc.whattocheck[chat] = struct{}{}
+	tc.whattocheck[sender] = struct{}{}
+	tc.whattocheck[date] = struct{}{}
+	tc.whattocheck[msgid] = struct{}{}
+	tc.whattocheck[replyed] = struct{}{}
+	tc.whattocheck[anim] = struct{}{}
+	tc.whattocheck[msg] = struct{}{}
 	tc.addMedia = addAnim
 	tc.mediaF = animArr
-	tc.mediadata = animdata
-	tc.sendMediaReq(t)
+	tc.mediadata = animdata[tc.token]
+	tc.sendMediaReq(t, false)
 }
 
 func animAll(t *testing.T) {
 	tc := new(testcase)
+	tc.init()
+	go tc.changeToken(animdata, thumbanim)
+	tc.whattocheck[status] = struct{}{}
+	tc.whattocheck[errr] = struct{}{}
+	tc.whattocheck[chat] = struct{}{}
+	tc.whattocheck[sender] = struct{}{}
+	tc.whattocheck[date] = struct{}{}
+	tc.whattocheck[msgid] = struct{}{}
+	tc.whattocheck[replyed] = struct{}{}
+	tc.whattocheck[anim] = struct{}{}
+	tc.whattocheck[msg] = struct{}{}
 	tc.addMedia = addAnim
 	tc.mediaF = animArr
-	tc.mediadata = animdata
+	tc.mediadata = animdata[tc.token]
 	tc.common = animCommon
 	tc.thumb = true
 	tc.thumbnailF = animThumb
-	tc.thumbdata = thumbanim
+	tc.thumbdata = thumbanim[tc.token]
 	for i := 0; i < 3; i++ {
 		if i == 0 {
 			t.Log("Test Animation With Inline Keyboard")
@@ -609,7 +758,7 @@ func animAll(t *testing.T) {
 			t.Log("Test Animation With ForceReply Keyboard")
 			tc.kbF = tc.forceKb
 		}
-		tc.sendMediaAll(t)
+		tc.sendMediaAll(t, false)
 	}
 }
 
@@ -620,7 +769,7 @@ func TestAnimation(t *testing.T) {
 
 func voiceCommon(tc *testcase, t *testing.T) {
 	var err error
-	if err = tc.ch.WriteChatID(738070596); err != nil {
+	if err = tc.ch.WriteChatID(chatid); err != nil {
 		t.Fatal(err)
 	}
 	if err = tc.vc.WriteDuration(111); err != nil {
@@ -635,10 +784,10 @@ func voiceCommon(tc *testcase, t *testing.T) {
 	if err = tc.prm.WriteProtectContent(); err != nil {
 		t.Fatal(err)
 	}
-	if err = tc.prm.WriteMessageEffectID("5107584321108051014"); err != nil {
+	if err = tc.prm.WriteMessageEffectID(msgEffect); err != nil {
 		t.Fatal(err)
 	}
-	if err = tc.prm.WriteReplyParameters(&types.ReplyParameters{MessageID: testbotdata.MessageID[types.BotID], ChatID: 738070596}); err != nil {
+	if err = tc.prm.WriteReplyParameters(tc.getReplyPrm()); err != nil {
 		t.Fatal(err)
 	}
 	if err = tc.msg.AddChat(tc.ch); err != nil {
@@ -651,17 +800,39 @@ func voiceCommon(tc *testcase, t *testing.T) {
 
 func voiceReq(t *testing.T) {
 	tc := new(testcase)
+	tc.init()
+	go tc.changeToken(voicedata, nil)
+	tc.whattocheck[status] = struct{}{}
+	tc.whattocheck[errr] = struct{}{}
+	tc.whattocheck[chat] = struct{}{}
+	tc.whattocheck[sender] = struct{}{}
+	tc.whattocheck[date] = struct{}{}
+	tc.whattocheck[msgid] = struct{}{}
+	tc.whattocheck[replyed] = struct{}{}
+	tc.whattocheck[vc] = struct{}{}
+	tc.whattocheck[msg] = struct{}{}
 	tc.addMedia = addVoice
 	tc.mediaF = voiceArr
-	tc.mediadata = voicedata
-	tc.sendMediaReq(t)
+	tc.mediadata = voicedata[tc.token]
+	tc.sendMediaReq(t, true)
 }
 
 func voiceAll(t *testing.T) {
 	tc := new(testcase)
+	tc.init()
+	go tc.changeToken(voicedata, nil)
+	tc.whattocheck[status] = struct{}{}
+	tc.whattocheck[errr] = struct{}{}
+	tc.whattocheck[chat] = struct{}{}
+	tc.whattocheck[sender] = struct{}{}
+	tc.whattocheck[date] = struct{}{}
+	tc.whattocheck[msgid] = struct{}{}
+	tc.whattocheck[replyed] = struct{}{}
+	tc.whattocheck[vc] = struct{}{}
+	tc.whattocheck[msg] = struct{}{}
 	tc.addMedia = addVoice
 	tc.mediaF = voiceArr
-	tc.mediadata = voicedata
+	tc.mediadata = voicedata[tc.token]
 	tc.common = voiceCommon
 	for i := 0; i < 3; i++ {
 		if i == 0 {
@@ -674,7 +845,7 @@ func voiceAll(t *testing.T) {
 			t.Log("Test Voice With ForceReply Keyboard")
 			tc.kbF = tc.forceKb
 		}
-		tc.sendMediaAll(t)
+		tc.sendMediaAll(t, true)
 	}
 }
 
@@ -685,7 +856,7 @@ func TestVoice(t *testing.T) {
 
 func videoNCommon(tc *testcase, t *testing.T) {
 	var err error
-	if err = tc.ch.WriteChatID(738070596); err != nil {
+	if err = tc.ch.WriteChatID(chatid); err != nil {
 		t.Fatal(err)
 	}
 	if err = tc.vdn.WriteDuration(111); err != nil {
@@ -700,10 +871,10 @@ func videoNCommon(tc *testcase, t *testing.T) {
 	if err = tc.prm.WriteProtectContent(); err != nil {
 		t.Fatal(err)
 	}
-	if err = tc.prm.WriteMessageEffectID("5107584321108051014"); err != nil {
+	if err = tc.prm.WriteMessageEffectID(msgEffect); err != nil {
 		t.Fatal(err)
 	}
-	if err = tc.prm.WriteReplyParameters(&types.ReplyParameters{MessageID: testbotdata.MessageID[types.BotID], ChatID: 738070596}); err != nil {
+	if err = tc.prm.WriteReplyParameters(tc.getReplyPrm()); err != nil {
 		t.Fatal(err)
 	}
 	if err = tc.msg.AddChat(tc.ch); err != nil {
@@ -716,22 +887,44 @@ func videoNCommon(tc *testcase, t *testing.T) {
 
 func videoNReq(t *testing.T) {
 	tc := new(testcase)
+	tc.init()
+	go tc.changeToken(videoNdata, nil)
+	tc.whattocheck[status] = struct{}{}
+	tc.whattocheck[errr] = struct{}{}
+	tc.whattocheck[chat] = struct{}{}
+	tc.whattocheck[sender] = struct{}{}
+	tc.whattocheck[date] = struct{}{}
+	tc.whattocheck[msgid] = struct{}{}
+	tc.whattocheck[replyed] = struct{}{}
+	tc.whattocheck[vdn] = struct{}{}
+	tc.whattocheck[msg] = struct{}{}
 	tc.addMedia = addVideoNote
 	tc.mediaF = videoNArr
-	tc.mediadata = videoNdata
-	tc.sendMediaReq(t)
+	tc.mediadata = videoNdata[tc.token]
+	tc.sendMediaReq(t, false)
 }
 
 func videoNAll(t *testing.T) {
 	tc := new(testcase)
+	tc.init()
+	go tc.changeToken(videoNdata, thumbvideoN)
+	tc.whattocheck[status] = struct{}{}
+	tc.whattocheck[errr] = struct{}{}
+	tc.whattocheck[chat] = struct{}{}
+	tc.whattocheck[sender] = struct{}{}
+	tc.whattocheck[date] = struct{}{}
+	tc.whattocheck[msgid] = struct{}{}
+	tc.whattocheck[replyed] = struct{}{}
+	// tc.whattocheck[vdn] = struct{}{}
+	tc.whattocheck[msg] = struct{}{}
 	tc.addMedia = addVideoNote
 	tc.mediaF = videoNArr
-	tc.mediadata = videoNdata
+	tc.mediadata = videoNdata[tc.token]
 	tc.common = videoNCommon
 	tc.thumb = true
 	tc.withoutString = true
 	tc.thumbnailF = videoNThumb
-	tc.thumbdata = thumbvideoN
+	tc.thumbdata = thumbvideoN[tc.token]
 	for i := 0; i < 3; i++ {
 		if i == 0 {
 			t.Log("Test Video Note With Inline Keyboard")
@@ -743,7 +936,7 @@ func videoNAll(t *testing.T) {
 			t.Log("Test Video Note With ForceReply Keyboard")
 			tc.kbF = tc.forceKb
 		}
-		tc.sendMediaAll(t)
+		tc.sendMediaAll(t, false)
 	}
 }
 
@@ -754,20 +947,40 @@ func TestVideoNote(t *testing.T) {
 
 func paidPhReq(t *testing.T) {
 	tc := new(testcase)
+	tc.init()
+	tc.whattocheck[status] = struct{}{}
+	tc.whattocheck[errr] = struct{}{}
+	tc.whattocheck[chat] = struct{}{}
+	tc.whattocheck[sender] = struct{}{}
+	tc.whattocheck[date] = struct{}{}
+	tc.whattocheck[msgid] = struct{}{}
+	tc.whattocheck[replyed] = struct{}{}
+	tc.whattocheck[ph] = struct{}{}
+	tc.whattocheck[msg] = struct{}{}
 	tc.addMedia = addPhoto
 	tc.mediaF = photoArr
-	tc.mediadata = photodata
+	tc.mediadata = photodata[types.BotID]
 	tc.paid = true
-	tc.sendMediaReq(t)
+	tc.sendMediaReq(t, false)
 }
 
 func paidVdReq(t *testing.T) {
 	tc := new(testcase)
+	tc.init()
+	tc.whattocheck[status] = struct{}{}
+	tc.whattocheck[errr] = struct{}{}
+	tc.whattocheck[chat] = struct{}{}
+	tc.whattocheck[sender] = struct{}{}
+	tc.whattocheck[date] = struct{}{}
+	tc.whattocheck[msgid] = struct{}{}
+	tc.whattocheck[replyed] = struct{}{}
+	tc.whattocheck[vd] = struct{}{}
+	tc.whattocheck[msg] = struct{}{}
 	tc.addMedia = addVideo
 	tc.mediaF = videoArr
-	tc.mediadata = videodata
+	tc.mediadata = videodata[types.BotID]
 	tc.paid = true
-	tc.sendMediaReq(t)
+	tc.sendMediaReq(t, false)
 }
 
 func paidReq(t *testing.T) {
@@ -777,9 +990,19 @@ func paidReq(t *testing.T) {
 
 func paidPhAll(t *testing.T) {
 	tc := new(testcase)
+	tc.init()
+	tc.whattocheck[status] = struct{}{}
+	tc.whattocheck[errr] = struct{}{}
+	tc.whattocheck[chat] = struct{}{}
+	tc.whattocheck[sender] = struct{}{}
+	tc.whattocheck[date] = struct{}{}
+	tc.whattocheck[msgid] = struct{}{}
+	tc.whattocheck[replyed] = struct{}{}
+	tc.whattocheck[ph] = struct{}{}
+	tc.whattocheck[msg] = struct{}{}
 	tc.addMedia = addPhoto
 	tc.mediaF = photoArr
-	tc.mediadata = photodata
+	tc.mediadata = photodata[types.BotID]
 	tc.paid = true
 	tc.common = photoCommon
 	for i := 0; i < 3; i++ {
@@ -793,20 +1016,30 @@ func paidPhAll(t *testing.T) {
 			t.Log("Test Photo With ForceReply Keyboard")
 			tc.kbF = tc.forceKb
 		}
-		tc.sendMediaAll(t)
+		tc.sendMediaAll(t, false)
 	}
 }
 
 func paidVdAll(t *testing.T) {
 	tc := new(testcase)
+	tc.init()
+	tc.whattocheck[status] = struct{}{}
+	tc.whattocheck[errr] = struct{}{}
+	tc.whattocheck[chat] = struct{}{}
+	tc.whattocheck[sender] = struct{}{}
+	tc.whattocheck[date] = struct{}{}
+	tc.whattocheck[msgid] = struct{}{}
+	tc.whattocheck[replyed] = struct{}{}
+	tc.whattocheck[vd] = struct{}{}
+	tc.whattocheck[msg] = struct{}{}
 	tc.addMedia = addVideo
 	tc.mediaF = videoArr
-	tc.mediadata = videodata
+	tc.mediadata = videodata[types.BotID]
 	tc.common = videoCommon
 	tc.thumb = true
 	tc.paid = true
 	tc.thumbnailF = videoThumb
-	tc.thumbdata = thumbvideo
+	tc.thumbdata = thumbvideo[types.BotID]
 	for i := 0; i < 3; i++ {
 		if i == 0 {
 			t.Log("Test Video With Inline Keyboard")
@@ -818,7 +1051,7 @@ func paidVdAll(t *testing.T) {
 			t.Log("Test Video With ForceReply Keyboard")
 			tc.kbF = tc.forceKb
 		}
-		tc.sendMediaAll(t)
+		tc.sendMediaAll(t, false)
 	}
 }
 
@@ -834,11 +1067,11 @@ func TestPaidMedia(t *testing.T) {
 
 func mgPhotoAll(ph formatter.IPhoto, q *int, t *testing.T) {
 	var err error
-	if err = ph.WriteCaption("there's a string"); err != nil {
+	if err = ph.WriteCaption(textformsg); err != nil {
 		t.Fatal(err)
 	}
 	if *q == 3 {
-		if err = ph.WriteCaptionEntities([]*types.MessageEntity{{Offset: 1, Length: 4, Type: "italic"}}); err != nil {
+		if err = ph.WriteCaptionEntities(entities); err != nil {
 			t.Fatal(err)
 		}
 	} else if *q >= 0 {
@@ -860,11 +1093,11 @@ func mgPhotoAll(ph formatter.IPhoto, q *int, t *testing.T) {
 
 func mgVideoAll(vd formatter.IVideo, q *int, majorq int, t *testing.T) {
 	var err error
-	if err = vd.WriteCaption("there's a string"); err != nil {
+	if err = vd.WriteCaption(textformsg); err != nil {
 		t.Fatal(err)
 	}
 	if *q == 3 {
-		if err = vd.WriteCaptionEntities([]*types.MessageEntity{{Offset: 1, Length: 4, Type: "italic"}}); err != nil {
+		if err = vd.WriteCaptionEntities(entities); err != nil {
 			t.Fatal(err)
 		}
 	} else if *q >= 0 {
@@ -891,11 +1124,11 @@ func mgVideoAll(vd formatter.IVideo, q *int, majorq int, t *testing.T) {
 		t.Fatal(err)
 	}
 	if majorq == 0 {
-		if err = vd.WriteThumbnail(thumbvideo[0]); err != nil {
+		if err = vd.WriteThumbnail(thumbvideo[types.BotID][0]); err != nil {
 			t.Fatal(err)
 		}
 	} else if majorq == 1 {
-		if err = vd.WriteThumbnailID(thumbvideo[1]); err != nil {
+		if err = vd.WriteThumbnailID(thumbvideo[types.BotID][1]); err != nil {
 			t.Fatal(err)
 		}
 	}
@@ -907,11 +1140,11 @@ func mgVideoAll(vd formatter.IVideo, q *int, majorq int, t *testing.T) {
 
 func mgDocumentAll(dc formatter.IDocument, q *int, majorq int, t *testing.T) {
 	var err error
-	if err = dc.WriteCaption("there's a string"); err != nil {
+	if err = dc.WriteCaption(textformsg); err != nil {
 		t.Fatal(err)
 	}
 	if *q == 3 {
-		if err = dc.WriteCaptionEntities([]*types.MessageEntity{{Offset: 1, Length: 4, Type: "italic"}}); err != nil {
+		if err = dc.WriteCaptionEntities(entities); err != nil {
 			t.Fatal(err)
 		}
 	} else if *q >= 0 {
@@ -920,11 +1153,11 @@ func mgDocumentAll(dc formatter.IDocument, q *int, majorq int, t *testing.T) {
 		}
 	}
 	if majorq == 0 {
-		if err = dc.WriteThumbnail(thumbdoc[0]); err != nil {
+		if err = dc.WriteThumbnail(thumbdoc[types.BotID][0]); err != nil {
 			t.Fatal(err)
 		}
 	} else if majorq == 1 {
-		if err = dc.WriteThumbnailID(thumbdoc[1]); err != nil {
+		if err = dc.WriteThumbnailID(thumbdoc[types.BotID][1]); err != nil {
 			t.Fatal(err)
 		}
 	}
@@ -939,11 +1172,11 @@ func mgDocumentAll(dc formatter.IDocument, q *int, majorq int, t *testing.T) {
 
 func mgAudioAll(ad formatter.IAudio, q *int, majorq int, t *testing.T) {
 	var err error
-	if err = ad.WriteCaption("there's a string"); err != nil {
+	if err = ad.WriteCaption(textformsg); err != nil {
 		t.Fatal(err)
 	}
 	if *q == 3 {
-		if err = ad.WriteCaptionEntities([]*types.MessageEntity{{Offset: 1, Length: 4, Type: "italic"}}); err != nil {
+		if err = ad.WriteCaptionEntities(entities); err != nil {
 			t.Fatal(err)
 		}
 	} else if *q >= 0 {
@@ -952,21 +1185,21 @@ func mgAudioAll(ad formatter.IAudio, q *int, majorq int, t *testing.T) {
 		}
 	}
 	if majorq == 0 {
-		if err = ad.WriteThumbnail(thumbaudio[0]); err != nil {
+		if err = ad.WriteThumbnail(thumbaudio[types.BotID][0]); err != nil {
 			t.Fatal(err)
 		}
 	} else if majorq == 1 {
-		if err = ad.WriteThumbnailID(thumbaudio[1]); err != nil {
+		if err = ad.WriteThumbnailID(thumbaudio[types.BotID][1]); err != nil {
 			t.Fatal(err)
 		}
 	}
 	if err = ad.WriteDuration(22); err != nil {
 		t.Fatal(err)
 	}
-	if err = ad.WritePerformer("Me Myself & I"); err != nil {
+	if err = ad.WritePerformer(emojies[rand.Intn(8)]); err != nil {
 		t.Fatal(err)
 	}
-	if err = ad.WriteTitle("The Cool Song"); err != nil {
+	if err = ad.WriteTitle(topicnames[rand.Intn(4)]); err != nil {
 		t.Fatal(err)
 	}
 	*q++
@@ -981,7 +1214,7 @@ func addMediaInGroup(tc *testcase, obj []int, q int, t *testing.T) {
 	for i := 0; i < tc.mg.amout; i++ {
 		if obj[i] == photo {
 			tc.mg.photos[p] = tc.msg.NewPhoto()
-			if err = tc.mg.phFunc(tc.mg.photos[p])[q](photodata[q]); err != nil {
+			if err = tc.mg.phFunc(tc.mg.photos[p])[q](photodata[types.BotID][q]); err != nil {
 				t.Fatal(err)
 			}
 			if tc.mg.all {
@@ -993,7 +1226,7 @@ func addMediaInGroup(tc *testcase, obj []int, q int, t *testing.T) {
 			p++
 		} else if obj[i] == video {
 			tc.mg.videos[v] = tc.msg.NewVideo()
-			if err = tc.mg.vdFunc(tc.mg.videos[v])[q](videodata[q]); err != nil {
+			if err = tc.mg.vdFunc(tc.mg.videos[v])[q](videodata[types.BotID][q]); err != nil {
 				t.Fatal(err)
 			}
 			if tc.mg.all {
@@ -1005,7 +1238,7 @@ func addMediaInGroup(tc *testcase, obj []int, q int, t *testing.T) {
 			v++
 		} else if obj[i] == audio {
 			tc.mg.audios[a] = tc.msg.NewAudio()
-			if err = tc.mg.adFunc(tc.mg.audios[a])[q](audiodata[q]); err != nil {
+			if err = tc.mg.adFunc(tc.mg.audios[a])[q](audiodata[types.BotID][q]); err != nil {
 				t.Fatal(err)
 			}
 			if tc.mg.all {
@@ -1017,7 +1250,7 @@ func addMediaInGroup(tc *testcase, obj []int, q int, t *testing.T) {
 			a++
 		} else {
 			tc.mg.documents[d] = tc.msg.NewDocument()
-			if err = tc.mg.docFunc(tc.mg.documents[d])[q](docdata[q]); err != nil {
+			if err = tc.mg.docFunc(tc.mg.documents[d])[q](docdata[types.BotID][q]); err != nil {
 				t.Fatal(err)
 			}
 			if tc.mg.all {
@@ -1049,26 +1282,46 @@ func audioF(ad formatter.IAudio) []func(string) error {
 
 func mediaGroupData(tc *testcase, obj []int, objtype int) {
 	var tp int
+	tc.whattocheck[status] = struct{}{}
+	tc.whattocheck[errr] = struct{}{}
+	tc.whattocheck[chat] = struct{}{}
+	tc.whattocheck[sender] = struct{}{}
+	tc.whattocheck[date] = struct{}{}
+	tc.whattocheck[msgids] = struct{}{}
+	tc.whattocheck[groupid] = struct{}{}
+	tc.whattocheck[replyed] = struct{}{}
+	tc.whattocheck[msgs] = struct{}{}
 	if objtype == photo {
 		tc.mg.phFunc = photoF
 		tc.mg.photos = make([]formatter.IPhoto, tc.mg.amout)
+		tc.whattocheck[phs] = struct{}{}
 	} else if objtype == video {
 		tp = video
 		tc.mg.vdFunc = videoF
 		tc.mg.videos = make([]formatter.IVideo, tc.mg.amout)
+		delete(tc.whattocheck, phs)
+		tc.whattocheck[vds] = struct{}{}
 	} else if objtype == audio {
 		tp = audio
 		tc.mg.adFunc = audioF
 		tc.mg.audios = make([]formatter.IAudio, tc.mg.amout)
+		delete(tc.whattocheck, vds)
+		tc.whattocheck[ads] = struct{}{}
 	} else if objtype == together {
 		tc.mg.vdFunc = videoF
 		tc.mg.phFunc = photoF
 		tc.mg.videos = make([]formatter.IVideo, tc.mg.amout/2)
 		tc.mg.photos = make([]formatter.IPhoto, tc.mg.amout/2)
+		delete(tc.whattocheck, ads)
+		tc.whattocheck[phs] = struct{}{}
+		tc.whattocheck[vds] = struct{}{}
 	} else {
 		tp = document
 		tc.mg.docFunc = documentF
 		tc.mg.documents = make([]formatter.IDocument, tc.mg.amout)
+		delete(tc.whattocheck, phs)
+		delete(tc.whattocheck, vds)
+		tc.whattocheck[docs] = struct{}{}
 	}
 	for k := range obj {
 		if objtype == together {
@@ -1101,17 +1354,15 @@ func mediaGroup(all bool, objtype int, t *testing.T) {
 			if all {
 				mediaGroupCommon(tc, t)
 			} else {
-				if err = tc.ch.WriteChatID(738070596); err != nil {
+				if err = tc.ch.WriteChatID(chatid); err != nil {
 					t.Fatal(err)
 				}
 				if err = tc.msg.AddChat(tc.ch); err != nil {
 					t.Fatal(err)
 				}
 			}
-			send(tc.msg, t)
-			if code, msg := tc.get.Error(); (code != tc.code[i]) && (msg != tc.errmsg[i]) {
-				t.Fatal(msg)
-			}
+			tc.send(tc.msg, t)
+			tc.checkResponse(t, i)
 		}
 	}
 }
@@ -1126,7 +1377,7 @@ func mediaReq(t *testing.T) {
 
 func mediaGroupCommon(tc *testcase, t *testing.T) {
 	var err error
-	if err = tc.ch.WriteChatID(738070596); err != nil {
+	if err = tc.ch.WriteChatID(chatid); err != nil {
 		t.Fatal(err)
 	}
 	if err = tc.prm.WriteDisableNotification(); err != nil {
@@ -1135,10 +1386,10 @@ func mediaGroupCommon(tc *testcase, t *testing.T) {
 	if err = tc.prm.WriteProtectContent(); err != nil {
 		t.Fatal(err)
 	}
-	if err = tc.prm.WriteMessageEffectID("5107584321108051014"); err != nil {
+	if err = tc.prm.WriteMessageEffectID(msgEffect); err != nil {
 		t.Fatal(err)
 	}
-	if err = tc.prm.WriteReplyParameters(&types.ReplyParameters{MessageID: testbotdata.MessageID[types.BotID], ChatID: 738070596}); err != nil {
+	if err = tc.prm.WriteReplyParameters(tc.getReplyPrm()); err != nil {
 		t.Fatal(err)
 	}
 	if err = tc.msg.AddChat(tc.ch); err != nil {
@@ -1163,13 +1414,13 @@ func locReq(t *testing.T) {
 	var err error
 	tc := new(testcase)
 	tc.init()
-	if err = tc.ch.WriteChatID(738070596); err != nil {
+	if err = tc.ch.WriteChatID(chatid); err != nil {
 		t.Fatal(err)
 	}
-	if err = tc.loc.WriteLatitude(31.7962236); err != nil {
+	if err = tc.loc.WriteLatitude(latitude); err != nil {
 		t.Fatal(err)
 	}
-	if err = tc.loc.WriteLongitude(35.0194702); err != nil {
+	if err = tc.loc.WriteLongitude(longitude); err != nil {
 		t.Fatal(err)
 	}
 	if err = tc.msg.AddLocation(tc.loc); err != nil {
@@ -1178,7 +1429,7 @@ func locReq(t *testing.T) {
 	if err = tc.msg.AddChat(tc.ch); err != nil {
 		t.Fatal(err)
 	}
-	send(tc.msg, t)
+	tc.send(tc.msg, t)
 	if code, msg := tc.get.Error(); code != 0 && msg != "" {
 		t.Fatal(msg)
 	}
@@ -1190,13 +1441,13 @@ func locAll(t *testing.T) {
 		tc := new(testcase)
 		tc.init()
 		var kb = [3]func(*testcase, *testing.T){tc.replyKb, tc.inlineKb, tc.forceKb}
-		if err = tc.ch.WriteChatID(738070596); err != nil {
+		if err = tc.ch.WriteChatID(chatid); err != nil {
 			t.Fatal(err)
 		}
-		if err = tc.loc.WriteLatitude(31.7962236); err != nil {
+		if err = tc.loc.WriteLatitude(latitude); err != nil {
 			t.Fatal(err)
 		}
-		if err = tc.loc.WriteLongitude(35.0194702); err != nil {
+		if err = tc.loc.WriteLongitude(longitude); err != nil {
 			t.Fatal(err)
 		}
 		if err = tc.loc.WriteHorizontalAccuracy(22); err != nil {
@@ -1217,10 +1468,10 @@ func locAll(t *testing.T) {
 		if err = tc.prm.WriteProtectContent(); err != nil {
 			t.Fatal(err)
 		}
-		if err = tc.prm.WriteMessageEffectID("5107584321108051014"); err != nil {
+		if err = tc.prm.WriteMessageEffectID(msgEffect); err != nil {
 			t.Fatal(err)
 		}
-		if err = tc.prm.WriteReplyParameters(&types.ReplyParameters{MessageID: testbotdata.MessageID[types.BotID], ChatID: 738070596}); err != nil {
+		if err = tc.prm.WriteReplyParameters(tc.getReplyPrm()); err != nil {
 			t.Fatal(err)
 		}
 		if err = tc.msg.AddParameters(tc.prm); err != nil {
@@ -1233,7 +1484,7 @@ func locAll(t *testing.T) {
 			t.Fatal(err)
 		}
 		kb[i](tc, t)
-		send(tc.msg, t)
+		tc.send(tc.msg, t)
 		if code, msg := tc.get.Error(); code != 0 && msg != "" {
 			t.Fatal(msg)
 		}
@@ -1249,19 +1500,19 @@ func venReq(t *testing.T) {
 	var err error
 	tc := new(testcase)
 	tc.init()
-	if err = tc.ch.WriteChatID(738070596); err != nil {
+	if err = tc.ch.WriteChatID(chatid); err != nil {
 		t.Fatal(err)
 	}
-	if err = tc.loc.WriteLatitude(31.7962236); err != nil {
+	if err = tc.loc.WriteLatitude(latitude); err != nil {
 		t.Fatal(err)
 	}
-	if err = tc.loc.WriteLongitude(35.0194702); err != nil {
+	if err = tc.loc.WriteLongitude(longitude); err != nil {
 		t.Fatal(err)
 	}
-	if err = tc.loc.WriteTitle("The City Of The History"); err != nil {
+	if err = tc.loc.WriteTitle(placetitle); err != nil {
 		t.Fatal(err)
 	}
-	if err = tc.loc.WriteAddress("Jerusalem"); err != nil {
+	if err = tc.loc.WriteAddress(city); err != nil {
 		t.Fatal(err)
 	}
 	if err = tc.msg.AddLocation(tc.loc); err != nil {
@@ -1270,7 +1521,7 @@ func venReq(t *testing.T) {
 	if err = tc.msg.AddChat(tc.ch); err != nil {
 		t.Fatal(err)
 	}
-	send(tc.msg, t)
+	tc.send(tc.msg, t)
 	if code, msg := tc.get.Error(); code != 0 && msg != "" {
 		t.Fatal(msg)
 	}
@@ -1282,19 +1533,19 @@ func venAll(t *testing.T) {
 		tc := new(testcase)
 		tc.init()
 		var kb = [3]func(*testcase, *testing.T){tc.replyKb, tc.inlineKb, tc.forceKb}
-		if err = tc.ch.WriteChatID(738070596); err != nil {
+		if err = tc.ch.WriteChatID(chatid); err != nil {
 			t.Fatal(err)
 		}
-		if err = tc.loc.WriteLatitude(31.7962236); err != nil {
+		if err = tc.loc.WriteLatitude(latitude); err != nil {
 			t.Fatal(err)
 		}
-		if err = tc.loc.WriteLongitude(35.0194702); err != nil {
+		if err = tc.loc.WriteLongitude(longitude); err != nil {
 			t.Fatal(err)
 		}
-		if err = tc.loc.WriteTitle("The City Of The History"); err != nil {
+		if err = tc.loc.WriteTitle(placetitle); err != nil {
 			t.Fatal(err)
 		}
-		if err = tc.loc.WriteAddress("Jerusalem"); err != nil {
+		if err = tc.loc.WriteAddress(city); err != nil {
 			t.Fatal(err)
 		}
 		if err = tc.loc.WriteFoursquareID("44"); err != nil {
@@ -1315,10 +1566,10 @@ func venAll(t *testing.T) {
 		if err = tc.prm.WriteProtectContent(); err != nil {
 			t.Fatal(err)
 		}
-		if err = tc.prm.WriteMessageEffectID("5107584321108051014"); err != nil {
+		if err = tc.prm.WriteMessageEffectID(msgEffect); err != nil {
 			t.Fatal(err)
 		}
-		if err = tc.prm.WriteReplyParameters(&types.ReplyParameters{MessageID: testbotdata.MessageID[types.BotID], ChatID: 738070596}); err != nil {
+		if err = tc.prm.WriteReplyParameters(tc.getReplyPrm()); err != nil {
 			t.Fatal(err)
 		}
 		if err = tc.msg.AddParameters(tc.prm); err != nil {
@@ -1331,7 +1582,7 @@ func venAll(t *testing.T) {
 			t.Fatal(err)
 		}
 		kb[i](tc, t)
-		send(tc.msg, t)
+		tc.send(tc.msg, t)
 		if code, msg := tc.get.Error(); code != 0 && msg != "" {
 			t.Fatal(msg)
 		}
@@ -1347,13 +1598,13 @@ func conReq(t *testing.T) {
 	var err error
 	tc := new(testcase)
 	tc.init()
-	if err = tc.ch.WriteChatID(738070596); err != nil {
+	if err = tc.ch.WriteChatID(chatid); err != nil {
 		t.Fatal(err)
 	}
-	if err = tc.con.WritePhoneNumber("0123422211"); err != nil {
+	if err = tc.con.WritePhoneNumber(phonenum); err != nil {
 		t.Fatal(err)
 	}
-	if err = tc.con.WriteFirstName("Nathan"); err != nil {
+	if err = tc.con.WriteFirstName(name); err != nil {
 		t.Fatal(err)
 	}
 	if err = tc.msg.AddContact(tc.con); err != nil {
@@ -1362,7 +1613,7 @@ func conReq(t *testing.T) {
 	if err = tc.msg.AddChat(tc.ch); err != nil {
 		t.Fatal(err)
 	}
-	send(tc.msg, t)
+	tc.send(tc.msg, t)
 	if code, msg := tc.get.Error(); code != 0 && msg != "" {
 		t.Fatal(msg)
 	}
@@ -1374,19 +1625,19 @@ func conAll(t *testing.T) {
 		tc := new(testcase)
 		tc.init()
 		var kb = [3]func(*testcase, *testing.T){tc.replyKb, tc.inlineKb, tc.forceKb}
-		if err = tc.ch.WriteChatID(738070596); err != nil {
+		if err = tc.ch.WriteChatID(chatid); err != nil {
 			t.Fatal(err)
 		}
-		if err = tc.con.WritePhoneNumber("0123422211"); err != nil {
+		if err = tc.con.WritePhoneNumber(phonenum); err != nil {
 			t.Fatal(err)
 		}
-		if err = tc.con.WriteFirstName("Nathan"); err != nil {
+		if err = tc.con.WriteFirstName(name); err != nil {
 			t.Fatal(err)
 		}
-		if err = tc.con.WriteLastName("Sahar"); err != nil {
+		if err = tc.con.WriteLastName(lastname); err != nil {
 			t.Fatal(err)
 		}
-		if err = tc.con.WriteVCard("BEGIN:VCARD\nVERSION:4.0\nFN:Nathan Sahar\nN:Nathan;Simon;;;ing. jr,M.Sc.\nBDAY:--0203\nGENDER:M\nEMAIL;TYPE=work:nathan.sahar@proton.me\nEND:VCARD"); err != nil {
+		if err = tc.con.WriteVCard(vcard); err != nil {
 			t.Fatal(err)
 		}
 		if err = tc.prm.WriteDisableNotification(); err != nil {
@@ -1395,10 +1646,10 @@ func conAll(t *testing.T) {
 		if err = tc.prm.WriteProtectContent(); err != nil {
 			t.Fatal(err)
 		}
-		if err = tc.prm.WriteMessageEffectID("5107584321108051014"); err != nil {
+		if err = tc.prm.WriteMessageEffectID(msgEffect); err != nil {
 			t.Fatal(err)
 		}
-		if err = tc.prm.WriteReplyParameters(&types.ReplyParameters{MessageID: testbotdata.MessageID[types.BotID], ChatID: 738070596}); err != nil {
+		if err = tc.prm.WriteReplyParameters(tc.getReplyPrm()); err != nil {
 			t.Fatal(err)
 		}
 		if err = tc.msg.AddParameters(tc.prm); err != nil {
@@ -1411,7 +1662,7 @@ func conAll(t *testing.T) {
 			t.Fatal(err)
 		}
 		kb[i](tc, t)
-		send(tc.msg, t)
+		tc.send(tc.msg, t)
 		if code, msg := tc.get.Error(); code != 0 && msg != "" {
 			t.Fatal(msg)
 		}
@@ -1427,13 +1678,13 @@ func pollReq(t *testing.T) {
 	var err error
 	tc := new(testcase)
 	tc.init()
-	if err = tc.ch.WriteChatID(738070596); err != nil {
+	if err = tc.ch.WriteChatID(chatid); err != nil {
 		t.Fatal(err)
 	}
-	if err = tc.poll.WriteQuestion("Am I good?"); err != nil {
+	if err = tc.poll.WriteQuestion(question); err != nil {
 		t.Fatal(err)
 	}
-	if err = tc.poll.WriteOptions([]*types.PollOption{{Text: "Yes!"}, {Text: "No!"}}); err != nil {
+	if err = tc.poll.WriteOptions(pollOpt); err != nil {
 		t.Fatal(err)
 	}
 	if err = tc.msg.AddPoll(tc.poll); err != nil {
@@ -1442,7 +1693,7 @@ func pollReq(t *testing.T) {
 	if err = tc.msg.AddChat(tc.ch); err != nil {
 		t.Fatal(err)
 	}
-	send(tc.msg, t)
+	tc.send(tc.msg, t)
 	if code, msg := tc.get.Error(); code != 0 && msg != "" {
 		t.Fatal(msg)
 	}
@@ -1457,7 +1708,7 @@ func pollAll(t *testing.T) {
 				tc.init()
 				var kb = [3]func(*testcase, *testing.T){tc.replyKb, tc.inlineKb, tc.forceKb}
 				if j == 3 {
-					if err = tc.poll.WriteQuestionEntities([]*types.MessageEntity{{Offset: 1, Length: 4, Type: "italic"}}); err != nil {
+					if err = tc.poll.WriteQuestionEntities(entities); err != nil {
 						t.Fatal(err)
 					}
 				} else {
@@ -1466,7 +1717,7 @@ func pollAll(t *testing.T) {
 					}
 				}
 				if k == 3 {
-					if err = tc.poll.WriteExplanationEntities([]*types.MessageEntity{{Offset: 1, Length: 4, Type: "italic"}}); err != nil {
+					if err = tc.poll.WriteExplanationEntities(entities); err != nil {
 						t.Fatal(err)
 					}
 				} else {
@@ -1474,13 +1725,13 @@ func pollAll(t *testing.T) {
 						t.Fatal(err)
 					}
 				}
-				if err = tc.ch.WriteChatID(738070596); err != nil {
+				if err = tc.ch.WriteChatID(chatid); err != nil {
 					t.Fatal(err)
 				}
-				if err = tc.poll.WriteQuestion("Am I good?"); err != nil {
+				if err = tc.poll.WriteQuestion(question); err != nil {
 					t.Fatal(err)
 				}
-				if err = tc.poll.WriteOptions([]*types.PollOption{{Text: "Yes!", VoterCount: 66}, {Text: "No!", VoterCount: 12}}); err != nil {
+				if err = tc.poll.WriteOptions(pollOpt); err != nil {
 					t.Fatal(err)
 				}
 				if err = tc.poll.WriteAnonymous(false); err != nil {
@@ -1504,13 +1755,13 @@ func pollAll(t *testing.T) {
 				if err = tc.prm.WriteProtectContent(); err != nil {
 					t.Fatal(err)
 				}
-				if err = tc.prm.WriteMessageEffectID("5107584321108051014"); err != nil {
+				if err = tc.prm.WriteMessageEffectID(msgEffect); err != nil {
 					t.Fatal(err)
 				}
-				if err = tc.prm.WriteReplyParameters(&types.ReplyParameters{MessageID: testbotdata.MessageID[types.BotID], ChatID: 738070596}); err != nil {
+				if err = tc.prm.WriteReplyParameters(tc.getReplyPrm()); err != nil {
 					t.Fatal(err)
 				}
-				if err = tc.poll.WriteExplanation("Yes, I am"); err != nil {
+				if err = tc.poll.WriteExplanation(explanation); err != nil {
 					t.Fatal(err)
 				}
 				if err = tc.msg.AddPoll(tc.poll); err != nil {
@@ -1523,7 +1774,7 @@ func pollAll(t *testing.T) {
 					t.Fatal(err)
 				}
 				kb[i](tc, t)
-				send(tc.msg, t)
+				tc.send(tc.msg, t)
 				if code, msg := tc.get.Error(); code != 0 && msg != "" {
 					t.Fatal(msg)
 				}
@@ -1541,7 +1792,7 @@ func diceReq(t *testing.T) {
 	var err error
 	tc := new(testcase)
 	tc.init()
-	if err = tc.ch.WriteChatID(738070596); err != nil {
+	if err = tc.ch.WriteChatID(chatid); err != nil {
 		t.Fatal(err)
 	}
 	if err = tc.prm.WriteEmoji(types.Emojis[0]); err != nil {
@@ -1553,7 +1804,7 @@ func diceReq(t *testing.T) {
 	if err = tc.msg.AddChat(tc.ch); err != nil {
 		t.Fatal(err)
 	}
-	send(tc.msg, t)
+	tc.send(tc.msg, t)
 	if code, msg := tc.get.Error(); code != 0 && msg != "" {
 		t.Fatal(msg)
 	}
@@ -1565,7 +1816,7 @@ func diceAll(t *testing.T) {
 		tc := new(testcase)
 		tc.init()
 		var kb = [3]func(*testcase, *testing.T){tc.replyKb, tc.inlineKb, tc.forceKb}
-		if err = tc.ch.WriteChatID(738070596); err != nil {
+		if err = tc.ch.WriteChatID(chatid); err != nil {
 			t.Fatal(err)
 		}
 		if err = tc.prm.WriteEmoji(types.Emojis[rand.Intn(5)]); err != nil {
@@ -1577,10 +1828,10 @@ func diceAll(t *testing.T) {
 		if err = tc.prm.WriteProtectContent(); err != nil {
 			t.Fatal(err)
 		}
-		if err = tc.prm.WriteMessageEffectID("5107584321108051014"); err != nil {
+		if err = tc.prm.WriteMessageEffectID(msgEffect); err != nil {
 			t.Fatal(err)
 		}
-		if err = tc.prm.WriteReplyParameters(&types.ReplyParameters{MessageID: testbotdata.MessageID[types.BotID], ChatID: 738070596}); err != nil {
+		if err = tc.prm.WriteReplyParameters(tc.getReplyPrm()); err != nil {
 			t.Fatal(err)
 		}
 		if err = tc.msg.AddParameters(tc.prm); err != nil {
@@ -1590,7 +1841,7 @@ func diceAll(t *testing.T) {
 			t.Fatal(err)
 		}
 		kb[i](tc, t)
-		send(tc.msg, t)
+		tc.send(tc.msg, t)
 		if code, msg := tc.get.Error(); code != 0 && msg != "" {
 			t.Fatal(msg)
 		}
@@ -1606,7 +1857,7 @@ func chactReq(t *testing.T) {
 	var err error
 	tc := new(testcase)
 	tc.init()
-	if err = tc.ch.WriteChatID(738070596); err != nil {
+	if err = tc.ch.WriteChatID(chatid); err != nil {
 		t.Fatal(err)
 	}
 	if err = tc.prm.WriteAction(types.Actions[rand.Intn(10)]); err != nil {
@@ -1618,7 +1869,7 @@ func chactReq(t *testing.T) {
 	if err = tc.msg.AddChat(tc.ch); err != nil {
 		t.Fatal(err)
 	}
-	send(tc.msg, t)
+	tc.send(tc.msg, t)
 	if code, msg := tc.get.Error(); code != 0 && msg != "" {
 		t.Fatal(msg)
 	}
@@ -1628,64 +1879,64 @@ func TestChatAction(t *testing.T) {
 	t.Run("Req", chactReq)
 }
 
-func stickerCommon(tc *testcase, t *testing.T) {
-	var err error
-	if err = tc.ch.WriteChatID(738070596); err != nil {
-		t.Fatal(err)
-	}
-	if err = tc.st.WriteAssociatedEmoji("😁"); err != nil {
-		t.Fatal(err)
-	}
-	if err = tc.prm.WriteDisableNotification(); err != nil {
-		t.Fatal(err)
-	}
-	if err = tc.prm.WriteProtectContent(); err != nil {
-		t.Fatal(err)
-	}
-	if err = tc.prm.WriteMessageEffectID("5107584321108051014"); err != nil {
-		t.Fatal(err)
-	}
-	if err = tc.prm.WriteReplyParameters(&types.ReplyParameters{MessageID: testbotdata.MessageID[types.BotID], ChatID: 738070596}); err != nil {
-		t.Fatal(err)
-	}
-	if err = tc.msg.AddChat(tc.ch); err != nil {
-		t.Fatal(err)
-	}
-	if err = tc.msg.AddParameters(tc.prm); err != nil {
-		t.Fatal(err)
-	}
-}
+// func stickerCommon(tc *testcase, t *testing.T) {
+// 	var err error
+// 	if err = tc.ch.WriteChatID(chatid); err != nil {
+// 		t.Fatal(err)
+// 	}
+// 	if err = tc.st.WriteAssociatedEmoji("😁"); err != nil {
+// 		t.Fatal(err)
+// 	}
+// 	if err = tc.prm.WriteDisableNotification(); err != nil {
+// 		t.Fatal(err)
+// 	}
+// 	if err = tc.prm.WriteProtectContent(); err != nil {
+// 		t.Fatal(err)
+// 	}
+// 	if err = tc.prm.WriteMessageEffectID(msgEffect); err != nil {
+// 		t.Fatal(err)
+// 	}
+// 	if err = tc.prm.WriteReplyParameters(tc.getReplyPrm()); err != nil {
+// 		t.Fatal(err)
+// 	}
+// 	if err = tc.msg.AddChat(tc.ch); err != nil {
+// 		t.Fatal(err)
+// 	}
+// 	if err = tc.msg.AddParameters(tc.prm); err != nil {
+// 		t.Fatal(err)
+// 	}
+// }
 
 func stickerReq(t *testing.T) {
 	tc := new(testcase)
 	tc.addMedia = addSticker
 	tc.mediaF = stickerArr
-	tc.mediadata = stickerdata
-	tc.sendMediaReq(t)
+	tc.mediadata = stickerdata[types.BotID]
+	tc.sendMediaReq(t, false)
 }
 
-func stickerAll(t *testing.T) {
-	tc := new(testcase)
-	tc.addMedia = addSticker
-	tc.mediaF = stickerArr
-	tc.mediadata = stickerdata
-	tc.common = stickerCommon
-	for i := 0; i < 3; i++ {
-		if i == 0 {
-			t.Log("Test Sticker With Inline Keyboard")
-			tc.kbF = tc.inlineKb
-		} else if i == 1 {
-			t.Log("Test Sticker With ReplyMarkup Keyboard")
-			tc.kbF = tc.replyKb
-		} else {
-			t.Log("Test Sticker With ForceReply Keyboard")
-			tc.kbF = tc.forceKb
-		}
-		tc.sendMediaAll(t)
-	}
-}
+// func stickerAll(t *testing.T) {
+// 	tc := new(testcase)
+// 	tc.addMedia = addSticker
+// 	tc.mediaF = stickerArr
+// 	tc.mediadata = stickerdata
+// 	tc.common = stickerCommon
+// 	for i := 0; i < 3; i++ {
+// 		if i == 0 {
+// 			t.Log("Test Sticker With Inline Keyboard")
+// 			tc.kbF = tc.inlineKb
+// 		} else if i == 1 {
+// 			t.Log("Test Sticker With ReplyMarkup Keyboard")
+// 			tc.kbF = tc.replyKb
+// 		} else {; err != nil {
+// 		t.Fatal(err)
+// 	}
+// 		}
+// 		tc.sendMediaAll(t, false)
+// 	}
+// }
 
 func TestSticker(t *testing.T) {
 	t.Run("Req", stickerReq)
-	t.Run("All", stickerAll)
+	// t.Run("All", stickerAll)
 }

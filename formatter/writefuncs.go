@@ -99,7 +99,8 @@ func (ph *photo) WritePhotoStorage(photo string) error {
 	if err = checkStringValue(photo, ph.Photo); err == nil {
 		if err = ph.isCorrectType(photo); err == nil {
 			ph.gottenFrom = Storage
-			ph.Photo, ph.Media = photo, photo
+			ph.Photo, ph.Media = photo, fmt.Sprintf("attach://%s", photo)
+			ph.Type = "photo"
 			logs.DataWrittenSuccessfully(interfacePhoto, "Photo From Storage")
 		}
 	}
@@ -111,6 +112,7 @@ func (ph *photo) WritePhotoTelegram(photo string) error {
 	if err = checkStringValue(photo, ph.Photo); err == nil {
 		ph.gottenFrom = Telegram
 		ph.Photo, ph.Media = photo, photo
+		ph.Type = "photo"
 		logs.DataWrittenSuccessfully(interfacePhoto, "Photo From Telegram")
 
 	}
@@ -122,6 +124,7 @@ func (ph *photo) WritePhotoInternet(photo string) error {
 	if err = checkStringValue(photo, ph.Photo); err == nil {
 		ph.gottenFrom = Internet
 		ph.Photo, ph.Media = photo, photo
+		ph.Type = "photo"
 		logs.DataWrittenSuccessfully(interfacePhoto, "Photo From Internet")
 
 	}
@@ -182,8 +185,9 @@ func (vd *video) WriteVideoStorage(video string) error {
 	if err = checkStringValue(video, vd.Video); err == nil {
 		if err = vd.isCorrectType(video); err == nil {
 			vd.videoGottenFrom = Storage
-			vd.Video, vd.Media = video, video
-			logs.DataWrittenSuccessfully(interfaceVideo, "Photo From Storage")
+			vd.Video, vd.Media = video, fmt.Sprintf("attach://%s", video)
+			vd.Type = "video"
+			logs.DataWrittenSuccessfully(interfaceVideo, "Video From Storage")
 		}
 	}
 	return err
@@ -194,7 +198,8 @@ func (vd *video) WriteVideoTelegram(video string) error {
 	if err = checkStringValue(video, vd.Video); err == nil {
 		vd.videoGottenFrom = Telegram
 		vd.Video, vd.Media = video, video
-		logs.DataWrittenSuccessfully(interfaceVideo, "Photo From Telegram")
+		vd.Type = "video"
+		logs.DataWrittenSuccessfully(interfaceVideo, "Video From Telegram")
 	}
 	return err
 }
@@ -204,7 +209,8 @@ func (vd *video) WriteVideoInternet(video string) error {
 	if err = checkStringValue(video, vd.Video); err == nil {
 		vd.videoGottenFrom = Internet
 		vd.Video, vd.Media = video, video
-		logs.DataWrittenSuccessfully(interfaceVideo, "Photo From Internet")
+		vd.Type = "video"
+		logs.DataWrittenSuccessfully(interfaceVideo, "Video From Internet")
 	}
 	return err
 }
@@ -321,7 +327,7 @@ func (vd *video) WriteHasSpoiler() error {
 func (vd *video) WriteCoverStorage(path string) error {
 	var err error
 	if err = checkStringValue(path, vd.Cover); err == nil {
-		vd.Cover = path
+		vd.Cover = fmt.Sprintf("attach://%s", path)
 		vd.coverGottenFrom = Storage
 		logs.DataWrittenSuccessfully(interfaceVideo, "Cover From Storage")
 	}
@@ -353,7 +359,8 @@ func (ad *audio) WriteAudioStorage(audio string) error {
 	if err = checkStringValue(audio, ad.Audio); err == nil {
 		if err = ad.isCorrectType(audio); err == nil {
 			ad.audioGottenFrom = Storage
-			ad.Audio, ad.Media = audio, audio
+			ad.Audio, ad.Media = audio, fmt.Sprintf("attach://%s", audio)
+			ad.Type = "audio"
 			logs.DataWrittenSuccessfully(interfaceAudio, "Audio From Storage")
 		}
 	}
@@ -365,6 +372,7 @@ func (ad *audio) WriteAudioTelegram(audio string) error {
 	if err = checkStringValue(audio, ad.Audio); err == nil {
 		ad.audioGottenFrom = Telegram
 		ad.Audio, ad.Media = audio, audio
+		ad.Type = "audio"
 		logs.DataWrittenSuccessfully(interfaceAudio, "Audio From Telegram")
 	}
 	return err
@@ -375,6 +383,7 @@ func (ad *audio) WriteAudioInternet(audio string) error {
 	if err = checkStringValue(audio, ad.Audio); err == nil {
 		ad.audioGottenFrom = Internet
 		ad.Audio, ad.Media = audio, audio
+		ad.Type = "audio"
 		logs.DataWrittenSuccessfully(interfaceAudio, "Audio From Internet")
 	}
 	return err
@@ -460,7 +469,8 @@ func (dc *document) WriteDocumentStorage(document string) error {
 	var err error
 	if err = checkStringValue(document, dc.Document); err == nil {
 		dc.documentGottenFrom = Storage
-		dc.Document, dc.Media = document, document
+		dc.Document, dc.Media = document, fmt.Sprintf("attach://%s", document)
+		dc.Type = "document"
 		logs.DataWrittenSuccessfully(interfaceDocument, "Document From Storage")
 	}
 	return err
@@ -471,6 +481,7 @@ func (dc *document) WriteDocumentTelegram(document string) error {
 	if err = checkStringValue(document, dc.Document); err == nil {
 		dc.documentGottenFrom = Telegram
 		dc.Document, dc.Media = document, document
+		dc.Type = "document"
 		logs.DataWrittenSuccessfully(interfaceDocument, "Document From Telegram")
 	}
 	return err
@@ -481,6 +492,7 @@ func (dc *document) WriteDocumentInternet(document string) error {
 	if err = checkStringValue(document, dc.Document); err == nil {
 		dc.documentGottenFrom = Internet
 		dc.Document, dc.Media = document, document
+		dc.Type = "document"
 		logs.DataWrittenSuccessfully(interfaceDocument, "Document From Internet")
 	}
 	return err
@@ -546,16 +558,12 @@ func (dc *document) WriteDisableContentTypeDetection() error {
 	return err
 }
 
-func (dc *document) GetResponse() types.Document {
-	return dc.response
-}
-
 func (an *animation) WriteAnimationStorage(animation string) error {
 	var err error
 	if err = checkStringValue(animation, an.Animation); err == nil {
 		if err = an.isCorrectType(animation); err == nil {
 			an.animationGottenFrom = Storage
-			an.Animation = animation
+			an.Animation, an.Media = animation, fmt.Sprintf("attach://%s", animation)
 			logs.DataWrittenSuccessfully(interfaceAnimation, "Animation From Storage")
 		}
 	}
@@ -688,7 +696,7 @@ func (vdn *videonote) WriteVideoNoteStorage(videonote string) error {
 	if err = checkStringValue(videonote, vdn.VideoNote); err == nil {
 		if err = vdn.isCorrectType(videonote); err == nil {
 			vdn.videoGottenFrom = Storage
-			vdn.VideoNote, vdn.Media = videonote, videonote
+			vdn.VideoNote = videonote
 			logs.DataWrittenSuccessfully(interfaceVoice, "Video-Note From Storage")
 		}
 	}
@@ -699,7 +707,7 @@ func (vdn *videonote) WriteVideoNoteTelegram(vdnID string) error {
 	var err error
 	if err = checkStringValue(vdnID, vdn.VideoNote); err == nil {
 		vdn.videoGottenFrom = Telegram
-		vdn.VideoNote, vdn.Media = vdnID, vdnID
+		vdn.VideoNote = vdnID
 		logs.DataWrittenSuccessfully(interfaceVoice, "Video-Note From Telegram")
 	}
 	return err
@@ -709,7 +717,7 @@ func (vdn *videonote) WriteVideoNoteInternet(URL string) error {
 	var err error
 	if err = checkStringValue(URL, vdn.VideoNote); err == nil {
 		vdn.videoGottenFrom = Internet
-		vdn.VideoNote, vdn.Media = URL, URL
+		vdn.VideoNote = URL
 		logs.DataWrittenSuccessfully(interfaceVoice, "Video-Note From Internet")
 	}
 	return err
@@ -1233,7 +1241,7 @@ func (st *sticker) WriteStickerStorage(path string) error {
 	var err error
 	if err = checkStringValue(path, st.Sticker); err == nil {
 		if err = st.isCorrectType(path); err == nil {
-			st.Sticker, st.stickerGottenFrom = path, Storage
+			st.Sticker, st.stickerGottenFrom = fmt.Sprintf("attach://%s", path), Storage
 			logs.DataWrittenSuccessfully(interfaceSticker, "Sticker From Storage")
 		}
 	}

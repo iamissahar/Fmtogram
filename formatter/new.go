@@ -40,7 +40,7 @@ func (msg *Message) NewVoice() IVoice {
 
 func (msg *Message) NewVideoNote() IVideoNote {
 	logs.NewInterfaceCreated(interfaceVideoNote)
-	return &videonote{Type: "video_note"}
+	return &videonote{}
 }
 
 func (msg *Message) NewLocation() ILocation {

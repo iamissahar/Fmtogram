@@ -7,61 +7,15 @@ import (
 	"github.com/l1qwie/Fmtogram/types"
 )
 
-func send(msg *formatter.Message, t *testing.T) {
+func (tc *testcase) send(msg *formatter.Message, t *testing.T) {
+	types.BotID = tc.token
 	if _, err := msg.Send(); err != nil {
 		t.Log(err)
 	}
 }
 
-func (tc *testcase) txtAndPrm(gotext func(string) error, goentities func([]*types.MessageEntity) error, do bool, t *testing.T) {
-	var err error
-	if err = gotext("There's a text"); err != nil {
-		t.Fatal(err)
-	}
-	if do {
-		if err = goentities([]*types.MessageEntity{{Offset: 1, Length: 4, Type: "italic"}}); err != nil {
-			t.Fatal(err)
-		}
-	}
-}
-
-func (tc *testcase) begining(t *testing.T) {
-	var err error
-	if err = tc.ch.WriteChatID(738070596); err != nil {
-		t.Fatal(err)
-	}
-	if err = tc.ch.WriteBusinessConnectionID("BusinessConnectionID"); err != nil {
-		t.Fatal(err)
-	}
-	if err = tc.prm.WriteMessageThreadID(1111); err != nil {
-		t.Fatal(err)
-	}
-}
-
 func addKb(msg *formatter.Message, kb formatter.IKeyboard, t *testing.T) {
 	if err := msg.AddKeyboard(kb); err != nil {
-		t.Fatal(err)
-	}
-}
-
-func (tc *testcase) ending(t *testing.T) {
-	var err error
-	if err = tc.prm.WriteDisableNotification(); err != nil {
-		t.Fatal(err)
-	}
-	if err = tc.prm.WriteProtectContent(); err != nil {
-		t.Fatal(err)
-	}
-	// if err = tc.prm.WriteAllowPaidBroadcast(); err != nil {
-	// 	t.Fatal(err)
-	// }
-	if err = tc.prm.WriteMessageEffectID("5107584321108051014"); err != nil {
-		t.Fatal(err)
-	}
-	if err = tc.prm.WriteReplyParameters(&types.ReplyParameters{MessageID: 3966, ChatID: 738070596}); err != nil {
-		t.Fatal(err)
-	}
-	if err = tc.msg.AddParameters(tc.prm); err != nil {
 		t.Fatal(err)
 	}
 }
@@ -150,7 +104,6 @@ func (*testcase) replyKb(tc *testcase, t *testing.T) {
 		}
 	}
 	addKb(tc.msg, kb, t)
-	send(tc.msg, t)
 }
 
 // I'm not testing WritePay and WriteCallbackGame
@@ -222,7 +175,6 @@ func (*testcase) inlineKb(tc *testcase, t *testing.T) {
 		}
 	}
 	addKb(tc.msg, kb, t)
-	send(tc.msg, t)
 }
 
 func (*testcase) forceKb(tc *testcase, t *testing.T) {
@@ -241,25 +193,4 @@ func (*testcase) forceKb(tc *testcase, t *testing.T) {
 		t.Fatal(err)
 	}
 	addKb(tc.msg, kb, t)
-	send(tc.msg, t)
 }
-
-// func (tc *testcase) ending(t *testing.T) {
-// 	if err := tc.msg.AddParameters(tc.prm); err != nil {
-// 		t.Fatal(err)
-// 	}
-// 	if !tc.withoutEnding {
-// 		withoutKB(tc.prm, t)
-// 		if !tc.withoutKB {
-// 			if tc.onlyInline {
-// 				withInlineKB(tc.msg, t)
-// 			} else {
-// 				withReplyKB(tc.msg, t)
-// 				withInlineKB(tc.msg, t)
-// 				withForceReplyKB(tc.msg, t)
-// 			}
-// 		}
-// 	} else {
-// 		send(tc.msg, t)
-// 	}
-// }

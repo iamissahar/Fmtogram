@@ -118,6 +118,10 @@ func (g *get) Message() *types.Message {
 	return g.msg
 }
 
+func (g *get) Messages() []*types.Message {
+	return g.msgs
+}
+
 func (g *get) String() string {
 	return g.str
 }

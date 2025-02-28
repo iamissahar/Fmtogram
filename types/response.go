@@ -131,6 +131,11 @@ type MediaGroupResponse struct {
 	Result []*Message `json:"result,omitempty"`
 }
 
+type MessageIDResponse struct {
+	Ok     bool       `json:"ok"`
+	Result *MessageID `json:"result,omitempty"`
+}
+
 type MessageIDsResponse struct {
 	Ok     bool         `json:"ok"`
 	Result []*MessageID `json:"result,omitempty"`

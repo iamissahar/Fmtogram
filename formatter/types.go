@@ -6,16 +6,19 @@ import (
 )
 
 type mediaHolder struct {
+	amount      int
 	storage     [10]handlerMedia
 	i           int
-	amount      int
 	atLeastOnce bool
+	m           map[string]interface{}
 }
 
 type stickerHolder struct {
+	amount      int
 	storage     [50]*sticker
 	i           int
 	atLeastOnce bool
+	m           map[string]interface{}
 }
 
 type formatter struct {
@@ -37,6 +40,7 @@ type formatter struct {
 	mh          *mediaHolder
 	buf         *bytes.Buffer
 	method      string
+	httpMethod  string
 	notchange   bool
 	g           *get
 	tgr         interface{}

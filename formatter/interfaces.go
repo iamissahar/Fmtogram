@@ -1,6 +1,7 @@
 package formatter
 
 import (
+	"bytes"
 	"mime/multipart"
 	"time"
 
@@ -8,9 +9,13 @@ import (
 )
 
 type handlerMedia interface {
-	multipartFields(writer *multipart.Writer, group *[]interface{}, id int, input bool) error
-	jsonFileds() (jsbody []byte, err error)
+	proccessFile(wr *multipart.Writer, cnttype *string, isgroup bool) error
 	uniqueConst() (constID int)
+}
+
+type handleFiles interface {
+	single(wr *multipart.Writer, buf *bytes.Buffer, contenttype *string) (queryStr string, err error)
+	multiple(wr *multipart.Writer, buf *bytes.Buffer, contenttype *string) (queryStr string, err error)
 }
 
 type kb interface {
@@ -48,6 +53,7 @@ type IGet interface {
 	Stickers() []*types.Sticker
 	Gifts() []*types.Gift
 	Message() *types.Message
+	Messages() []*types.Message
 	String() string
 	InviteLink() *types.ChatInviteLink
 	ChatInfo() *types.ChatFullInfo

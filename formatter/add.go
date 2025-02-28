@@ -1,6 +1,8 @@
 package formatter
 
 import (
+	"net/http"
+
 	"github.com/l1qwie/Fmtogram/formatter/methods"
 	"github.com/l1qwie/Fmtogram/logs"
 	"github.com/l1qwie/Fmtogram/types"
@@ -16,13 +18,15 @@ func (msg *Message) AddPhoto(ph IPhoto) error {
 					if p.gottenFrom == Storage {
 						msg.fm.mh.atLeastOnce = true
 					}
-					if msg.fm.method == "" || msg.fm.method == methods.Photo {
+					if !msg.fm.notchange && msg.fm.method != methods.PaidMedia {
 						if msg.fm.mh.i == 0 {
 							msg.fm.method = methods.Photo
 							msg.fm.tgr = new(types.MessageResponse)
+							msg.fm.httpMethod = http.MethodPost
 						} else {
 							msg.fm.method = methods.MediaGroup
 							msg.fm.tgr = new(types.MediaGroupResponse)
+							msg.fm.httpMethod = http.MethodPost
 						}
 					}
 					msg.fm.mh.storage[msg.fm.mh.i] = p
@@ -54,14 +58,16 @@ func (msg *Message) AddVideo(vd IVideo) error {
 					if v.videoGottenFrom == Storage || v.thumbnailGottenFrom == Storage {
 						msg.fm.mh.atLeastOnce = true
 					}
-					if msg.fm.method == "" || msg.fm.method == methods.Video {
+					if !msg.fm.notchange && msg.fm.method != methods.PaidMedia {
 						if msg.fm.mh.i == 0 {
 							msg.fm.method = methods.Video
 							msg.fm.tgr = new(types.MessageResponse)
 							v.StartTimestamp = &msg.fm.inf.VideoStartTimestamp
+							msg.fm.httpMethod = http.MethodPost
 						} else {
 							msg.fm.method = methods.MediaGroup
 							msg.fm.tgr = new(types.MediaGroupResponse)
+							msg.fm.httpMethod = http.MethodPost
 						}
 					}
 					msg.fm.mh.storage[msg.fm.mh.i] = v
@@ -93,12 +99,16 @@ func (msg *Message) AddDocument(dc IDocument) error {
 					if d.documentGottenFrom == Storage || d.thumbnailGottenFrom == Storage {
 						msg.fm.mh.atLeastOnce = true
 					}
-					if msg.fm.mh.i == 0 {
-						msg.fm.method = methods.Document
-						msg.fm.tgr = new(types.MessageResponse)
-					} else {
-						msg.fm.method = methods.MediaGroup
-						msg.fm.tgr = new(types.MediaGroupResponse)
+					if !msg.fm.notchange {
+						if msg.fm.mh.i == 0 {
+							msg.fm.method = methods.Document
+							msg.fm.tgr = new(types.MessageResponse)
+							msg.fm.httpMethod = http.MethodPost
+						} else {
+							msg.fm.method = methods.MediaGroup
+							msg.fm.tgr = new(types.MediaGroupResponse)
+							msg.fm.httpMethod = http.MethodPost
+						}
 					}
 					msg.fm.mh.storage[msg.fm.mh.i] = d
 					msg.fm.mh.i++
@@ -129,8 +139,11 @@ func (msg *Message) AddAnimation(an IAnimation) error {
 					if a.animationGottenFrom == Storage || a.thumbnailGottenFrom == Storage {
 						msg.fm.mh.atLeastOnce = true
 					}
-					msg.fm.method = methods.Animation
-					msg.fm.tgr = new(types.MessageResponse)
+					if !msg.fm.notchange {
+						msg.fm.method = methods.Animation
+						msg.fm.tgr = new(types.MessageResponse)
+						msg.fm.httpMethod = http.MethodPost
+					}
 					msg.fm.mh.storage[msg.fm.mh.i] = a
 					msg.fm.mh.i++
 					msg.fm.mh.amount++
@@ -160,12 +173,16 @@ func (msg *Message) AddAudio(ad IAudio) error {
 					if a.audioGottenFrom == Storage || a.thumbnailGottenFrom == Storage {
 						msg.fm.mh.atLeastOnce = true
 					}
-					if msg.fm.mh.i == 0 {
-						msg.fm.method = methods.Audio
-						msg.fm.tgr = new(types.MessageResponse)
-					} else {
-						msg.fm.method = methods.MediaGroup
-						msg.fm.tgr = new(types.MediaGroupResponse)
+					if !msg.fm.notchange {
+						if msg.fm.mh.i == 0 {
+							msg.fm.method = methods.Audio
+							msg.fm.tgr = new(types.MessageResponse)
+							msg.fm.httpMethod = http.MethodPost
+						} else {
+							msg.fm.method = methods.MediaGroup
+							msg.fm.tgr = new(types.MediaGroupResponse)
+							msg.fm.httpMethod = http.MethodPost
+						}
 					}
 					msg.fm.mh.storage[msg.fm.mh.i] = a
 					msg.fm.mh.i++
@@ -196,8 +213,11 @@ func (msg *Message) AddVoice(vc IVoice) error {
 					if v.gottenFrom == Storage {
 						msg.fm.mh.atLeastOnce = true
 					}
-					msg.fm.method = methods.Voice
-					msg.fm.tgr = new(types.MessageResponse)
+					if !msg.fm.notchange {
+						msg.fm.method = methods.Voice
+						msg.fm.tgr = new(types.MessageResponse)
+						msg.fm.httpMethod = http.MethodPost
+					}
 					msg.fm.mh.storage[msg.fm.mh.i] = v
 					msg.fm.mh.i++
 					msg.fm.mh.amount++
@@ -224,11 +244,14 @@ func (msg *Message) AddVideoNote(vdn IVideoNote) error {
 		if v.VideoNote != "" {
 			if compatibilityCheck(msg, constVideoNote) {
 				if msg.fm.mh.i+1 <= len(msg.fm.mh.storage) {
-					if v.videoGottenFrom == Storage {
+					if v.videoGottenFrom == Storage || v.thumbnailGottenFrom == Storage {
 						msg.fm.mh.atLeastOnce = true
 					}
-					msg.fm.method = methods.VideoNote
-					msg.fm.tgr = new(types.MessageResponse)
+					if !msg.fm.notchange {
+						msg.fm.method = methods.VideoNote
+						msg.fm.tgr = new(types.MessageResponse)
+						msg.fm.httpMethod = http.MethodPost
+					}
 					msg.fm.mh.storage[msg.fm.mh.i] = v
 					msg.fm.mh.i++
 					msg.fm.mh.amount++
@@ -255,11 +278,14 @@ func (msg *Message) AddLocation(loc ILocation) error {
 		if msg.fm.loc == nil {
 			if (l.Latitude != 0) && (l.Longitude) != 0 {
 				msg.fm.loc = l
-				if msg.fm.loc.Title == "" {
-					msg.fm.method = methods.Location
-				} else {
-					msg.fm.method = methods.Venue
+				if !msg.fm.notchange {
+					if msg.fm.loc.Title == "" {
+						msg.fm.method = methods.Location
+					} else {
+						msg.fm.method = methods.Venue
+					}
 				}
+				msg.fm.httpMethod = http.MethodPost
 				msg.fm.tgr = new(types.MessageResponse)
 				logs.InterfaceSaved(interfaceLocation)
 			} else {
@@ -280,8 +306,11 @@ func (msg *Message) AddContact(con IContact) error {
 		if msg.fm.con == nil {
 			if (c.PhoneNumber != "") && (c.FirstName != "") {
 				msg.fm.con = c
-				msg.fm.method = methods.Contact
-				msg.fm.tgr = new(types.MessageResponse)
+				if !msg.fm.notchange {
+					msg.fm.method = methods.Contact
+					msg.fm.tgr = new(types.MessageResponse)
+					msg.fm.httpMethod = http.MethodPost
+				}
 				logs.InterfaceSaved(interfaceContact)
 			} else {
 				err = code21()
@@ -301,8 +330,11 @@ func (msg *Message) AddPoll(p IPoll) error {
 		if msg.fm.poll == nil {
 			if (pp.Question != "") && (pp.Options != nil) {
 				msg.fm.poll = pp
-				msg.fm.method = methods.Poll
-				msg.fm.tgr = new(types.MessageResponse)
+				if !msg.fm.notchange {
+					msg.fm.method = methods.Poll
+					msg.fm.tgr = new(types.MessageResponse)
+					msg.fm.httpMethod = http.MethodPost
+				}
 				logs.InterfaceSaved(interfacePoll)
 			} else {
 				err = code21()
@@ -322,18 +354,24 @@ func (msg *Message) AddParameters(param IParameters) error {
 	if p, ok := param.(*information); ok {
 		if isDefaultParams(msg.fm.inf) {
 			msg.fm.inf = p
-			if p.StarCount != 0 {
-				msg.fm.method = methods.PaidMedia
-				msg.fm.tgr = new(types.MessageResponse)
-			} else if p.Emoji != "" {
-				msg.fm.method = methods.Dice
-				msg.fm.tgr = new(types.MessageResponse)
-			} else if p.Action != "" {
-				msg.fm.method = methods.ChatAction
-				msg.fm.tgr = new(types.SimpleResponse)
-			} else if msg.fm.method == "" {
-				msg.fm.method = methods.Message
-				msg.fm.tgr = new(types.MessageResponse)
+			if !msg.fm.notchange {
+				if p.StarCount != 0 {
+					msg.fm.method = methods.PaidMedia
+					msg.fm.tgr = new(types.MessageResponse)
+					msg.fm.httpMethod = http.MethodPost
+				} else if p.Emoji != "" {
+					msg.fm.method = methods.Dice
+					msg.fm.tgr = new(types.MessageResponse)
+					msg.fm.httpMethod = http.MethodPost
+				} else if p.Action != "" {
+					msg.fm.method = methods.ChatAction
+					msg.fm.tgr = new(types.SimpleResponse)
+					msg.fm.httpMethod = http.MethodGet
+				} else if msg.fm.method == "" {
+					msg.fm.method = methods.Message
+					msg.fm.tgr = new(types.MessageResponse)
+					msg.fm.httpMethod = http.MethodPost
+				}
 			}
 			logs.InterfaceSaved(interfaceParam)
 		} else {
@@ -390,62 +428,94 @@ func (msg *Message) AddMethod(method string) error {
 	var data interface{}
 	if data, ok = simpleResponse[method]; ok {
 		msg.fm.tgr = data
+		msg.fm.httpMethod = http.MethodGet
 	} else if data, ok = messageResponse[method]; ok {
 		msg.fm.tgr = data
+		msg.fm.httpMethod = http.MethodPost
 	} else if data, ok = messageIDsReponse[method]; ok {
 		msg.fm.tgr = data
+		msg.fm.httpMethod = http.MethodGet
 	} else if data, ok = inviteLinkResponse[method]; ok {
 		msg.fm.tgr = data
+		msg.fm.httpMethod = http.MethodPost
+	} else if method == methods.CopyMessage {
+		msg.fm.tgr = new(types.MessageIDResponse)
+		msg.fm.httpMethod = http.MethodGet
 	} else if method == methods.MediaGroup {
 		msg.fm.tgr = new(types.MediaGroupResponse)
+		msg.fm.httpMethod = http.MethodPost
 	} else if method == methods.UserProfilePhotos {
 		msg.fm.tgr = new(types.UserProfilePhotosResponse)
+		msg.fm.httpMethod = http.MethodGet
 	} else if (method == methods.File) || (method == methods.UploadSticker) {
 		msg.fm.tgr = new(types.FileResponse)
+		msg.fm.httpMethod = http.MethodPost
 	} else if method == methods.GetChat {
 		msg.fm.tgr = new(types.ChatFullInfoResponse)
+		msg.fm.httpMethod = http.MethodGet
 	} else if method == methods.GetAdmins {
 		msg.fm.tgr = new(types.ChatMembersResponse)
+		msg.fm.httpMethod = http.MethodGet
 	} else if method == methods.GetMember {
 		msg.fm.tgr = new(types.ChatMemberResponse)
+		msg.fm.httpMethod = http.MethodGet
 	} else if (method == methods.GetForumIconStickers) || (method == methods.GetEmojiStickers) {
 		msg.fm.tgr = new(types.StickersResponse)
+		msg.fm.httpMethod = http.MethodGet
 	} else if method == methods.CreateForumTopic {
 		msg.fm.tgr = new(types.ForumResponse)
+		msg.fm.httpMethod = http.MethodPost
 	} else if method == methods.GetUsersBoosts {
 		msg.fm.tgr = new(types.UserBoostsResponse)
+		msg.fm.httpMethod = http.MethodGet
 	} else if method == methods.GetBusinessConnection {
 		msg.fm.tgr = new(types.BusinessConResponse)
+		msg.fm.httpMethod = http.MethodGet
 	} else if method == methods.GetMyCommands {
 		msg.fm.tgr = new(types.BotCommandResponse)
+		msg.fm.httpMethod = http.MethodGet
 	} else if method == methods.GetMyName {
 		msg.fm.tgr = new(types.BotNameResponse)
+		msg.fm.httpMethod = http.MethodGet
 	} else if method == methods.GetMyDescription {
 		msg.fm.tgr = new(types.BotDescriptionResponse)
+		msg.fm.httpMethod = http.MethodGet
 	} else if method == methods.GetMyShortDescription {
 		msg.fm.tgr = new(types.BotShorDescriptionResponse)
+		msg.fm.httpMethod = http.MethodGet
 	} else if method == methods.GetChatMenuButton {
 		msg.fm.tgr = new(types.MenuButtonResponse)
+		msg.fm.httpMethod = http.MethodGet
 	} else if method == methods.GetMyDefaultAdministratorRights {
 		msg.fm.tgr = new(types.AdminRightResponse)
+		msg.fm.httpMethod = http.MethodGet
 	} else if method == methods.StopPoll {
 		msg.fm.tgr = new(types.PollResponse)
+		msg.fm.httpMethod = http.MethodGet
 	} else if method == methods.GetStickerSet {
 		msg.fm.tgr = new(types.StickerSetResponse)
+		msg.fm.httpMethod = http.MethodGet
 	} else if method == methods.GetAvailableGifts {
 		msg.fm.tgr = new(types.GiftsResponse)
+		msg.fm.httpMethod = http.MethodGet
 	} else if method == methods.AnswerWebAppQuery {
 		msg.fm.tgr = new(types.WepAppMsgResponse)
+		msg.fm.httpMethod = http.MethodPost
 	} else if method == methods.SavePreparedInlineMessage {
 		msg.fm.tgr = new(types.PreparedInlineMessageResponse)
+		msg.fm.httpMethod = http.MethodPost
 	} else if method == methods.ExportInviteLink || method == methods.CreateInvoiceLink {
 		msg.fm.tgr = new(types.StringResponse)
+		msg.fm.httpMethod = http.MethodGet
 	} else if method == methods.GetStarTransactions {
 		msg.fm.tgr = new(types.StarTransactionResponse)
+		msg.fm.httpMethod = http.MethodGet
 	} else if method == methods.GetGameHighScores {
 		msg.fm.tgr = new(types.GameHighScoresResponse)
+		msg.fm.httpMethod = http.MethodGet
 	} else if method == methods.GetMemberCount {
 		msg.fm.tgr = new(types.IntResponse)
+		msg.fm.httpMethod = http.MethodGet
 	} else {
 		err = code07()
 	}
@@ -482,11 +552,15 @@ func (msg *Message) AddSticker(st ISticker) error {
 				}
 				msg.fm.sticker.storage[msg.fm.sticker.i] = s
 				msg.fm.sticker.i++
-				if s.GiftID != "" {
-					msg.fm.method = methods.Gift
-				} else {
-					msg.fm.method = methods.Sticker
+				msg.fm.sticker.amount++
+				if !msg.fm.notchange {
+					if s.GiftID != "" {
+						msg.fm.method = methods.Gift
+					} else {
+						msg.fm.method = methods.Sticker
+					}
 				}
+				msg.fm.httpMethod = http.MethodPost
 				logs.InterfaceSaved(interfaceSticker)
 			} else {
 				err = code21()
@@ -555,7 +629,11 @@ func (msg *Message) AddPayment(pay IPayment) error {
 		if msg.fm.payment == nil {
 			if (p.Title != "") && (p.Description != "") && (p.Payload != "") && (p.Currency != "") && (p.Prices != nil) {
 				msg.fm.payment = p
-				msg.fm.method = methods.Invoice
+				if !msg.fm.notchange {
+					msg.fm.method = methods.Invoice
+					msg.fm.tgr = new(types.MessageResponse)
+					msg.fm.httpMethod = http.MethodPost
+				}
 				logs.InterfaceSaved(interfacePayment)
 			} else {
 				err = code21()
@@ -575,7 +653,11 @@ func (msg *Message) AddGame(gg IGame) error {
 		if msg.fm.game == nil {
 			if g.ShortName != "" {
 				msg.fm.game = g
-				msg.fm.method = methods.Game
+				if !msg.fm.notchange {
+					msg.fm.method = methods.Game
+					msg.fm.tgr = new(types.MessageResponse)
+					msg.fm.httpMethod = http.MethodPost
+				}
 				logs.InterfaceSaved(interfacePayment)
 			} else {
 				err = code21()

@@ -19,11 +19,12 @@ const (
 	// 	(formatter.IGet).Status()
 	// 	(formatter.IGet).Error()
 	// 	(formatter.IGet).Chat()
-	// 	(formatter.IGet).User()
-	// 	(formatter.IGet).Bot()
+	// 	(formatter.IGet).Sender()
 	// 	(formatter.IGet).Date()
 	// 	(formatter.IGet).MessageID()
 	// 	(formatter.IGet).Replyed()
+	// or
+	// 	(formatter.IGet).Message() (all possible data included)
 	Message string = "sendMessage"
 
 	// Use this method to forward messages of any kind. Service messages and messages with protected content can't be forwarded.
@@ -36,7 +37,15 @@ const (
 	// 	(formatter.IParameters).WriteMessageID() [Required]
 	// 	(formatter.IParameters).WriteVideoStartTimestamp() [Optional]
 	// Get the results here:
+	// 	(formatter.IGet).Status()
+	// 	(formatter.IGet).Error()
+	// 	(formatter.IGet).Chat()
+	// 	(formatter.IGet).Sender()
+	// 	(formatter.IGet).Date()
 	// 	(formatter.IGet).MessageID()
+	// 	(formatter.IGet).Replyed()
+	// or
+	// 	(formatter.IGet).Message() (all possible data included)
 	ForwardMessage string = "forwardMessage"
 
 	// Use this method to forward multiple messages of any kind. If some of the specified
@@ -53,6 +62,8 @@ const (
 	// 	(formatter.IParameters).WriteDisableNotification() [Optional]
 	// 	(formatter.IParameters).WriteProtectContent() [Optional]
 	// Get the results here:
+	// 	(formatter.IGet).Status()
+	// 	(formatter.IGet).Error()
 	// 	(formatter.IGet).MessageIDs()
 	ForwardMessages string = "forwardMessages"
 
@@ -75,6 +86,8 @@ const (
 	// 	(formatter.IParameters).WriteVideoStartTimestamp() [Optional]
 	// 	(formatter.IKeyboard).WriteReply() or (formatter.IKeyboard).WriteInline() or (formatter.IKeyboard).WriteForceReply() [Optional]
 	// Get the results here:
+	// 	(formatter.IGet).Status()
+	// 	(formatter.IGet).Error()
 	// 	(formatter.IGet).MessageID()
 	CopyMessage string = "copyMessage"
 
@@ -89,6 +102,8 @@ const (
 	// 	(formatter.IParameters).WriteProtectContent() [Optional]
 	// 	(formatter.IParameters).WriteRemoveCaption() [Optional]
 	// Get the results here:
+	// 	(formatter.IGet).Status()
+	// 	(formatter.IGet).Error()
 	// 	(formatter.IGet).MessageIDs()
 	CopyMessages string = "copyMessages"
 
@@ -111,11 +126,13 @@ const (
 	// 	(formatter.IKeyboard).WriteReply() or (formatter.IKeyboard).WriteInline() or (formatter.IKeyboard).WriteForceReply() [Optional]
 	// Get the results here:
 	// 	(formatter.IGet).MessageID()
-	// 	(formatter.IGet).Bot()
+	// 	(formatter.IGet).Sender()
 	// 	(formatter.IGet).Chat()
 	// 	(formatter.IGet).Date()
 	// 	(formatter.IGet).Photo()
 	// 	(formatter.IGet).Replyed()
+	// or
+	// 	(formatter.IGet).Message() (all possible data included)
 	Photo string = "sendPhoto"
 
 	// Use this method to send audio files, if you want Telegram clients to display them in the music player.
@@ -141,11 +158,13 @@ const (
 	// 	(formatter.IKeyboard).WriteReply() or (formatter.IKeyboard).WriteInline() or (formatter.IKeyboard).WriteForceReply() [Optional]
 	// Get the results here:
 	// 	(formatter.IGet).MessageID()
-	// 	(formatter.IGet).Bot()
+	// 	(formatter.IGet).Sender()
 	// 	(formatter.IGet).Chat()
 	// 	(formatter.IGet).Date()
 	// 	(formatter.IGet).Audio()
 	// 	(formatter.IGet).Replyed()
+	// or
+	// 	(formatter.IGet).Message() (all possible data included)
 	Audio string = "sendAudio"
 
 	// Use this method to send general files.
@@ -167,11 +186,13 @@ const (
 	// 	(formatter.IKeyboard).WriteReply() or (formatter.IKeyboard).WriteInline() or (formatter.IKeyboard).WriteForceReply() [Optional]
 	// Get the results here:
 	// 	(formatter.IGet).MessageID()
-	// 	(formatter.IGet).Bot()
+	// 	(formatter.IGet).Sender()
 	// 	(formatter.IGet).Chat()
 	// 	(formatter.IGet).Date()
 	// 	(formatter.IGet).Document()
 	// 	(formatter.IGet).Replyed()
+	// or
+	// 	(formatter.IGet).Message() (all possible data included)
 	Document string = "sendDocument"
 
 	// Use this method to send video files, Telegram clients support MPEG4 videos (other formats may be sent as Document).
@@ -200,11 +221,13 @@ const (
 	// 	(formatter.IKeyboard).WriteReply() or (formatter.IKeyboard).WriteInline() or (formatter.IKeyboard).WriteForceReply() [Optional]
 	// Get the results here:
 	// 	(formatter.IGet).MessageID()
-	// 	(formatter.IGet).Bot()
+	// 	(formatter.IGet).Sender()
 	// 	(formatter.IGet).Chat()
 	// 	(formatter.IGet).Date()
 	// 	(formatter.IGet).Video()
 	// 	(formatter.IGet).Replyed()
+	// or
+	// 	(formatter.IGet).Message() (all possible data included)
 	Video string = "sendVideo"
 
 	// Use this method to send animation files (GIF or H.264/MPEG-4 AVC video without sound).
@@ -230,11 +253,13 @@ const (
 	// 	(formatter.IKeyboard).WriteReply() or (formatter.IKeyboard).WriteInline() or (formatter.IKeyboard).WriteForceReply() [Optional]
 	// Get the results here:
 	// 	(formatter.IGet).MessageID()
-	// 	(formatter.IGet).Bot()
+	// 	(formatter.IGet).Sender()
 	// 	(formatter.IGet).Chat()
 	// 	(formatter.IGet).Date()
 	// 	(formatter.IGet).Animation()
 	// 	(formatter.IGet).Replyed()
+	// or
+	// 	(formatter.IGet).Message() (all possible data included)
 	Animation string = "sendAnimation"
 
 	// Use this method to send audio files, if you want Telegram clients to display the file
@@ -257,11 +282,13 @@ const (
 	// 	(formatter.IKeyboard).WriteReply() or (formatter.IKeyboard).WriteInline() or (formatter.IKeyboard).WriteForceReply() [Optional]
 	// Get the results here:
 	// 	(formatter.IGet).MessageID()
-	// 	(formatter.IGet).Bot()
+	// 	(formatter.IGet).Sender()
 	// 	(formatter.IGet).Chat()
 	// 	(formatter.IGet).Date()
 	// 	(formatter.IGet).Voice()
 	// 	(formatter.IGet).Replyed()
+	// or
+	// 	(formatter.IGet).Message() (all possible data included)
 	Voice string = "sendVoice"
 
 	// Telegram clients support rounded square MPEG4 videos of up to 1 minute long. Use this method to send video messages. Parameters:
@@ -280,11 +307,13 @@ const (
 	// 	(formatter.IKeyboard).WriteReply() or (formatter.IKeyboard).WriteInline() or (formatter.IKeyboard).WriteForceReply() [Optional]
 	// Get the results here:
 	// 	(formatter.IGet).MessageID()
-	// 	(formatter.IGet).Bot()
+	// 	(formatter.IGet).Sender()
 	// 	(formatter.IGet).Chat()
 	// 	(formatter.IGet).Date()
 	// 	(formatter.IGet).VideoNote()
 	// 	(formatter.IGet).Replyed()
+	// or
+	// 	(formatter.IGet).Message() (all possible data included)
 	VideoNote string = "sendVideoNote"
 
 	// Use this method to send paid media. Paid media can be only (formatter.IPhoto) or (formatter.IVideo). Also, the fields of methods.Photo
@@ -316,11 +345,13 @@ const (
 	// 	(formatter.IParameters).WriteVideoStartTimestamp() [Optional]
 	// Get the results here:
 	// 	(formatter.IGet).MessageID()
-	// 	(formatter.IGet).Bot()
+	// 	(formatter.IGet).Sender()
 	// 	(formatter.IGet).Chat()
 	// 	(formatter.IGet).Date()
 	// 	(formatter.IGet).PaidMedia()
 	// 	(formatter.IGet).Replyed()
+	// or
+	// 	(formatter.IGet).Message() (all possible data included)
 	PaidMedia string = "sendPaidMedia"
 
 	// Use this method to send a group of photos, videos, documents or audios as an album.
@@ -370,7 +401,7 @@ const (
 	// Get the results here:
 	// 	(formatter.IGet).MessageIDs()
 	// 	(formatter.IGet).MediaGroupID()
-	// 	(formatter.IGet).Bot()
+	// 	(formatter.IGet).Sender()
 	// 	(formatter.IGet).Chat()
 	// 	(formatter.IGet).Date()
 	// 	(formatter.IGet).Photos()
@@ -378,6 +409,8 @@ const (
 	// 	(formatter.IGet).Audios()
 	// 	(formatter.IGet).Documents()
 	// 	(formatter.IGet).Replyed()
+	// or
+	// 	(formatter.IGet).Messages() (all possible data included)
 	MediaGroup string = "sendMediaGroup"
 
 	// Use this method to send point on the map. Parameters:
@@ -398,7 +431,7 @@ const (
 	// 	(formatter.IKeyboard).WriteReply() or (formatter.IKeyboard).WriteInline() or (formatter.IKeyboard).WriteForceReply() [Optional]
 	// Get the results here:
 	// 	(formatter.IGet).MessageID()
-	// 	(formatter.IGet).Bot()
+	// 	(formatter.IGet).Sender()
 	// 	(formatter.IGet).Chat()
 	// 	(formatter.IGet).Date()
 	// 	(formatter.IGet).Replyed()
@@ -424,7 +457,7 @@ const (
 	// 	(formatter.IKeyboard).WriteReply() or (formatter.IKeyboard).WriteInline() or (formatter.IKeyboard).WriteForceReply() [Optional]
 	// Get the results here:
 	// 	(formatter.IGet).MessageID()
-	// 	(formatter.IGet).Bot()
+	// 	(formatter.IGet).Sender()
 	// 	(formatter.IGet).Chat()
 	// 	(formatter.IGet).Date()
 	// 	(formatter.IGet).Replyed()
@@ -446,7 +479,7 @@ const (
 	// 	(formatter.IKeyboard).WriteReply() or (formatter.IKeyboard).WriteInline() or (formatter.IKeyboard).WriteForceReply() [Optional]
 	// Get the results here:
 	// 	(formatter.IGet).MessageID()
-	// 	(formatter.IGet).Bot()
+	// 	(formatter.IGet).Sender()
 	// 	(formatter.IGet).Chat()
 	// 	(formatter.IGet).Date()
 	// 	(formatter.IGet).Replyed()
@@ -478,7 +511,7 @@ const (
 	// 	(formatter.IKeyboard).WriteReply() or (formatter.IKeyboard).WriteInline() or (formatter.IKeyboard).WriteForceReply() [Optional]
 	// Get the results here:
 	// 	(formatter.IGet).MessageID()
-	// 	(formatter.IGet).Bot()
+	// 	(formatter.IGet).Sender()
 	// 	(formatter.IGet).Chat()
 	// 	(formatter.IGet).Date()
 	// 	(formatter.IGet).Poll()
@@ -498,7 +531,7 @@ const (
 	// 	(formatter.IKeyboard).WriteReply() or (formatter.IKeyboard).WriteInline() or (formatter.IKeyboard).WriteForceReply() [Optional]
 	// Get the results here:
 	// 	(formatter.IGet).MessageID()
-	// 	(formatter.IGet).Bot()
+	// 	(formatter.IGet).Sender()
 	// 	(formatter.IGet).Chat()
 	// 	(formatter.IGet).Date()
 	// 	(formatter.IGet).Dice()
@@ -1205,7 +1238,7 @@ const (
 	// 	and a keyboard: (formatter.IKeyboard).WriteReply(), (formatter.IKeyboard).WriteInline() or (formatter.IKeyboard).WriteForceReply() [Optional]
 	// Get the results here:
 	// 	(formatter.IGet).MessageID()
-	// 	(formatter.IGet).Bot()
+	// 	(formatter.IGet).Sender()
 	// 	(formatter.IGet).Chat()
 	// 	(formatter.IGet).Date()
 	// 	(formatter.IGet).Sticker()
