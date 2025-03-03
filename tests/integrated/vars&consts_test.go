@@ -1,12 +1,11 @@
 package integrated
 
 import (
+	"fmt"
 	"math/rand"
 	"testing"
-	"time"
 
 	"github.com/l1qwie/Fmtogram/formatter"
-	"github.com/l1qwie/Fmtogram/logs"
 	"github.com/l1qwie/Fmtogram/testbotdata"
 	"github.com/l1qwie/Fmtogram/types"
 )
@@ -53,14 +52,14 @@ const (
 	animurl                                               string  = "https://www.icegif.com/wp-content/uploads/2025/02/patrick-mahomes-icegif-1.gif"
 	voicepath                                             string  = "../media/dimaJOSKAproNATO.ogg"
 	voiceurl                                              string  = "https://freetestdata.com/wp-content/uploads/2021/09/Free_Test_Data_100KB_OGG.ogg"
-	vdnpath                                               string  = "../media/black.mp4"
+	vdnpath                                               string  = "../media/tea.mp4"
 	vdnurl                                                string  = "https://www.pexels.com/download/video/6646588/"
+	stickerpath                                           string  = "../media/sticker.webp"
+	stickerurl                                            string  = "https://www.gstatic.com/webp/gallery/1.webp"
 )
 
 var (
-	getFuncs     []interface{}
-	f            bool
-	timetochange = make(chan struct{})
+	f bool
 )
 
 var photodata = map[string][]string{
@@ -136,27 +135,27 @@ var voicedata = map[string][]string{
 }
 
 var videoNdata = map[string][]string{
-	testbotdata.Secondtestbotforb_bot:     {vdnpath, vdnurl},
-	testbotdata.Tttesty_bot_bot:           {vdnpath, vdnurl},
-	testbotdata.TestsInGroup2_bot:         {vdnpath, vdnurl},
-	testbotdata.TestsInGroup1_bot:         {vdnpath, vdnurl},
-	testbotdata.Make_event_bot:            {vdnpath, vdnurl},
-	testbotdata.Testdatbot_bot:            {vdnpath, vdnurl},
-	testbotdata.SpeakOnlyWithAnton_bot:    {vdnpath, vdnurl},
-	testbotdata.LearnSpanishOrEnglish_bot: {vdnpath, vdnurl},
-	testbotdata.Testmy_bots_bot:           {vdnpath, vdnurl},
+	testbotdata.Secondtestbotforb_bot:     {vdnpath, "BAACAgIAAxkDAAIkvGfBkvLSP9hFU3NIc7vklpoPe7rvAAKHaAACcV8ISkiUHwhVsyfCNgQ", vdnurl},
+	testbotdata.Tttesty_bot_bot:           {vdnpath, "BAACAgIAAxkDAAPgZ8GTjZ9cz0ItPSFej1DdSyZVmWsAAlBmAAJ6LhFK0QWpUbKmq902BA", vdnurl},
+	testbotdata.TestsInGroup2_bot:         {vdnpath, "BAACAgIAAxkDAAMhZ8GTp9o5cP2NyD-OuMc-Z3Zk5xoAAuRmAAIHFQhKe7szag7Rhog2BA", vdnurl},
+	testbotdata.TestsInGroup1_bot:         {vdnpath, "BAACAgIAAxkDAAMcZ8GT9OiHradGiCv3tLP69McwTUkAAkhpAAKgtwlKiwtDD_rXyWI2BA", vdnurl},
+	testbotdata.Make_event_bot:            {vdnpath, "BAACAgIAAxkDAAMgZ8GUGMwxCk16CnPogd_nqoQCIr8AAjlgAAL9khFKE-qFFnndiWE2BA", vdnurl},
+	testbotdata.Testdatbot_bot:            {vdnpath, "BAACAgIAAxkDAAIF9mfBlFlPVqlfnW-odJFCG23nnSXWAALoZgACvNURSoVcdVVbKFmaNgQ", vdnurl},
+	testbotdata.SpeakOnlyWithAnton_bot:    {vdnpath, "BAACAgIAAxkDAANgZ8GUcuK2gaFSdO0PRgEIqKgrn6sAAkFfAAJyphFKlM67MZwJE-42BA", vdnurl},
+	testbotdata.LearnSpanishOrEnglish_bot: {vdnpath, "BAACAgIAAxkDAAMsZ8GUmsK7YQ5TVZ0M9JYfyB6-NFUAAg9sAALaARBKEyhR3n97IEU2BA", vdnurl},
+	testbotdata.Testmy_bots_bot:           {vdnpath, "BAACAgIAAxkDAAMYZ8GU1rUDG_jA0uCiJB5v7WufPcsAAsBbAAJ61BFKapM2KIL3jW82BA", vdnurl},
 }
 
 var stickerdata = map[string][]string{
-	testbotdata.Secondtestbotforb_bot:     {},
-	testbotdata.Tttesty_bot_bot:           {},
-	testbotdata.TestsInGroup2_bot:         {},
-	testbotdata.TestsInGroup1_bot:         {},
-	testbotdata.Make_event_bot:            {},
-	testbotdata.Testdatbot_bot:            {},
-	testbotdata.SpeakOnlyWithAnton_bot:    {},
-	testbotdata.LearnSpanishOrEnglish_bot: {},
-	testbotdata.Testmy_bots_bot:           {},
+	testbotdata.Secondtestbotforb_bot:     {stickerpath, stickerurl},
+	testbotdata.Tttesty_bot_bot:           {stickerpath, stickerurl},
+	testbotdata.TestsInGroup2_bot:         {stickerpath, stickerurl},
+	testbotdata.TestsInGroup1_bot:         {stickerpath, stickerurl},
+	testbotdata.Make_event_bot:            {stickerpath, stickerurl},
+	testbotdata.Testdatbot_bot:            {stickerpath, stickerurl},
+	testbotdata.SpeakOnlyWithAnton_bot:    {stickerpath, stickerurl},
+	testbotdata.LearnSpanishOrEnglish_bot: {stickerpath, stickerurl},
+	testbotdata.Testmy_bots_bot:           {stickerpath, stickerurl},
 }
 
 var thumbaudio = map[string][]string{
@@ -208,30 +207,40 @@ var thumbanim = map[string][]string{
 }
 
 var thumbvideoN = map[string][]string{
-	testbotdata.Secondtestbotforb_bot:     {thumbnail},
-	testbotdata.Tttesty_bot_bot:           {thumbnail},
-	testbotdata.TestsInGroup2_bot:         {thumbnail},
-	testbotdata.TestsInGroup1_bot:         {thumbnail},
-	testbotdata.Make_event_bot:            {thumbnail},
-	testbotdata.Testdatbot_bot:            {thumbnail},
-	testbotdata.SpeakOnlyWithAnton_bot:    {thumbnail},
-	testbotdata.LearnSpanishOrEnglish_bot: {thumbnail},
-	testbotdata.Testmy_bots_bot:           {thumbnail},
+	testbotdata.Secondtestbotforb_bot:     {thumbnail, "AAMCAgADGQMAAiS8Z8GS8tI_2EVTc0hzu-SWmg97uu8AAodoAAJxXwhKSJQfCFWzJ8IBAAdtAAM2BA"},
+	testbotdata.Tttesty_bot_bot:           {thumbnail, "AAMCAgADGQMAA-BnwZONn1zPQi09IV6PUN1LJlWZawACUGYAAnouEUrRBalRsqar3QEAB20AAzYE"},
+	testbotdata.TestsInGroup2_bot:         {thumbnail, "AAMCAgADGQMAAyFnwZOn2jlw_Y3IP464xz5ndmTnGgAC5GYAAgcVCEp7uzNqDtGGiAEAB20AAzYE"},
+	testbotdata.TestsInGroup1_bot:         {thumbnail, "AAMCAgADGQMAAxxnwZP06Ietp0aIK_e0s_r0xzBNSQACSGkAAqC3CUqLC0MP-tfJYgEAB20AAzYE"},
+	testbotdata.Make_event_bot:            {thumbnail, "AAMCAgADGQMAAyBnwZQYzDEKTXoKc-iB3-eqhAIivwACOWAAAv2SEUoT6oUWed2JYQEAB20AAzYE"},
+	testbotdata.Testdatbot_bot:            {thumbnail, "AAMCAgADGQMAAgX2Z8GUWU9WqV-db6h0kUIbbeedJdYAAuhmAAK81RFKhVx1VVsoWZoBAAdtAAM2BA"},
+	testbotdata.SpeakOnlyWithAnton_bot:    {thumbnail, "AAMCAgADGQMAA2BnwZRy4raBoVJ07Q9GAQioqCufqwACQV8AAnKmEUqUzrsxnAkT7gEAB20AAzYE"},
+	testbotdata.LearnSpanishOrEnglish_bot: {thumbnail, "AAMCAgADGQMAAyxnwZSawrthDlNVnQz0lh_IHr40VQACD2wAAtoBEEoTKFHef3sgRQEAB20AAzYE"},
+	testbotdata.Testmy_bots_bot:           {thumbnail, "AAMCAgADGQMAAxhnwZTWtQMb-MDS4KIkHm_ta589ywACwFsAAnrUEUpqkzYogveNbwEAB20AAzYE"},
 }
 
 var (
-	parsemode    = []string{types.HTML, types.Markdown, types.MarkdownV2}
-	groupnames   = []string{"A new group title/name", "What a cool name!", "something very very bad", "I don't like it at all"}
-	titles       = []string{"the new admin", "something like a cool title", "don't have any clue", "to find a really cool title"}
-	topicnames   = []string{"The Name", "No Name", "Something Like a Name", "Good Name", "Not a Good Name"}
-	entities     = []*types.MessageEntity{{Offset: 1, Length: 4, Type: "italic"}}
-	linkpopt     = &types.LinkPreviewOptions{IsDisabled: false, URL: "https://youtube.com"}
-	chatperm     = &types.ChatPermissions{CanSendMessages: &f}
-	botcomm      = []*types.BotCommand{{Command: "/start", Description: "Hello!"}, {Command: "/help", Description: "Help me!"}}
-	botcommscope = &types.BotCommandScope{Type: "default"}
-	emojies      = []string{"😁", "😢", "😊", "😄", "😝", "😉", "🙈", "😜", "😞"}
-	keywords     = []string{"Regular", "cool", "bad", "nothing", "etc"}
-	pollOpt      = []*types.PollOption{{Text: "Yes!", VoterCount: 66}, {Text: "No!", VoterCount: 12}}
+	parsemode     = []string{types.HTML, types.Markdown, types.MarkdownV2}
+	groupnames    = []string{"A new group title/name", "What a cool name!", "something very very bad", "I don't like it at all"}
+	titles        = []string{"the new admin", "something like a cool title", "don't have any clue", "to find a really cool title"}
+	topicnames    = []string{"The Name", "No Name", "Something Like a Name", "Good Name", "Not a Good Name"}
+	entities      = []*types.MessageEntity{{Offset: 1, Length: 4, Type: "italic"}}
+	linkpopt      = &types.LinkPreviewOptions{IsDisabled: false, URL: "https://youtube.com"}
+	chatperm      = &types.ChatPermissions{CanSendMessages: &f}
+	botcomm       = []*types.BotCommand{{Command: "/start", Description: "Hello!"}, {Command: "/help", Description: "Help me!"}}
+	botcommscope  = &types.BotCommandScope{Type: "default"}
+	emojies       = []string{"😁", "😢", "😊", "😄", "😝", "😉", "🙈", "😜", "😞"}
+	keywords      = []string{"Regular", "cool", "bad", "nothing", "etc"}
+	pollOpt       = []*types.PollOption{{Text: "Yes!", VoterCount: 66}, {Text: "No!", VoterCount: 12}}
+	kbnames       = []string{"inline", "reply-markup", "force-reply"}
+	kb            = []func(*testcase){inlineKb, replyKb, forceKb}
+	addToMapPhoto = []func(*testcase){photoIntoMap, photoIntoMap, photoIntoMap}
+	addToMapAudio = []func(*testcase){audioIntoMap, audioIntoMap, audioIntoMap}
+	addToMapDoc   = []func(*testcase){docIntoMap, docIntoMap, docIntoMap}
+	addToMapVideo = []func(*testcase){vidIntoMap, vidIntoMap, vidIntoMap}
+	addToMapAnim  = []func(*testcase){animIntoMap, animIntoMap, animIntoMap}
+	addToMapVoice = []func(*testcase){vcIntoMap, vcIntoMap, vcIntoMap1}
+	addToMapVdn   = []func(*testcase){vdnIntoMap, vdnIntoMap1, vdnIntoMap1}
+	addToMapVdn1  = []func(*testcase){vdnIntoMap1, vdnIntoMap1, vdnIntoMap1}
 )
 
 type mediagroup struct {
@@ -271,8 +280,8 @@ type testcase struct {
 	mediaF        func(*testcase) []func(string) error
 	mediadata     []string
 	thumbdata     []string
-	common        func(*testcase, *testing.T)
-	kbF           func(*testcase, *testing.T)
+	common        func(*testcase, *testcase, *testing.T)
+	kbF           func(*testcase)
 	thumb         bool
 	thumbnailF    func(*testcase) []func(string) error
 	code          [3]int
@@ -281,28 +290,36 @@ type testcase struct {
 	withoutString bool
 	paid          bool
 	token         string
+	timetochange  chan struct{}
+	workdone      chan struct{}
+	getFuncs      []interface{}
 }
 
 func (tc *testcase) getReplyPrm() *types.ReplyParameters {
 	return &types.ReplyParameters{MessageID: testbotdata.MessageID[tc.token], ChatID: chatid}
 }
 
-func (tc *testcase) changeToken(d, dd map[string][]string) {
+func (tc *testcase) changeToken(d, dd map[string][]string, t *testing.T) {
 	for {
-		<-timetochange
-		tc.token = testbotdata.Tokens[rand.Intn(8)]
-		if d != nil {
-			tc.mediadata = d[tc.token]
+		select {
+		case <-tc.workdone:
+			return
+		default:
+			<-tc.timetochange
+			tc.token = testbotdata.Tokens[rand.Intn(8)]
+			if d != nil {
+				tc.mediadata = d[tc.token]
+			}
+			if dd != nil {
+				tc.thumbdata = dd[tc.token]
+			}
 		}
-		if dd != nil {
-			tc.thumbdata = dd[tc.token]
-		}
-		time.Sleep(500 * time.Millisecond)
+
 	}
 }
 
 func (tc *testcase) init() {
-	tc.token = testbotdata.Secondtestbotforb_bot
+	// tc.token = testbotdata.Secondtestbotforb_bot
 	// tc.token = testbotdata.Tttesty_bot_bot
 	// tc.token = testbotdata.TestsInGroup2_bot
 	// tc.token = testbotdata.TestsInGroup1_bot
@@ -311,7 +328,7 @@ func (tc *testcase) init() {
 	// tc.token = testbotdata.SpeakOnlyWithAnton_bot
 	// tc.token = testbotdata.LearnSpanishOrEnglish_bot
 	// tc.token = testbotdata.Testmy_bots_bot
-	// tc.token = testbotdata.Tokens[rand.Intn(8)]
+	tc.token = testbotdata.Tokens[rand.Intn(8)]
 	tc.msg = formatter.CreateEmpltyMessage()
 	tc.prm = tc.msg.NewParameters()
 	tc.ch = tc.msg.NewChat()
@@ -331,214 +348,216 @@ func (tc *testcase) init() {
 	tc.fr = tc.msg.NewForum()
 	tc.bot = tc.msg.NewBot()
 	tc.whattocheck = make(map[int]struct{})
+	tc.timetochange = make(chan struct{})
+	tc.workdone = make(chan struct{}, 1)
 	tc.fillAllGetFunc()
-	types.DEBUG = true
-	logs.DebugOrInfo()
+	// types.DEBUG = true
+	// logs.DebugOrInfo()
 }
 
 func (tc *testcase) fillAllGetFunc() {
-	getFuncs = make([]interface{}, 41)
-	getFuncs[0] = tc.get.Status
-	getFuncs[1] = tc.get.Error
-	getFuncs[2] = tc.get.Chat
-	getFuncs[3] = tc.get.Sender
-	getFuncs[4] = tc.get.Date
-	getFuncs[5] = tc.get.MessageID
-	getFuncs[6] = tc.get.MessageIDs
-	getFuncs[7] = tc.get.Replyed
-	getFuncs[8] = tc.get.ForwardOrigin
-	getFuncs[9] = tc.get.Photo
-	getFuncs[10] = tc.get.Audio
-	getFuncs[11] = tc.get.Document
-	getFuncs[12] = tc.get.Video
-	getFuncs[13] = tc.get.Animation
-	getFuncs[14] = tc.get.Voice
-	getFuncs[15] = tc.get.VideoNote
-	getFuncs[16] = tc.get.PaidMedia
-	getFuncs[17] = tc.get.MediaGroupID
-	getFuncs[18] = tc.get.Photos
-	getFuncs[19] = tc.get.Videos
-	getFuncs[20] = tc.get.Audios
-	getFuncs[21] = tc.get.Documents
-	getFuncs[22] = tc.get.Poll
-	getFuncs[23] = tc.get.Dice
-	getFuncs[24] = tc.get.ProfilePhotos
-	getFuncs[25] = tc.get.File
-	getFuncs[26] = tc.get.Stickers
-	getFuncs[27] = tc.get.Gifts
-	getFuncs[28] = tc.get.Message
-	getFuncs[29] = tc.get.String
-	getFuncs[30] = tc.get.InviteLink
-	getFuncs[31] = tc.get.ChatInfo
-	getFuncs[32] = tc.get.Members
-	getFuncs[33] = tc.get.Integer
-	getFuncs[34] = tc.get.Forum
-	getFuncs[35] = tc.get.Boosts
-	getFuncs[36] = tc.get.BusinessConnection
-	getFuncs[37] = tc.get.Commands
-	getFuncs[38] = tc.get.MenuButton
-	getFuncs[39] = tc.get.AdminRights
-	getFuncs[40] = tc.get.Messages
+	tc.getFuncs = make([]interface{}, 41)
+	tc.getFuncs[0] = tc.get.Status
+	tc.getFuncs[1] = tc.get.Error
+	tc.getFuncs[2] = tc.get.Chat
+	tc.getFuncs[3] = tc.get.Sender
+	tc.getFuncs[4] = tc.get.Date
+	tc.getFuncs[5] = tc.get.MessageID
+	tc.getFuncs[6] = tc.get.MessageIDs
+	tc.getFuncs[7] = tc.get.Replyed
+	tc.getFuncs[8] = tc.get.ForwardOrigin
+	tc.getFuncs[9] = tc.get.Photo
+	tc.getFuncs[10] = tc.get.Audio
+	tc.getFuncs[11] = tc.get.Document
+	tc.getFuncs[12] = tc.get.Video
+	tc.getFuncs[13] = tc.get.Animation
+	tc.getFuncs[14] = tc.get.Voice
+	tc.getFuncs[15] = tc.get.VideoNote
+	tc.getFuncs[16] = tc.get.PaidMedia
+	tc.getFuncs[17] = tc.get.MediaGroupID
+	tc.getFuncs[18] = tc.get.Photos
+	tc.getFuncs[19] = tc.get.Videos
+	tc.getFuncs[20] = tc.get.Audios
+	tc.getFuncs[21] = tc.get.Documents
+	tc.getFuncs[22] = tc.get.Poll
+	tc.getFuncs[23] = tc.get.Dice
+	tc.getFuncs[24] = tc.get.ProfilePhotos
+	tc.getFuncs[25] = tc.get.File
+	tc.getFuncs[26] = tc.get.Stickers
+	tc.getFuncs[27] = tc.get.Gifts
+	tc.getFuncs[28] = tc.get.Message
+	tc.getFuncs[29] = tc.get.String
+	tc.getFuncs[30] = tc.get.InviteLink
+	tc.getFuncs[31] = tc.get.ChatInfo
+	tc.getFuncs[32] = tc.get.Members
+	tc.getFuncs[33] = tc.get.Integer
+	tc.getFuncs[34] = tc.get.Forum
+	tc.getFuncs[35] = tc.get.Boosts
+	tc.getFuncs[36] = tc.get.BusinessConnection
+	tc.getFuncs[37] = tc.get.Commands
+	tc.getFuncs[38] = tc.get.MenuButton
+	tc.getFuncs[39] = tc.get.AdminRights
+	tc.getFuncs[40] = tc.get.Messages
 }
 
-func (tc *testcase) checkResponse(t *testing.T, j int) {
+func (tc *testcase) checkResponse(j int) {
 	for i := range tc.whattocheck {
-		switch g := getFuncs[i].(type) {
+		switch g := tc.getFuncs[i].(type) {
 		case func() bool:
 			if !g() {
-				t.Fatal("Received boolean result has unexpectedly been 'false'. Should've been 'true'")
+				panic("Received boolean result has unexpectedly been 'false'. Should've been 'true'")
 			}
 		case func() (int, string):
 			if code, msg := g(); (code != tc.code[i]) && (msg != tc.errmsg[i]) {
-				t.Fatalf("Received (int, string) result has unexpectedly been %d and %s. Should've been %d and `%s`", code, msg, tc.code[j], tc.errmsg[j])
+				panic(fmt.Sprintf("Received (int, string) result has unexpectedly been %d and %s. Should've been %d and `%s`", code, msg, tc.code[j], tc.errmsg[j]))
 			}
 		case func() string:
 			if g() == "" {
-				t.Fatal("Received string result has unexpectedly been empty. Should've been anything else but empty")
+				panic("Received string result has unexpectedly been empty. Should've been anything else but empty")
 			}
 		case func() int:
 			if g() == 0 {
-				t.Fatal("Received int result has unexpectedly been 0. Should've been anything else but 0")
+				panic("Received int result has unexpectedly been 0. Should've been anything else but 0")
 			}
 		case func() *int:
 			if g() == nil {
-				t.Fatal("Received *int result has unexpectedly been nil. Should've been anything else but nil")
+				panic("Received *int result has unexpectedly been nil. Should've been anything else but nil")
 			}
 		case func() []int:
 			if g() == nil {
-				t.Fatal("Received []int result has unexpectedly been nil. Should've been anything else but nil")
+				panic("Received []int result has unexpectedly been nil. Should've been anything else but nil")
 			}
 		case func() *types.Chat:
 			if g() == nil {
-				t.Fatal("Received *types.Chat result has unexpectedly been nil. Should've been anything else but nil")
+				panic("Received *types.Chat result has unexpectedly been nil. Should've been anything else but nil")
 			}
 		case func() *types.User:
 			if g() == nil {
-				t.Fatal("Received *types.User result has unexpectedly been nil. Should've been anything else but nil")
+				panic("Received *types.User result has unexpectedly been nil. Should've been anything else but nil")
 			}
 		case func() formatter.IGet:
 			if g() == nil {
-				t.Fatal("Received formatter.IGet result has unexpectedly been nil. Should've been anything else but nil")
+				panic("Received formatter.IGet result has unexpectedly been nil. Should've been anything else but nil")
 			}
 		case func() *types.MessageOrigin:
 			if g() == nil {
-				t.Fatal("Received *types.MessageOrigin result has unexpectedly been nil. Should've been anything else but nil")
+				panic("Received *types.MessageOrigin result has unexpectedly been nil. Should've been anything else but nil")
 			}
 		case func() []*types.PhotoSize:
 			if g() == nil {
-				t.Fatal("Received []*types.PhotoSize result has unexpectedly been nil. Should've been anything else but nil")
+				panic("Received []*types.PhotoSize result has unexpectedly been nil. Should've been anything else but nil")
 			}
 		case func() *types.Audio:
 			if g() == nil {
-				t.Fatal("Received *types.Audio result has unexpectedly been nil. Should've been anything else but nil")
+				panic("Received *types.Audio result has unexpectedly been nil. Should've been anything else but nil")
 			}
 		case func() *types.Document:
 			if g() == nil {
-				t.Fatal("Received *types.Document result has unexpectedly been nil. Should've been anything else but nil")
+				panic("Received *types.Document result has unexpectedly been nil. Should've been anything else but nil")
 			}
 		case func() *types.Video:
 			if g() == nil {
-				t.Fatal("Received *types.Video result has unexpectedly been nil. Should've been anything else but nil")
+				panic("Received *types.Video result has unexpectedly been nil. Should've been anything else but nil")
 			}
 		case func() *types.Animation:
 			if g() == nil {
-				t.Fatal("Received *types.Animation result has unexpectedly been nil. Should've been anything else but nil")
+				panic("Received *types.Animation result has unexpectedly been nil. Should've been anything else but nil")
 			}
 		case func() *types.Voice:
 			if g() == nil {
-				t.Fatal("Received *types.Voice result has unexpectedly been nil. Should've been anything else but nil")
+				panic("Received *types.Voice result has unexpectedly been nil. Should've been anything else but nil")
 			}
 		case func() *types.VideoNote:
 			if g() == nil {
-				t.Fatal("Received *types.VideoNote result has unexpectedly been nil. Should've been anything else but nil")
+				panic("Received *types.VideoNote result has unexpectedly been nil. Should've been anything else but nil")
 			}
 		case func() *types.PaidMedia:
 			if g() == nil {
-				t.Fatal("Received *types.PaidMedia result has unexpectedly been nil. Should've been anything else but nil")
+				panic("Received *types.PaidMedia result has unexpectedly been nil. Should've been anything else but nil")
 			}
 		case func() [][]*types.PhotoSize:
 			if g() == nil {
-				t.Fatal("Received *[][]types.PhotoSize result has unexpectedly been nil. Should've been anything else but nil")
+				panic("Received *[][]types.PhotoSize result has unexpectedly been nil. Should've been anything else but nil")
 			}
 		case func() []*types.Video:
 			if g() == nil {
-				t.Fatal("Received *[]types.Video result has unexpectedly been nil. Should've been anything else but nil")
+				panic("Received *[]types.Video result has unexpectedly been nil. Should've been anything else but nil")
 			}
 		case func() []*types.Audio:
 			if g() == nil {
-				t.Fatal("Received *[]types.Audio result has unexpectedly been nil. Should've been anything else but nil")
+				panic("Received *[]types.Audio result has unexpectedly been nil. Should've been anything else but nil")
 			}
 		case func() []*types.Document:
 			if g() == nil {
-				t.Fatal("Received *[]types.Document result has unexpectedly been nil. Should've been anything else but nil")
+				panic("Received *[]types.Document result has unexpectedly been nil. Should've been anything else but nil")
 			}
 		case func() *types.Poll:
 			if g() == nil {
-				t.Fatal("Received *types.Poll result has unexpectedly been nil. Should've been anything else but nil")
+				panic("Received *types.Poll result has unexpectedly been nil. Should've been anything else but nil")
 			}
 		case func() *types.Dice:
 			if g() == nil {
-				t.Fatal("Received *types.Dice result has unexpectedly been nil. Should've been anything else but nil")
+				panic("Received *types.Dice result has unexpectedly been nil. Should've been anything else but nil")
 			}
 		case func() *types.UserProfilePhotos:
 			if g() == nil {
-				t.Fatal("Received *types.UserProfilePhotos result has unexpectedly been nil. Should've been anything else but nil")
+				panic("Received *types.UserProfilePhotos result has unexpectedly been nil. Should've been anything else but nil")
 			}
 		case func() *types.File:
 			if g() == nil {
-				t.Fatal("Received *types.File result has unexpectedly been nil. Should've been anything else but nil")
+				panic("Received *types.File result has unexpectedly been nil. Should've been anything else but nil")
 			}
 		case func() []*types.Sticker:
 			if g() == nil {
-				t.Fatal("Received *types.Sticker result has unexpectedly been nil. Should've been anything else but nil")
+				panic("Received *types.Sticker result has unexpectedly been nil. Should've been anything else but nil")
 			}
 		case func() []*types.Gift:
 			if g() == nil {
-				t.Fatal("Received *[]types.Gift result has unexpectedly been nil. Should've been anything else but nil")
+				panic("Received *[]types.Gift result has unexpectedly been nil. Should've been anything else but nil")
 			}
 		case func() *types.Message:
 			if g() == nil {
-				t.Fatal("Received *types.Message result has unexpectedly been nil. Should've been anything else but nil")
+				panic("Received *types.Message result has unexpectedly been nil. Should've been anything else but nil")
 			}
 		case func() []*types.Message:
 			if g() == nil {
-				t.Fatal("Received []*types.Message result has unexpectedly been nil. Should've been anything else but nil")
+				panic("Received []*types.Message result has unexpectedly been nil. Should've been anything else but nil")
 			}
 		case func() *types.ChatInviteLink:
 			if g() == nil {
-				t.Fatal("Received *types.ChatInviteLink result has unexpectedly been nil. Should've been anything else but nil")
+				panic("Received *types.ChatInviteLink result has unexpectedly been nil. Should've been anything else but nil")
 			}
 		case func() *types.ChatFullInfo:
 			if g() == nil {
-				t.Fatal("Received *types.ChatFullInfo result has unexpectedly been nil. Should've been anything else but nil")
+				panic("Received *types.ChatFullInfo result has unexpectedly been nil. Should've been anything else but nil")
 			}
 		case func() []*types.ChatMember:
 			if g() == nil {
-				t.Fatal("Received *types.ChatMember result has unexpectedly been nil. Should've been anything else but nil")
+				panic("Received *types.ChatMember result has unexpectedly been nil. Should've been anything else but nil")
 			}
 		case func() *types.ForumTopic:
 			if g() == nil {
-				t.Fatal("Received *types.ForumTopic result has unexpectedly been nil. Should've been anything else but nil")
+				panic("Received *types.ForumTopic result has unexpectedly been nil. Should've been anything else but nil")
 			}
 		case func() []*types.ChatBoost:
 			if g() == nil {
-				t.Fatal("Received *types.ChatBoost result has unexpectedly been nil. Should've been anything else but nil")
+				panic("Received *types.ChatBoost result has unexpectedly been nil. Should've been anything else but nil")
 			}
 		case func() *types.BusinessConnection:
 			if g() == nil {
-				t.Fatal("Received *types.BusinessConnection result has unexpectedly been nil. Should've been anything else but nil")
+				panic("Received *types.BusinessConnection result has unexpectedly been nil. Should've been anything else but nil")
 			}
 		case func() []*types.BotCommand:
 			if g() == nil {
-				t.Fatal("Received *types.BotCommand result has unexpectedly been nil. Should've been anything else but nil")
+				panic("Received *types.BotCommand result has unexpectedly been nil. Should've been anything else but nil")
 			}
 		case func() *types.MenuButton:
 			if g() == nil {
-				t.Fatal("Received *types.MenuButton result has unexpectedly been nil. Should've been anything else but nil")
+				panic("Received *types.MenuButton result has unexpectedly been nil. Should've been anything else but nil")
 			}
 		case func() *types.ChatAdministratorRights:
 			if g() == nil {
-				t.Fatal("Received *types.ChatAdministratorRights result has unexpectedly been nil. Should've been anything else but nil")
+				panic("Received *types.ChatAdministratorRights result has unexpectedly been nil. Should've been anything else but nil")
 			}
 		}
 	}

@@ -670,3 +670,17 @@ func (msg *Message) AddGame(gg IGame) error {
 	}
 	return err
 }
+
+func (msg *Message) AddToken(token string) error {
+	var err error
+	if token != "" {
+		if msg.fm.token == "" {
+			msg.fm.token = token
+		} else {
+			err = code20()
+		}
+	} else {
+		err = code10()
+	}
+	return err
+}

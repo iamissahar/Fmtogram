@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
 	"mime/multipart"
 	"net/http"
 	"net/url"
@@ -570,7 +569,7 @@ func responseDecoder(msg *Message) error {
 	return err
 }
 
-func sendRequest(msg *Message, query string) error {
+func sendRequest(msg *Message, query string) ([]byte, error) {
 	var resp *http.Response
 	var body []byte
 	var err error
@@ -581,20 +580,19 @@ func sendRequest(msg *Message, query string) error {
 		err = msg.fm.writer.Close()
 	}
 
+	msg.fm.g.request = fmt.Sprintf("content-type=%s\nmethod=%s\nhttp-method=%s\nbot-token=%s\n",
+		msg.fm.contentType, msg.fm.method, msg.fm.httpMethod, msg.fm.token)
 	if msg.fm.contentType == "application/json" {
-		log.Print(msg.fm.buf.String())
+		msg.fm.g.request = fmt.Sprintf("%s\n%s", msg.fm.g.request, msg.fm.buf.String())
 	} else {
-		log.Printf("UrlData=%s, Content-Type=%s", query, msg.fm.contentType)
+		msg.fm.g.request = fmt.Sprintf("%s\nurl=%s", msg.fm.g.request, query)
 	}
-
-	log.Printf("BotToken=`%s` HTTPMethod=`%s` Method=`%s`", types.BotID, msg.fm.httpMethod, msg.fm.method)
 
 	if err == nil {
 		if query != "" {
 			query = "?" + query
 		}
-		url := fmt.Sprint(types.TelegramAPI, "bot", types.BotID, "/", msg.fm.method, query)
-		log.Print(url)
+		url := fmt.Sprint(types.TelegramAPI, "bot", msg.fm.token, "/", msg.fm.method, query)
 		req, err = http.NewRequest(msg.fm.httpMethod, url, msg.fm.buf)
 		req.Header.Set("Content-Type", msg.fm.contentType)
 
@@ -607,7 +605,6 @@ func sendRequest(msg *Message, query string) error {
 				body, err = io.ReadAll(resp.Body)
 
 				if err == nil {
-					fmt.Println(string(body))
 					errResp := new(types.Error)
 					err = json.Unmarshal(body, errResp)
 					if !errResp.Ok {
@@ -622,19 +619,20 @@ func sendRequest(msg *Message, query string) error {
 			}
 		}
 	}
-	return err
+	return body, err
 }
 
-func (msg *Message) Send() (interface{}, error) {
+func (msg *Message) Send() ([]byte, error) {
 	var err error
 	var query string
+	var body []byte
 
 	if query, err = makeRequest(msg); err == nil {
 		if msg.fm.tgr == nil {
 			panic("!~")
 		}
-		err = sendRequest(msg, query)
+		body, err = sendRequest(msg, query)
 	}
 
-	return msg.fm.tgr, err
+	return body, err
 }

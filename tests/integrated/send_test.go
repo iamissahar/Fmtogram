@@ -8,8 +8,24 @@ import (
 	"github.com/l1qwie/Fmtogram/types"
 )
 
-func (tc *testcase) sendMessage(t *testing.T) {
+func (tc *testcase) defaultSet() {
+	tc.whattocheck[status] = struct{}{}
+	tc.whattocheck[errr] = struct{}{}
+	tc.whattocheck[chat] = struct{}{}
+	tc.whattocheck[sender] = struct{}{}
+	tc.whattocheck[date] = struct{}{}
+	tc.whattocheck[msgid] = struct{}{}
+	tc.whattocheck[replyed] = struct{}{}
+	tc.whattocheck[msg] = struct{}{}
+}
+
+func sendMessage(t *testing.T, title string, kbF func(*testcase)) {
 	var err error
+	tc := new(testcase)
+	defer func() { tc.workdone <- struct{}{} }()
+	tc.init()
+	tc.defaultSet()
+	go tc.changeToken(nil, nil, t)
 	for i := 0; i < 4; i++ {
 		tt := new(testcase)
 		tt.init()
@@ -49,10 +65,15 @@ func (tc *testcase) sendMessage(t *testing.T) {
 		if err = tt.msg.AddChat(tt.ch); err != nil {
 			t.Fatal(err)
 		}
-		tc.kbF(tt, t)
-		tc.send(tt.msg, t)
-		tc.checkResponse(t, i)
-		timetochange <- struct{}{}
+		if err = tt.msg.AddToken(tc.token); err != nil {
+			t.Fatal(err)
+		}
+		kbF(tt)
+		resp := send(tt.msg)
+		t.Logf("[TEST:%s] Request:\n%s", title, tt.get.Request())
+		t.Logf("[TEST:%s] Response:\n%s", title, string(resp))
+		tc.checkResponse(i)
+		tc.timetochange <- struct{}{}
 	}
 }
 
@@ -60,14 +81,7 @@ func msgReq(t *testing.T) {
 	var err error
 	tc := new(testcase)
 	tc.init()
-	tc.whattocheck[status] = struct{}{}
-	tc.whattocheck[errr] = struct{}{}
-	tc.whattocheck[chat] = struct{}{}
-	tc.whattocheck[sender] = struct{}{}
-	tc.whattocheck[date] = struct{}{}
-	tc.whattocheck[msgid] = struct{}{}
-	tc.whattocheck[replyed] = struct{}{}
-	tc.whattocheck[msg] = struct{}{}
+	tc.defaultSet()
 	if err = tc.prm.WriteString(textformsg); err != nil {
 		t.Fatal(err)
 	}
@@ -80,40 +94,23 @@ func msgReq(t *testing.T) {
 	if err = tc.msg.AddChat(tc.ch); err != nil {
 		t.Fatal(err)
 	}
-	tc.send(tc.msg, t)
-	tc.checkResponse(t, 0)
-}
-
-func msgAll(t *testing.T) {
-	tc := new(testcase)
-	tc.init()
-	go tc.changeToken(nil, nil)
-	tc.whattocheck[status] = struct{}{}
-	tc.whattocheck[errr] = struct{}{}
-	tc.whattocheck[chat] = struct{}{}
-	tc.whattocheck[sender] = struct{}{}
-	tc.whattocheck[date] = struct{}{}
-	tc.whattocheck[msgid] = struct{}{}
-	tc.whattocheck[replyed] = struct{}{}
-	tc.whattocheck[msg] = struct{}{}
-	for i := 0; i < 3; i++ {
-		if i == 0 {
-			t.Log("Test Message With Inline Keyboard")
-			tc.kbF = tc.inlineKb
-		} else if i == 1 {
-			t.Log("Test Message With ReplyMarkup Keyboard")
-			tc.kbF = tc.replyKb
-		} else {
-			t.Log("Test Message With ForceReply Keyboard")
-			tc.kbF = tc.forceKb
-		}
-		tc.sendMessage(t)
+	if err = tc.msg.AddToken(tc.token); err != nil {
+		t.Fatal(err)
 	}
+	send(tc.msg)
+	tc.checkResponse(0)
 }
 
-func TestSMessage(t *testing.T) {
+func TestSendMessage(t *testing.T) {
 	t.Run("Req", msgReq)
-	t.Run("All", msgAll)
+	t.Run("All", func(t *testing.T) {
+		for i := 0; i < 3; i++ {
+			t.Run(kbnames[i], func(t *testing.T) {
+				t.Parallel()
+				sendMessage(t, kbnames[i], kb[i])
+			})
+		}
+	})
 }
 
 func photoArr(tc *testcase) []func(string) error {
@@ -216,91 +213,95 @@ func videoNThumb(tc *testcase) []func(string) error {
 	return []func(string) error{tc.vdn.WriteThumbnail, tc.vdn.WriteThumbnailID}
 }
 
-func (tc *testcase) sendMediaReq(t *testing.T, isvoice bool) {
+func sendMediaReq(t *testing.T, tc *testcase, addMorePrm []func(*testcase), title string) {
 	var err error
 	for i := 0; i < 3; i++ {
-		test := new(testcase)
-		test.init()
+		tt := new(testcase)
+		tt.init()
+		tt.defaultSet()
+		addMorePrm[i](tt)
 		if tc.paid {
-			if err = test.prm.WriteStarCount(stars); err != nil {
+			if err = tt.prm.WriteStarCount(stars); err != nil {
 				t.Fatal(err)
 			}
 		}
-		if err = tc.mediaF(test)[i](tc.mediadata[i]); err != nil {
+		if err = tc.mediaF(tt)[i](tc.mediadata[i]); err != nil {
 			t.Fatal(err)
 		}
-		if err = test.ch.WriteChatID(chatid); err != nil {
+		if err = tt.ch.WriteChatID(chatid); err != nil {
 			t.Fatal(err)
 		}
-		if err = test.msg.AddChat(test.ch); err != nil {
+		if err = tt.msg.AddChat(tt.ch); err != nil {
 			t.Fatal(err)
 		}
-		if err = test.msg.AddParameters(test.prm); err != nil {
+		if err = tt.msg.AddParameters(tt.prm); err != nil {
 			t.Fatal(err)
 		}
-		tc.addMedia(test, t)
-		tc.send(test.msg, t)
-		if isvoice && i == 2 {
-			delete(tc.whattocheck, vc)
-			tc.whattocheck[doc] = struct{}{}
+		if err = tt.msg.AddToken(tc.token); err != nil {
+			t.Fatal(err)
 		}
-		tc.checkResponse(t, i)
-		timetochange <- struct{}{}
+		tc.addMedia(tt, t)
+		resp := send(tt.msg)
+		t.Logf("[TEST:%s] Request:\n%s", title, tt.get.Request())
+		t.Logf("[TEST:%s] Response:\n%s", title, string(resp))
+		tt.checkResponse(i)
+		tc.timetochange <- struct{}{}
 	}
 }
 
-func (tc *testcase) sendMediaAll(t *testing.T, isvoice bool) {
+func sendMediaAll(t *testing.T, tc *testcase, addMorePrm []func(*testcase), kbF func(*testcase), title string) {
 	var err error
 	for i := 0; i < 3; i++ {
 		for j := 0; j < 4; j++ {
-			tcc := new(testcase)
-			tcc.init()
+			tt := new(testcase)
+			tt.init()
+			tt.defaultSet()
+			addMorePrm[i](tt)
 			if tc.paid {
-				if err = tcc.prm.WriteStarCount(stars); err != nil {
+				if err = tt.prm.WriteStarCount(stars); err != nil {
 					t.Fatal(err)
 				}
 			}
 			if !tc.withoutString {
-				if err = tcc.prm.WriteString(textformsg); err != nil {
+				if err = tt.prm.WriteString(textformsg); err != nil {
 					t.Fatal(err)
 				}
 				if j == 3 {
-					if err = tcc.prm.WriteEntities(entities); err != nil {
+					if err = tt.prm.WriteEntities(entities); err != nil {
 						t.Fatal(err)
 					}
 				} else if j >= 0 {
-					if err = tcc.prm.WriteParseMode(parsemode[j]); err != nil {
+					if err = tt.prm.WriteParseMode(parsemode[j]); err != nil {
 						t.Fatal(err)
 					}
 				}
 			}
-			if err = tc.mediaF(tcc)[i](tc.mediadata[i]); err != nil {
+			if err = tc.mediaF(tt)[i](tc.mediadata[i]); err != nil {
 				t.Fatal(err)
 			}
 			if tc.thumb {
 				if i == 0 || i == 1 {
-					if err = tc.thumbnailF(tcc)[i](tc.thumbdata[i]); err != nil {
+					if err = tc.thumbnailF(tt)[i](tc.thumbdata[i]); err != nil {
 						t.Fatal(err)
 					}
 				}
 			}
-			tc.common(tcc, t)
-			tc.addMedia(tcc, t)
-			tc.kbF(tcc, t)
-			tc.send(tcc.msg, t)
-			if isvoice && i == 2 {
-				delete(tc.whattocheck, vc)
-				tc.whattocheck[doc] = struct{}{}
-			} else {
-				delete(tc.whattocheck, doc)
+			if err = tt.msg.AddToken(tc.token); err != nil {
+				t.Fatal(err)
 			}
-			tc.checkResponse(t, i)
-			timetochange <- struct{}{}
+			tc.common(tc, tt, t)
+			tc.addMedia(tt, t)
+			kbF(tt)
+			resp := send(tt.msg)
+			t.Logf("[TEST:%s] Request:\n%s", title, tt.get.Request())
+			t.Logf("[TEST:%s] Response:\n%s", title, string(resp))
+			tt.checkResponse(i)
+			tc.timetochange <- struct{}{}
 		}
 	}
 }
 
-func photoCommon(tc *testcase, t *testing.T) {
+func photoCommon(oldtc, tc *testcase, t *testing.T) {
 	var err error
 	if err = tc.ph.WriteShowCaptionAboveMedia(); err != nil {
 		t.Fatal(err)
@@ -317,7 +318,7 @@ func photoCommon(tc *testcase, t *testing.T) {
 	if err = tc.prm.WriteMessageEffectID(msgEffect); err != nil {
 		t.Fatal(err)
 	}
-	if err = tc.prm.WriteReplyParameters(tc.getReplyPrm()); err != nil {
+	if err = tc.prm.WriteReplyParameters(oldtc.getReplyPrm()); err != nil {
 		t.Fatal(err)
 	}
 	if err = tc.ch.WriteChatID(chatid); err != nil {
@@ -331,63 +332,44 @@ func photoCommon(tc *testcase, t *testing.T) {
 	}
 }
 
+func photoIntoMap(tc *testcase) {
+	tc.whattocheck[ph] = struct{}{}
+}
+
 func photoReq(t *testing.T) {
 	tc := new(testcase)
+	defer func() { tc.workdone <- struct{}{} }()
 	tc.init()
-	go tc.changeToken(photodata, nil)
-	tc.whattocheck[status] = struct{}{}
-	tc.whattocheck[errr] = struct{}{}
-	tc.whattocheck[chat] = struct{}{}
-	tc.whattocheck[sender] = struct{}{}
-	tc.whattocheck[date] = struct{}{}
-	tc.whattocheck[msgid] = struct{}{}
-	tc.whattocheck[replyed] = struct{}{}
-	tc.whattocheck[ph] = struct{}{}
-	tc.whattocheck[msg] = struct{}{}
+	go tc.changeToken(photodata, nil, t)
 	tc.addMedia = addPhoto
 	tc.mediaF = photoArr
 	tc.mediadata = photodata[tc.token]
-	tc.sendMediaReq(t, false)
+	sendMediaReq(t, tc, addToMapPhoto, "photo")
 }
 
 func photoAll(t *testing.T) {
-	tc := new(testcase)
-	tc.init()
-	go tc.changeToken(photodata, nil)
-	tc.whattocheck[status] = struct{}{}
-	tc.whattocheck[errr] = struct{}{}
-	tc.whattocheck[chat] = struct{}{}
-	tc.whattocheck[sender] = struct{}{}
-	tc.whattocheck[date] = struct{}{}
-	tc.whattocheck[msgid] = struct{}{}
-	tc.whattocheck[replyed] = struct{}{}
-	tc.whattocheck[ph] = struct{}{}
-	tc.whattocheck[msg] = struct{}{}
-	tc.addMedia = addPhoto
-	tc.mediaF = photoArr
-	tc.mediadata = photodata[tc.token]
-	tc.common = photoCommon
 	for i := 0; i < 3; i++ {
-		if i == 0 {
-			t.Log("Test Photo With Inline Keyboard")
-			tc.kbF = tc.inlineKb
-		} else if i == 1 {
-			t.Log("Test Photo With ReplyMarkup Keyboard")
-			tc.kbF = tc.replyKb
-		} else {
-			t.Log("Test Photo With ForceReply Keyboard")
-			tc.kbF = tc.forceKb
-		}
-		tc.sendMediaAll(t, false)
+		t.Run(kbnames[i], func(t *testing.T) {
+			t.Parallel()
+			tc := new(testcase)
+			defer func() { tc.workdone <- struct{}{} }()
+			tc.init()
+			go tc.changeToken(photodata, nil, t)
+			tc.addMedia = addPhoto
+			tc.mediaF = photoArr
+			tc.mediadata = photodata[tc.token]
+			tc.common = photoCommon
+			sendMediaAll(t, tc, addToMapPhoto, kb[i], kbnames[i])
+		})
 	}
 }
 
-func TestPhoto(t *testing.T) {
+func TestSendPhoto(t *testing.T) {
 	t.Run("Req", photoReq)
 	t.Run("All", photoAll)
 }
 
-func audioCommon(tc *testcase, t *testing.T) {
+func audioCommon(oldtc *testcase, tc *testcase, t *testing.T) {
 	var err error
 	if err = tc.ch.WriteChatID(chatid); err != nil {
 		t.Fatal(err)
@@ -410,7 +392,7 @@ func audioCommon(tc *testcase, t *testing.T) {
 	if err = tc.prm.WriteMessageEffectID(msgEffect); err != nil {
 		t.Fatal(err)
 	}
-	if err = tc.prm.WriteReplyParameters(tc.getReplyPrm()); err != nil {
+	if err = tc.prm.WriteReplyParameters(oldtc.getReplyPrm()); err != nil {
 		t.Fatal(err)
 	}
 	if err = tc.msg.AddChat(tc.ch); err != nil {
@@ -421,68 +403,47 @@ func audioCommon(tc *testcase, t *testing.T) {
 	}
 }
 
+func audioIntoMap(tc *testcase) {
+	tc.whattocheck[ad] = struct{}{}
+}
+
 func audioReq(t *testing.T) {
 	tc := new(testcase)
+	defer func() { tc.workdone <- struct{}{} }()
 	tc.init()
-	go tc.changeToken(audiodata, nil)
-	tc.whattocheck[status] = struct{}{}
-	tc.whattocheck[errr] = struct{}{}
-	tc.whattocheck[chat] = struct{}{}
-	tc.whattocheck[sender] = struct{}{}
-	tc.whattocheck[date] = struct{}{}
-	tc.whattocheck[msgid] = struct{}{}
-	tc.whattocheck[replyed] = struct{}{}
-	tc.whattocheck[audio] = struct{}{}
-	tc.whattocheck[msg] = struct{}{}
+	go tc.changeToken(audiodata, nil, t)
 	tc.addMedia = addAudio
 	tc.mediaF = audioArr
 	tc.mediadata = audiodata[tc.token]
-	tc.code = [3]int{0, 0, 400}
-	tc.errmsg = [3]string{"", "", "[ERROR:400] Bad Request: wrong type of the web page content"}
-	tc.sendMediaReq(t, false)
+	sendMediaReq(t, tc, addToMapAudio, "audio")
 }
 
 func audioAll(t *testing.T) {
-	tc := new(testcase)
-	tc.init()
-	go tc.changeToken(audiodata, thumbaudio)
-	tc.whattocheck[status] = struct{}{}
-	tc.whattocheck[errr] = struct{}{}
-	tc.whattocheck[chat] = struct{}{}
-	tc.whattocheck[sender] = struct{}{}
-	tc.whattocheck[date] = struct{}{}
-	tc.whattocheck[msgid] = struct{}{}
-	tc.whattocheck[replyed] = struct{}{}
-	tc.whattocheck[audio] = struct{}{}
-	tc.whattocheck[msg] = struct{}{}
-	tc.addMedia = addAudio
-	tc.mediaF = audioArr
-	tc.mediadata = audiodata[tc.token]
-	tc.common = audioCommon
-	tc.thumb = true
-	tc.thumbnailF = audioThumb
-	tc.thumbdata = thumbaudio[tc.token]
 	for i := 0; i < 3; i++ {
-		if i == 0 {
-			t.Log("Test Audio With Inline Keyboard")
-			tc.kbF = tc.inlineKb
-		} else if i == 1 {
-			t.Log("Test Audio With ReplyMarkup Keyboard")
-			tc.kbF = tc.replyKb
-		} else {
-			t.Log("Test Audio With ForceReply Keyboard")
-			tc.kbF = tc.forceKb
-		}
-		tc.sendMediaAll(t, false)
+		t.Run(kbnames[i], func(t *testing.T) {
+			t.Parallel()
+			tc := new(testcase)
+			defer func() { tc.workdone <- struct{}{} }()
+			tc.init()
+			go tc.changeToken(audiodata, thumbaudio, t)
+			tc.addMedia = addAudio
+			tc.mediaF = audioArr
+			tc.mediadata = audiodata[tc.token]
+			tc.common = audioCommon
+			tc.thumb = true
+			tc.thumbnailF = audioThumb
+			tc.thumbdata = thumbaudio[tc.token]
+			sendMediaAll(t, tc, addToMapAudio, kb[i], kbnames[i])
+		})
 	}
 }
 
-func TestAudio(t *testing.T) {
+func TestSendAudio(t *testing.T) {
 	t.Run("Req", audioReq)
 	t.Run("All", audioAll)
 }
 
-func documentCommon(tc *testcase, t *testing.T) {
+func documentCommon(oldtc *testcase, tc *testcase, t *testing.T) {
 	var err error
 	if err = tc.ch.WriteChatID(chatid); err != nil {
 		t.Fatal(err)
@@ -496,7 +457,7 @@ func documentCommon(tc *testcase, t *testing.T) {
 	if err = tc.prm.WriteMessageEffectID(msgEffect); err != nil {
 		t.Fatal(err)
 	}
-	if err = tc.prm.WriteReplyParameters(tc.getReplyPrm()); err != nil {
+	if err = tc.prm.WriteReplyParameters(oldtc.getReplyPrm()); err != nil {
 		t.Fatal(err)
 	}
 	if err = tc.msg.AddChat(tc.ch); err != nil {
@@ -507,66 +468,47 @@ func documentCommon(tc *testcase, t *testing.T) {
 	}
 }
 
+func docIntoMap(tc *testcase) {
+	tc.whattocheck[doc] = struct{}{}
+}
+
 func docReq(t *testing.T) {
 	tc := new(testcase)
+	defer func() { tc.workdone <- struct{}{} }()
 	tc.init()
-	go tc.changeToken(docdata, nil)
-	tc.whattocheck[status] = struct{}{}
-	tc.whattocheck[errr] = struct{}{}
-	tc.whattocheck[chat] = struct{}{}
-	tc.whattocheck[sender] = struct{}{}
-	tc.whattocheck[date] = struct{}{}
-	tc.whattocheck[msgid] = struct{}{}
-	tc.whattocheck[replyed] = struct{}{}
-	tc.whattocheck[doc] = struct{}{}
-	tc.whattocheck[msg] = struct{}{}
+	go tc.changeToken(docdata, nil, t)
 	tc.addMedia = addDoc
 	tc.mediaF = docArr
 	tc.mediadata = docdata[tc.token]
-	tc.sendMediaReq(t, false)
+	sendMediaReq(t, tc, addToMapDoc, "document")
 }
 
 func docAll(t *testing.T) {
-	tc := new(testcase)
-	tc.init()
-	go tc.changeToken(docdata, thumbdoc)
-	tc.whattocheck[status] = struct{}{}
-	tc.whattocheck[errr] = struct{}{}
-	tc.whattocheck[chat] = struct{}{}
-	tc.whattocheck[sender] = struct{}{}
-	tc.whattocheck[date] = struct{}{}
-	tc.whattocheck[msgid] = struct{}{}
-	tc.whattocheck[replyed] = struct{}{}
-	tc.whattocheck[doc] = struct{}{}
-	tc.whattocheck[msg] = struct{}{}
-	tc.addMedia = addDoc
-	tc.mediaF = docArr
-	tc.mediadata = docdata[tc.token]
-	tc.common = documentCommon
-	tc.thumb = true
-	tc.thumbnailF = docThumb
-	tc.thumbdata = thumbdoc[tc.token]
 	for i := 0; i < 3; i++ {
-		if i == 0 {
-			t.Log("Test Document With Inline Keyboard")
-			tc.kbF = tc.inlineKb
-		} else if i == 1 {
-			t.Log("Test Document With ReplyMarkup Keyboard")
-			tc.kbF = tc.replyKb
-		} else {
-			t.Log("Test Document With ForceReply Keyboard")
-			tc.kbF = tc.forceKb
-		}
-		tc.sendMediaAll(t, false)
+		t.Run(kbnames[i], func(t *testing.T) {
+			t.Parallel()
+			tc := new(testcase)
+			defer func() { tc.workdone <- struct{}{} }()
+			tc.init()
+			go tc.changeToken(docdata, thumbdoc, t)
+			tc.addMedia = addDoc
+			tc.mediaF = docArr
+			tc.mediadata = docdata[tc.token]
+			tc.common = documentCommon
+			tc.thumb = true
+			tc.thumbnailF = docThumb
+			tc.thumbdata = thumbdoc[tc.token]
+			sendMediaAll(t, tc, addToMapDoc, kb[i], kbnames[i])
+		})
 	}
 }
 
-func TestDocument(t *testing.T) {
+func TestSendDocument(t *testing.T) {
 	t.Run("Req", docReq)
 	t.Run("All", docAll)
 }
 
-func videoCommon(tc *testcase, t *testing.T) {
+func videoCommon(oldtc *testcase, tc *testcase, t *testing.T) {
 	var err error
 	if err = tc.ch.WriteChatID(chatid); err != nil {
 		t.Fatal(err)
@@ -598,7 +540,7 @@ func videoCommon(tc *testcase, t *testing.T) {
 	if err = tc.prm.WriteMessageEffectID(msgEffect); err != nil {
 		t.Fatal(err)
 	}
-	if err = tc.prm.WriteReplyParameters(tc.getReplyPrm()); err != nil {
+	if err = tc.prm.WriteReplyParameters(oldtc.getReplyPrm()); err != nil {
 		t.Fatal(err)
 	}
 	if err = tc.msg.AddChat(tc.ch); err != nil {
@@ -609,66 +551,47 @@ func videoCommon(tc *testcase, t *testing.T) {
 	}
 }
 
+func vidIntoMap(tc *testcase) {
+	tc.whattocheck[vd] = struct{}{}
+}
+
 func videoReq(t *testing.T) {
 	tc := new(testcase)
+	defer func() { tc.workdone <- struct{}{} }()
 	tc.init()
-	go tc.changeToken(videodata, nil)
-	tc.whattocheck[status] = struct{}{}
-	tc.whattocheck[errr] = struct{}{}
-	tc.whattocheck[chat] = struct{}{}
-	tc.whattocheck[sender] = struct{}{}
-	tc.whattocheck[date] = struct{}{}
-	tc.whattocheck[msgid] = struct{}{}
-	tc.whattocheck[replyed] = struct{}{}
-	tc.whattocheck[video] = struct{}{}
-	tc.whattocheck[msg] = struct{}{}
+	go tc.changeToken(videodata, nil, t)
 	tc.addMedia = addVideo
 	tc.mediaF = videoArr
 	tc.mediadata = videodata[tc.token]
-	tc.sendMediaReq(t, false)
+	sendMediaReq(t, tc, addToMapVideo, "video")
 }
 
 func videoAll(t *testing.T) {
-	tc := new(testcase)
-	tc.init()
-	go tc.changeToken(videodata, thumbvideo)
-	tc.whattocheck[status] = struct{}{}
-	tc.whattocheck[errr] = struct{}{}
-	tc.whattocheck[chat] = struct{}{}
-	tc.whattocheck[sender] = struct{}{}
-	tc.whattocheck[date] = struct{}{}
-	tc.whattocheck[msgid] = struct{}{}
-	tc.whattocheck[replyed] = struct{}{}
-	tc.whattocheck[video] = struct{}{}
-	tc.whattocheck[msg] = struct{}{}
-	tc.addMedia = addVideo
-	tc.mediaF = videoArr
-	tc.mediadata = videodata[tc.token]
-	tc.common = videoCommon
-	tc.thumb = true
-	tc.thumbnailF = videoThumb
-	tc.thumbdata = thumbvideo[tc.token]
 	for i := 0; i < 3; i++ {
-		if i == 0 {
-			t.Log("Test Video With Inline Keyboard")
-			tc.kbF = tc.inlineKb
-		} else if i == 1 {
-			t.Log("Test Video With ReplyMarkup Keyboard")
-			tc.kbF = tc.replyKb
-		} else {
-			t.Log("Test Video With ForceReply Keyboard")
-			tc.kbF = tc.forceKb
-		}
-		tc.sendMediaAll(t, false)
+		t.Run(kbnames[i], func(t *testing.T) {
+			t.Parallel()
+			tc := new(testcase)
+			defer func() { tc.workdone <- struct{}{} }()
+			tc.init()
+			go tc.changeToken(videodata, thumbvideo, t)
+			tc.addMedia = addVideo
+			tc.mediaF = videoArr
+			tc.mediadata = videodata[tc.token]
+			tc.common = videoCommon
+			tc.thumb = true
+			tc.thumbnailF = videoThumb
+			tc.thumbdata = thumbvideo[tc.token]
+			sendMediaAll(t, tc, addToMapVideo, kb[i], kbnames[i])
+		})
 	}
 }
 
-func TestVideo(t *testing.T) {
+func TestSendVideo(t *testing.T) {
 	t.Run("Req", videoReq)
 	t.Run("All", videoAll)
 }
 
-func animCommon(tc *testcase, t *testing.T) {
+func animCommon(oldtc *testcase, tc *testcase, t *testing.T) {
 	var err error
 	if err = tc.ch.WriteChatID(chatid); err != nil {
 		t.Fatal(err)
@@ -697,7 +620,7 @@ func animCommon(tc *testcase, t *testing.T) {
 	if err = tc.prm.WriteMessageEffectID(msgEffect); err != nil {
 		t.Fatal(err)
 	}
-	if err = tc.prm.WriteReplyParameters(tc.getReplyPrm()); err != nil {
+	if err = tc.prm.WriteReplyParameters(oldtc.getReplyPrm()); err != nil {
 		t.Fatal(err)
 	}
 	if err = tc.msg.AddChat(tc.ch); err != nil {
@@ -708,66 +631,47 @@ func animCommon(tc *testcase, t *testing.T) {
 	}
 }
 
+func animIntoMap(tc *testcase) {
+	tc.whattocheck[anim] = struct{}{}
+}
+
 func animReq(t *testing.T) {
 	tc := new(testcase)
+	defer func() { tc.workdone <- struct{}{} }()
 	tc.init()
-	go tc.changeToken(animdata, nil)
-	tc.whattocheck[status] = struct{}{}
-	tc.whattocheck[errr] = struct{}{}
-	tc.whattocheck[chat] = struct{}{}
-	tc.whattocheck[sender] = struct{}{}
-	tc.whattocheck[date] = struct{}{}
-	tc.whattocheck[msgid] = struct{}{}
-	tc.whattocheck[replyed] = struct{}{}
-	tc.whattocheck[anim] = struct{}{}
-	tc.whattocheck[msg] = struct{}{}
+	go tc.changeToken(animdata, nil, t)
 	tc.addMedia = addAnim
 	tc.mediaF = animArr
 	tc.mediadata = animdata[tc.token]
-	tc.sendMediaReq(t, false)
+	sendMediaReq(t, tc, addToMapAnim, "animation")
 }
 
 func animAll(t *testing.T) {
-	tc := new(testcase)
-	tc.init()
-	go tc.changeToken(animdata, thumbanim)
-	tc.whattocheck[status] = struct{}{}
-	tc.whattocheck[errr] = struct{}{}
-	tc.whattocheck[chat] = struct{}{}
-	tc.whattocheck[sender] = struct{}{}
-	tc.whattocheck[date] = struct{}{}
-	tc.whattocheck[msgid] = struct{}{}
-	tc.whattocheck[replyed] = struct{}{}
-	tc.whattocheck[anim] = struct{}{}
-	tc.whattocheck[msg] = struct{}{}
-	tc.addMedia = addAnim
-	tc.mediaF = animArr
-	tc.mediadata = animdata[tc.token]
-	tc.common = animCommon
-	tc.thumb = true
-	tc.thumbnailF = animThumb
-	tc.thumbdata = thumbanim[tc.token]
 	for i := 0; i < 3; i++ {
-		if i == 0 {
-			t.Log("Test Animation With Inline Keyboard")
-			tc.kbF = tc.inlineKb
-		} else if i == 1 {
-			t.Log("Test Animation With ReplyMarkup Keyboard")
-			tc.kbF = tc.replyKb
-		} else {
-			t.Log("Test Animation With ForceReply Keyboard")
-			tc.kbF = tc.forceKb
-		}
-		tc.sendMediaAll(t, false)
+		t.Run(kbnames[i], func(t *testing.T) {
+			t.Parallel()
+			tc := new(testcase)
+			defer func() { tc.workdone <- struct{}{} }()
+			tc.init()
+			go tc.changeToken(animdata, thumbanim, t)
+			tc.addMedia = addAnim
+			tc.mediaF = animArr
+			tc.mediadata = animdata[tc.token]
+			tc.common = animCommon
+			tc.thumb = true
+			tc.thumbnailF = animThumb
+			tc.thumbdata = thumbanim[tc.token]
+			sendMediaAll(t, tc, addToMapAnim, kb[i], kbnames[i])
+		})
 	}
 }
 
-func TestAnimation(t *testing.T) {
+func TestSendAnimation(t *testing.T) {
 	t.Run("Req", animReq)
 	t.Run("All", animAll)
 }
 
-func voiceCommon(tc *testcase, t *testing.T) {
+func voiceCommon(oldtc *testcase, tc *testcase, t *testing.T) {
 	var err error
 	if err = tc.ch.WriteChatID(chatid); err != nil {
 		t.Fatal(err)
@@ -787,7 +691,7 @@ func voiceCommon(tc *testcase, t *testing.T) {
 	if err = tc.prm.WriteMessageEffectID(msgEffect); err != nil {
 		t.Fatal(err)
 	}
-	if err = tc.prm.WriteReplyParameters(tc.getReplyPrm()); err != nil {
+	if err = tc.prm.WriteReplyParameters(oldtc.getReplyPrm()); err != nil {
 		t.Fatal(err)
 	}
 	if err = tc.msg.AddChat(tc.ch); err != nil {
@@ -798,63 +702,48 @@ func voiceCommon(tc *testcase, t *testing.T) {
 	}
 }
 
+func vcIntoMap(tc *testcase) {
+	tc.whattocheck[vc] = struct{}{}
+}
+
+func vcIntoMap1(tc *testcase) {
+	tc.whattocheck[doc] = struct{}{}
+}
+
 func voiceReq(t *testing.T) {
 	tc := new(testcase)
+	defer func() { tc.workdone <- struct{}{} }()
 	tc.init()
-	go tc.changeToken(voicedata, nil)
-	tc.whattocheck[status] = struct{}{}
-	tc.whattocheck[errr] = struct{}{}
-	tc.whattocheck[chat] = struct{}{}
-	tc.whattocheck[sender] = struct{}{}
-	tc.whattocheck[date] = struct{}{}
-	tc.whattocheck[msgid] = struct{}{}
-	tc.whattocheck[replyed] = struct{}{}
-	tc.whattocheck[vc] = struct{}{}
-	tc.whattocheck[msg] = struct{}{}
+	go tc.changeToken(voicedata, nil, t)
 	tc.addMedia = addVoice
 	tc.mediaF = voiceArr
 	tc.mediadata = voicedata[tc.token]
-	tc.sendMediaReq(t, true)
+	sendMediaReq(t, tc, addToMapVoice, "voice")
 }
 
 func voiceAll(t *testing.T) {
-	tc := new(testcase)
-	tc.init()
-	go tc.changeToken(voicedata, nil)
-	tc.whattocheck[status] = struct{}{}
-	tc.whattocheck[errr] = struct{}{}
-	tc.whattocheck[chat] = struct{}{}
-	tc.whattocheck[sender] = struct{}{}
-	tc.whattocheck[date] = struct{}{}
-	tc.whattocheck[msgid] = struct{}{}
-	tc.whattocheck[replyed] = struct{}{}
-	tc.whattocheck[vc] = struct{}{}
-	tc.whattocheck[msg] = struct{}{}
-	tc.addMedia = addVoice
-	tc.mediaF = voiceArr
-	tc.mediadata = voicedata[tc.token]
-	tc.common = voiceCommon
 	for i := 0; i < 3; i++ {
-		if i == 0 {
-			t.Log("Test Voice With Inline Keyboard")
-			tc.kbF = tc.inlineKb
-		} else if i == 1 {
-			t.Log("Test Voice With ReplyMarkup Keyboard")
-			tc.kbF = tc.replyKb
-		} else {
-			t.Log("Test Voice With ForceReply Keyboard")
-			tc.kbF = tc.forceKb
-		}
-		tc.sendMediaAll(t, true)
+		t.Run(kbnames[i], func(t *testing.T) {
+			t.Parallel()
+			tc := new(testcase)
+			defer func() { tc.workdone <- struct{}{} }()
+			tc.init()
+			go tc.changeToken(voicedata, nil, t)
+			tc.addMedia = addVoice
+			tc.mediaF = voiceArr
+			tc.mediadata = voicedata[tc.token]
+			tc.common = voiceCommon
+			sendMediaAll(t, tc, addToMapVoice, kb[i], kbnames[i])
+		})
 	}
 }
 
-func TestVoice(t *testing.T) {
+func TestSendVoice(t *testing.T) {
 	t.Run("Req", voiceReq)
 	t.Run("All", voiceAll)
 }
 
-func videoNCommon(tc *testcase, t *testing.T) {
+func videoNCommon(oldtc *testcase, tc *testcase, t *testing.T) {
 	var err error
 	if err = tc.ch.WriteChatID(chatid); err != nil {
 		t.Fatal(err)
@@ -874,7 +763,7 @@ func videoNCommon(tc *testcase, t *testing.T) {
 	if err = tc.prm.WriteMessageEffectID(msgEffect); err != nil {
 		t.Fatal(err)
 	}
-	if err = tc.prm.WriteReplyParameters(tc.getReplyPrm()); err != nil {
+	if err = tc.prm.WriteReplyParameters(oldtc.getReplyPrm()); err != nil {
 		t.Fatal(err)
 	}
 	if err = tc.msg.AddChat(tc.ch); err != nil {
@@ -885,102 +774,71 @@ func videoNCommon(tc *testcase, t *testing.T) {
 	}
 }
 
+func vdnIntoMap(tc *testcase) {
+	tc.whattocheck[vdn] = struct{}{}
+}
+
+func vdnIntoMap1(tc *testcase) {
+	tc.whattocheck[vd] = struct{}{}
+}
+
 func videoNReq(t *testing.T) {
 	tc := new(testcase)
+	defer func() { tc.workdone <- struct{}{} }()
 	tc.init()
-	go tc.changeToken(videoNdata, nil)
-	tc.whattocheck[status] = struct{}{}
-	tc.whattocheck[errr] = struct{}{}
-	tc.whattocheck[chat] = struct{}{}
-	tc.whattocheck[sender] = struct{}{}
-	tc.whattocheck[date] = struct{}{}
-	tc.whattocheck[msgid] = struct{}{}
-	tc.whattocheck[replyed] = struct{}{}
-	tc.whattocheck[vdn] = struct{}{}
-	tc.whattocheck[msg] = struct{}{}
+	go tc.changeToken(videoNdata, nil, t)
 	tc.addMedia = addVideoNote
 	tc.mediaF = videoNArr
 	tc.mediadata = videoNdata[tc.token]
-	tc.sendMediaReq(t, false)
+	sendMediaReq(t, tc, addToMapVdn, "video-note")
 }
 
 func videoNAll(t *testing.T) {
-	tc := new(testcase)
-	tc.init()
-	go tc.changeToken(videoNdata, thumbvideoN)
-	tc.whattocheck[status] = struct{}{}
-	tc.whattocheck[errr] = struct{}{}
-	tc.whattocheck[chat] = struct{}{}
-	tc.whattocheck[sender] = struct{}{}
-	tc.whattocheck[date] = struct{}{}
-	tc.whattocheck[msgid] = struct{}{}
-	tc.whattocheck[replyed] = struct{}{}
-	// tc.whattocheck[vdn] = struct{}{}
-	tc.whattocheck[msg] = struct{}{}
-	tc.addMedia = addVideoNote
-	tc.mediaF = videoNArr
-	tc.mediadata = videoNdata[tc.token]
-	tc.common = videoNCommon
-	tc.thumb = true
-	tc.withoutString = true
-	tc.thumbnailF = videoNThumb
-	tc.thumbdata = thumbvideoN[tc.token]
 	for i := 0; i < 3; i++ {
-		if i == 0 {
-			t.Log("Test Video Note With Inline Keyboard")
-			tc.kbF = tc.inlineKb
-		} else if i == 1 {
-			t.Log("Test Video Note With ReplyMarkup Keyboard")
-			tc.kbF = tc.replyKb
-		} else {
-			t.Log("Test Video Note With ForceReply Keyboard")
-			tc.kbF = tc.forceKb
-		}
-		tc.sendMediaAll(t, false)
+		t.Run(kbnames[i], func(t *testing.T) {
+			t.Parallel()
+			tc := new(testcase)
+			defer func() { tc.workdone <- struct{}{} }()
+			tc.init()
+			go tc.changeToken(videoNdata, thumbvideoN, t)
+			tc.addMedia = addVideoNote
+			tc.mediaF = videoNArr
+			tc.mediadata = videoNdata[tc.token]
+			tc.common = videoNCommon
+			tc.thumb = true
+			tc.withoutString = true
+			tc.thumbnailF = videoNThumb
+			tc.thumbdata = thumbvideoN[tc.token]
+			sendMediaAll(t, tc, addToMapVdn1, kb[i], kbnames[i])
+		})
 	}
 }
 
-func TestVideoNote(t *testing.T) {
+func TestSendNoteVideo(t *testing.T) {
 	t.Run("Req", videoNReq)
 	t.Run("All", videoNAll)
 }
 
 func paidPhReq(t *testing.T) {
 	tc := new(testcase)
+	defer func() { tc.workdone <- struct{}{} }()
 	tc.init()
-	tc.whattocheck[status] = struct{}{}
-	tc.whattocheck[errr] = struct{}{}
-	tc.whattocheck[chat] = struct{}{}
-	tc.whattocheck[sender] = struct{}{}
-	tc.whattocheck[date] = struct{}{}
-	tc.whattocheck[msgid] = struct{}{}
-	tc.whattocheck[replyed] = struct{}{}
-	tc.whattocheck[ph] = struct{}{}
-	tc.whattocheck[msg] = struct{}{}
+	go tc.changeToken(photodata, nil, t)
 	tc.addMedia = addPhoto
 	tc.mediaF = photoArr
-	tc.mediadata = photodata[types.BotID]
-	tc.paid = true
-	tc.sendMediaReq(t, false)
+	tc.mediadata = photodata[tc.token]
+	sendMediaReq(t, tc, addToMapPhoto, "paid-photo")
 }
 
 func paidVdReq(t *testing.T) {
 	tc := new(testcase)
+	defer func() { tc.workdone <- struct{}{} }()
 	tc.init()
-	tc.whattocheck[status] = struct{}{}
-	tc.whattocheck[errr] = struct{}{}
-	tc.whattocheck[chat] = struct{}{}
-	tc.whattocheck[sender] = struct{}{}
-	tc.whattocheck[date] = struct{}{}
-	tc.whattocheck[msgid] = struct{}{}
-	tc.whattocheck[replyed] = struct{}{}
-	tc.whattocheck[vd] = struct{}{}
-	tc.whattocheck[msg] = struct{}{}
+	go tc.changeToken(videodata, nil, t)
 	tc.addMedia = addVideo
 	tc.mediaF = videoArr
-	tc.mediadata = videodata[types.BotID]
-	tc.paid = true
-	tc.sendMediaReq(t, false)
+	tc.mediadata = videodata[tc.token]
+	sendMediaReq(t, tc, addToMapVideo, "paid-video")
 }
 
 func paidReq(t *testing.T) {
@@ -989,69 +847,41 @@ func paidReq(t *testing.T) {
 }
 
 func paidPhAll(t *testing.T) {
-	tc := new(testcase)
-	tc.init()
-	tc.whattocheck[status] = struct{}{}
-	tc.whattocheck[errr] = struct{}{}
-	tc.whattocheck[chat] = struct{}{}
-	tc.whattocheck[sender] = struct{}{}
-	tc.whattocheck[date] = struct{}{}
-	tc.whattocheck[msgid] = struct{}{}
-	tc.whattocheck[replyed] = struct{}{}
-	tc.whattocheck[ph] = struct{}{}
-	tc.whattocheck[msg] = struct{}{}
-	tc.addMedia = addPhoto
-	tc.mediaF = photoArr
-	tc.mediadata = photodata[types.BotID]
-	tc.paid = true
-	tc.common = photoCommon
 	for i := 0; i < 3; i++ {
-		if i == 0 {
-			t.Log("Test Photo With Inline Keyboard")
-			tc.kbF = tc.inlineKb
-		} else if i == 1 {
-			t.Log("Test Photo With ReplyMarkup Keyboard")
-			tc.kbF = tc.replyKb
-		} else {
-			t.Log("Test Photo With ForceReply Keyboard")
-			tc.kbF = tc.forceKb
-		}
-		tc.sendMediaAll(t, false)
+		t.Run(kbnames[i], func(t *testing.T) {
+			t.Parallel()
+			tc := new(testcase)
+			defer func() { tc.workdone <- struct{}{} }()
+			tc.init()
+			go tc.changeToken(photodata, nil, t)
+			tc.addMedia = addPhoto
+			tc.mediaF = photoArr
+			tc.mediadata = photodata[tc.token]
+			tc.paid = true
+			tc.common = photoCommon
+			sendMediaAll(t, tc, addToMapPhoto, kb[i], kbnames[i])
+		})
 	}
 }
 
 func paidVdAll(t *testing.T) {
-	tc := new(testcase)
-	tc.init()
-	tc.whattocheck[status] = struct{}{}
-	tc.whattocheck[errr] = struct{}{}
-	tc.whattocheck[chat] = struct{}{}
-	tc.whattocheck[sender] = struct{}{}
-	tc.whattocheck[date] = struct{}{}
-	tc.whattocheck[msgid] = struct{}{}
-	tc.whattocheck[replyed] = struct{}{}
-	tc.whattocheck[vd] = struct{}{}
-	tc.whattocheck[msg] = struct{}{}
-	tc.addMedia = addVideo
-	tc.mediaF = videoArr
-	tc.mediadata = videodata[types.BotID]
-	tc.common = videoCommon
-	tc.thumb = true
-	tc.paid = true
-	tc.thumbnailF = videoThumb
-	tc.thumbdata = thumbvideo[types.BotID]
 	for i := 0; i < 3; i++ {
-		if i == 0 {
-			t.Log("Test Video With Inline Keyboard")
-			tc.kbF = tc.inlineKb
-		} else if i == 1 {
-			t.Log("Test Video With ReplyMarkup Keyboard")
-			tc.kbF = tc.replyKb
-		} else {
-			t.Log("Test Video With ForceReply Keyboard")
-			tc.kbF = tc.forceKb
-		}
-		tc.sendMediaAll(t, false)
+		t.Run(kbnames[i], func(t *testing.T) {
+			t.Parallel()
+			tc := new(testcase)
+			defer func() { tc.workdone <- struct{}{} }()
+			tc.init()
+			go tc.changeToken(videodata, thumbvideo, t)
+			tc.addMedia = addVideo
+			tc.mediaF = videoArr
+			tc.mediadata = videodata[tc.token]
+			tc.common = videoCommon
+			tc.thumb = true
+			tc.paid = true
+			tc.thumbnailF = videoThumb
+			tc.thumbdata = thumbvideo[tc.token]
+			sendMediaAll(t, tc, addToMapVideo, kb[i], kbnames[i])
+		})
 	}
 }
 
@@ -1060,7 +890,7 @@ func paidAll(t *testing.T) {
 	t.Run("Video", paidVdAll)
 }
 
-func TestPaidMedia(t *testing.T) {
+func TestSendPaidMedia(t *testing.T) {
 	t.Run("Req", paidReq)
 	t.Run("All", paidAll)
 }
@@ -1091,7 +921,7 @@ func mgPhotoAll(ph formatter.IPhoto, q *int, t *testing.T) {
 	}
 }
 
-func mgVideoAll(vd formatter.IVideo, q *int, majorq int, t *testing.T) {
+func mgVideoAll(vd formatter.IVideo, q *int, majorq int, token string, t *testing.T) {
 	var err error
 	if err = vd.WriteCaption(textformsg); err != nil {
 		t.Fatal(err)
@@ -1124,11 +954,11 @@ func mgVideoAll(vd formatter.IVideo, q *int, majorq int, t *testing.T) {
 		t.Fatal(err)
 	}
 	if majorq == 0 {
-		if err = vd.WriteThumbnail(thumbvideo[types.BotID][0]); err != nil {
+		if err = vd.WriteThumbnail(thumbvideo[token][0]); err != nil {
 			t.Fatal(err)
 		}
 	} else if majorq == 1 {
-		if err = vd.WriteThumbnailID(thumbvideo[types.BotID][1]); err != nil {
+		if err = vd.WriteThumbnailID(thumbvideo[token][1]); err != nil {
 			t.Fatal(err)
 		}
 	}
@@ -1138,7 +968,7 @@ func mgVideoAll(vd formatter.IVideo, q *int, majorq int, t *testing.T) {
 	}
 }
 
-func mgDocumentAll(dc formatter.IDocument, q *int, majorq int, t *testing.T) {
+func mgDocumentAll(dc formatter.IDocument, q *int, majorq int, token string, t *testing.T) {
 	var err error
 	if err = dc.WriteCaption(textformsg); err != nil {
 		t.Fatal(err)
@@ -1153,11 +983,11 @@ func mgDocumentAll(dc formatter.IDocument, q *int, majorq int, t *testing.T) {
 		}
 	}
 	if majorq == 0 {
-		if err = dc.WriteThumbnail(thumbdoc[types.BotID][0]); err != nil {
+		if err = dc.WriteThumbnail(thumbdoc[token][0]); err != nil {
 			t.Fatal(err)
 		}
 	} else if majorq == 1 {
-		if err = dc.WriteThumbnailID(thumbdoc[types.BotID][1]); err != nil {
+		if err = dc.WriteThumbnailID(thumbdoc[token][1]); err != nil {
 			t.Fatal(err)
 		}
 	}
@@ -1170,7 +1000,7 @@ func mgDocumentAll(dc formatter.IDocument, q *int, majorq int, t *testing.T) {
 	}
 }
 
-func mgAudioAll(ad formatter.IAudio, q *int, majorq int, t *testing.T) {
+func mgAudioAll(ad formatter.IAudio, q *int, majorq int, token string, t *testing.T) {
 	var err error
 	if err = ad.WriteCaption(textformsg); err != nil {
 		t.Fatal(err)
@@ -1185,11 +1015,11 @@ func mgAudioAll(ad formatter.IAudio, q *int, majorq int, t *testing.T) {
 		}
 	}
 	if majorq == 0 {
-		if err = ad.WriteThumbnail(thumbaudio[types.BotID][0]); err != nil {
+		if err = ad.WriteThumbnail(thumbaudio[token][0]); err != nil {
 			t.Fatal(err)
 		}
 	} else if majorq == 1 {
-		if err = ad.WriteThumbnailID(thumbaudio[types.BotID][1]); err != nil {
+		if err = ad.WriteThumbnailID(thumbaudio[token][1]); err != nil {
 			t.Fatal(err)
 		}
 	}
@@ -1214,7 +1044,7 @@ func addMediaInGroup(tc *testcase, obj []int, q int, t *testing.T) {
 	for i := 0; i < tc.mg.amout; i++ {
 		if obj[i] == photo {
 			tc.mg.photos[p] = tc.msg.NewPhoto()
-			if err = tc.mg.phFunc(tc.mg.photos[p])[q](photodata[types.BotID][q]); err != nil {
+			if err = tc.mg.phFunc(tc.mg.photos[p])[q](photodata[tc.token][q]); err != nil {
 				t.Fatal(err)
 			}
 			if tc.mg.all {
@@ -1226,11 +1056,11 @@ func addMediaInGroup(tc *testcase, obj []int, q int, t *testing.T) {
 			p++
 		} else if obj[i] == video {
 			tc.mg.videos[v] = tc.msg.NewVideo()
-			if err = tc.mg.vdFunc(tc.mg.videos[v])[q](videodata[types.BotID][q]); err != nil {
+			if err = tc.mg.vdFunc(tc.mg.videos[v])[q](videodata[tc.token][q]); err != nil {
 				t.Fatal(err)
 			}
 			if tc.mg.all {
-				mgVideoAll(tc.mg.videos[v], &justcounter, q, t)
+				mgVideoAll(tc.mg.videos[v], &justcounter, q, tc.token, t)
 			}
 			if err = tc.msg.AddVideo(tc.mg.videos[v]); err != nil {
 				t.Fatal(err)
@@ -1238,11 +1068,11 @@ func addMediaInGroup(tc *testcase, obj []int, q int, t *testing.T) {
 			v++
 		} else if obj[i] == audio {
 			tc.mg.audios[a] = tc.msg.NewAudio()
-			if err = tc.mg.adFunc(tc.mg.audios[a])[q](audiodata[types.BotID][q]); err != nil {
+			if err = tc.mg.adFunc(tc.mg.audios[a])[q](audiodata[tc.token][q]); err != nil {
 				t.Fatal(err)
 			}
 			if tc.mg.all {
-				mgAudioAll(tc.mg.audios[a], &justcounter, q, t)
+				mgAudioAll(tc.mg.audios[a], &justcounter, q, tc.token, t)
 			}
 			if err = tc.msg.AddAudio(tc.mg.audios[a]); err != nil {
 				t.Fatal(err)
@@ -1250,11 +1080,11 @@ func addMediaInGroup(tc *testcase, obj []int, q int, t *testing.T) {
 			a++
 		} else {
 			tc.mg.documents[d] = tc.msg.NewDocument()
-			if err = tc.mg.docFunc(tc.mg.documents[d])[q](docdata[types.BotID][q]); err != nil {
+			if err = tc.mg.docFunc(tc.mg.documents[d])[q](docdata[tc.token][q]); err != nil {
 				t.Fatal(err)
 			}
 			if tc.mg.all {
-				mgDocumentAll(tc.mg.documents[d], &justcounter, q, t)
+				mgDocumentAll(tc.mg.documents[d], &justcounter, q, tc.token, t)
 			}
 			if err = tc.msg.AddDocument(tc.mg.documents[d]); err != nil {
 				t.Fatal(err)
@@ -1334,7 +1164,7 @@ func mediaGroupData(tc *testcase, obj []int, objtype int) {
 	}
 }
 
-func mediaGroup(all bool, objtype int, t *testing.T) {
+func mediaGroup(all bool, objtype int, title string, t *testing.T) {
 	var err error
 	var obj []int
 	for i := 0; i < 3; i++ {
@@ -1361,18 +1191,23 @@ func mediaGroup(all bool, objtype int, t *testing.T) {
 					t.Fatal(err)
 				}
 			}
-			tc.send(tc.msg, t)
-			tc.checkResponse(t, i)
+			if err = tc.msg.AddToken(tc.token); err != nil {
+				t.Fatal(err)
+			}
+			resp := send(tc.msg)
+			t.Logf("[TEST:%s] Request:\n%s", title, tc.get.Request())
+			t.Logf("[TEST:%s] Response:\n%s", title, string(resp))
+			tc.checkResponse(i)
 		}
 	}
 }
 
 func mediaReq(t *testing.T) {
-	t.Run("Photo", func(t *testing.T) { mediaGroup(false, photo, t) })
-	t.Run("Video", func(t *testing.T) { mediaGroup(false, video, t) })
-	t.Run("TogetherPhVd", func(t *testing.T) { mediaGroup(false, together, t) })
-	t.Run("Document", func(t *testing.T) { mediaGroup(false, document, t) })
-	t.Run("Audio", func(t *testing.T) { mediaGroup(false, audio, t) })
+	t.Run("Photo", func(t *testing.T) { t.Parallel(); mediaGroup(false, photo, "photo", t) })
+	t.Run("Video", func(t *testing.T) { t.Parallel(); mediaGroup(false, video, "video", t) })
+	t.Run("TogetherPhVd", func(t *testing.T) { t.Parallel(); mediaGroup(false, together, "photo+video", t) })
+	t.Run("Document", func(t *testing.T) { t.Parallel(); mediaGroup(false, document, "document", t) })
+	t.Run("Audio", func(t *testing.T) { t.Parallel(); mediaGroup(false, audio, "audio", t) })
 }
 
 func mediaGroupCommon(tc *testcase, t *testing.T) {
@@ -1398,14 +1233,14 @@ func mediaGroupCommon(tc *testcase, t *testing.T) {
 }
 
 func mediaAll(t *testing.T) {
-	t.Run("Photo", func(t *testing.T) { mediaGroup(true, photo, t) })
-	t.Run("Video", func(t *testing.T) { mediaGroup(true, video, t) })
-	t.Run("TogetherPhVd", func(t *testing.T) { mediaGroup(true, together, t) })
-	t.Run("Document", func(t *testing.T) { mediaGroup(true, document, t) })
-	t.Run("Audio", func(t *testing.T) { mediaGroup(true, audio, t) })
+	t.Run("Photo", func(t *testing.T) { mediaGroup(true, photo, "photo", t) })
+	t.Run("Video", func(t *testing.T) { mediaGroup(true, video, "video", t) })
+	t.Run("TogetherPhVd", func(t *testing.T) { mediaGroup(true, together, "photo+video", t) })
+	t.Run("Document", func(t *testing.T) { mediaGroup(true, document, "document", t) })
+	t.Run("Audio", func(t *testing.T) { mediaGroup(true, audio, "audio", t) })
 }
 
-func TestMediaGroup(t *testing.T) {
+func TestSendMediaGroup(t *testing.T) {
 	t.Run("Req", mediaReq)
 	t.Run("All", mediaAll)
 }
@@ -1429,7 +1264,7 @@ func locReq(t *testing.T) {
 	if err = tc.msg.AddChat(tc.ch); err != nil {
 		t.Fatal(err)
 	}
-	tc.send(tc.msg, t)
+	send(tc.msg)
 	if code, msg := tc.get.Error(); code != 0 && msg != "" {
 		t.Fatal(msg)
 	}
@@ -1440,7 +1275,7 @@ func locAll(t *testing.T) {
 	for i := 0; i < 3; i++ {
 		tc := new(testcase)
 		tc.init()
-		var kb = [3]func(*testcase, *testing.T){tc.replyKb, tc.inlineKb, tc.forceKb}
+		var kb = [3]func(*testcase){replyKb, inlineKb, forceKb}
 		if err = tc.ch.WriteChatID(chatid); err != nil {
 			t.Fatal(err)
 		}
@@ -1483,15 +1318,15 @@ func locAll(t *testing.T) {
 		if err = tc.msg.AddChat(tc.ch); err != nil {
 			t.Fatal(err)
 		}
-		kb[i](tc, t)
-		tc.send(tc.msg, t)
+		kb[i](tc)
+		send(tc.msg)
 		if code, msg := tc.get.Error(); code != 0 && msg != "" {
 			t.Fatal(msg)
 		}
 	}
 }
 
-func TestLocation(t *testing.T) {
+func TestSendLocation(t *testing.T) {
 	t.Run("Req", locReq)
 	t.Run("All", locAll)
 }
@@ -1521,7 +1356,7 @@ func venReq(t *testing.T) {
 	if err = tc.msg.AddChat(tc.ch); err != nil {
 		t.Fatal(err)
 	}
-	tc.send(tc.msg, t)
+	send(tc.msg)
 	if code, msg := tc.get.Error(); code != 0 && msg != "" {
 		t.Fatal(msg)
 	}
@@ -1532,7 +1367,7 @@ func venAll(t *testing.T) {
 	for i := 0; i < 3; i++ {
 		tc := new(testcase)
 		tc.init()
-		var kb = [3]func(*testcase, *testing.T){tc.replyKb, tc.inlineKb, tc.forceKb}
+		var kb = [3]func(*testcase){replyKb, inlineKb, forceKb}
 		if err = tc.ch.WriteChatID(chatid); err != nil {
 			t.Fatal(err)
 		}
@@ -1581,15 +1416,15 @@ func venAll(t *testing.T) {
 		if err = tc.msg.AddChat(tc.ch); err != nil {
 			t.Fatal(err)
 		}
-		kb[i](tc, t)
-		tc.send(tc.msg, t)
+		kb[i](tc)
+		send(tc.msg)
 		if code, msg := tc.get.Error(); code != 0 && msg != "" {
 			t.Fatal(msg)
 		}
 	}
 }
 
-func TestVenue(t *testing.T) {
+func TestSendVenue(t *testing.T) {
 	t.Run("Req", venReq)
 	t.Run("All", venAll)
 }
@@ -1613,7 +1448,7 @@ func conReq(t *testing.T) {
 	if err = tc.msg.AddChat(tc.ch); err != nil {
 		t.Fatal(err)
 	}
-	tc.send(tc.msg, t)
+	send(tc.msg)
 	if code, msg := tc.get.Error(); code != 0 && msg != "" {
 		t.Fatal(msg)
 	}
@@ -1624,7 +1459,7 @@ func conAll(t *testing.T) {
 	for i := 0; i < 3; i++ {
 		tc := new(testcase)
 		tc.init()
-		var kb = [3]func(*testcase, *testing.T){tc.replyKb, tc.inlineKb, tc.forceKb}
+		var kb = [3]func(*testcase){replyKb, inlineKb, forceKb}
 		if err = tc.ch.WriteChatID(chatid); err != nil {
 			t.Fatal(err)
 		}
@@ -1661,15 +1496,15 @@ func conAll(t *testing.T) {
 		if err = tc.msg.AddChat(tc.ch); err != nil {
 			t.Fatal(err)
 		}
-		kb[i](tc, t)
-		tc.send(tc.msg, t)
+		kb[i](tc)
+		send(tc.msg)
 		if code, msg := tc.get.Error(); code != 0 && msg != "" {
 			t.Fatal(msg)
 		}
 	}
 }
 
-func TestContact(t *testing.T) {
+func TestSendContact(t *testing.T) {
 	t.Run("Req", conReq)
 	t.Run("All", conAll)
 }
@@ -1693,7 +1528,7 @@ func pollReq(t *testing.T) {
 	if err = tc.msg.AddChat(tc.ch); err != nil {
 		t.Fatal(err)
 	}
-	tc.send(tc.msg, t)
+	send(tc.msg)
 	if code, msg := tc.get.Error(); code != 0 && msg != "" {
 		t.Fatal(msg)
 	}
@@ -1706,7 +1541,7 @@ func pollAll(t *testing.T) {
 			for k := 0; k < 4; k++ {
 				tc := new(testcase)
 				tc.init()
-				var kb = [3]func(*testcase, *testing.T){tc.replyKb, tc.inlineKb, tc.forceKb}
+				var kb = [3]func(*testcase){replyKb, inlineKb, forceKb}
 				if j == 3 {
 					if err = tc.poll.WriteQuestionEntities(entities); err != nil {
 						t.Fatal(err)
@@ -1773,8 +1608,8 @@ func pollAll(t *testing.T) {
 				if err = tc.msg.AddParameters(tc.prm); err != nil {
 					t.Fatal(err)
 				}
-				kb[i](tc, t)
-				tc.send(tc.msg, t)
+				kb[i](tc)
+				send(tc.msg)
 				if code, msg := tc.get.Error(); code != 0 && msg != "" {
 					t.Fatal(msg)
 				}
@@ -1783,7 +1618,7 @@ func pollAll(t *testing.T) {
 	}
 }
 
-func TestPoll(t *testing.T) {
+func TestSendPoll(t *testing.T) {
 	t.Run("Req", pollReq)
 	t.Run("All", pollAll)
 }
@@ -1804,7 +1639,7 @@ func diceReq(t *testing.T) {
 	if err = tc.msg.AddChat(tc.ch); err != nil {
 		t.Fatal(err)
 	}
-	tc.send(tc.msg, t)
+	send(tc.msg)
 	if code, msg := tc.get.Error(); code != 0 && msg != "" {
 		t.Fatal(msg)
 	}
@@ -1815,7 +1650,7 @@ func diceAll(t *testing.T) {
 	for i := 0; i < 3; i++ {
 		tc := new(testcase)
 		tc.init()
-		var kb = [3]func(*testcase, *testing.T){tc.replyKb, tc.inlineKb, tc.forceKb}
+		var kb = [3]func(*testcase){replyKb, inlineKb, forceKb}
 		if err = tc.ch.WriteChatID(chatid); err != nil {
 			t.Fatal(err)
 		}
@@ -1840,15 +1675,15 @@ func diceAll(t *testing.T) {
 		if err = tc.msg.AddChat(tc.ch); err != nil {
 			t.Fatal(err)
 		}
-		kb[i](tc, t)
-		tc.send(tc.msg, t)
+		kb[i](tc)
+		send(tc.msg)
 		if code, msg := tc.get.Error(); code != 0 && msg != "" {
 			t.Fatal(msg)
 		}
 	}
 }
 
-func TestDice(t *testing.T) {
+func TestSendDice(t *testing.T) {
 	t.Run("Req", diceReq)
 	t.Run("All", diceAll)
 }
@@ -1869,13 +1704,13 @@ func chactReq(t *testing.T) {
 	if err = tc.msg.AddChat(tc.ch); err != nil {
 		t.Fatal(err)
 	}
-	tc.send(tc.msg, t)
+	send(tc.msg)
 	if code, msg := tc.get.Error(); code != 0 && msg != "" {
 		t.Fatal(msg)
 	}
 }
 
-func TestChatAction(t *testing.T) {
+func TestSendChatAction(t *testing.T) {
 	t.Run("Req", chactReq)
 }
 
@@ -1912,7 +1747,7 @@ func stickerReq(t *testing.T) {
 	tc.addMedia = addSticker
 	tc.mediaF = stickerArr
 	tc.mediadata = stickerdata[types.BotID]
-	tc.sendMediaReq(t, false)
+	// tc.sendMediaAll(t, false)
 }
 
 // func stickerAll(t *testing.T) {
@@ -1936,7 +1771,7 @@ func stickerReq(t *testing.T) {
 // 	}
 // }
 
-func TestSticker(t *testing.T) {
+func TestSendSticker(t *testing.T) {
 	t.Run("Req", stickerReq)
 	// t.Run("All", stickerAll)
 }

@@ -314,6 +314,8 @@ const (
 	// 	(formatter.IGet).Replyed()
 	// or
 	// 	(formatter.IGet).Message() (all possible data included)
+	// note: sometimes telegram could behaive wierd and think that you're giving a video not video-note.
+	// So if (formatter.IGet).VideoNote() returns nil, you may call (formatter.IGet).Video()
 	VideoNote string = "sendVideoNote"
 
 	// Use this method to send paid media. Paid media can be only (formatter.IPhoto) or (formatter.IVideo). Also, the fields of methods.Photo

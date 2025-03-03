@@ -437,4 +437,5 @@ type get struct {
 	admin      *types.ChatAdministratorRights
 	stickerset *types.StickerSet
 	msgs       []*types.Message
+	request    string
 }

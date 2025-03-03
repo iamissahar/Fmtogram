@@ -65,6 +65,7 @@ type IGet interface {
 	Commands() []*types.BotCommand
 	MenuButton() *types.MenuButton
 	AdminRights() *types.ChatAdministratorRights
+	Request() string
 }
 
 type IPhoto interface {

@@ -165,3 +165,7 @@ func (g *get) MenuButton() *types.MenuButton {
 func (g *get) AdminRights() *types.ChatAdministratorRights {
 	return g.admin
 }
+
+func (g *get) Request() string {
+	return g.request
+}
