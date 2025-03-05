@@ -1241,7 +1241,7 @@ func (st *sticker) WriteStickerStorage(path string) error {
 	var err error
 	if err = checkStringValue(path, st.Sticker); err == nil {
 		if err = st.isCorrectType(path); err == nil {
-			st.Sticker, st.stickerGottenFrom = fmt.Sprintf("attach://%s", path), Storage
+			st.Sticker, st.stickerGottenFrom = path, Storage
 			logs.DataWrittenSuccessfully(interfaceSticker, "Sticker From Storage")
 		}
 	}

@@ -185,7 +185,7 @@ func (*videonote) uniqueConst() int {
 func (st *sticker) proccessFile(wr *multipart.Writer, cnttype *string, isgroup bool) error {
 	var err error
 	if st.stickerGottenFrom == Storage {
-		err = writeFileToMultipart(wr, st.Sticker, st.Sticker)
+		err = writeFileToMultipart(wr, "sticker", st.Sticker)
 		st.Sticker = ""
 		*cnttype = wr.FormDataContentType()
 	}

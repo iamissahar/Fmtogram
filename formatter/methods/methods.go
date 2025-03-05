@@ -437,6 +437,8 @@ const (
 	// 	(formatter.IGet).Chat()
 	// 	(formatter.IGet).Date()
 	// 	(formatter.IGet).Replyed()
+	// or
+	// 	(formatter.IGet).Message() (all possible data included)
 	Location string = "sendLocation"
 
 	// Use this method to send information about a venue. Parameters:
@@ -463,6 +465,8 @@ const (
 	// 	(formatter.IGet).Chat()
 	// 	(formatter.IGet).Date()
 	// 	(formatter.IGet).Replyed()
+	// or
+	// 	(formatter.IGet).Message() (all possible data included)
 	Venue string = "sendVenue"
 
 	// Use this method to send phone contacts. Parameters:
@@ -485,6 +489,8 @@ const (
 	// 	(formatter.IGet).Chat()
 	// 	(formatter.IGet).Date()
 	// 	(formatter.IGet).Replyed()
+	// or
+	// 	(formatter.IGet).Message() (all possible data included)
 	Contact string = "sendContact"
 
 	// Use this method to send a native poll. Parameters:
@@ -1245,8 +1251,8 @@ const (
 	// 	(formatter.IGet).Date()
 	// 	(formatter.IGet).Sticker()
 	// 	(formatter.IGet).Replyed()
-	// or get the all results:
-	// 	(formatter.IGet).Message()
+	// or
+	// 	(formatter.IGet).Message() (all possible data included)
 	Sticker string = "sendSticker"
 
 	// Use this method to get a sticker set. Parameters:

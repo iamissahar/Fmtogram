@@ -147,15 +147,15 @@ var videoNdata = map[string][]string{
 }
 
 var stickerdata = map[string][]string{
-	testbotdata.Secondtestbotforb_bot:     {stickerpath, stickerurl},
-	testbotdata.Tttesty_bot_bot:           {stickerpath, stickerurl},
-	testbotdata.TestsInGroup2_bot:         {stickerpath, stickerurl},
-	testbotdata.TestsInGroup1_bot:         {stickerpath, stickerurl},
-	testbotdata.Make_event_bot:            {stickerpath, stickerurl},
-	testbotdata.Testdatbot_bot:            {stickerpath, stickerurl},
-	testbotdata.SpeakOnlyWithAnton_bot:    {stickerpath, stickerurl},
-	testbotdata.LearnSpanishOrEnglish_bot: {stickerpath, stickerurl},
-	testbotdata.Testmy_bots_bot:           {stickerpath, stickerurl},
+	testbotdata.Secondtestbotforb_bot:     {stickerpath, "CAACAgIAAxkDAAIl5WfHo8zs5ud4xNaPxEmKXfPTJ5nDAAIxbAAC4rlBSpNZGOcIr2z6NgQ", stickerurl},
+	testbotdata.Tttesty_bot_bot:           {stickerpath, "CAACAgIAAxkDAAIB32fHo-IWY706YU_LKIgkTlOHIl6kAAL9XQACsd9ASnlhL0Ds2pBONgQ", stickerurl},
+	testbotdata.TestsInGroup2_bot:         {stickerpath, "CAACAgIAAxkDAAIBMmfHpBNEjb9N5bpau88H5wTOCat2AAIeXQACIr5ASklDvgmDNQcdNgQ", stickerurl},
+	testbotdata.TestsInGroup1_bot:         {stickerpath, "CAACAgIAAxkDAAIBdGfHpCNQIP9ySZNvepLjdzWcR4TRAAKkdgAC9WY4Sp3x99p_5HslNgQ", stickerurl},
+	testbotdata.Make_event_bot:            {stickerpath, "CAACAgIAAxkDAAIBIWfHpEOGChFq9qbh91ObA1rF0Q3NAAKgbQACD1FASlGLo2OH1YFrNgQ", stickerurl},
+	testbotdata.Testdatbot_bot:            {stickerpath, "CAACAgIAAxkDAAIHPGfHpFDgAyKeicXGkhe1yUpcu_mCAAKqaQACO9hBSq6eJJQ8r6A2NgQ", stickerurl},
+	testbotdata.SpeakOnlyWithAnton_bot:    {stickerpath, "CAACAgIAAxkDAAIBUWfHpF-tuT26e9zrC1Au-eZhYMDjAAJmaAACXjdBSiCPLuzh6PTJNgQ", stickerurl},
+	testbotdata.LearnSpanishOrEnglish_bot: {stickerpath, "CAACAgIAAxkDAAIBTWfHpG0NF5SrRbEbqveHuO5v6_XyAAKGcQACNoA5SpvZY4yvTOMWNgQ", stickerurl},
+	testbotdata.Testmy_bots_bot:           {stickerpath, "CAACAgIAAxkDAAMZZ8ekfON-YvQ9S5uw4IDx7j-zn9cAAut0AAJdwUFKndGRr9FWp8U2BA", stickerurl},
 }
 
 var thumbaudio = map[string][]string{
@@ -219,28 +219,30 @@ var thumbvideoN = map[string][]string{
 }
 
 var (
-	parsemode     = []string{types.HTML, types.Markdown, types.MarkdownV2}
-	groupnames    = []string{"A new group title/name", "What a cool name!", "something very very bad", "I don't like it at all"}
-	titles        = []string{"the new admin", "something like a cool title", "don't have any clue", "to find a really cool title"}
-	topicnames    = []string{"The Name", "No Name", "Something Like a Name", "Good Name", "Not a Good Name"}
-	entities      = []*types.MessageEntity{{Offset: 1, Length: 4, Type: "italic"}}
-	linkpopt      = &types.LinkPreviewOptions{IsDisabled: false, URL: "https://youtube.com"}
-	chatperm      = &types.ChatPermissions{CanSendMessages: &f}
-	botcomm       = []*types.BotCommand{{Command: "/start", Description: "Hello!"}, {Command: "/help", Description: "Help me!"}}
-	botcommscope  = &types.BotCommandScope{Type: "default"}
-	emojies       = []string{"😁", "😢", "😊", "😄", "😝", "😉", "🙈", "😜", "😞"}
-	keywords      = []string{"Regular", "cool", "bad", "nothing", "etc"}
-	pollOpt       = []*types.PollOption{{Text: "Yes!", VoterCount: 66}, {Text: "No!", VoterCount: 12}}
-	kbnames       = []string{"inline", "reply-markup", "force-reply"}
-	kb            = []func(*testcase){inlineKb, replyKb, forceKb}
-	addToMapPhoto = []func(*testcase){photoIntoMap, photoIntoMap, photoIntoMap}
-	addToMapAudio = []func(*testcase){audioIntoMap, audioIntoMap, audioIntoMap}
-	addToMapDoc   = []func(*testcase){docIntoMap, docIntoMap, docIntoMap}
-	addToMapVideo = []func(*testcase){vidIntoMap, vidIntoMap, vidIntoMap}
-	addToMapAnim  = []func(*testcase){animIntoMap, animIntoMap, animIntoMap}
-	addToMapVoice = []func(*testcase){vcIntoMap, vcIntoMap, vcIntoMap1}
-	addToMapVdn   = []func(*testcase){vdnIntoMap, vdnIntoMap1, vdnIntoMap1}
-	addToMapVdn1  = []func(*testcase){vdnIntoMap1, vdnIntoMap1, vdnIntoMap1}
+	parsemode       = []string{types.HTML, types.Markdown, types.MarkdownV2}
+	groupnames      = []string{"A new group title/name", "What a cool name!", "something very very bad", "I don't like it at all"}
+	titles          = []string{"the new admin", "something like a cool title", "don't have any clue", "to find a really cool title"}
+	topicnames      = []string{"The Name", "No Name", "Something Like a Name", "Good Name", "Not a Good Name"}
+	entities        = []*types.MessageEntity{{Offset: 1, Length: 4, Type: "italic"}}
+	linkpopt        = &types.LinkPreviewOptions{IsDisabled: false, URL: "https://youtube.com"}
+	chatperm        = &types.ChatPermissions{CanSendMessages: &f}
+	botcomm         = []*types.BotCommand{{Command: "/start", Description: "Hello!"}, {Command: "/help", Description: "Help me!"}}
+	botcommscope    = &types.BotCommandScope{Type: "default"}
+	emojies         = []string{"😁", "😢", "😊", "😄", "😝", "😉", "🙈", "😜", "😞"}
+	keywords        = []string{"Regular", "cool", "bad", "nothing", "etc"}
+	pollOpt         = []*types.PollOption{{Text: "Yes!", VoterCount: 66}, {Text: "No!", VoterCount: 12}}
+	kbnames         = []string{"inline", "reply-markup", "force-reply"}
+	filenames       = []string{"storage", "telegram", "internet"}
+	kb              = []func(*testcase){inlineKb, replyKb, forceKb}
+	addToMapPhoto   = []func(*testcase){photoIntoMap, photoIntoMap, photoIntoMap}
+	addToMapAudio   = []func(*testcase){audioIntoMap, audioIntoMap, audioIntoMap}
+	addToMapDoc     = []func(*testcase){docIntoMap, docIntoMap, docIntoMap}
+	addToMapVideo   = []func(*testcase){vidIntoMap, vidIntoMap, vidIntoMap}
+	addToMapAnim    = []func(*testcase){animIntoMap, animIntoMap, animIntoMap}
+	addToMapVoice   = []func(*testcase){vcIntoMap, vcIntoMap, vcIntoMap1}
+	addToMapVdn     = []func(*testcase){vdnIntoMap, vdnIntoMap1, vdnIntoMap1}
+	addToMapVdn1    = []func(*testcase){vdnIntoMap1, vdnIntoMap1, vdnIntoMap1}
+	addToMapSticker = []func(*testcase){stckrIntoMap, stckrIntoMap, stckrIntoMap}
 )
 
 type mediagroup struct {

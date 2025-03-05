@@ -560,6 +560,7 @@ func (msg *Message) AddSticker(st ISticker) error {
 						msg.fm.method = methods.Sticker
 					}
 				}
+				msg.fm.tgr = new(types.MessageResponse)
 				msg.fm.httpMethod = http.MethodPost
 				logs.InterfaceSaved(interfaceSticker)
 			} else {
