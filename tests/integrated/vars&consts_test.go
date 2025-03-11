@@ -11,51 +11,59 @@ import (
 )
 
 const (
-	chatid                                                int     = 738070596
-	photo, video, audio, document, together               int     = 0, 1, 2, 3, 4
-	link                                                  string  = "https://t.me/+azuTu6sZ5CBjNzA6"
-	textformsg                                            string  = "There's some kind of text"
-	status, errr, chat, sender, date, msgid               int     = 0, 1, 2, 3, 4, 5
-	msgids, replyed, fororig, ph, ad, doc                 int     = 6, 7, 8, 9, 10, 11
-	vd, anim, vc, vdn, paidm, groupid, phs                int     = 12, 13, 14, 15, 16, 17, 18
-	vds, ads, docs, poll, dice, profph, file              int     = 19, 20, 21, 22, 23, 24, 25
-	stkrs, gifts, msg, str, invl, chinf, memb             int     = 26, 27, 28, 29, 30, 31, 32
-	integer, frm, boosts, bcon, comm, mbut, adright, msgs int     = 33, 34, 35, 36, 37, 38, 39, 40
-	msgEffect                                             string  = "5107584321108051014"
-	testybotid                                            int     = 8033103339
-	unknownid                                             int     = -998425295
-	supergroupid                                          int     = -1002309471573
-	month                                                 int     = 2592000
-	iconemojiid                                           string  = "C5310262535021142850"
-	iconcolor                                             int     = 0x6FB9F0
-	english                                               string  = "en"
-	stars                                                 int     = 33
-	latitude, longitude                                   float64 = 31.7962236, 35.0194702
-	placetitle                                            string  = "The City Of The History"
-	city                                                  string  = "Jerusalem"
-	phonenum                                              string  = "0123422211"
-	name                                                  string  = "Nathan"
-	lastname                                              string  = "Sahar"
-	vcard                                                 string  = "BEGIN:VCARD\nVERSION:4.0\nFN:Nathan Sahar\nN:Nathan;Simon;;;ing. jr,M.Sc.\nBDAY:--0203\nGENDER:M\nEMAIL;TYPE=work:nathan.sahar@proton.me\nEND:VCARD"
-	question                                              string  = "Am I good?"
-	explanation                                           string  = "Yes, I am!"
-	thumbnail                                             string  = "../media/tel-aviv.jpg"
-	photopath                                             string  = "../media/tel-aviv.jpg"
-	photourl                                              string  = "https://www.aljazeera.com/wp-content/uploads/2025/01/AFP__20250120__36UX28A__v2__HighRes__TopshotUsPoliticsTrumpInauguration-1737420954.jpg?w=770&resize=770,513"
-	videopath                                             string  = "../media/black.mp4"
-	videourl                                              string  = "https://www.pexels.com/download/video/6646588/"
-	audiopath                                             string  = "../media/sound.mp3"
-	audiourl                                              string  = "https://freetestdata.com/wp-content/uploads/2021/09/Free_Test_Data_100KB_MP3.mp3"
-	docpath                                               string  = "../media/Resume.pdf"
-	docurl                                                string  = "https://www.aljazeera.com/wp-content/uploads/2025/01/AFP__20250120__36UX28A__v2__HighRes__TopshotUsPoliticsTrumpInauguration-1737420954.jpg?w=770&resize=770,513"
-	animpath                                              string  = "../media/prichinatryski.mp4"
-	animurl                                               string  = "https://www.icegif.com/wp-content/uploads/2025/02/patrick-mahomes-icegif-1.gif"
-	voicepath                                             string  = "../media/dimaJOSKAproNATO.ogg"
-	voiceurl                                              string  = "https://freetestdata.com/wp-content/uploads/2021/09/Free_Test_Data_100KB_OGG.ogg"
-	vdnpath                                               string  = "../media/tea.mp4"
-	vdnurl                                                string  = "https://www.pexels.com/download/video/6646588/"
-	stickerpath                                           string  = "../media/sticker.webp"
-	stickerurl                                            string  = "https://www.gstatic.com/webp/gallery/1.webp"
+	chatid                                          int     = 738070596
+	photo, video, audio, document, together         int     = 0, 1, 2, 3, 4
+	link                                            string  = "https://t.me/+azuTu6sZ5CBjNzA6"
+	textformsg                                      string  = "There's some kind of text"
+	status, errr, chat, sender, date, msgid         int     = 0, 1, 2, 3, 4, 5
+	msgids, replyed, fororig, ph, ad, doc           int     = 6, 7, 8, 9, 10, 11
+	vd, anim, vc, vdn, paidm, groupid, phs          int     = 12, 13, 14, 15, 16, 17, 18
+	vds, ads, docs, poll, dice, profph, file        int     = 19, 20, 21, 22, 23, 24, 25
+	stkrs, gifts, msg, str, invl, chinf, memb       int     = 26, 27, 28, 29, 30, 31, 32
+	integer, frm, boosts, bcon, comm, mbut, adright int     = 33, 34, 35, 36, 37, 38, 39
+	msgs, startrans, score                          int     = 40, 41, 42
+	msgEffect                                       string  = "5107584321108051014"
+	testybotid                                      int     = 8033103339
+	unknownid                                       int     = -998425295
+	supergroupid                                    int     = -1002309471573
+	month                                           int     = 2592000
+	iconemojiid                                     string  = "C5310262535021142850"
+	iconcolor                                       int     = 0x6FB9F0
+	english                                         string  = "en"
+	stars                                           int     = 33
+	latitude, longitude                             float64 = 31.7962236, 35.0194702
+	placetitle                                      string  = "The City Of The History"
+	city                                            string  = "Jerusalem"
+	phonenum                                        string  = "0123422211"
+	name                                            string  = "Nathan"
+	lastname                                        string  = "Sahar"
+	vcard                                           string  = "BEGIN:VCARD\nVERSION:4.0\nFN:Nathan Sahar\nN:Nathan;Simon;;;ing. jr,M.Sc.\nBDAY:--0203\nGENDER:M\nEMAIL;TYPE=work:nathan.sahar@proton.me\nEND:VCARD"
+	question                                        string  = "Am I good?"
+	explanation                                     string  = "Yes, I am!"
+	thumbnail                                       string  = "../media/tel-aviv.jpg"
+	photopath                                       string  = "../media/tel-aviv.jpg"
+	photourl                                        string  = "https://www.aljazeera.com/wp-content/uploads/2025/01/AFP__20250120__36UX28A__v2__HighRes__TopshotUsPoliticsTrumpInauguration-1737420954.jpg?w=770&resize=770,513"
+	videopath                                       string  = "../media/black.mp4"
+	videourl                                        string  = "https://www.pexels.com/download/video/6646588/"
+	audiopath                                       string  = "../media/sound.mp3"
+	audiourl                                        string  = "https://freetestdata.com/wp-content/uploads/2021/09/Free_Test_Data_100KB_MP3.mp3"
+	docpath                                         string  = "../media/Resume.pdf"
+	docurl                                          string  = "https://www.aljazeera.com/wp-content/uploads/2025/01/AFP__20250120__36UX28A__v2__HighRes__TopshotUsPoliticsTrumpInauguration-1737420954.jpg?w=770&resize=770,513"
+	animpath                                        string  = "../media/prichinatryski.mp4"
+	animurl                                         string  = "https://www.icegif.com/wp-content/uploads/2025/02/patrick-mahomes-icegif-1.gif"
+	voicepath                                       string  = "../media/dimaJOSKAproNATO.ogg"
+	voiceurl                                        string  = "https://freetestdata.com/wp-content/uploads/2021/09/Free_Test_Data_100KB_OGG.ogg"
+	vdnpath                                         string  = "../media/tea.mp4"
+	vdnurl                                          string  = "https://www.pexels.com/download/video/6646588/"
+	stickerpath                                     string  = "../media/sticker.webp"
+	stickerurl                                      string  = "https://www.gstatic.com/webp/gallery/1.webp"
+	giftid                                          string  = "VALID_GIFT_ID"
+	queryid                                         string  = "VALID_INLINE_QUERY_ID"
+	invtitle                                        string  = "Product Name"
+	invdescrip                                      string  = "Product Description"
+	invpayload                                      string  = "unique-payload-id"
+	starsName                                       string  = "XTR"
+	gameshortname                                   string  = "tetris"
 )
 
 var (
@@ -218,6 +226,18 @@ var thumbvideoN = map[string][]string{
 	testbotdata.Testmy_bots_bot:           {thumbnail, "AAMCAgADGQMAAxhnwZTWtQMb-MDS4KIkHm_ta589ywACwFsAAnrUEUpqkzYogveNbwEAB20AAzYE"},
 }
 
+var botnames = map[string]string{
+	testbotdata.Secondtestbotforb_bot:     "secondtestbotforb_bot",
+	testbotdata.Tttesty_bot_bot:           "tttesty_bot_bot",
+	testbotdata.TestsInGroup2_bot:         "TestsInGroup2_bot",
+	testbotdata.TestsInGroup1_bot:         "TestsInGroup1_bot",
+	testbotdata.Make_event_bot:            "make_event_bot",
+	testbotdata.Testdatbot_bot:            "testdatbot_bot",
+	testbotdata.SpeakOnlyWithAnton_bot:    "SpeakOnlyWithAnton_bot",
+	testbotdata.LearnSpanishOrEnglish_bot: "LearnSpanishOrEnglish_bot",
+	testbotdata.Testmy_bots_bot:           "testmy_bots_bot",
+}
+
 var (
 	parsemode       = []string{types.HTML, types.Markdown, types.MarkdownV2}
 	groupnames      = []string{"A new group title/name", "What a cool name!", "something very very bad", "I don't like it at all"}
@@ -243,6 +263,7 @@ var (
 	addToMapVdn     = []func(*testcase){vdnIntoMap, vdnIntoMap1, vdnIntoMap1}
 	addToMapVdn1    = []func(*testcase){vdnIntoMap1, vdnIntoMap1, vdnIntoMap1}
 	addToMapSticker = []func(*testcase){stckrIntoMap, stckrIntoMap, stckrIntoMap}
+	prices          = []*types.LabeledPrice{{Label: "Total", Amount: 1000}}
 )
 
 type mediagroup struct {
@@ -277,13 +298,15 @@ type testcase struct {
 	st            formatter.ISticker
 	fr            formatter.IForum
 	bot           formatter.IBot
+	inline        formatter.IInlineMode
+	pay           formatter.IPayment
+	game          formatter.IGame
 	mg            *mediagroup
 	addMedia      func(*testcase, *testing.T)
 	mediaF        func(*testcase) []func(string) error
 	mediadata     []string
 	thumbdata     []string
 	common        func(*testcase, *testcase, *testing.T)
-	kbF           func(*testcase)
 	thumb         bool
 	thumbnailF    func(*testcase) []func(string) error
 	code          [3]int
@@ -301,7 +324,7 @@ func (tc *testcase) getReplyPrm() *types.ReplyParameters {
 	return &types.ReplyParameters{MessageID: testbotdata.MessageID[tc.token], ChatID: chatid}
 }
 
-func (tc *testcase) changeToken(d, dd map[string][]string, t *testing.T) {
+func (tc *testcase) changeToken(d, dd map[string][]string) {
 	for {
 		select {
 		case <-tc.workdone:
@@ -330,7 +353,7 @@ func (tc *testcase) init() {
 	// tc.token = testbotdata.SpeakOnlyWithAnton_bot
 	// tc.token = testbotdata.LearnSpanishOrEnglish_bot
 	// tc.token = testbotdata.Testmy_bots_bot
-	tc.token = testbotdata.Tokens[rand.Intn(8)]
+	tc.token = testbotdata.Tokens[rand.Intn(9)]
 	tc.msg = formatter.CreateEmpltyMessage()
 	tc.prm = tc.msg.NewParameters()
 	tc.ch = tc.msg.NewChat()
@@ -349,6 +372,9 @@ func (tc *testcase) init() {
 	tc.st = tc.msg.NewSticker()
 	tc.fr = tc.msg.NewForum()
 	tc.bot = tc.msg.NewBot()
+	tc.pay = tc.msg.NewPayment()
+	tc.inline = tc.msg.NewInlineMode()
+	tc.game = tc.msg.NewGame()
 	tc.whattocheck = make(map[int]struct{})
 	tc.timetochange = make(chan struct{})
 	tc.workdone = make(chan struct{}, 1)
@@ -358,7 +384,7 @@ func (tc *testcase) init() {
 }
 
 func (tc *testcase) fillAllGetFunc() {
-	tc.getFuncs = make([]interface{}, 41)
+	tc.getFuncs = make([]interface{}, 43)
 	tc.getFuncs[0] = tc.get.Status
 	tc.getFuncs[1] = tc.get.Error
 	tc.getFuncs[2] = tc.get.Chat
@@ -400,6 +426,8 @@ func (tc *testcase) fillAllGetFunc() {
 	tc.getFuncs[38] = tc.get.MenuButton
 	tc.getFuncs[39] = tc.get.AdminRights
 	tc.getFuncs[40] = tc.get.Messages
+	tc.getFuncs[41] = tc.get.StarTransaction
+	tc.getFuncs[42] = tc.get.Score
 }
 
 func (tc *testcase) checkResponse(j int) {
@@ -410,7 +438,7 @@ func (tc *testcase) checkResponse(j int) {
 				panic("Received boolean result has unexpectedly been 'false'. Should've been 'true'")
 			}
 		case func() (int, string):
-			if code, msg := g(); (code != tc.code[i]) && (msg != tc.errmsg[i]) {
+			if code, msg := g(); (code != tc.code[j]) && (msg != tc.errmsg[j]) {
 				panic(fmt.Sprintf("Received (int, string) result has unexpectedly been %d and %s. Should've been %d and `%s`", code, msg, tc.code[j], tc.errmsg[j]))
 			}
 		case func() string:
@@ -560,6 +588,14 @@ func (tc *testcase) checkResponse(j int) {
 		case func() *types.ChatAdministratorRights:
 			if g() == nil {
 				panic("Received *types.ChatAdministratorRights result has unexpectedly been nil. Should've been anything else but nil")
+			}
+		case func() *types.StarTransaction:
+			if g() == nil {
+				panic("Received *types.StarTransaction result has unexpectedly been nil. Should've been anything else but nil")
+			}
+		case func() []*types.GameHighScore:
+			if g() == nil {
+				panic("Received []*types.GameHighScore result has unexpectedly been nil. Should've been anything else but nil")
 			}
 		}
 	}

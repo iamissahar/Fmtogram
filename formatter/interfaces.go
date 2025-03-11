@@ -65,7 +65,11 @@ type IGet interface {
 	Commands() []*types.BotCommand
 	MenuButton() *types.MenuButton
 	AdminRights() *types.ChatAdministratorRights
+	PreparedInlineMessage() *types.PreparedInlineMessage
+	StarTransaction() *types.StarTransaction
+	Score() []*types.GameHighScore
 	Request() string
+	Response() string
 }
 
 type IPhoto interface {
@@ -441,7 +445,11 @@ type IBot interface {
 	WriteForChannels() error
 }
 
-type IResult interface {
+type IInlineMode interface {
+	WriteQueryID(queryID string) error
+
+	WriteWebAppQueryID(queryID string) error
+
 	WriteCachedAudio(cachedAudio *types.InlineQueryResultCachedAudio) error
 
 	WriteCachedDocument(cachedDocument *types.InlineQueryResultCachedDocument) error
@@ -481,16 +489,6 @@ type IResult interface {
 	WriteVideo(vd *types.InlineQueryResultVideo) error
 
 	WriteVoice(vc *types.InlineQueryResultVoice) error
-}
-
-type IInlineMode interface {
-	WriteQueryID(queryID string) error
-
-	WriteWebAppQueryID(queryID string) error
-
-	WriteResult() (res IResult, err error)
-
-	WriteResults(length int) (res []IResult, err error)
 
 	WriteCacheTime(time int) error
 
@@ -508,6 +506,8 @@ type IInlineMode interface {
 	WriteAllowGroupChats() error
 
 	WriteAllowChannelChats() error
+
+	WriteIntoArray()
 }
 
 type IParameters interface {
@@ -891,17 +891,13 @@ type IPayment interface {
 
 	WriteShippingID(id string) error
 
-	WriteOK() error
+	WriteOK(b bool) error
 
 	WriteShippingOptions(options []*types.ShippingOption) error
 
 	WriteErrorMessage(msg string) error
 
 	WritePreCheckoutID(id string) error
-
-	WriteLimit(limit int) error
-
-	WriteOffset(offset int) error
 
 	WriteTelegramPaymentChargeID(id string) error
 

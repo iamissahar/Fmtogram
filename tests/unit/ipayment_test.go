@@ -161,16 +161,6 @@ func (paytc *payTestContainer) preCheckoutID(pay formatter.IPayment, p *paymentT
 	p.str = paytc.inputStr[i]
 }
 
-func (paytc *payTestContainer) limit(pay formatter.IPayment, p *paymentT, i int) {
-	p.testedFunc = pay.WriteLimit
-	p.integer = paytc.inputInt[i]
-}
-
-func (paytc *payTestContainer) offset(pay formatter.IPayment, p *paymentT, i int) {
-	p.testedFunc = pay.WriteOffset
-	p.integer = paytc.inputInt[i]
-}
-
 func (paytc *payTestContainer) telegramPaymentChargeID(pay formatter.IPayment, p *paymentT, i int) {
 	p.testedFunc = pay.WriteTelegramPaymentChargeID
 	p.str = paytc.inputStr[i]
@@ -413,24 +403,6 @@ func (paytc *payTestContainer) writePreCheckoutID() {
 	paytc.codeErr = []string{"", "20", "", "10"}
 	paytc.amount, paytc.until = 4, 2
 	paytc.buildF = paytc.preCheckoutID
-}
-
-func (paytc *payTestContainer) writeLimit() {
-	paytc.name = "(IPayment).WriteLimit()"
-	paytc.inputInt = []int{16, 0, -231, 213123, 22, 55}
-	paytc.isExpectedErr = []bool{false, true, true, true, false, true}
-	paytc.codeErr = []string{"", "20", "20", "20", "", "10"}
-	paytc.amount, paytc.until = 6, 4
-	paytc.buildF = paytc.limit
-}
-
-func (paytc *payTestContainer) writeOffset() {
-	paytc.name = "(IPayment).WriteOffset()"
-	paytc.inputInt = []int{16, 0, -231, 213123, 22, 55}
-	paytc.isExpectedErr = []bool{false, true, true, false, false, true}
-	paytc.codeErr = []string{"", "20", "20", "", "", "10"}
-	paytc.amount, paytc.until = 6, 4
-	paytc.buildF = paytc.offset
 }
 
 func (paytc *payTestContainer) writeTelegramPaymentChargeID() {
@@ -692,20 +664,6 @@ func TestPaymentWriteErrorMessage(t *testing.T) {
 func TestPaymentWritePreCheckoutID(t *testing.T) {
 	paytc := new(payTestContainer)
 	paytc.writePreCheckoutID()
-	msg := formatter.CreateEmpltyMessage()
-	paytc.mainLogic(msg, t)
-}
-
-func TestPaymentWriteLimit(t *testing.T) {
-	paytc := new(payTestContainer)
-	paytc.writeLimit()
-	msg := formatter.CreateEmpltyMessage()
-	paytc.mainLogic(msg, t)
-}
-
-func TestPaymentWriteOffset(t *testing.T) {
-	paytc := new(payTestContainer)
-	paytc.writeOffset()
 	msg := formatter.CreateEmpltyMessage()
 	paytc.mainLogic(msg, t)
 }

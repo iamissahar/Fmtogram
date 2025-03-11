@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/l1qwie/Fmtogram/formatter"
+	"github.com/l1qwie/Fmtogram/testbotdata"
 	"github.com/l1qwie/Fmtogram/types"
 )
 
@@ -20,13 +21,8 @@ func (tc *testcase) defaultSet() {
 	tc.whattocheck[msg] = struct{}{}
 }
 
-func sendMessage(t *testing.T, title string, kbF func(*testcase)) {
+func sendMessage(tc *testcase, t *testing.T, title string, kbF func(*testcase)) {
 	var err error
-	tc := new(testcase)
-	defer func() { tc.workdone <- struct{}{} }()
-	tc.init()
-	tc.defaultSet()
-	go tc.changeToken(nil, nil, t)
 	for i := 0; i < 4; i++ {
 		tt := new(testcase)
 		tt.init()
@@ -70,10 +66,10 @@ func sendMessage(t *testing.T, title string, kbF func(*testcase)) {
 			t.Fatal(err)
 		}
 		kbF(tt)
-		resp := send(tt.msg)
+		send(tt.msg, t)
 		t.Logf("[TEST:%s] Request:\n%s", title, tt.get.Request())
-		t.Logf("[TEST:%s] Response:\n%s", title, string(resp))
-		tc.checkResponse(i)
+		t.Logf("[TEST:%s] Response:\n%s", title, tt.get.Response())
+		tt.checkResponse(i)
 		tc.timetochange <- struct{}{}
 	}
 }
@@ -98,7 +94,9 @@ func msgReq(t *testing.T) {
 	if err = tc.msg.AddToken(tc.token); err != nil {
 		t.Fatal(err)
 	}
-	send(tc.msg)
+	send(tc.msg, t)
+	t.Logf("[TEST:%s] Request:\n%s", "message", tc.get.Request())
+	t.Logf("[TEST:%s] Response:\n%s", "message", tc.get.Response())
 	tc.checkResponse(0)
 }
 
@@ -108,7 +106,12 @@ func TestSendMessage(t *testing.T) {
 		for i := 0; i < 3; i++ {
 			t.Run(kbnames[i], func(t *testing.T) {
 				t.Parallel()
-				sendMessage(t, kbnames[i], kb[i])
+				tc := new(testcase)
+				defer func() { tc.workdone <- struct{}{} }()
+				tc.init()
+				tc.defaultSet()
+				go tc.changeToken(nil, nil)
+				sendMessage(tc, t, kbnames[i], kb[i])
 			})
 		}
 	})
@@ -242,9 +245,9 @@ func sendMediaReq(t *testing.T, tc *testcase, addMorePrm []func(*testcase), titl
 		t.Fatal(err)
 	}
 	tc.addMedia(tt, t)
-	resp := send(tt.msg)
+	send(tt.msg, t)
 	t.Logf("[TEST:%s] Request:\n%s", title, tt.get.Request())
-	t.Logf("[TEST:%s] Response:\n%s", title, string(resp))
+	t.Logf("[TEST:%s] Response:\n%s", title, tt.get.Response())
 	tt.checkResponse(i)
 	tc.timetochange <- struct{}{}
 	// }
@@ -293,9 +296,9 @@ func sendMediaAll(t *testing.T, tc *testcase, addMorePrm []func(*testcase), kbF 
 			tc.common(tc, tt, t)
 			tc.addMedia(tt, t)
 			kbF(tt)
-			resp := send(tt.msg)
+			send(tt.msg, t)
 			t.Logf("[TEST:%s] Request:\n%s", title, tt.get.Request())
-			t.Logf("[TEST:%s] Response:\n%s", title, string(resp))
+			t.Logf("[TEST:%s] Response:\n%s", title, tt.get.Response())
 			tt.checkResponse(i)
 			tc.timetochange <- struct{}{}
 		}
@@ -344,7 +347,7 @@ func photoReq(t *testing.T) {
 			tc := new(testcase)
 			defer func() { tc.workdone <- struct{}{} }()
 			tc.init()
-			go tc.changeToken(photodata, nil, t)
+			go tc.changeToken(photodata, nil)
 			tc.addMedia = addPhoto
 			tc.mediaF = photoArr
 			tc.mediadata = photodata[tc.token]
@@ -360,7 +363,7 @@ func photoAll(t *testing.T) {
 			tc := new(testcase)
 			defer func() { tc.workdone <- struct{}{} }()
 			tc.init()
-			go tc.changeToken(photodata, nil, t)
+			go tc.changeToken(photodata, nil)
 			tc.addMedia = addPhoto
 			tc.mediaF = photoArr
 			tc.mediadata = photodata[tc.token]
@@ -420,7 +423,7 @@ func audioReq(t *testing.T) {
 			tc := new(testcase)
 			defer func() { tc.workdone <- struct{}{} }()
 			tc.init()
-			go tc.changeToken(audiodata, nil, t)
+			go tc.changeToken(audiodata, nil)
 			tc.addMedia = addAudio
 			tc.mediaF = audioArr
 			tc.mediadata = audiodata[tc.token]
@@ -436,7 +439,7 @@ func audioAll(t *testing.T) {
 			tc := new(testcase)
 			defer func() { tc.workdone <- struct{}{} }()
 			tc.init()
-			go tc.changeToken(audiodata, thumbaudio, t)
+			go tc.changeToken(audiodata, thumbaudio)
 			tc.addMedia = addAudio
 			tc.mediaF = audioArr
 			tc.mediadata = audiodata[tc.token]
@@ -490,7 +493,7 @@ func docReq(t *testing.T) {
 			tc := new(testcase)
 			defer func() { tc.workdone <- struct{}{} }()
 			tc.init()
-			go tc.changeToken(docdata, nil, t)
+			go tc.changeToken(docdata, nil)
 			tc.addMedia = addDoc
 			tc.mediaF = docArr
 			tc.mediadata = docdata[tc.token]
@@ -506,7 +509,7 @@ func docAll(t *testing.T) {
 			tc := new(testcase)
 			defer func() { tc.workdone <- struct{}{} }()
 			tc.init()
-			go tc.changeToken(docdata, thumbdoc, t)
+			go tc.changeToken(docdata, thumbdoc)
 			tc.addMedia = addDoc
 			tc.mediaF = docArr
 			tc.mediadata = docdata[tc.token]
@@ -578,7 +581,7 @@ func videoReq(t *testing.T) {
 			tc := new(testcase)
 			defer func() { tc.workdone <- struct{}{} }()
 			tc.init()
-			go tc.changeToken(videodata, nil, t)
+			go tc.changeToken(videodata, nil)
 			tc.addMedia = addVideo
 			tc.mediaF = videoArr
 			tc.mediadata = videodata[tc.token]
@@ -594,7 +597,7 @@ func videoAll(t *testing.T) {
 			tc := new(testcase)
 			defer func() { tc.workdone <- struct{}{} }()
 			tc.init()
-			go tc.changeToken(videodata, thumbvideo, t)
+			go tc.changeToken(videodata, thumbvideo)
 			tc.addMedia = addVideo
 			tc.mediaF = videoArr
 			tc.mediadata = videodata[tc.token]
@@ -663,7 +666,7 @@ func animReq(t *testing.T) {
 			tc := new(testcase)
 			defer func() { tc.workdone <- struct{}{} }()
 			tc.init()
-			go tc.changeToken(animdata, nil, t)
+			go tc.changeToken(animdata, nil)
 			tc.addMedia = addAnim
 			tc.mediaF = animArr
 			tc.mediadata = animdata[tc.token]
@@ -679,7 +682,7 @@ func animAll(t *testing.T) {
 			tc := new(testcase)
 			defer func() { tc.workdone <- struct{}{} }()
 			tc.init()
-			go tc.changeToken(animdata, thumbanim, t)
+			go tc.changeToken(animdata, thumbanim)
 			tc.addMedia = addAnim
 			tc.mediaF = animArr
 			tc.mediadata = animdata[tc.token]
@@ -743,7 +746,7 @@ func voiceReq(t *testing.T) {
 			tc := new(testcase)
 			defer func() { tc.workdone <- struct{}{} }()
 			tc.init()
-			go tc.changeToken(voicedata, nil, t)
+			go tc.changeToken(voicedata, nil)
 			tc.addMedia = addVoice
 			tc.mediaF = voiceArr
 			tc.mediadata = voicedata[tc.token]
@@ -759,7 +762,7 @@ func voiceAll(t *testing.T) {
 			tc := new(testcase)
 			defer func() { tc.workdone <- struct{}{} }()
 			tc.init()
-			go tc.changeToken(voicedata, nil, t)
+			go tc.changeToken(voicedata, nil)
 			tc.addMedia = addVoice
 			tc.mediaF = voiceArr
 			tc.mediadata = voicedata[tc.token]
@@ -820,7 +823,7 @@ func videoNReq(t *testing.T) {
 			tc := new(testcase)
 			defer func() { tc.workdone <- struct{}{} }()
 			tc.init()
-			go tc.changeToken(videoNdata, nil, t)
+			go tc.changeToken(videoNdata, nil)
 			tc.addMedia = addVideoNote
 			tc.mediaF = videoNArr
 			tc.mediadata = videoNdata[tc.token]
@@ -836,7 +839,7 @@ func videoNAll(t *testing.T) {
 			tc := new(testcase)
 			defer func() { tc.workdone <- struct{}{} }()
 			tc.init()
-			go tc.changeToken(videoNdata, thumbvideoN, t)
+			go tc.changeToken(videoNdata, thumbvideoN)
 			tc.addMedia = addVideoNote
 			tc.mediaF = videoNArr
 			tc.mediadata = videoNdata[tc.token]
@@ -862,7 +865,7 @@ func paidPhReq(t *testing.T) {
 			tc := new(testcase)
 			defer func() { tc.workdone <- struct{}{} }()
 			tc.init()
-			go tc.changeToken(photodata, nil, t)
+			go tc.changeToken(photodata, nil)
 			tc.addMedia = addPhoto
 			tc.mediaF = photoArr
 			tc.mediadata = photodata[tc.token]
@@ -879,7 +882,7 @@ func paidVdReq(t *testing.T) {
 			tc := new(testcase)
 			defer func() { tc.workdone <- struct{}{} }()
 			tc.init()
-			go tc.changeToken(videodata, nil, t)
+			go tc.changeToken(videodata, nil)
 			tc.addMedia = addVideo
 			tc.mediaF = videoArr
 			tc.mediadata = videodata[tc.token]
@@ -901,7 +904,7 @@ func paidPhAll(t *testing.T) {
 			tc := new(testcase)
 			defer func() { tc.workdone <- struct{}{} }()
 			tc.init()
-			go tc.changeToken(photodata, nil, t)
+			go tc.changeToken(photodata, nil)
 			tc.addMedia = addPhoto
 			tc.mediaF = photoArr
 			tc.mediadata = photodata[tc.token]
@@ -919,7 +922,7 @@ func paidVdAll(t *testing.T) {
 			tc := new(testcase)
 			defer func() { tc.workdone <- struct{}{} }()
 			tc.init()
-			go tc.changeToken(videodata, thumbvideo, t)
+			go tc.changeToken(videodata, thumbvideo)
 			tc.addMedia = addVideo
 			tc.mediaF = videoArr
 			tc.mediadata = videodata[tc.token]
@@ -1242,9 +1245,9 @@ func mediaGroup(all bool, objtype int, title string, t *testing.T) {
 			if err = tc.msg.AddToken(tc.token); err != nil {
 				t.Fatal(err)
 			}
-			resp := send(tc.msg)
+			send(tc.msg, t)
 			t.Logf("[TEST:%s] Request:\n%s", title, tc.get.Request())
-			t.Logf("[TEST:%s] Response:\n%s", title, string(resp))
+			t.Logf("[TEST:%s] Response:\n%s", title, tc.get.Response())
 			tc.checkResponse(i)
 		}
 	}
@@ -1316,9 +1319,9 @@ func locReq(t *testing.T) {
 	if err = tc.msg.AddToken(tc.token); err != nil {
 		t.Fatal(err)
 	}
-	resp := send(tc.msg)
+	send(tc.msg, t)
 	t.Logf("[TEST:%s] Request:\n%s", "location", tc.get.Request())
-	t.Logf("[TEST:%s] Response:\n%s", "location", string(resp))
+	t.Logf("[TEST:%s] Response:\n%s", "location", tc.get.Response())
 	tc.checkResponse(0)
 }
 
@@ -1373,9 +1376,9 @@ func locAll(tc *testcase, t *testing.T, kb func(*testcase), title string, i int)
 		t.Fatal(err)
 	}
 	kb(tt)
-	resp := send(tt.msg)
+	send(tt.msg, t)
 	t.Logf("[TEST:%s] Request:\n%s", title, tt.get.Request())
-	t.Logf("[TEST:%s] Response:\n%s", title, string(resp))
+	t.Logf("[TEST:%s] Response:\n%s", title, tt.get.Response())
 	tt.checkResponse(i)
 	tc.timetochange <- struct{}{}
 }
@@ -1392,7 +1395,7 @@ func TestSendLocation(t *testing.T) {
 				tc := new(testcase)
 				tc.init()
 				defer func() { tc.workdone <- struct{}{} }()
-				go tc.changeToken(nil, nil, t)
+				go tc.changeToken(nil, nil)
 				locAll(tc, t, kb[i], kbnames[i], i)
 			})
 		}
@@ -1428,9 +1431,9 @@ func venReq(t *testing.T) {
 	if err = tc.msg.AddToken(tc.token); err != nil {
 		t.Fatal(err)
 	}
-	resp := send(tc.msg)
+	send(tc.msg, t)
 	t.Logf("[TEST:%s] Request:\n%s", "venue", tc.get.Request())
-	t.Logf("[TEST:%s] Response:\n%s", "venue", string(resp))
+	t.Logf("[TEST:%s] Response:\n%s", "venue", tc.get.Response())
 	tc.checkResponse(0)
 }
 
@@ -1491,9 +1494,9 @@ func venAll(tc *testcase, t *testing.T, kb func(*testcase), title string, i int)
 		t.Fatal(err)
 	}
 	kb(tt)
-	resp := send(tt.msg)
+	send(tt.msg, t)
 	t.Logf("[TEST:%s] Request:\n%s", title, tt.get.Request())
-	t.Logf("[TEST:%s] Response:\n%s", title, string(resp))
+	t.Logf("[TEST:%s] Response:\n%s", title, tt.get.Response())
 	tt.checkResponse(i)
 	tc.timetochange <- struct{}{}
 }
@@ -1510,7 +1513,7 @@ func TestSendVenue(t *testing.T) {
 				tc := new(testcase)
 				tc.init()
 				defer func() { tc.workdone <- struct{}{} }()
-				go tc.changeToken(nil, nil, t)
+				go tc.changeToken(nil, nil)
 				venAll(tc, t, kb[i], kbnames[i], i)
 			})
 		}
@@ -1540,9 +1543,9 @@ func conReq(t *testing.T) {
 	if err = tc.msg.AddToken(tc.token); err != nil {
 		t.Fatal(err)
 	}
-	resp := send(tc.msg)
+	send(tc.msg, t)
 	t.Logf("[TEST:%s] Request:\n%s", "contact", tc.get.Request())
-	t.Logf("[TEST:%s] Response:\n%s", "contact", string(resp))
+	t.Logf("[TEST:%s] Response:\n%s", "contact", tc.get.Response())
 	tc.checkResponse(0)
 }
 
@@ -1591,9 +1594,9 @@ func conAll(tc *testcase, t *testing.T, kb func(*testcase), title string) {
 		t.Fatal(err)
 	}
 	kb(tt)
-	resp := send(tt.msg)
+	send(tt.msg, t)
 	t.Logf("[TEST:%s] Request:\n%s", title, tt.get.Request())
-	t.Logf("[TEST:%s] Response:\n%s", title, string(resp))
+	t.Logf("[TEST:%s] Response:\n%s", title, tt.get.Response())
 	tt.checkResponse(0)
 	tc.timetochange <- struct{}{}
 }
@@ -1607,7 +1610,7 @@ func TestSendContact(t *testing.T) {
 				tc := new(testcase)
 				tc.init()
 				defer func() { tc.workdone <- struct{}{} }()
-				go tc.changeToken(nil, nil, t)
+				go tc.changeToken(nil, nil)
 				conAll(tc, t, kb[i], kbnames[i])
 			})
 		}
@@ -1637,9 +1640,9 @@ func pollReq(t *testing.T) {
 	if err = tc.msg.AddToken(tc.token); err != nil {
 		t.Fatal(err)
 	}
-	resp := send(tc.msg)
+	send(tc.msg, t)
 	t.Logf("[TEST:%s] Request:\n%s", "poll", tc.get.Request())
-	t.Logf("[TEST:%s] Response:\n%s", "poll", string(resp))
+	t.Logf("[TEST:%s] Response:\n%s", "poll", tc.get.Response())
 	tc.checkResponse(0)
 }
 
@@ -1648,7 +1651,7 @@ func pollAll(t *testing.T) {
 	tc := new(testcase)
 	tc.init()
 	defer func() { tc.workdone <- struct{}{} }()
-	go tc.changeToken(nil, nil, t)
+	go tc.changeToken(nil, nil)
 	for i := 0; i < 3; i++ {
 		for j := 0; j < 4; j++ {
 			for k := 0; k < 4; k++ {
@@ -1724,9 +1727,9 @@ func pollAll(t *testing.T) {
 					t.Fatal(err)
 				}
 				kb[i](tt)
-				resp := send(tt.msg)
+				send(tt.msg, t)
 				t.Logf("[TEST:%s] Request:\n%s", "poll", tt.get.Request())
-				t.Logf("[TEST:%s] Response:\n%s", "poll", string(resp))
+				t.Logf("[TEST:%s] Response:\n%s", "poll", tt.get.Response())
 				tt.checkResponse(i)
 				tc.timetochange <- struct{}{}
 			}
@@ -1759,9 +1762,9 @@ func diceReq(t *testing.T) {
 	if err = tc.msg.AddToken(tc.token); err != nil {
 		t.Fatal(err)
 	}
-	resp := send(tc.msg)
+	send(tc.msg, t)
 	t.Logf("[TEST:%s] Request:\n%s", "poll", tc.get.Request())
-	t.Logf("[TEST:%s] Response:\n%s", "poll", string(resp))
+	t.Logf("[TEST:%s] Response:\n%s", "poll", tc.get.Response())
 	tc.checkResponse(0)
 }
 
@@ -1798,9 +1801,9 @@ func diceAll(tc *testcase, t *testing.T, kb func(*testcase), title string, i int
 		t.Fatal(err)
 	}
 	kb(tt)
-	resp := send(tt.msg)
+	send(tt.msg, t)
 	t.Logf("[TEST:%s] Request:\n%s", title, tt.get.Request())
-	t.Logf("[TEST:%s] Response:\n%s", title, string(resp))
+	t.Logf("[TEST:%s] Response:\n%s", title, tt.get.Response())
 	tt.checkResponse(i)
 }
 
@@ -1813,7 +1816,7 @@ func TestSendDice(t *testing.T) {
 				tc := new(testcase)
 				tc.init()
 				defer func() { tc.workdone <- struct{}{} }()
-				go tc.changeToken(nil, nil, t)
+				go tc.changeToken(nil, nil)
 				diceAll(tc, t, kb[i], kbnames[i], i)
 			})
 		}
@@ -1841,9 +1844,9 @@ func chactReq(t *testing.T) {
 	if err = tc.msg.AddToken(tc.token); err != nil {
 		t.Fatal(err)
 	}
-	resp := send(tc.msg)
+	send(tc.msg, t)
 	t.Logf("[TEST:%s] Request:\n%s", "poll", tc.get.Request())
-	t.Logf("[TEST:%s] Response:\n%s", "poll", string(resp))
+	t.Logf("[TEST:%s] Response:\n%s", "poll", tc.get.Response())
 	tc.checkResponse(0)
 }
 
@@ -1890,7 +1893,7 @@ func stickerReq(t *testing.T) {
 			tc := new(testcase)
 			defer func() { tc.workdone <- struct{}{} }()
 			tc.init()
-			go tc.changeToken(stickerdata, nil, t)
+			go tc.changeToken(stickerdata, nil)
 			tc.addMedia = addSticker
 			tc.mediaF = stickerArr
 			tc.mediadata = stickerdata[tc.token]
@@ -1906,7 +1909,7 @@ func stickerAll(t *testing.T) {
 			tc := new(testcase)
 			defer func() { tc.workdone <- struct{}{} }()
 			tc.init()
-			go tc.changeToken(stickerdata, nil, t)
+			go tc.changeToken(stickerdata, nil)
 			tc.addMedia = addSticker
 			tc.mediaF = stickerArr
 			tc.mediadata = stickerdata[tc.token]
@@ -1919,4 +1922,288 @@ func stickerAll(t *testing.T) {
 func TestSendSticker(t *testing.T) {
 	t.Run("Req", stickerReq)
 	t.Run("All", stickerAll)
+}
+
+func giftReq(t *testing.T) {
+	var err error
+	tc := new(testcase)
+	tc.init()
+	tc.errmsg[0] = "Bad Request: STARGIFT_INVALID"
+	tc.code[0] = 400
+	tc.whattocheck[errr] = struct{}{}
+	if err = tc.prm.WriteUserID(chatid); err != nil {
+		t.Fatal(err)
+	}
+	if err = tc.st.WriteGiftID(giftid); err != nil {
+		t.Fatal(err)
+	}
+	if err = tc.msg.AddParameters(tc.prm); err != nil {
+		t.Fatal(err)
+	}
+	if err = tc.msg.AddSticker(tc.st); err != nil {
+		t.Fatal(err)
+	}
+	if err = tc.msg.AddToken(tc.token); err != nil {
+		t.Fatal(err)
+	}
+	send(tc.msg, t)
+	t.Logf("[TEST:%s] Request:\n%s", "gift", tc.get.Request())
+	t.Logf("[TEST:%s] Response:\n%s", "gift", tc.get.Response())
+	tc.checkResponse(0)
+}
+
+func sendgift(i int, tc *testcase, t *testing.T) {
+	var err error
+	if i < 3 {
+		if err = tc.prm.WriteParseMode(parsemode[i]); err != nil {
+			t.Fatal(err)
+		}
+	} else if i == 3 {
+		if err = tc.prm.WriteEntities(entities); err != nil {
+			t.Fatal(err)
+		}
+	}
+	if err = tc.prm.WriteString(textformsg); err != nil {
+		t.Fatal(err)
+	}
+	if err = tc.st.WritePayForUpgrade(); err != nil {
+		t.Fatal(err)
+	}
+	if err = tc.st.WriteGiftID(giftid); err != nil {
+		t.Fatal(err)
+	}
+	if err = tc.ch.WriteChatID(chatid); err != nil {
+		t.Fatal(err)
+	}
+	if err = tc.prm.WriteUserID(chatid); err != nil {
+		t.Fatal(err)
+	}
+	if err = tc.msg.AddParameters(tc.prm); err != nil {
+		t.Fatal(err)
+	}
+	if err = tc.msg.AddChat(tc.ch); err != nil {
+		t.Fatal(err)
+	}
+	if err = tc.msg.AddSticker(tc.st); err != nil {
+		t.Fatal(err)
+	}
+	if err = tc.msg.AddToken(tc.token); err != nil {
+		t.Fatal(err)
+	}
+	send(tc.msg, t)
+	t.Logf("[TEST:%s] Request:\n%s", "gift", tc.get.Request())
+	t.Logf("[TEST:%s] Response:\n%s", "gift", tc.get.Response())
+	tc.checkResponse(0)
+	tc.timetochange <- struct{}{}
+}
+
+func giftAll(t *testing.T) {
+	for i := 0; i < 5; i++ {
+		t.Run(fmt.Sprint(i), func(t *testing.T) {
+			t.Parallel()
+			tc := new(testcase)
+			tc.init()
+			tc.errmsg[0] = "Bad Request: STARGIFT_INVALID"
+			tc.code[0] = 400
+			tc.whattocheck[errr] = struct{}{}
+			defer func() { tc.workdone <- struct{}{} }()
+			go tc.changeToken(nil, nil)
+			sendgift(i, tc, t)
+		})
+	}
+}
+
+func TestSendGift(t *testing.T) {
+	t.Run("Req", giftReq)
+	t.Run("All", giftAll)
+}
+
+func payReq(t *testing.T) {
+	var err error
+	tc := new(testcase)
+	tc.init()
+	tc.defaultSet()
+	if err = tc.ch.WriteChatID(chatid); err != nil {
+		t.Fatal(err)
+	}
+	if err = tc.pay.WriteTitle(invtitle); err != nil {
+		t.Fatal(err)
+	}
+	if err = tc.pay.WriteDescription(invdescrip); err != nil {
+		t.Fatal(err)
+	}
+	if err = tc.pay.WritePayload(invpayload); err != nil {
+		t.Fatal(err)
+	}
+	if err = tc.pay.WriteCurrency(starsName); err != nil {
+		t.Fatal(err)
+	}
+	if err = tc.pay.WritePrices(prices); err != nil {
+		t.Fatal(err)
+	}
+	if err = tc.msg.AddPayment(tc.pay); err != nil {
+		t.Fatal(err)
+	}
+	if err = tc.msg.AddChat(tc.ch); err != nil {
+		t.Fatal(err)
+	}
+	if err = tc.msg.AddToken(tc.token); err != nil {
+		t.Fatal(err)
+	}
+	send(tc.msg, t)
+	t.Logf("[TEST:%s] Request:\n%s", "payment", tc.get.Request())
+	t.Logf("[TEST:%s] Response:\n%s", "payment", tc.get.Response())
+	tc.checkResponse(0)
+	tc.checkResponse(0)
+}
+
+func payAll(t *testing.T) {
+	var err error
+	tt := new(testcase)
+	tt.init()
+	tt.defaultSet()
+	if err = tt.ch.WriteChatID(chatid); err != nil {
+		t.Fatal(err)
+	}
+	if err = tt.pay.WriteTitle(invtitle); err != nil {
+		t.Fatal(err)
+	}
+	if err = tt.pay.WriteDescription(invdescrip); err != nil {
+		t.Fatal(err)
+	}
+	if err = tt.pay.WritePayload(invpayload); err != nil {
+		t.Fatal(err)
+	}
+	if err = tt.pay.WriteCurrency(starsName); err != nil {
+		t.Fatal(err)
+	}
+	if err = tt.pay.WriteProviderToken(""); err != nil {
+		t.Fatal(err)
+	}
+	if err = tt.pay.WritePrices(prices); err != nil {
+		t.Fatal(err)
+	}
+	// tt.pay.WriteMaxTipAmount(15)
+	// tt.pay.WriteSuggestedTipAmounts([]int{5})
+	if err = tt.pay.WriteStartParameter("stars_payment"); err != nil {
+		t.Fatal(err)
+	}
+	if err = tt.pay.WriteProviderData("{}"); err != nil {
+		t.Fatal(err)
+	}
+	if err = tt.pay.WritePhotoUrl(photodata[tt.token][2]); err != nil {
+		t.Fatal(err)
+	}
+	if err = tt.pay.WritePhotoSize(12); err != nil {
+		t.Fatal(err)
+	}
+	if err = tt.pay.WritePhotoWidth(3); err != nil {
+		t.Fatal(err)
+	}
+	if err = tt.pay.WritePhotoHeight(6); err != nil {
+		t.Fatal(err)
+	}
+	// tt.pay.WriteNeedName()
+	// tt.pay.WriteNeedPhoneNumber()
+	// tt.pay.WriteNeedEmail()
+	// tt.pay.WriteNeedShippingAddress()
+	// tt.pay.WriteSendPhoneNumberToProvider()
+	// tt.pay.WriteSendEmailToProvider()
+	// tt.pay.WriteIsFlexible()
+	tt.prm.WriteDisableNotification()
+	tt.prm.WriteProtectContent()
+	tt.prm.WriteMessageEffectID(msgEffect)
+	tt.prm.WriteReplyParameters(tt.getReplyPrm())
+	// kb[0](tt)
+	if err = tt.msg.AddPayment(tt.pay); err != nil {
+		t.Fatal(err)
+	}
+
+	if err = tt.msg.AddChat(tt.ch); err != nil {
+		t.Fatal(err)
+	}
+	if err = tt.msg.AddToken(tt.token); err != nil {
+		t.Fatal(err)
+	}
+	send(tt.msg, t)
+	t.Logf("[TEST:%s] Request:\n%s", "payment", tt.get.Request())
+	t.Logf("[TEST:%s] Response:\n%s", "payment", tt.get.Response())
+	tt.checkResponse(0)
+}
+
+func TestSendInvoice(t *testing.T) {
+	t.Run("Req", payReq)
+	t.Run("All", payAll)
+}
+
+func gameReq(t *testing.T) {
+	var err error
+	tc := new(testcase)
+	tc.init()
+	tc.token = testbotdata.TestsInGroup2_bot
+	if err = tc.ch.WriteChatID(chatid); err != nil {
+		t.Fatal(err)
+	}
+	if err = tc.game.WriteShortName(gameshortname); err != nil {
+		t.Fatal(err)
+	}
+	if err = tc.msg.AddChat(tc.ch); err != nil {
+		t.Fatal(err)
+	}
+	if err = tc.msg.AddGame(tc.game); err != nil {
+		t.Fatal(err)
+	}
+	if err = tc.msg.AddToken(tc.token); err != nil {
+		t.Fatal(err)
+	}
+	send(tc.msg, t)
+	t.Logf("[TEST:%s] Request:\n%s", "game", tc.get.Request())
+	t.Logf("[TEST:%s] Response:\n%s", "game", tc.get.Response())
+	tc.checkResponse(0)
+}
+
+func gameAll(t *testing.T) {
+	var err error
+	tc := new(testcase)
+	tc.init()
+	tc.token = testbotdata.TestsInGroup2_bot
+	if err = tc.ch.WriteChatID(chatid); err != nil {
+		t.Fatal(err)
+	}
+	if err = tc.game.WriteShortName(gameshortname); err != nil {
+		t.Fatal(err)
+	}
+	if err = tc.prm.WriteDisableNotification(); err != nil {
+		t.Fatal(err)
+	}
+	if err = tc.prm.WriteProtectContent(); err != nil {
+		t.Fatal(err)
+	}
+	if err = tc.prm.WriteMessageEffectID(msgEffect); err != nil {
+		t.Fatal(err)
+	}
+	if err = tc.prm.WriteReplyParameters(tc.getReplyPrm()); err != nil {
+		t.Fatal(err)
+	}
+	if err = tc.msg.AddParameters(tc.prm); err != nil {
+		t.Fatal(err)
+	}
+	if err = tc.msg.AddChat(tc.ch); err != nil {
+		t.Fatal(err)
+	}
+	if err = tc.msg.AddGame(tc.game); err != nil {
+		t.Fatal(err)
+	}
+	if err = tc.msg.AddToken(tc.token); err != nil {
+		t.Fatal(err)
+	}
+	send(tc.msg, t)
+	t.Logf("[TEST:%s] Request:\n%s", "game", tc.get.Request())
+	t.Logf("[TEST:%s] Response:\n%s", "game", tc.get.Response())
+	tc.checkResponse(0)
+}
+
+func TestSendGame(t *testing.T) {
+	t.Run("Req", gameReq)
+	t.Run("All", gameAll)
 }

@@ -166,6 +166,22 @@ func (g *get) AdminRights() *types.ChatAdministratorRights {
 	return g.admin
 }
 
+func (g *get) PreparedInlineMessage() *types.PreparedInlineMessage {
+	return g.prepinlmsg
+}
+
+func (g *get) StarTransaction() *types.StarTransaction {
+	return g.startrans
+}
+
+func (g *get) Score() []*types.GameHighScore {
+	return g.score
+}
+
 func (g *get) Request() string {
 	return g.request
+}
+
+func (g *get) Response() string {
+	return g.response
 }

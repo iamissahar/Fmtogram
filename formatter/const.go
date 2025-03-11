@@ -214,7 +214,6 @@ var simpleResponse = map[string]*types.SimpleResponse{methods.MessageReaction: n
 	methods.SetMyDefaultAdminRights:      new(types.SimpleResponse),
 	methods.DeleteMessage:                new(types.SimpleResponse),
 	methods.DeleteMessages:               new(types.SimpleResponse),
-	methods.CreateNewStickerSet:          new(types.SimpleResponse),
 	methods.AddStickerToSet:              new(types.SimpleResponse),
 	methods.SetStickerPositionInSet:      new(types.SimpleResponse),
 	methods.DeleteStickerFromSet:         new(types.SimpleResponse),
@@ -234,6 +233,8 @@ var simpleResponse = map[string]*types.SimpleResponse{methods.MessageReaction: n
 	methods.RefundStarPayment:            new(types.SimpleResponse),
 	methods.EditUserStarSubscription:     new(types.SimpleResponse),
 	methods.SetPassportDataErrors:        new(types.SimpleResponse),
+	methods.AnswerInlineQuery:            new(types.SimpleResponse),
+	methods.AnswerShippingQuery:          new(types.SimpleResponse),
 }
 
 var messageResponse = map[string]*types.MessageResponse{methods.Message: new(types.MessageResponse),

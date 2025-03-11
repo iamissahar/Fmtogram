@@ -296,7 +296,7 @@ func (sh *stickerHolder) multiple(wr *multipart.Writer, buf *bytes.Buffer, conte
 				group[i] = sh.storage[i]
 			}
 		}
-		sh.m["media"] = group
+		sh.m["stickers"] = group
 		if sh.atLeastOnce {
 			queryStr, err = putUrlValues(sh.m)
 		} else {
@@ -358,7 +358,7 @@ func travers(msg *Message) (string, error) {
 
 	for i := 0; i < len(media) && err == nil; i++ {
 		if media[i] != nil {
-			if (msg.fm.method == methods.Sticker) || ((msg.fm.method != methods.PaidMedia) && (msg.fm.method != methods.MediaGroup)) {
+			if (msg.fm.mh.amount == 1) || (msg.fm.sticker.amount == 1) {
 				queryArr[cntr], err = media[i].single(msg.fm.writer, msg.fm.buf, &msg.fm.contentType)
 				cntr++
 			} else {
@@ -546,13 +546,17 @@ func responseDecoder(msg *Message) error {
 		msg.fm.g.stickerset = t.Result
 	case *types.GiftsResponse:
 		msg.fm.g.status = t.Ok
-		// msg.fm.g.gift = t.Result
+		if t.Result != nil && t.Result.G != nil {
+			msg.fm.g.gifts = t.Result.G
+		}
 	case *types.WepAppMsgResponse:
 		msg.fm.g.status = t.Ok
-		// msg.fm.g.wepappmsg = t.Result
+		if t.Result != nil {
+			msg.fm.g.str = t.Result.InlineMessageID
+		}
 	case *types.PreparedInlineMessageResponse:
 		msg.fm.g.status = t.Ok
-		// msg.fm.g.inmsg = t.Result
+		msg.fm.g.prepinlmsg = t.Result
 	case *types.StringResponse:
 		msg.fm.g.status = t.Ok
 		msg.fm.g.str = t.Result
@@ -561,15 +565,15 @@ func responseDecoder(msg *Message) error {
 		msg.fm.g.integer = &t.Result
 	case *types.StarTransactionResponse:
 		msg.fm.g.status = t.Ok
-		// msg.fm.g.startrans = t.Result
+		msg.fm.g.startrans = t.Result
 	case *types.GameHighScoresResponse:
 		msg.fm.g.status = t.Ok
-		// msg.fm.g.score = t.Result
+		msg.fm.g.score = t.Result
 	}
 	return err
 }
 
-func sendRequest(msg *Message, query string) ([]byte, error) {
+func sendRequest(msg *Message, query string) error {
 	var resp *http.Response
 	var body []byte
 	var err error
@@ -607,6 +611,7 @@ func sendRequest(msg *Message, query string) ([]byte, error) {
 				if err == nil {
 					errResp := new(types.Error)
 					err = json.Unmarshal(body, errResp)
+					msg.fm.g.response = string(body)
 					if !errResp.Ok {
 						msg.fm.g.status, msg.fm.g.errorCode, msg.fm.g.errorMsg = errResp.Ok, errResp.ErrorCode, errResp.Description
 						err = code22()
@@ -619,20 +624,19 @@ func sendRequest(msg *Message, query string) ([]byte, error) {
 			}
 		}
 	}
-	return body, err
+	return err
 }
 
-func (msg *Message) Send() ([]byte, error) {
+func (msg *Message) Send() error {
 	var err error
 	var query string
-	var body []byte
 
 	if query, err = makeRequest(msg); err == nil {
 		if msg.fm.tgr == nil {
 			panic("!~")
 		}
-		body, err = sendRequest(msg, query)
+		err = sendRequest(msg, query)
 	}
 
-	return body, err
+	return err
 }

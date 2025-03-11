@@ -42,14 +42,14 @@ func (inmtc *inmTestContainer) webAppQueryID(inmode formatter.IInlineMode, in *i
 	in.str = inmtc.inputStr[i]
 }
 
-func (inmtc *inmTestContainer) result(inmode formatter.IInlineMode, in *inlineModeT, i int) {
-	in.testedFunc = inmode.WriteResult
-}
+// func (inmtc *inmTestContainer) result(inmode formatter.IInlineMode, in *inlineModeT, i int) {
+// 	in.testedFunc = inmode.WriteResult
+// }
 
-func (inmtc *inmTestContainer) results(inmode formatter.IInlineMode, in *inlineModeT, i int) {
-	in.testedFunc = inmode.WriteResults
-	in.integer = inmtc.inputInt[i]
-}
+// func (inmtc *inmTestContainer) results(inmode formatter.IInlineMode, in *inlineModeT, i int) {
+// 	in.testedFunc = inmode.WriteResults
+// 	in.integer = inmtc.inputInt[i]
+// }
 
 func (inmtc *inmTestContainer) cacheTime(inmode formatter.IInlineMode, in *inlineModeT, i int) {
 	in.testedFunc = inmode.WriteCacheTime
@@ -104,22 +104,22 @@ func (inmtc *inmTestContainer) writeWebAppQueryID() {
 	inmtc.buildF = inmtc.webAppQueryID
 }
 
-func (inmtc *inmTestContainer) writeResult() {
-	inmtc.name = "(IInlineMode).WriteResult()"
-	inmtc.isExpectedErr = []bool{false, false, true}
-	inmtc.codeErr = []string{"", "", "10"}
-	inmtc.amount, inmtc.until = 3, 1
-	inmtc.buildF = inmtc.result
-}
+// func (inmtc *inmTestContainer) writeResult() {
+// 	inmtc.name = "(IInlineMode).WriteResult()"
+// 	inmtc.isExpectedErr = []bool{false, false, true}
+// 	inmtc.codeErr = []string{"", "", "10"}
+// 	inmtc.amount, inmtc.until = 3, 1
+// 	inmtc.buildF = inmtc.result
+// }
 
-func (inmtc *inmTestContainer) writeResults() {
-	inmtc.name = "(IInlineMode).WriteResults()"
-	inmtc.inputInt = []int{0, -12124, -1, 1231, 34341234, 645, 1}
-	inmtc.isExpectedErr = []bool{true, true, true, false, false, false, true}
-	inmtc.codeErr = []string{"20", "20", "20", "", "", "", "10"}
-	inmtc.amount, inmtc.until = 7, 5
-	inmtc.buildF = inmtc.results
-}
+// func (inmtc *inmTestContainer) writeResults() {
+// 	inmtc.name = "(IInlineMode).WriteResults()"
+// 	inmtc.inputInt = []int{0, -12124, -1, 1231, 34341234, 645, 1}
+// 	inmtc.isExpectedErr = []bool{true, true, true, false, false, false, true}
+// 	inmtc.codeErr = []string{"20", "20", "20", "", "", "", "10"}
+// 	inmtc.amount, inmtc.until = 7, 5
+// 	inmtc.buildF = inmtc.results
+// }
 
 func (inmtc *inmTestContainer) writeCacheTime() {
 	inmtc.name = "(IInlineMode).WriteCacheTime()"
@@ -202,14 +202,14 @@ func (inm *inlineModeT) startTest(part string, i int, t *testing.T) {
 	case func(*types.InlineQueryResultsButton) error:
 		printTestLog(part, inm.name, inm.codeErr, inm.but, inm.isExpectedErr, i)
 		checkError(f(inm.but), inm.isExpectedErr, inm.codeErr, t)
-	case func() (formatter.IResult, error):
-		printTestLog(part, inm.name, inm.codeErr, true, inm.isExpectedErr, i)
-		_, err := f()
-		checkError(err, inm.isExpectedErr, inm.codeErr, t)
-	case func(int) ([]formatter.IResult, error):
-		printTestLog(part, inm.name, inm.codeErr, inm.integer, inm.isExpectedErr, i)
-		_, err := f(inm.integer)
-		checkError(err, inm.isExpectedErr, inm.codeErr, t)
+	// case func() (formatter.IResult, error):
+	// 	printTestLog(part, inm.name, inm.codeErr, true, inm.isExpectedErr, i)
+	// 	_, err := f()
+	// 	checkError(err, inm.isExpectedErr, inm.codeErr, t)
+	// case func(int) ([]formatter.IResult, error):
+	// 	printTestLog(part, inm.name, inm.codeErr, inm.integer, inm.isExpectedErr, i)
+	// 	_, err := f(inm.integer)
+	// 	checkError(err, inm.isExpectedErr, inm.codeErr, t)
 	case func() error:
 		printTestLog(part, inm.name, inm.codeErr, true, inm.isExpectedErr, i)
 		checkError(f(), inm.isExpectedErr, inm.codeErr, t)
@@ -258,19 +258,19 @@ func TestInlineModeWriteWebAppQueryID(t *testing.T) {
 	inmtc.mainLogic(msg, t)
 }
 
-func TestInlineModeWriteResult(t *testing.T) {
-	inmtc := new(inmTestContainer)
-	inmtc.writeResult()
-	msg := formatter.CreateEmpltyMessage()
-	inmtc.mainLogic(msg, t)
-}
+// func TestInlineModeWriteResult(t *testing.T) {
+// 	inmtc := new(inmTestContainer)
+// 	inmtc.writeResult()
+// 	msg := formatter.CreateEmpltyMessage()
+// 	inmtc.mainLogic(msg, t)
+// }
 
-func TestInlineModeWriteResults(t *testing.T) {
-	inmtc := new(inmTestContainer)
-	inmtc.writeResults()
-	msg := formatter.CreateEmpltyMessage()
-	inmtc.mainLogic(msg, t)
-}
+// func TestInlineModeWriteResults(t *testing.T) {
+// 	inmtc := new(inmTestContainer)
+// 	inmtc.writeResults()
+// 	msg := formatter.CreateEmpltyMessage()
+// 	inmtc.mainLogic(msg, t)
+// }
 
 func TestInlineModeWriteCacheTime(t *testing.T) {
 	inmtc := new(inmTestContainer)

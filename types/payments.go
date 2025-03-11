@@ -1,9 +1,9 @@
 package types
 
 type ShippingOption struct {
-	ID     string         `json:"id"`
-	Title  string         `json:"title"`
-	Prices []LabeledPrice `json:"prices"`
+	ID     string          `json:"id"`
+	Title  string          `json:"title"`
+	Prices []*LabeledPrice `json:"prices"`
 }
 
 type PaidMediaPurchased struct {

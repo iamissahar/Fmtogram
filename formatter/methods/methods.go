@@ -524,6 +524,8 @@ const (
 	// 	(formatter.IGet).Date()
 	// 	(formatter.IGet).Poll()
 	// 	(formatter.IGet).Replyed()
+	// or
+	// 	(formatter.IGet).Message() (all possible data included)
 	Poll string = "sendPoll"
 
 	// Use this method to send an animated emoji that will display a random value. Parameters:
@@ -544,6 +546,8 @@ const (
 	// 	(formatter.IGet).Date()
 	// 	(formatter.IGet).Dice()
 	// 	(formatter.IGet).Replyed()
+	// or
+	// 	(formatter.IGet).Message() (all possible data included)
 	Dice string = "sendDice"
 
 	// Use this method when you need to tell the user that something is happening on
@@ -580,6 +584,7 @@ const (
 	// 	(formatter.IParameters).WriteOffset() [Optional]
 	// 	(formatter.IParameters).WriteLimit() [Optional]
 	// Get the results here:
+	// 	(formatter.IGet).Status()
 	// 	(formatter.IGet).ProfilePhotos()
 	UserProfilePhotos string = "getUserProfilePhotos"
 
@@ -596,6 +601,7 @@ const (
 	// For the moment, bots can download files of up to 20MB in size. Parameters:
 	//	(formatter.IParameters).WriteFileID() [Required]
 	// Get the results here:
+	// 	(formatter.IGet).Status()
 	// 	(formatter.IGet).File()
 	File string = "getFile"
 
@@ -1288,6 +1294,8 @@ const (
 	// 	(formatter.ISticker).WriteAssociatedEmojies() [Optional]
 	// 	(formatter.ISticker).WriteMaskPosition() [Optional]
 	// 	(formatter.ISticker).WriteKeywords() [Optional]
+	// Get the results here:
+	// 	(formatter.IGet).Status()
 	CreateNewStickerSet string = "createNewStickerSet"
 
 	// Use this method to add a new sticker to a set created by the bot. Emoji sticker sets can have up to 200
@@ -1401,6 +1409,8 @@ const (
 	// 	(formatter.IInlineMode).WriteIsPersonal() [Optional]
 	// 	(formatter.IInlineMode).WriteNextOffset() [Optional]
 	// 	(formatter.IInlineMode).WriteButton() [Optional]
+	// Get the results here:
+	// 	(formatter.IGet).Status()
 	AnswerInlineQuery string = "answerInlineQuery"
 
 	// Use this method to set the result of an interaction with a Web App and send a corresponding message
@@ -1408,7 +1418,8 @@ const (
 	// 	(formatter.IIlineMode).WriteWebAppQueryID() [Required]
 	// 	(formatter.IInlineMode).WriteResult() [Required]
 	// Get the results here:
-	// 	(formatter.IInlineMode).GetSentWebAppMessage()
+	// 	(formatter.IGet).Status()
+	// 	(formatter.IGet).String()
 	AnswerWebAppQuery string = "answerWebAppQuery"
 
 	// Stores a message that can be sent by a user of a Mini App. Parameters:
@@ -1419,7 +1430,8 @@ const (
 	// 	(formatter.IInlineMode).WriteAllowGroupChats() [Optional]
 	// 	(formatter.IInlineMode).WriteAllowChannelChats() [Optional]
 	// Get the results here:
-	// 	(formatter.IInlineMode).GetPreparedInlineMessage()
+	// 	(formatter.IGet).Status()
+	// 	(formatter.IGet).PreparedInlineMessage()
 	SavePreparedInlineMessage string = "savePreparedInlineMessage"
 
 	// Use this method to send invoices. Parameters:
@@ -1451,7 +1463,15 @@ const (
 	// 	(formatter.IParameters).WriteReplyParameters() [Optional]
 	// 	(formatter.IKeyboard).WriteInline() [Optional]
 	// Get the results here:
-	// 	(formatter.IParameters).GetMessage()
+	// 	(formatter.IGet).Status()
+	// 	(formatter.IGet).Error()
+	// 	(formatter.IGet).Chat()
+	// 	(formatter.IGet).Sender()
+	// 	(formatter.IGet).Date()
+	// 	(formatter.IGet).MessageID()
+	// 	(formatter.IGet).Replyed()
+	// or
+	// 	(formatter.Get).Message() (all possible data included)
 	Invoice string = "sendInvoice"
 
 	// Use this method to create a link for an invoice. Parameters:
@@ -1477,7 +1497,8 @@ const (
 	// 	(formatter.IPayment).WriteSendEmailToProvider() [Optional]
 	// 	(formatter.IPayment).WriteIsFlexible() [Optional]
 	// Get the results here:
-	// 	(formatter.IPayment).GetInvoiceLink()
+	// 	(formatter.Get).Status()
+	// 	(formatter.Get).String()
 	CreateInvoiceLink string = "createInvoiceLink"
 
 	// If you sent an invoice requesting a shipping address and the parameter formatter.IPayment).WriteIsFlexible() was specified,
@@ -1487,6 +1508,8 @@ const (
 	// 	(formatter.IPayment).WriteOK() [Required]
 	// 	(formatter.IPayment).WriteShippingOptions() [Optional]
 	// 	(formatter.IPayment).WriteErrorMessage() [Optional]
+	// Get the results here:
+	// 	(formatter.Get).Status()
 	AnswerShippingQuery string = "answerShippingQuery"
 
 	// Once the user has confirmed their payment and shipping details, the Bot API sends the final confirmation in the form of
@@ -1494,25 +1517,32 @@ const (
 	// receive an answer within 10 seconds after the pre-checkout query was sent. Parameters:
 	// 	(formatter.IPayment).WritePreCheckoutID() [Required]
 	// 	(formatter.IPayment).WriteOK() [Required]
-	// 	(formatter.IIPayment).WriteErrorMessage() [Optional]
+	// 	(formatter.IPayment).WriteErrorMessage() [Optional]
+	// Get the results here:
+	// 	(formatter.Get).Status()
 	AnswerPreCheckoutQuery string = "answerPreCheckoutQuery"
 
 	// Returns the bot's Telegram Star transactions in chronological order. Parameters:
-	// 	(formatter.IPayment).WriteLimit() [Optional]
-	// 	(formatter.IPaymentt).WriteOffset() [Optional]
+	// 	(formatter.IParameters).WriteLimit() [Optional]
+	// 	(formatter.IParameters).WriteOffset() [Optional]
 	// Get the results here:
-	// 	(formatter.IPayment).GetStarTransactions()
+	// 	(formatter.IGet).Status()
+	// 	(formatter.IGet).StarTransactions()
 	GetStarTransactions string = "getStarTransactions"
 
 	// Refunds a successful payment in Telegram Stars. Parameters:
 	// 	(formatter.IParameters).WriteUserID() [Required]
 	// 	(formatter.IPayment).WriteTelegramPaymentChargeID() [Required]
+	// Get the results here:
+	// 	(formatter.IGet).Status()
 	RefundStarPayment string = "refundStarPayment"
 
 	// Allows the bot to cancel or re-enable extension of a subscription paid in Telegram Stars. Parameters:
 	// 	(formatter.IParameters).WriteUserID() [Required]
 	// 	(formatter.IPayment).WriteTelegramPaymentChargeID() [Required]
 	// 	(formatter.IPayment).WriteIsCanceled() [Required]
+	// Get the results here:
+	// 	(formatter.IGet).Status()
 	EditUserStarSubscription string = "editUserStarSubscription"
 
 	// Informs a user that some of the Telegram Passport elements they provided contains errors. The user will not be able to re-submit
@@ -1522,6 +1552,8 @@ const (
 	// details in the error message to make sure the user knows how to correct the issues. Parameters:
 	// 	(formatter.IParameters).WriteUserID() [Required]
 	// 	(formatter.IParameters).WriteErrors() [Required]
+	// Get the results here:
+	// 	(formatter.IGet).Status()
 	SetPassportDataErrors string = "setPassportDataErrors"
 
 	// Use this method to send a game. Parameters:
@@ -1535,6 +1567,14 @@ const (
 	// 	(formatter.IParameters).WriteMessageEffectID() [Optional]
 	// 	(formatter.IParameters).WriteReplyParameters() [Optional]
 	// 	(formatter.IKeyboard).WriteInline() [Optional]
+	// Get the results here:
+	// 	(formatter.IGet).MessageID()
+	// 	(formatter.IGet).Sender()
+	// 	(formatter.IGet).Chat()
+	// 	(formatter.IGet).Date()
+	// 	(formatter.IGet).Replyed()
+	// or
+	// 	(formatter.IGet).Message() (all possible data included)
 	Game string = "sendGame"
 
 	// Use this method to set the score of the specified user in a game message. Parameters:
@@ -1545,6 +1585,16 @@ const (
 	// 	(formatter.IChat).WriteChatID() [Optional]
 	// 	(formatter.IParameters).WriteMessageID() [Optional]
 	//	(formatter.IParameters).WriteInlineMessageID() [Optional]
+	// If the message is not an inline message, then get the results here:
+	// 	(formatter.IGet).MessageID()
+	// 	(formatter.IGet).Sender()
+	// 	(formatter.IGet).Chat()
+	// 	(formatter.IGet).Date()
+	// 	(formatter.IGet).Replyed()
+	// 	or
+	// 	(formatter.IGet).Message() (all possible data included)
+	// Else:
+	// 	(formatter.IGet).Status()
 	SetGameScore string = "setGameScore"
 
 	// Use this method to get data for high score tables. Will return the score of the
@@ -1556,6 +1606,9 @@ const (
 	// 	(formatter.IChat).WriteChatID() [Optional]
 	// 	(formatter.IParameters).WriteMessageID() [Optional]
 	// 	(formatter.IParameters).WriteInlineMessageID() [Optional]
+	// Get the results here:
+	// 	(formatter.IGet).Status()
+	// 	(formatter.IGet).Score()
 	GetGameHighScores string = "getGameHighScores"
 )
 

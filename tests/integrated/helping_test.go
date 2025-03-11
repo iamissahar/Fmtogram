@@ -1,19 +1,17 @@
 package integrated
 
 import (
-	"log"
+	"testing"
 
 	"github.com/l1qwie/Fmtogram/formatter"
 	"github.com/l1qwie/Fmtogram/types"
 )
 
-func send(msg *formatter.Message) []byte {
-	var body []byte
+func send(msg *formatter.Message, t *testing.T) {
 	var err error
-	if body, err = msg.Send(); err != nil {
-		log.Print(err)
+	if err = msg.Send(); err != nil && err.Error() != "22" {
+		t.Fatal(err)
 	}
-	return body
 }
 
 func addKb(msg *formatter.Message, kb formatter.IKeyboard) {

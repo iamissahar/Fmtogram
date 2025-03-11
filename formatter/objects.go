@@ -311,8 +311,8 @@ type reply struct {
 type inlinemode struct {
 	QueryID           string                          `json:"inline_query_id,omitempty" field:"inline_query_id" ifempty:"false"`
 	WebAppQueryID     string                          `json:"web_app_query_id,omitempty" field:"web_app_query_id" ifempty:"false"`
-	Result            IResult                         `json:"result,omitempty" field:"result" ifempty:"false"`
-	Results           []IResult                       `json:"results,omitempty" field:"results" ifempty:"false"`
+	Result            interface{}                     `json:"result,omitempty" field:"result" ifempty:"false"`
+	Results           []interface{}                   `json:"results,omitempty" field:"results" ifempty:"false"`
 	CacheTime         int                             `json:"cache_time,omitempty" field:"cache_time" ifempty:"false"`
 	IsPersonal        bool                            `json:"is_personal,omitempty" field:"is_personal" ifempty:"false"`
 	NextOffset        string                          `json:"next_offset,omitempty" field:"next_offset" ifempty:"false"`
@@ -323,41 +323,20 @@ type inlinemode struct {
 	AllowChannelChats bool                            `json:"allow_channel_chats,omitempty" field:"allow_channel_chats" ifempty:"false"`
 	webAppResponse    *types.SentWebAppMessage
 	inMessageResponse *types.PreparedInlineMessage
-}
-
-type result struct {
-	CachedAudio    *types.InlineQueryResultCachedAudio
-	CachedDocument *types.InlineQueryResultCachedDocument
-	CachedGif      *types.InlineQueryResultCachedGif
-	CachedMpeg4Gif *types.InlineQueryResultCachedMpeg4Gif
-	CachedPhoto    *types.InlineQueryResultCachedPhoto
-	CachedSticker  *types.InlineQueryResultCachedSticker
-	CachedVideo    *types.InlineQueryResultCachedVideo
-	CachedVoice    *types.InlineQueryResultCachedVoice
-	Article        *types.InlineQueryResultArticle
-	Audio          *types.InlineQueryResultAudio
-	Contact        *types.InlineQueryResultContact
-	Game           *types.InlineQueryResultGame
-	Document       *types.InlineQueryResultDocument
-	Gif            *types.InlineQueryResultGif
-	Location       *types.InlineQueryResultLocation
-	Mpeg4Gif       *types.InlineQueryResultMpeg4Gif
-	Photo          *types.InlineQueryResultPhoto
-	Venue          *types.InlineQueryResultVenue
-	Video          *types.InlineQueryResultVideo
-	Voice          *types.InlineQueryResultVoice
+	resultcounter     int
+	onlytothearray    bool
 }
 
 type payment struct {
 	Title                     string                  `json:"title,omitempty" field:"title" ifempty:"false"`
 	Description               string                  `json:"description,omitempty" field:"description" ifempty:"false"`
 	Payload                   string                  `json:"payload,omitempty" field:"payload" ifempty:"false"`
-	ProviderToken             string                  `json:"provider_token,omitempty" field:"provider_token" ifempty:"false"`
+	ProviderToken             *string                 `json:"provider_token,omitempty" field:"provider_token" ifempty:"false"`
 	Currency                  string                  `json:"currency,omitempty" field:"currency" ifempty:"false"`
 	Prices                    []*types.LabeledPrice   `json:"prices,omitempty" field:"prices" ifempty:"false"`
 	MaxTipAmount              int                     `json:"max_tip_amount,omitempty" field:"max_tip_amount" ifempty:"false"`
 	SuggestedTipAmounts       []int                   `json:"suggested_tip_amounts,omitempty" field:"suggested_tip_amounts" ifempty:"false"`
-	StartParameter            string                  `json:"start_parameter,omitempty" field:"start_parameter" ifempty:"false"`
+	StartParameter            *string                 `json:"start_parameter,omitempty" field:"start_parameter" ifempty:"false"`
 	ProviderData              string                  `json:"provider_data,omitempty" field:"provider_data" ifempty:"false"`
 	PhotoUrl                  string                  `json:"photo_url,omitempty" field:"photo_url" ifempty:"false"`
 	PhotoSize                 int                     `json:"photo_size,omitempty" field:"photo_size" ifempty:"false"`
@@ -372,12 +351,10 @@ type payment struct {
 	IsFlexible                bool                    `json:"is_flexible,omitempty" field:"is_flexible" ifempty:"false"`
 	SubscriptionPeriod        int                     `json:"subscription_period,omitempty" field:"subscription_period" ifempty:"false"`
 	ShippingID                string                  `json:"shipping_query_id,omitempty" field:"shipping_query_id" ifempty:"false"`
-	OK                        bool                    `json:"ok,omitempty" field:"ok" ifempty:"false"`
+	OK                        *bool                   `json:"ok,omitempty" field:"ok" ifempty:"false"`
 	ShippingOptions           []*types.ShippingOption `json:"shipping_options,omitempty" field:"shipping_options" ifempty:"false"`
 	ErrorMessage              string                  `json:"error_message,omitempty" field:"error_message" ifempty:"false"`
 	PreCheckoutID             string                  `json:"pre_checkout_query_id,omitempty" field:"pre_checkout_query_id" ifempty:"false"`
-	Offset                    int                     `json:"offset,omitempty" field:"offset" ifempty:"false"`
-	Limit                     int                     `json:"limit,omitempty" field:"limit" ifempty:"false"`
 	TelegramPaymentChargeID   string                  `json:"telegram_payment_charge_id,omitempty" field:"telegram_payment_charge_id" ifempty:"false"`
 	IsCanceled                bool                    `json:"is_canceled,omitempty" field:"is_canceled" ifempty:"false"`
 }
@@ -437,5 +414,9 @@ type get struct {
 	admin      *types.ChatAdministratorRights
 	stickerset *types.StickerSet
 	msgs       []*types.Message
+	prepinlmsg *types.PreparedInlineMessage
+	startrans  *types.StarTransaction
+	score      []*types.GameHighScore
 	request    string
+	response   string
 }

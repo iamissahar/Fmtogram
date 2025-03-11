@@ -516,6 +516,9 @@ func (msg *Message) AddMethod(method string) error {
 	} else if method == methods.GetMemberCount {
 		msg.fm.tgr = new(types.IntResponse)
 		msg.fm.httpMethod = http.MethodGet
+	} else if method == methods.CreateNewStickerSet {
+		msg.fm.tgr = new(types.SimpleResponse)
+		msg.fm.httpMethod = http.MethodPost
 	} else {
 		err = code07()
 	}
@@ -546,7 +549,7 @@ func (msg *Message) AddSticker(st ISticker) error {
 	var err error
 	if s, ok := st.(*sticker); ok {
 		if msg.fm.sticker.storage[msg.fm.sticker.i] == nil {
-			if (s.Sticker != "") || (s.SetName != "") {
+			if ((s.Sticker != "") || (s.SetName != "")) || (s.GiftID != "") {
 				if s.stickerGottenFrom == Storage {
 					msg.fm.sticker.atLeastOnce = true
 				}
@@ -628,7 +631,8 @@ func (msg *Message) AddPayment(pay IPayment) error {
 	var err error
 	if p, ok := pay.(*payment); ok {
 		if msg.fm.payment == nil {
-			if (p.Title != "") && (p.Description != "") && (p.Payload != "") && (p.Currency != "") && (p.Prices != nil) {
+			if ((p.Title != "") && (p.Description != "") && (p.Payload != "") && (p.Currency != "") && (p.Prices != nil)) ||
+				(p.ShippingID != "" && p.OK != nil) && (*p.OK && p.ShippingOptions != nil || !*p.OK && p.ErrorMessage != "") {
 				msg.fm.payment = p
 				if !msg.fm.notchange {
 					msg.fm.method = methods.Invoice
@@ -652,7 +656,7 @@ func (msg *Message) AddGame(gg IGame) error {
 	var err error
 	if g, ok := gg.(*game); ok {
 		if msg.fm.game == nil {
-			if g.ShortName != "" {
+			if g.ShortName != "" || g.Score != 0 {
 				msg.fm.game = g
 				if !msg.fm.notchange {
 					msg.fm.method = methods.Game

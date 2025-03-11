@@ -83,7 +83,8 @@ func GetUpdates(tg *types.Telegram, offset *int, botID string) error {
 		types.TelegramAPI,
 		fmt.Sprintf("bot%s", botID), "/",
 		"getUpdates", "?", "limit=10", "&", fmt.Sprintf("offset=%d", *offset-1),
-		"&", "timeout=30", "&", "allowed_updates=[]")
+		"&", "timeout=3", "&", "allowed_updates=[]")
+	fmt.Println(url)
 	body, err := sendRequest(bytes.NewBuffer(nil), url, "application/json", "GET")
 	if err == nil {
 		fmt.Println(string(body))
@@ -97,10 +98,9 @@ func GetOffset(offset *int, botID string) error {
 	url := fmt.Sprint(
 		types.TelegramAPI,
 		fmt.Sprintf("bot%s", botID), "/",
-		"getUpdates", "?", "limit=1")
+		"getUpdates", "?", "limit=30")
 	body, err := sendRequest(bytes.NewBuffer(nil), url, "application/json", "GET")
 	if err == nil {
-
 		err = json.Unmarshal(body, tg)
 		if err == nil {
 

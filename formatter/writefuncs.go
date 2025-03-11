@@ -1692,7 +1692,7 @@ func (inf *information) WriteString(text string) error {
 func (inf *information) WriteParseMode(parsemode string) error {
 	var err error
 	if err = checkParseMode(parsemode, inf.ParseMode); err == nil {
-		inf.ParseMode = parsemode
+		inf.ParseMode, inf.GiftParseMode = parsemode, parsemode
 		logs.DataWrittenSuccessfully(interfaceParam, "Parse Mode")
 	}
 	return err
@@ -1743,6 +1743,7 @@ func (inf *information) WriteEntities(entities []*types.MessageEntity) error {
 	if err = checkEntities(entities, inf.Entities); err == nil {
 		inf.Entities = entities
 		inf.CaptionEntities = entities
+		inf.GiftEntities = entities
 		logs.DataWrittenSuccessfully(interfaceParam, "Entities")
 	}
 	return err
@@ -2884,37 +2885,6 @@ func (in *inlinemode) WriteWebAppQueryID(queryID string) error {
 	return err
 }
 
-func (in *inlinemode) WriteResult() (IResult, error) {
-	var err error
-	var r IResult
-	if in.Results == nil && in.Result == nil {
-		r = &result{}
-		in.Result = r
-	} else {
-		err = code10()
-	}
-	return r, err
-}
-
-func (in *inlinemode) WriteResults(length int) ([]IResult, error) {
-	var err error
-	var r []IResult
-	if length > 0 {
-		if in.Results == nil && in.Result == nil {
-			r = make([]IResult, length)
-			for i := range r {
-				r[i] = &result{}
-			}
-			in.Results = r
-		} else {
-			err = code10()
-		}
-	} else {
-		err = code20()
-	}
-	return r, err
-}
-
 func (in *inlinemode) WriteCacheTime(time int) error {
 	var err error
 	if err = checkIntegerValue(time, in.CacheTime); err == nil {
@@ -3025,300 +2995,238 @@ func (in *inlinemode) GetPreparedInlineMessage() types.PreparedInlineMessage {
 	return *in.inMessageResponse
 }
 
-func (r *result) WriteCachedAudio(cachedAudio *types.InlineQueryResultCachedAudio) error {
+func (in *inlinemode) addRes(res interface{}) {
+	if in.onlytothearray {
+		in.Results = append(in.Results, res)
+	} else {
+		if in.resultcounter == 0 {
+			in.Result = res
+		} else if in.resultcounter == 1 {
+			in.Results = append(in.Results, in.Result, res)
+		} else {
+			in.Results = append(in.Results, res)
+		}
+	}
+}
+
+func (in *inlinemode) WriteCachedAudio(cachedAudio *types.InlineQueryResultCachedAudio) error {
 	var err error
 	if cachedAudio != nil {
-		if r.CachedAudio == nil {
-			r.CachedAudio = cachedAudio
-			logs.DataWrittenSuccessfully(interfaceResult, "Cached Audio")
-		} else {
-			err = code10()
-		}
+		in.addRes(cachedAudio)
+		logs.DataWrittenSuccessfully(interfaceInlineMode, "Cached Audio")
 	} else {
 		err = code20()
 	}
 	return err
 }
 
-func (r *result) WriteCachedDocument(cachedDocument *types.InlineQueryResultCachedDocument) error {
+func (in *inlinemode) WriteCachedDocument(cachedDocument *types.InlineQueryResultCachedDocument) error {
 	var err error
 	if cachedDocument != nil {
-		if r.CachedDocument == nil {
-			r.CachedDocument = cachedDocument
-			logs.DataWrittenSuccessfully(interfaceResult, "Cached Document")
-		} else {
-			err = code10()
-		}
+		in.addRes(cachedDocument)
+		logs.DataWrittenSuccessfully(interfaceInlineMode, "Cached Document")
 	} else {
 		err = code20()
 	}
 	return err
 }
 
-func (r *result) WriteCachedGif(cachedGif *types.InlineQueryResultCachedGif) error {
+func (in *inlinemode) WriteCachedGif(cachedGif *types.InlineQueryResultCachedGif) error {
 	var err error
 	if cachedGif != nil {
-		if r.CachedGif == nil {
-			r.CachedGif = cachedGif
-			logs.DataWrittenSuccessfully(interfaceResult, "Cached Gif")
-		} else {
-			err = code10()
-		}
+		in.addRes(cachedGif)
+		logs.DataWrittenSuccessfully(interfaceInlineMode, "Cached Gif")
 	} else {
 		err = code20()
 	}
 	return err
 }
 
-func (r *result) WriteCachedMpeg4Gif(cachedMpeg4Gif *types.InlineQueryResultCachedMpeg4Gif) error {
+func (in *inlinemode) WriteCachedMpeg4Gif(cachedMpeg4Gif *types.InlineQueryResultCachedMpeg4Gif) error {
 	var err error
 	if cachedMpeg4Gif != nil {
-		if r.CachedMpeg4Gif == nil {
-			r.CachedMpeg4Gif = cachedMpeg4Gif
-			logs.DataWrittenSuccessfully(interfaceResult, "Cached Mpeg4 Gif")
-		} else {
-			err = code10()
-		}
+		in.addRes(cachedMpeg4Gif)
+		logs.DataWrittenSuccessfully(interfaceInlineMode, "Cached Mpeg4 Gif")
 	} else {
 		err = code20()
 	}
 	return err
 }
 
-func (r *result) WriteCachedPhoto(cachedPhoto *types.InlineQueryResultCachedPhoto) error {
+func (in *inlinemode) WriteCachedPhoto(cachedPhoto *types.InlineQueryResultCachedPhoto) error {
 	var err error
 	if cachedPhoto != nil {
-		if r.CachedPhoto == nil {
-			r.CachedPhoto = cachedPhoto
-			logs.DataWrittenSuccessfully(interfaceResult, "Cached Photo")
-		} else {
-			err = code10()
-		}
+		in.addRes(cachedPhoto)
+		logs.DataWrittenSuccessfully(interfaceInlineMode, "Cached Photo")
 	} else {
 		err = code20()
 	}
 	return err
 }
 
-func (r *result) WriteCachedSticker(cachedSticker *types.InlineQueryResultCachedSticker) error {
+func (in *inlinemode) WriteCachedSticker(cachedSticker *types.InlineQueryResultCachedSticker) error {
 	var err error
 	if cachedSticker != nil {
-		if r.CachedSticker == nil {
-			r.CachedSticker = cachedSticker
-			logs.DataWrittenSuccessfully(interfaceResult, "Cached Sticker")
-		} else {
-			err = code10()
-		}
+		in.addRes(cachedSticker)
+		logs.DataWrittenSuccessfully(interfaceInlineMode, "Cached Sticker")
 	} else {
 		err = code20()
 	}
 	return err
 }
 
-func (r *result) WriteCachedVideo(cachedVideo *types.InlineQueryResultCachedVideo) error {
+func (in *inlinemode) WriteCachedVideo(cachedVideo *types.InlineQueryResultCachedVideo) error {
 	var err error
 	if cachedVideo != nil {
-		if r.CachedVideo == nil {
-			r.CachedVideo = cachedVideo
-			logs.DataWrittenSuccessfully(interfaceResult, "Cached Video")
-		} else {
-			err = code10()
-		}
+		in.addRes(cachedVideo)
+		logs.DataWrittenSuccessfully(interfaceInlineMode, "Cached Video")
 	} else {
 		err = code20()
 	}
 	return err
 }
 
-func (r *result) WriteCachedVoice(cachedVoice *types.InlineQueryResultCachedVoice) error {
+func (in *inlinemode) WriteCachedVoice(cachedVoice *types.InlineQueryResultCachedVoice) error {
 	var err error
 	if cachedVoice != nil {
-		if r.CachedVoice == nil {
-			r.CachedVoice = cachedVoice
-			logs.DataWrittenSuccessfully(interfaceResult, "Cached Voice")
-		} else {
-			err = code10()
-		}
+		in.addRes(cachedVoice)
+		logs.DataWrittenSuccessfully(interfaceInlineMode, "Cached Voice")
 	} else {
 		err = code20()
 	}
 	return err
 }
 
-func (r *result) WriteArticle(art *types.InlineQueryResultArticle) error {
+func (in *inlinemode) WriteArticle(art *types.InlineQueryResultArticle) error {
 	var err error
 	if art != nil {
-		if r.Article == nil {
-			r.Article = art
-			logs.DataWrittenSuccessfully(interfaceResult, "Article")
-		} else {
-			err = code10()
-		}
+		in.addRes(art)
+		logs.DataWrittenSuccessfully(interfaceInlineMode, "Article")
 	} else {
 		err = code20()
 	}
 	return err
 }
 
-func (r *result) WriteAudio(ad *types.InlineQueryResultAudio) error {
+func (in *inlinemode) WriteAudio(ad *types.InlineQueryResultAudio) error {
 	var err error
 	if ad != nil {
-		if r.Audio == nil {
-			r.Audio = ad
-			logs.DataWrittenSuccessfully(interfaceResult, "Audio")
-		} else {
-			err = code10()
-		}
+		in.addRes(ad)
+		logs.DataWrittenSuccessfully(interfaceInlineMode, "Audio")
 	} else {
 		err = code20()
 	}
 	return err
 }
 
-func (r *result) WriteContact(cont *types.InlineQueryResultContact) error {
+func (in *inlinemode) WriteContact(cont *types.InlineQueryResultContact) error {
 	var err error
 	if cont != nil {
-		if r.Contact == nil {
-			r.Contact = cont
-			logs.DataWrittenSuccessfully(interfaceResult, "Contact")
-		} else {
-			err = code10()
-		}
+		in.addRes(cont)
+		logs.DataWrittenSuccessfully(interfaceInlineMode, "Contact")
 	} else {
 		err = code20()
 	}
 	return err
 }
 
-func (r *result) WriteGame(game *types.InlineQueryResultGame) error {
+func (in *inlinemode) WriteGame(game *types.InlineQueryResultGame) error {
 	var err error
 	if game != nil {
-		if r.Game == nil {
-			r.Game = game
-			logs.DataWrittenSuccessfully(interfaceResult, "Game")
-		} else {
-			err = code10()
-		}
+		in.addRes(game)
+		logs.DataWrittenSuccessfully(interfaceInlineMode, "Game")
 	} else {
 		err = code20()
 	}
 	return err
 }
 
-func (r *result) WriteDocument(doc *types.InlineQueryResultDocument) error {
+func (in *inlinemode) WriteDocument(doc *types.InlineQueryResultDocument) error {
 	var err error
 	if doc != nil {
-		if r.Document == nil {
-			r.Document = doc
-			logs.DataWrittenSuccessfully(interfaceResult, "Document")
-		} else {
-			err = code10()
-		}
+		in.addRes(doc)
+		logs.DataWrittenSuccessfully(interfaceInlineMode, "Document")
 	} else {
 		err = code20()
 	}
 	return err
 }
 
-func (r *result) WriteGif(gif *types.InlineQueryResultGif) error {
+func (in *inlinemode) WriteGif(gif *types.InlineQueryResultGif) error {
 	var err error
 	if gif != nil {
-		if r.Gif == nil {
-			r.Gif = gif
-			logs.DataWrittenSuccessfully(interfaceResult, "Gif")
-		} else {
-			err = code10()
-		}
+		in.addRes(gif)
+		logs.DataWrittenSuccessfully(interfaceInlineMode, "Gif")
 	} else {
 		err = code20()
 	}
 	return err
 }
 
-func (r *result) WriteLocation(loc *types.InlineQueryResultLocation) error {
+func (in *inlinemode) WriteLocation(loc *types.InlineQueryResultLocation) error {
 	var err error
 	if loc != nil {
-		if r.Location == nil {
-			r.Location = loc
-			logs.DataWrittenSuccessfully(interfaceResult, "Location")
-		} else {
-			err = code10()
-		}
+		in.addRes(loc)
+		logs.DataWrittenSuccessfully(interfaceInlineMode, "Location")
 	} else {
 		err = code20()
 	}
 	return err
 }
 
-func (r *result) WriteMpeg4Gif(mpeg4gif *types.InlineQueryResultMpeg4Gif) error {
+func (in *inlinemode) WriteMpeg4Gif(mpeg4gif *types.InlineQueryResultMpeg4Gif) error {
 	var err error
 	if mpeg4gif != nil {
-		if r.Mpeg4Gif == nil {
-			r.Mpeg4Gif = mpeg4gif
-			logs.DataWrittenSuccessfully(interfaceResult, "Mpeg4 Gif")
-		} else {
-			err = code10()
-		}
+		in.addRes(mpeg4gif)
+		logs.DataWrittenSuccessfully(interfaceInlineMode, "Mpeg4 Gif")
 	} else {
 		err = code20()
 	}
 	return err
 }
 
-func (r *result) WritePhoto(ph *types.InlineQueryResultPhoto) error {
+func (in *inlinemode) WritePhoto(ph *types.InlineQueryResultPhoto) error {
 	var err error
 	if ph != nil {
-		if r.Photo == nil {
-			r.Photo = ph
-			logs.DataWrittenSuccessfully(interfaceResult, "Photo")
-		} else {
-			err = code10()
-		}
+		in.addRes(ph)
+		logs.DataWrittenSuccessfully(interfaceInlineMode, "Photo")
 	} else {
 		err = code20()
 	}
 	return err
 }
 
-func (r *result) WriteVenue(ven *types.InlineQueryResultVenue) error {
+func (in *inlinemode) WriteVenue(ven *types.InlineQueryResultVenue) error {
 	var err error
 	if ven != nil {
-		if r.Venue == nil {
-			r.Venue = ven
-			logs.DataWrittenSuccessfully(interfaceResult, "Venue")
-		} else {
-			err = code10()
-		}
+		in.addRes(ven)
+		logs.DataWrittenSuccessfully(interfaceInlineMode, "Venue")
 	} else {
 		err = code20()
 	}
 	return err
 }
 
-func (r *result) WriteVideo(vd *types.InlineQueryResultVideo) error {
+func (in *inlinemode) WriteVideo(vd *types.InlineQueryResultVideo) error {
 	var err error
 	if vd != nil {
-		if r.Video == nil {
-			r.Video = vd
-			logs.DataWrittenSuccessfully(interfaceResult, "Video")
-		} else {
-			err = code10()
-		}
+		in.addRes(vd)
+		logs.DataWrittenSuccessfully(interfaceInlineMode, "Video")
 	} else {
 		err = code20()
 	}
 	return err
 }
 
-func (r *result) WriteVoice(vc *types.InlineQueryResultVoice) error {
+func (in *inlinemode) WriteIntoArray() {
+	in.onlytothearray = true
+}
+
+func (in *inlinemode) WriteVoice(vc *types.InlineQueryResultVoice) error {
 	var err error
 	if vc != nil {
-		if r.Voice == nil {
-			r.Voice = vc
-			logs.DataWrittenSuccessfully(interfaceResult, "Voice")
-		} else {
-			err = code10()
-		}
+		in.addRes(vc)
+		logs.DataWrittenSuccessfully(interfaceInlineMode, "Voice")
 	} else {
 		err = code20()
 	}
@@ -3375,9 +3283,11 @@ func (p *payment) WritePayload(payload string) error {
 
 func (p *payment) WriteProviderToken(token string) error {
 	var err error
-	if err = checkStringValue(token, p.ProviderToken); err == nil {
-		p.ProviderToken = token
+	if p.ProviderToken == nil {
+		p.ProviderToken = &token
 		logs.DataWrittenSuccessfully(interfacePayment, "Provider Token")
+	} else {
+		err = code10()
 	}
 	return err
 }
@@ -3433,9 +3343,11 @@ func (p *payment) WritePrices(prices []*types.LabeledPrice) error {
 
 func (p *payment) WriteStartParameter(prm string) error {
 	var err error
-	if err = checkStringValue(prm, p.StartParameter); err == nil {
-		p.StartParameter = prm
+	if p.StartParameter == nil {
+		p.StartParameter = &prm
 		logs.DataWrittenSuccessfully(interfacePayment, "Start Parameter")
+	} else {
+		err = code10()
 	}
 	return err
 }
@@ -3485,19 +3397,23 @@ func (p *payment) WriteMaxTipAmount(amount int) error {
 
 func (p *payment) WriteSuggestedTipAmounts(amounts []int) error {
 	var err error
-	if len(amounts) > 0 && len(amounts) <= 4 {
-		for i := 0; i < len(amounts) && err == nil; i++ {
-			if amounts[i] < 1 {
-				err = code5()
+	if p.Currency != telegramStars && p.SubscriptionPeriod == 0 {
+		if len(amounts) > 0 && len(amounts) <= 4 {
+			for i := 0; i < len(amounts) && err == nil; i++ {
+				if amounts[i] < 1 {
+					err = code5()
+				}
 			}
-		}
-		if err == nil {
-			if p.SuggestedTipAmounts == nil {
-				p.SuggestedTipAmounts = amounts
-				logs.DataWrittenSuccessfully(interfacePayment, "Suggested Tip Amounts")
-			} else {
-				err = code10()
+			if err == nil {
+				if p.SuggestedTipAmounts == nil {
+					p.SuggestedTipAmounts = amounts
+					logs.DataWrittenSuccessfully(interfacePayment, "Suggested Tip Amounts")
+				} else {
+					err = code10()
+				}
 			}
+		} else {
+			err = code20()
 		}
 	} else {
 		err = code20()
@@ -3627,11 +3543,11 @@ func (p *payment) WriteShippingID(id string) error {
 	return err
 }
 
-func (p *payment) WriteOK() error {
+func (p *payment) WriteOK(b bool) error {
 	var err error
-	if !p.OK {
-		p.OK = true
-		logs.SettedParam("OK", interfacePayment, true)
+	if p.OK == nil {
+		p.OK = &b
+		logs.SettedParam("OK", interfacePayment, b)
 	} else {
 		err = code10()
 	}
@@ -3674,30 +3590,6 @@ func (p *payment) WritePreCheckoutID(id string) error {
 	if err = checkStringValue(id, p.PreCheckoutID); err == nil {
 		p.PreCheckoutID = id
 		logs.DataWrittenSuccessfully(interfacePayment, "Pre-Checkout ID")
-	}
-	return err
-}
-
-func (p *payment) WriteLimit(limit int) error {
-	var err error
-	if limit > 0 && limit <= 100 {
-		if p.Limit == 0 {
-			p.Limit = limit
-			logs.DataWrittenSuccessfully(interfacePayment, "Limit")
-		} else {
-			err = code10()
-		}
-	} else {
-		err = code20()
-	}
-	return err
-}
-
-func (p *payment) WriteOffset(offset int) error {
-	var err error
-	if err = checkIntegerValue(offset, p.Offset); err == nil {
-		p.Offset = offset
-		logs.DataWrittenSuccessfully(interfacePayment, "Offset")
 	}
 	return err
 }

@@ -2,6 +2,7 @@ package formatter
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"mime/multipart"
 	"os"
@@ -184,9 +185,17 @@ func (*videonote) uniqueConst() int {
 
 func (st *sticker) proccessFile(wr *multipart.Writer, cnttype *string, isgroup bool) error {
 	var err error
+	var fieldname string
 	if st.stickerGottenFrom == Storage {
-		err = writeFileToMultipart(wr, "sticker", st.Sticker)
-		st.Sticker = ""
+		if !isgroup {
+			fieldname = "sticker"
+		} else {
+			fieldname = st.Sticker
+		}
+		err = writeFileToMultipart(wr, fieldname, st.Sticker)
+		if isgroup {
+			st.Sticker = fmt.Sprintf("attach://%s", st.Sticker)
+		}
 		*cnttype = wr.FormDataContentType()
 	}
 	if st.thumbnailGottenFrom == Storage {
