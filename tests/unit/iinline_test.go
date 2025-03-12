@@ -3,7 +3,7 @@ package unit
 import (
 	"testing"
 
-	"github.com/l1qwie/Fmtogram/formatter"
+	"github.com/iamissahar/Fmtogram/formatter"
 )
 
 type inlineT struct {
@@ -82,10 +82,10 @@ func (in *inlineT) callSliceF(f func([]int) error, t *testing.T) {
 func (in *inlineT) startTest(part string, i int, t *testing.T) {
 	switch f := in.testedFunc.(type) {
 	case func(int, int) (formatter.IInlineButton, error):
-		printTestLog(part, in.name, in.codeErr, in.integer, in.isExpectedErr, i)
+		printTestLog(part, in.name, in.codeErr, in.integer, in.isExpectedErr, i, t)
 		in.callDIntF(f, t)
 	case func([]int) error:
-		printTestLog(part, in.name, in.codeErr, in.array, in.isExpectedErr, i)
+		printTestLog(part, in.name, in.codeErr, in.array, in.isExpectedErr, i, t)
 		in.callSliceF(f, t)
 	default:
 		t.Logf("%T", f)
@@ -126,6 +126,7 @@ func (intc *inTestContainer) mainLogic(msg *formatter.Message, t *testing.T) {
 }
 
 func TestInlineNewButtton(t *testing.T) {
+	t.Parallel()
 	intc := new(inTestContainer)
 	intc.newButton()
 	msg := formatter.CreateEmpltyMessage()
@@ -133,6 +134,7 @@ func TestInlineNewButtton(t *testing.T) {
 }
 
 func TestInlineSet(t *testing.T) {
+	t.Parallel()
 	intc := new(inTestContainer)
 	intc.set()
 	msg := formatter.CreateEmpltyMessage()

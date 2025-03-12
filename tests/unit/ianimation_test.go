@@ -3,7 +3,7 @@ package unit
 import (
 	"testing"
 
-	"github.com/l1qwie/Fmtogram/formatter"
+	"github.com/iamissahar/Fmtogram/formatter"
 )
 
 type animationT struct {
@@ -63,7 +63,7 @@ func putWriteAnimationHasSpoiler(antc anTestContainer, an formatter.IAnimation, 
 
 func (antc *anTestContainer) writeAnimationStorage() {
 	antc.name = "(IAnimation).WriteAnimationStorage"
-	antc.inputStr = []string{"../media_test/prichinatryski.mp4", "", "../media_test/tel-aviv.jpg", "../media_test/prichinatryski.mp4", "../media_test/prichinatryski.mp4"}
+	antc.inputStr = []string{"../media/prichinatryski.mp4", "", "../media/tel-aviv.jpg", "../media/prichinatryski.mp4", "../media/prichinatryski.mp4"}
 	antc.isExpectedErr = []bool{false, true, true, false, true}
 	antc.codeErr = []string{"", "20", "12", "", "10"}
 	antc.amount, antc.until = 5, 3
@@ -117,7 +117,7 @@ func (antc *anTestContainer) writeHeight() {
 
 func (antc *anTestContainer) writeThumbnail() {
 	antc.name = "(IAnimation).WriteThumbnail"
-	antc.inputStr = []string{"../media_test/tel-aviv.jpg", "", "../media_test/sound.mp3", "../media_test/tel-aviv.jpg", "../media_test/tel-aviv.jpg"}
+	antc.inputStr = []string{"../media/tel-aviv.jpg", "", "../media/sound.mp3", "../media/tel-aviv.jpg", "../media/tel-aviv.jpg"}
 	antc.isExpectedErr = []bool{false, true, true, false, true}
 	antc.codeErr = []string{"", "20", "12", "", "10"}
 	antc.amount, antc.until = 5, 3
@@ -180,13 +180,13 @@ func (an *animationT) callBoolF(testedF func() error, t *testing.T) {
 func (an *animationT) startTest(part string, i int, t *testing.T) {
 	switch f := an.testedFunc.(type) {
 	case func(string) error:
-		printTestLog(part, an.name, an.codeErr, an.str, an.isExpectedErr, i)
+		printTestLog(part, an.name, an.codeErr, an.str, an.isExpectedErr, i, t)
 		an.callStrF(f, t)
 	case func(int) error:
-		printTestLog(part, an.name, an.codeErr, an.integer, an.isExpectedErr, i)
+		printTestLog(part, an.name, an.codeErr, an.integer, an.isExpectedErr, i, t)
 		an.callIntF(f, t)
 	case func() error:
-		printTestLog(part, an.name, an.codeErr, true, an.isExpectedErr, i)
+		printTestLog(part, an.name, an.codeErr, true, an.isExpectedErr, i, t)
 		an.callBoolF(f, t)
 	default:
 		t.Fatal("unexpected type of tested function")
@@ -218,6 +218,7 @@ func mainAnimationLogic(msg *formatter.Message, antc anTestContainer, t *testing
 }
 
 func TestWriteAnimationStorage(t *testing.T) {
+	t.Parallel()
 	antc := new(anTestContainer)
 	antc.writeAnimationStorage()
 	msg := formatter.CreateEmpltyMessage()
@@ -225,6 +226,7 @@ func TestWriteAnimationStorage(t *testing.T) {
 }
 
 func TestWriteAnimationTelegram(t *testing.T) {
+	t.Parallel()
 	antc := new(anTestContainer)
 	antc.writeAnimationTelegram()
 	msg := formatter.CreateEmpltyMessage()
@@ -232,6 +234,7 @@ func TestWriteAnimationTelegram(t *testing.T) {
 }
 
 func TestWriteAnimationInternet(t *testing.T) {
+	t.Parallel()
 	antc := new(anTestContainer)
 	antc.writeAnimationInternet()
 	msg := formatter.CreateEmpltyMessage()
@@ -239,6 +242,7 @@ func TestWriteAnimationInternet(t *testing.T) {
 }
 
 func TestWriteAnimationDuration(t *testing.T) {
+	t.Parallel()
 	antc := new(anTestContainer)
 	antc.writeDuration()
 	msg := formatter.CreateEmpltyMessage()
@@ -246,6 +250,7 @@ func TestWriteAnimationDuration(t *testing.T) {
 }
 
 func TestWriteAnimationWidth(t *testing.T) {
+	t.Parallel()
 	antc := new(anTestContainer)
 	antc.writeWidth()
 	msg := formatter.CreateEmpltyMessage()
@@ -253,6 +258,7 @@ func TestWriteAnimationWidth(t *testing.T) {
 }
 
 func TestWriteAnimationHeight(t *testing.T) {
+	t.Parallel()
 	antc := new(anTestContainer)
 	antc.writeHeight()
 	msg := formatter.CreateEmpltyMessage()
@@ -260,6 +266,7 @@ func TestWriteAnimationHeight(t *testing.T) {
 }
 
 func TestWriteAnimationThumbnailStorage(t *testing.T) {
+	t.Parallel()
 	antc := new(anTestContainer)
 	antc.writeThumbnail()
 	msg := formatter.CreateEmpltyMessage()
@@ -267,6 +274,7 @@ func TestWriteAnimationThumbnailStorage(t *testing.T) {
 }
 
 func TestWriteAnimationThumbnailTelegram(t *testing.T) {
+	t.Parallel()
 	antc := new(anTestContainer)
 	antc.writeThumbnailID()
 	msg := formatter.CreateEmpltyMessage()
@@ -274,6 +282,7 @@ func TestWriteAnimationThumbnailTelegram(t *testing.T) {
 }
 
 func TestWriteAnimationHasSpoiler(t *testing.T) {
+	t.Parallel()
 	antc := new(anTestContainer)
 	antc.writeHasSpoiler()
 	msg := formatter.CreateEmpltyMessage()

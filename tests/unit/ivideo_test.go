@@ -3,8 +3,8 @@ package unit
 import (
 	"testing"
 
-	"github.com/l1qwie/Fmtogram/formatter"
-	"github.com/l1qwie/Fmtogram/types"
+	"github.com/iamissahar/Fmtogram/formatter"
+	"github.com/iamissahar/Fmtogram/types"
 )
 
 type videoT struct {
@@ -98,7 +98,7 @@ func putWriteCoverInternet(vdtc vdTestContainer, vd formatter.IVideo, i int) *vi
 
 func (vdtc *vdTestContainer) writeVideoStorage() {
 	vdtc.name = "(IVideo).WriteVideoStorage"
-	vdtc.inputStr = []string{"../media_test/black.mp4", "", "../media_test/sound.mp3", "../media_test/musk.mp4", "../media_test/black.mp4"}
+	vdtc.inputStr = []string{"../media/black.mp4", "", "../media/sound.mp3", "../media/musk.mp4", "../media/black.mp4"}
 	vdtc.isExpectedErr = []bool{false, true, true, false, true}
 	vdtc.codeErr = []string{"", "20", "12", "", "10"}
 	vdtc.amount, vdtc.until = 5, 3
@@ -198,7 +198,7 @@ func (vdtc *vdTestContainer) writeSupportStreaming() {
 
 func (vdtc *vdTestContainer) writeThumbnail() {
 	vdtc.name = "(IVideo).WriteThumbnail"
-	vdtc.inputStr = []string{"../media_test/tel-aviv.jpg", "", "../media_test/sound.mp3", "../media_test/tel-aviv.jpg", "../media_test/tel-aviv.jpg"}
+	vdtc.inputStr = []string{"../media/tel-aviv.jpg", "", "../media/sound.mp3", "../media/tel-aviv.jpg", "../media/tel-aviv.jpg"}
 	vdtc.isExpectedErr = []bool{false, true, true, false, true}
 	vdtc.codeErr = []string{"", "20", "12", "", "10"}
 	vdtc.amount, vdtc.until = 5, 3
@@ -301,16 +301,16 @@ func (vd *videoT) callBoolF(testedF func() error, t *testing.T) {
 func (vd *videoT) startTest(part string, i int, t *testing.T) {
 	switch f := vd.testedFunc.(type) {
 	case func(string) error:
-		printTestLog(part, vd.name, vd.codeErr, vd.str, vd.isExpectedErr, i)
+		printTestLog(part, vd.name, vd.codeErr, vd.str, vd.isExpectedErr, i, t)
 		vd.callStrF(f, t)
 	case func(int) error:
-		printTestLog(part, vd.name, vd.codeErr, vd.integer, vd.isExpectedErr, i)
+		printTestLog(part, vd.name, vd.codeErr, vd.integer, vd.isExpectedErr, i, t)
 		vd.callIntF(f, t)
 	case func([]*types.MessageEntity) error:
-		printTestLog(part, vd.name, vd.codeErr, vd.array, vd.isExpectedErr, i)
+		printTestLog(part, vd.name, vd.codeErr, vd.array, vd.isExpectedErr, i, t)
 		vd.callSliceF(f, t)
 	case func() error:
-		printTestLog(part, vd.name, vd.codeErr, true, vd.isExpectedErr, i)
+		printTestLog(part, vd.name, vd.codeErr, true, vd.isExpectedErr, i, t)
 		vd.callBoolF(f, t)
 	default:
 		t.Fatal("unexpected type of tested function")
@@ -342,6 +342,7 @@ func mainVideoLogic(msg *formatter.Message, vdtc vdTestContainer, t *testing.T) 
 }
 
 func TestWriteVideoStorage(t *testing.T) {
+	t.Parallel()
 	vdtc := new(vdTestContainer)
 	vdtc.writeVideoStorage()
 	msg := formatter.CreateEmpltyMessage()
@@ -349,6 +350,7 @@ func TestWriteVideoStorage(t *testing.T) {
 }
 
 func TestWriteVideoTelegram(t *testing.T) {
+	t.Parallel()
 	vdtc := new(vdTestContainer)
 	vdtc.writeVideoTelegram()
 	msg := formatter.CreateEmpltyMessage()
@@ -356,6 +358,7 @@ func TestWriteVideoTelegram(t *testing.T) {
 }
 
 func TestWriteVideoInternet(t *testing.T) {
+	t.Parallel()
 	vdtc := new(vdTestContainer)
 	vdtc.writeVideoInternet()
 	msg := formatter.CreateEmpltyMessage()
@@ -363,6 +366,7 @@ func TestWriteVideoInternet(t *testing.T) {
 }
 
 func TestWriteVideoCaption(t *testing.T) {
+	t.Parallel()
 	vdtc := new(vdTestContainer)
 	vdtc.writeCaption()
 	msg := formatter.CreateEmpltyMessage()
@@ -370,6 +374,7 @@ func TestWriteVideoCaption(t *testing.T) {
 }
 
 func TestWriteVideoCaptionEntities(t *testing.T) {
+	t.Parallel()
 	vdtc := new(vdTestContainer)
 	vdtc.writeCaptionEntities()
 	msg := formatter.CreateEmpltyMessage()
@@ -377,6 +382,7 @@ func TestWriteVideoCaptionEntities(t *testing.T) {
 }
 
 func TestWriteVideoDuration(t *testing.T) {
+	t.Parallel()
 	vdtc := new(vdTestContainer)
 	vdtc.writeDuration()
 	msg := formatter.CreateEmpltyMessage()
@@ -384,6 +390,7 @@ func TestWriteVideoDuration(t *testing.T) {
 }
 
 func TestWriteVideoHasSpoiler(t *testing.T) {
+	t.Parallel()
 	vdtc := new(vdTestContainer)
 	vdtc.writeHasSpoiler()
 	msg := formatter.CreateEmpltyMessage()
@@ -391,6 +398,7 @@ func TestWriteVideoHasSpoiler(t *testing.T) {
 }
 
 func TestWriteVideoHeight(t *testing.T) {
+	t.Parallel()
 	vdtc := new(vdTestContainer)
 	vdtc.writeHeight()
 	msg := formatter.CreateEmpltyMessage()
@@ -398,6 +406,7 @@ func TestWriteVideoHeight(t *testing.T) {
 }
 
 func TestWriteVideoParseMode(t *testing.T) {
+	t.Parallel()
 	vdtc := new(vdTestContainer)
 	vdtc.writeParseMode()
 	msg := formatter.CreateEmpltyMessage()
@@ -405,6 +414,7 @@ func TestWriteVideoParseMode(t *testing.T) {
 }
 
 func TestWriteVideoShowCaptionAboveMedia(t *testing.T) {
+	t.Parallel()
 	vdtc := new(vdTestContainer)
 	vdtc.writeShowCaptionAboveMedia()
 	msg := formatter.CreateEmpltyMessage()
@@ -412,6 +422,7 @@ func TestWriteVideoShowCaptionAboveMedia(t *testing.T) {
 }
 
 func TestWriteVideoSupportStreaming(t *testing.T) {
+	t.Parallel()
 	vdtc := new(vdTestContainer)
 	vdtc.writeSupportStreaming()
 	msg := formatter.CreateEmpltyMessage()
@@ -419,6 +430,7 @@ func TestWriteVideoSupportStreaming(t *testing.T) {
 }
 
 func TestWriteVideoThumbnail(t *testing.T) {
+	t.Parallel()
 	vdtc := new(vdTestContainer)
 	vdtc.writeThumbnail()
 	msg := formatter.CreateEmpltyMessage()
@@ -426,6 +438,7 @@ func TestWriteVideoThumbnail(t *testing.T) {
 }
 
 func TestWriteVideoThumbnailID(t *testing.T) {
+	t.Parallel()
 	vdtc := new(vdTestContainer)
 	vdtc.writeThumbnailID()
 	msg := formatter.CreateEmpltyMessage()
@@ -433,6 +446,7 @@ func TestWriteVideoThumbnailID(t *testing.T) {
 }
 
 func TestWriteVideoWidth(t *testing.T) {
+	t.Parallel()
 	vdtc := new(vdTestContainer)
 	vdtc.writeWidth()
 	msg := formatter.CreateEmpltyMessage()
@@ -440,6 +454,7 @@ func TestWriteVideoWidth(t *testing.T) {
 }
 
 func TestWriteCoverStorage(t *testing.T) {
+	t.Parallel()
 	vdtc := new(vdTestContainer)
 	vdtc.writeCoverStorage()
 	msg := formatter.CreateEmpltyMessage()
@@ -447,6 +462,7 @@ func TestWriteCoverStorage(t *testing.T) {
 }
 
 func TestWriteCoverTelegram(t *testing.T) {
+	t.Parallel()
 	vdtc := new(vdTestContainer)
 	vdtc.writeCoverTelegram()
 	msg := formatter.CreateEmpltyMessage()
@@ -454,6 +470,7 @@ func TestWriteCoverTelegram(t *testing.T) {
 }
 
 func TestWriteCoverInternet(t *testing.T) {
+	t.Parallel()
 	vdtc := new(vdTestContainer)
 	vdtc.writeCoverInternet()
 	msg := formatter.CreateEmpltyMessage()

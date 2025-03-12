@@ -3,7 +3,7 @@ package unit
 import (
 	"testing"
 
-	"github.com/l1qwie/Fmtogram/formatter"
+	"github.com/iamissahar/Fmtogram/formatter"
 )
 
 type replyT struct {
@@ -165,16 +165,16 @@ func (rp *replyT) callBoolF(f func() error, t *testing.T) {
 func (rp *replyT) startTest(part string, i int, t *testing.T) {
 	switch f := rp.testedFunc.(type) {
 	case func(string) error:
-		printTestLog(part, rp.name, rp.codeErr, rp.str, rp.isExpectedErr, i)
+		printTestLog(part, rp.name, rp.codeErr, rp.str, rp.isExpectedErr, i, t)
 		rp.callStrF(f, t)
 	case func(int, int) (formatter.IReplyButton, error):
-		printTestLog(part, rp.name, rp.codeErr, rp.integer, rp.isExpectedErr, i)
+		printTestLog(part, rp.name, rp.codeErr, rp.integer, rp.isExpectedErr, i, t)
 		rp.callDIntF(f, t)
 	case func([]int) error:
-		printTestLog(part, rp.name, rp.codeErr, rp.array, rp.isExpectedErr, i)
+		printTestLog(part, rp.name, rp.codeErr, rp.array, rp.isExpectedErr, i, t)
 		rp.callSliceF(f, t)
 	case func() error:
-		printTestLog(part, rp.name, rp.codeErr, true, rp.isExpectedErr, i)
+		printTestLog(part, rp.name, rp.codeErr, true, rp.isExpectedErr, i, t)
 		rp.callBoolF(f, t)
 	default:
 		t.Logf("%T", f)
@@ -222,6 +222,7 @@ func TestReplyNewButton(t *testing.T) {
 }
 
 func TestReplySet(t *testing.T) {
+	t.Parallel()
 	rptc := new(rpTestContainer)
 	rptc.set()
 	msg := formatter.CreateEmpltyMessage()
@@ -229,6 +230,7 @@ func TestReplySet(t *testing.T) {
 }
 
 func TestReplyWriteIsPersistent(t *testing.T) {
+	t.Parallel()
 	rptc := new(rpTestContainer)
 	rptc.writeIsPersistent()
 	msg := formatter.CreateEmpltyMessage()
@@ -236,6 +238,7 @@ func TestReplyWriteIsPersistent(t *testing.T) {
 }
 
 func TestReplyWriteResizeKeyboard(t *testing.T) {
+	t.Parallel()
 	rptc := new(rpTestContainer)
 	rptc.writeResizeKeyboard()
 	msg := formatter.CreateEmpltyMessage()
@@ -243,6 +246,7 @@ func TestReplyWriteResizeKeyboard(t *testing.T) {
 }
 
 func TestReplyWriteOneTimeKeyboard(t *testing.T) {
+	t.Parallel()
 	rptc := new(rpTestContainer)
 	rptc.writeOneTimeKeyboard()
 	msg := formatter.CreateEmpltyMessage()
@@ -250,6 +254,7 @@ func TestReplyWriteOneTimeKeyboard(t *testing.T) {
 }
 
 func TestReplyWriteInputFieldPlaceholder(t *testing.T) {
+	t.Parallel()
 	rptc := new(rpTestContainer)
 	rptc.writeInputFieldPlaceholder()
 	msg := formatter.CreateEmpltyMessage()
@@ -257,6 +262,7 @@ func TestReplyWriteInputFieldPlaceholder(t *testing.T) {
 }
 
 func TestReplyWriteRemove(t *testing.T) {
+	t.Parallel()
 	rptc := new(rpTestContainer)
 	rptc.writeRemove()
 	msg := formatter.CreateEmpltyMessage()

@@ -4,8 +4,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/l1qwie/Fmtogram/formatter"
-	"github.com/l1qwie/Fmtogram/types"
+	"github.com/iamissahar/Fmtogram/formatter"
+	"github.com/iamissahar/Fmtogram/types"
 )
 
 type stickerT struct {
@@ -122,7 +122,7 @@ func (sttc *stTestContainer) giftID(st formatter.ISticker, s *stickerT, i int) {
 
 func (sttc *stTestContainer) writeStickerStorage() {
 	sttc.name = "(ISticker).WriteStickerStorage()"
-	sttc.inputStr = []string{"../media_test/sticker.webp", "", "../media_test/Resume.pdf", "../media_test/sticker.webp", "../media_test/sticker.webp"}
+	sttc.inputStr = []string{"../media/sticker.webp", "", "../media/Resume.pdf", "../media/sticker.webp", "../media/sticker.webp"}
 	sttc.isExpectedErr = []bool{false, true, true, false, true}
 	sttc.codeErr = []string{"", "20", "12", "", "10"}
 	sttc.amount, sttc.until = 5, 3
@@ -248,11 +248,11 @@ func (sttc *stTestContainer) writeMaskPosition() {
 
 func (sttc *stTestContainer) writeThumbnailStorage() {
 	sttc.name = "(ISticker).WriteThumbnailStorage()"
-	sttc.inputStr = []string{"../media_test/cookie.png",
-		"../media_test/sticker.webp",
-		"../media_test/prichinatryski.webm", "",
-		"../media_test/tel-aviv.jpg",
-		"../media_test/cookie.png", "../media_test/cookie.png"}
+	sttc.inputStr = []string{"../media/cookie.png",
+		"../media/sticker.webp",
+		"../media/prichinatryski.webm", "",
+		"../media/tel-aviv.jpg",
+		"../media/cookie.png", "../media/cookie.png"}
 	sttc.isExpectedErr = []bool{false, false, false, true, true, false, true}
 	sttc.codeErr = []string{"", "", "", "20", "12", "", "10"}
 	sttc.amount, sttc.until = 7, 5
@@ -298,19 +298,19 @@ func (sttc *stTestContainer) writeGiftID() {
 func (st *stickerT) startTest(part string, i int, t *testing.T) {
 	switch f := st.testedFunc.(type) {
 	case func(string) error:
-		printTestLog(part, st.name, st.codeErr, st.str, st.isExpectedErr, i)
+		printTestLog(part, st.name, st.codeErr, st.str, st.isExpectedErr, i, t)
 		checkError(f(st.str), st.isExpectedErr, st.codeErr, t)
 	case func([]string) error:
-		printTestLog(part, st.name, st.codeErr, st.array, st.isExpectedErr, i)
+		printTestLog(part, st.name, st.codeErr, st.array, st.isExpectedErr, i, t)
 		checkError(f(st.array), st.isExpectedErr, st.codeErr, t)
 	case func(*types.MaskPosition) error:
-		printTestLog(part, st.name, st.codeErr, st.maskPos, st.isExpectedErr, i)
+		printTestLog(part, st.name, st.codeErr, st.maskPos, st.isExpectedErr, i, t)
 		checkError(f(st.maskPos), st.isExpectedErr, st.codeErr, t)
 	case func([]*types.MessageEntity) error:
-		printTestLog(part, st.name, st.codeErr, st.ent, st.isExpectedErr, i)
+		printTestLog(part, st.name, st.codeErr, st.ent, st.isExpectedErr, i, t)
 		checkError(f(st.ent), st.isExpectedErr, st.codeErr, t)
 	case func() error:
-		printTestLog(part, st.name, st.codeErr, true, st.isExpectedErr, i)
+		printTestLog(part, st.name, st.codeErr, true, st.isExpectedErr, i, t)
 		checkError(f(), st.isExpectedErr, st.codeErr, t)
 	default:
 		t.Fatal("unexpected type of tested function")
@@ -344,6 +344,7 @@ func (sttc *stTestContainer) mainLogic(msg *formatter.Message, t *testing.T) {
 }
 
 func TestStickerWriteStickerStorage(t *testing.T) {
+	t.Parallel()
 	sttc := new(stTestContainer)
 	sttc.writeStickerStorage()
 	msg := formatter.CreateEmpltyMessage()
@@ -351,6 +352,7 @@ func TestStickerWriteStickerStorage(t *testing.T) {
 }
 
 func TestStickerWriteStickerTelegram(t *testing.T) {
+	t.Parallel()
 	sttc := new(stTestContainer)
 	sttc.writeStickerTelegram()
 	msg := formatter.CreateEmpltyMessage()
@@ -358,6 +360,7 @@ func TestStickerWriteStickerTelegram(t *testing.T) {
 }
 
 func TestStickerWriteStickerInternet(t *testing.T) {
+	t.Parallel()
 	sttc := new(stTestContainer)
 	sttc.writeStickerInternet()
 	msg := formatter.CreateEmpltyMessage()
@@ -365,6 +368,7 @@ func TestStickerWriteStickerInternet(t *testing.T) {
 }
 
 func TestStickerWriteAssociatedEmoji(t *testing.T) {
+	t.Parallel()
 	sttc := new(stTestContainer)
 	sttc.writeAssociatedEmoji()
 	msg := formatter.CreateEmpltyMessage()
@@ -372,6 +376,7 @@ func TestStickerWriteAssociatedEmoji(t *testing.T) {
 }
 
 func TestStickerWriteAssociatedEmojies(t *testing.T) {
+	t.Parallel()
 	sttc := new(stTestContainer)
 	sttc.writeAssociatedEmojies()
 	msg := formatter.CreateEmpltyMessage()
@@ -379,6 +384,7 @@ func TestStickerWriteAssociatedEmojies(t *testing.T) {
 }
 
 func TestStickerWriteEmojiID(t *testing.T) {
+	t.Parallel()
 	sttc := new(stTestContainer)
 	sttc.writeEmojiID()
 	msg := formatter.CreateEmpltyMessage()
@@ -386,6 +392,7 @@ func TestStickerWriteEmojiID(t *testing.T) {
 }
 
 func TestStickerWriteEmojiIDs(t *testing.T) {
+	t.Parallel()
 	sttc := new(stTestContainer)
 	sttc.writeEmojiIDs()
 	msg := formatter.CreateEmpltyMessage()
@@ -393,6 +400,7 @@ func TestStickerWriteEmojiIDs(t *testing.T) {
 }
 
 func TestStickerWroteFormat(t *testing.T) {
+	t.Parallel()
 	sttc := new(stTestContainer)
 	sttc.writeFormat()
 	msg := formatter.CreateEmpltyMessage()
@@ -400,6 +408,7 @@ func TestStickerWroteFormat(t *testing.T) {
 }
 
 func TestStcikerWritePosition(t *testing.T) {
+	t.Parallel()
 	sttc := new(stTestContainer)
 	sttc.writePosition()
 	msg := formatter.CreateEmpltyMessage()
@@ -407,6 +416,7 @@ func TestStcikerWritePosition(t *testing.T) {
 }
 
 func TestStickerWriteOldSticker(t *testing.T) {
+	t.Parallel()
 	sttc := new(stTestContainer)
 	sttc.writeOldSticker()
 	msg := formatter.CreateEmpltyMessage()
@@ -414,6 +424,7 @@ func TestStickerWriteOldSticker(t *testing.T) {
 }
 
 func TestStickerWriteKeywords(t *testing.T) {
+	t.Parallel()
 	sttc := new(stTestContainer)
 	sttc.writeKeywords()
 	msg := formatter.CreateEmpltyMessage()
@@ -421,6 +432,7 @@ func TestStickerWriteKeywords(t *testing.T) {
 }
 
 func TestStickerWriteMaskPosition(t *testing.T) {
+	t.Parallel()
 	sttc := new(stTestContainer)
 	sttc.writeMaskPosition()
 	msg := formatter.CreateEmpltyMessage()
@@ -428,6 +440,7 @@ func TestStickerWriteMaskPosition(t *testing.T) {
 }
 
 func TestStikerWriteThumbnailStorage(t *testing.T) {
+	t.Parallel()
 	sttc := new(stTestContainer)
 	sttc.writeThumbnailStorage()
 	msg := formatter.CreateEmpltyMessage()
@@ -435,6 +448,7 @@ func TestStikerWriteThumbnailStorage(t *testing.T) {
 }
 
 func TestStikerWriteThumbnailTelegra(t *testing.T) {
+	t.Parallel()
 	sttc := new(stTestContainer)
 	sttc.writeThumbnailTelegram()
 	msg := formatter.CreateEmpltyMessage()
@@ -442,6 +456,7 @@ func TestStikerWriteThumbnailTelegra(t *testing.T) {
 }
 
 func TestStikerWriteThumbnailInternet(t *testing.T) {
+	t.Parallel()
 	sttc := new(stTestContainer)
 	sttc.writeThumbnailInternet()
 	msg := formatter.CreateEmpltyMessage()
@@ -449,6 +464,7 @@ func TestStikerWriteThumbnailInternet(t *testing.T) {
 }
 
 func TestStikerWriteGiftID(t *testing.T) {
+	t.Parallel()
 	sttc := new(stTestContainer)
 	sttc.writeThumbnailFormat()
 	msg := formatter.CreateEmpltyMessage()
@@ -456,6 +472,7 @@ func TestStikerWriteGiftID(t *testing.T) {
 }
 
 func TestStickerWriteGiftID(t *testing.T) {
+	t.Parallel()
 	sttc := new(stTestContainer)
 	sttc.writeGiftID()
 	msg := formatter.CreateEmpltyMessage()

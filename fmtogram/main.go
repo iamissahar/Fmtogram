@@ -4,15 +4,20 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/l1qwie/Fmtogram/executer"
-	"github.com/l1qwie/Fmtogram/fmerrors"
-	"github.com/l1qwie/Fmtogram/formatter"
-	"github.com/l1qwie/Fmtogram/helper"
-	"github.com/l1qwie/Fmtogram/logs"
-	"github.com/l1qwie/Fmtogram/types"
+	"github.com/iamissahar/Fmtogram/executer"
+	"github.com/iamissahar/Fmtogram/fmerrors"
+	"github.com/iamissahar/Fmtogram/formatter"
+	"github.com/iamissahar/Fmtogram/helper"
+	"github.com/iamissahar/Fmtogram/logs"
+	"github.com/iamissahar/Fmtogram/types"
 )
 
-var StartFunc func(*types.Telegram, *types.Telegram, *formatter.Message)
+type BasicSettings struct {
+	StartFunc func(formatter.ITelegram, *formatter.Message)
+	Token     string
+}
+
+var StartFunc func(formatter.ITelegram, *formatter.Message)
 
 func firstStep(offset *int, botID string) {
 	logs.GetOffset()
@@ -43,7 +48,7 @@ func queue(reg *executer.RegTable, tg *types.Telegram, chatID int, index *int) {
 	}
 }
 
-func pullResponse(reg *executer.RegTable, botID string, startFunc func(*types.Telegram, *types.Telegram, *formatter.Message)) {
+func pullResponse(reg *executer.RegTable, botID string, startFunc func(formatter.ITelegram, *formatter.Message)) {
 	var offset int
 	firstStep(&offset, botID)
 	for {
@@ -66,7 +71,7 @@ func pullResponse(reg *executer.RegTable, botID string, startFunc func(*types.Te
 	}
 }
 
-func worker(input chan *types.Telegram, returned chan *types.Telegram, botID string, startFunc func(*types.Telegram, *types.Telegram, *formatter.Message)) {
+func worker(input chan *types.Telegram, returned chan *types.Telegram, botID string, startFunc func(formatter.ITelegram, *formatter.Message)) {
 	tg := new(types.Telegram)
 	tgReturned := new(types.Telegram)
 
@@ -80,20 +85,15 @@ func worker(input chan *types.Telegram, returned chan *types.Telegram, botID str
 		}
 		logs.CallDeveloperFunc()
 		mes := formatter.CreateMessage(tg, botID)
-		startFunc(tg, tgReturned, mes)
+		startFunc(tg, mes)
 	}
 }
 
-func Start() {
+func (bs *BasicSettings) Start() {
 	defer logs.TurnOff()
 	logs.DebugOrInfo()
 	logs.TurnOn()
 
 	reg := new(executer.RegTable)
-	pullResponse(reg, types.BotID, StartFunc)
-}
-
-func ListenTo(botID string, startFunc func(*types.Telegram, *types.Telegram, *formatter.Message)) {
-	reg := new(executer.RegTable)
-	go pullResponse(reg, botID, startFunc)
+	go pullResponse(reg, bs.Token, bs.StartFunc)
 }

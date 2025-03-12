@@ -3,7 +3,7 @@ package unit
 import (
 	"testing"
 
-	"github.com/l1qwie/Fmtogram/formatter"
+	"github.com/iamissahar/Fmtogram/formatter"
 )
 
 type voiceT struct {
@@ -43,7 +43,7 @@ func putWriteVoiceDuration(vctc vcTestContainer, vc formatter.IVoice, i int) *vo
 
 func (vctc *vcTestContainer) writeVoiceStorage() {
 	vctc.name = "(IVoice).WriteVoiceStorage"
-	vctc.inputStr = []string{"../media_test/prichinatryski.mp4", "", "../media_test/tel-aviv.jpg", "../media_test/prichinatryski.mp4", "../media_test/prichinatryski.mp4"}
+	vctc.inputStr = []string{"../media/prichinatryski.mp4", "", "../media/tel-aviv.jpg", "../media/prichinatryski.mp4", "../media/prichinatryski.mp4"}
 	vctc.isExpectedErr = []bool{false, true, true, false, true}
 	vctc.codeErr = []string{"", "20", "12", "", "10"}
 	vctc.amount, vctc.until = 5, 3
@@ -104,10 +104,10 @@ func (vc *voiceT) callIntF(testedF func(int) error, t *testing.T) {
 func (vc *voiceT) startTest(part string, i int, t *testing.T) {
 	switch f := vc.testedFunc.(type) {
 	case func(string) error:
-		printTestLog(part, vc.name, vc.codeErr, vc.str, vc.isExpectedErr, i)
+		printTestLog(part, vc.name, vc.codeErr, vc.str, vc.isExpectedErr, i, t)
 		vc.callStrF(f, t)
 	case func(int) error:
-		printTestLog(part, vc.name, vc.codeErr, vc.integer, vc.isExpectedErr, i)
+		printTestLog(part, vc.name, vc.codeErr, vc.integer, vc.isExpectedErr, i, t)
 		vc.callIntF(f, t)
 	default:
 		t.Fatal("unexpected type of tested function")
@@ -139,6 +139,7 @@ func mainVoiceLogic(msg *formatter.Message, antc vcTestContainer, t *testing.T) 
 }
 
 func TestWriteVoiceStorage(t *testing.T) {
+	t.Parallel()
 	antc := new(vcTestContainer)
 	antc.writeVoiceStorage()
 	msg := formatter.CreateEmpltyMessage()
@@ -146,6 +147,7 @@ func TestWriteVoiceStorage(t *testing.T) {
 }
 
 func TestWriteVoiceTelegram(t *testing.T) {
+	t.Parallel()
 	antc := new(vcTestContainer)
 	antc.writeVoiceTelegram()
 	msg := formatter.CreateEmpltyMessage()
@@ -153,6 +155,7 @@ func TestWriteVoiceTelegram(t *testing.T) {
 }
 
 func TestWriteVoiceInternet(t *testing.T) {
+	t.Parallel()
 	antc := new(vcTestContainer)
 	antc.writeVoiceInternet()
 	msg := formatter.CreateEmpltyMessage()
@@ -160,6 +163,7 @@ func TestWriteVoiceInternet(t *testing.T) {
 }
 
 func TestWriteVoiceDuration(t *testing.T) {
+	t.Parallel()
 	antc := new(vcTestContainer)
 	antc.writeDuration()
 	msg := formatter.CreateEmpltyMessage()

@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/l1qwie/Fmtogram/formatter"
+	"github.com/iamissahar/Fmtogram/formatter"
 )
 
 type forceReplyT struct {
@@ -64,10 +64,10 @@ func (frptc *frpTestContainer) writeSelective() {
 func (frp *forceReplyT) startTest(part string, i int, t *testing.T) {
 	switch f := frp.testedFunc.(type) {
 	case func(string) error:
-		printTestLog(part, frp.name, frp.codeErr, frp.str, frp.isExpectedErr, i)
+		printTestLog(part, frp.name, frp.codeErr, frp.str, frp.isExpectedErr, i, t)
 		checkError(f(frp.str), frp.isExpectedErr, frp.codeErr, t)
 	case func() error:
-		printTestLog(part, frp.name, frp.codeErr, true, frp.isExpectedErr, i)
+		printTestLog(part, frp.name, frp.codeErr, true, frp.isExpectedErr, i, t)
 		checkError(f(), frp.isExpectedErr, frp.codeErr, t)
 	default:
 		t.Fatalf("unexpected type of tested function: %T", f)
@@ -104,6 +104,7 @@ func (frptc *frpTestContainer) mainLogic(msg *formatter.Message, t *testing.T) {
 }
 
 func TestForceReplyWriteForceReply(t *testing.T) {
+	t.Parallel()
 	frptc := new(frpTestContainer)
 	frptc.writeForceReply()
 	msg := formatter.CreateEmpltyMessage()
@@ -111,6 +112,7 @@ func TestForceReplyWriteForceReply(t *testing.T) {
 }
 
 func TestForceReplyWriteInputFieldPlaceholder(t *testing.T) {
+	t.Parallel()
 	frptc := new(frpTestContainer)
 	frptc.writeInputFieldPlaceholder()
 	msg := formatter.CreateEmpltyMessage()
@@ -118,6 +120,7 @@ func TestForceReplyWriteInputFieldPlaceholder(t *testing.T) {
 }
 
 func TestForceReplyWriteSelective(t *testing.T) {
+	t.Parallel()
 	frptc := new(frpTestContainer)
 	frptc.writeSelective()
 	msg := formatter.CreateEmpltyMessage()

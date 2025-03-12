@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/l1qwie/Fmtogram/logs"
-	"github.com/l1qwie/Fmtogram/types"
+	"github.com/iamissahar/Fmtogram/logs"
+	"github.com/iamissahar/Fmtogram/types"
 )
 
 type emojich struct {

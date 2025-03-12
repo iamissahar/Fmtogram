@@ -1,8 +1,6 @@
 package formatter
 
-import (
-	"github.com/l1qwie/Fmtogram/logs"
-)
+import "github.com/iamissahar/Fmtogram/logs"
 
 // Creates a new photo stucture and returns an interface with connected functions. This is the only one way to add your data to an object
 func (msg *Message) NewPhoto() IPhoto {

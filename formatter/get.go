@@ -1,6 +1,6 @@
 package formatter
 
-import "github.com/l1qwie/Fmtogram/types"
+import "github.com/iamissahar/Fmtogram/types"
 
 func (g *get) Status() bool {
 	return g.status

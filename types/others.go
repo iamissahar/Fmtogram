@@ -343,24 +343,10 @@ type ResponseParameters struct {
 	RetryAfter      int   `json:"retry_after,omitempty"`
 }
 
-type ReactionTypeEmoji struct {
-	Type  string `json:"type"`
-	Emoji string `json:"emoji"`
-}
-
-type ReactionTypeCustomEmoji struct {
-	Type          string `json:"type"`
-	CustomEmojiID string `json:"custom_emoji_id"`
-}
-
-type ReactionTypePaid struct {
-	Type string `json:"type"`
-}
-
 type ReactionType struct {
-	ReactionTypeEmoji       *ReactionTypeEmoji
-	ReactionTypeCustomEmoji *ReactionTypeCustomEmoji
-	ReactionTypePaid        *ReactionTypePaid
+	Type          string `json:"type,omitempty"`
+	Emoji         string `json:"emoji,omitempty"`
+	CustomEmojiID string `json:"custom_emoji_id,omitempty"`
 }
 
 type ReactionCount struct {
@@ -406,32 +392,6 @@ type MenuButton struct {
 	Type   string      `json:"type"`
 	Text   string      `json:"text"`
 	WebApp *WebAppInfo `json:"web_app"`
-}
-
-type Update struct {
-	UpdateID               int                          `json:"update_id"`
-	Message                *Message                     `json:"message"`
-	EditedMessage          *Message                     `json:"edited_message"`
-	ChanPost               *Message                     `json:"channel_post"`
-	EditedChanPost         *Message                     `json:"edited_channel_post"`
-	BusinessConn           *BusinessConnection          `json:"business_connection"`
-	BusinessMessage        *Message                     `json:"business_message"`
-	EditedBusinessMessage  *Message                     `json:"edited_business_message"`
-	DeletedBusinessMessage *BusinessMessagesDeleted     `json:"deleted_business_messages"`
-	MessageReaction        *MessageReactionUpdated      `json:"message_reaction"`
-	MessageReactionCount   *MessageReactionCountUpdated `json:"message_reaction_count"`
-	InlineQuery            *InlineQuery                 `json:"inline_query"`
-	ChosenInlineResult     *ChosenInlineResult          `json:"chosen_inline_result"`
-	CallbackQuery          *CallbackQuery               `json:"callback_query"`
-	ShippingQuery          *ShippingQuery               `json:"shipping_query"`
-	PreCheckoutQuery       *PreCheckoutQuery            `json:"pre_checkout_query"`
-	Poll                   *Poll                        `json:"poll"`
-	PollAnswer             *PollAnswer                  `json:"poll_answer"`
-	MyChatMember           *ChatMemberUpdated           `json:"my_chat_member"`
-	ChatMember             *ChatMemberUpdated           `json:"chat_member"`
-	ChatJoinRequest        *ChatJoinRequest             `json:"chat_join_request"`
-	ChatBoost              *ChatBoostUpdated            `json:"chat_boost"`
-	RemovedChatBoost       *ChatBoostRemoved            `json:"removed_chat_boost"`
 }
 
 type TelegramError struct {

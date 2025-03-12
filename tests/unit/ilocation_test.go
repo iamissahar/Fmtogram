@@ -3,7 +3,7 @@ package unit
 import (
 	"testing"
 
-	"github.com/l1qwie/Fmtogram/formatter"
+	"github.com/iamissahar/Fmtogram/formatter"
 )
 
 type locationT struct {
@@ -222,13 +222,13 @@ func (loc *locationT) callFloat64F(testedF func(float64) error, t *testing.T) {
 func (loc *locationT) startTest(part string, i int, t *testing.T) {
 	switch f := loc.testedFunc.(type) {
 	case func(string) error:
-		printTestLog(part, loc.name, loc.codeErr, loc.str, loc.isExpectedErr, i)
+		printTestLog(part, loc.name, loc.codeErr, loc.str, loc.isExpectedErr, i, t)
 		loc.callStrF(f, t)
 	case func(int) error:
-		printTestLog(part, loc.name, loc.codeErr, loc.integer, loc.isExpectedErr, i)
+		printTestLog(part, loc.name, loc.codeErr, loc.integer, loc.isExpectedErr, i, t)
 		loc.callIntF(f, t)
 	case func(float64) error:
-		printTestLog(part, loc.name, loc.codeErr, loc.float, loc.isExpectedErr, i)
+		printTestLog(part, loc.name, loc.codeErr, loc.float, loc.isExpectedErr, i, t)
 		loc.callFloat64F(f, t)
 	default:
 		t.Fatal("unexpected type of tested function")
@@ -260,6 +260,7 @@ func mainLocationLogic(msg *formatter.Message, loctc locTestContainer, t *testin
 }
 
 func TestWriteLocationLatitude(t *testing.T) {
+	t.Parallel()
 	locct := new(locTestContainer)
 	locct.writeLatitude()
 	msg := formatter.CreateEmpltyMessage()
@@ -267,6 +268,7 @@ func TestWriteLocationLatitude(t *testing.T) {
 }
 
 func TestWriteLocationLongitude(t *testing.T) {
+	t.Parallel()
 	locct := new(locTestContainer)
 	locct.writeLongitude()
 	msg := formatter.CreateEmpltyMessage()
@@ -274,6 +276,7 @@ func TestWriteLocationLongitude(t *testing.T) {
 }
 
 func TestWriteLocationHorizontalAccuracy(t *testing.T) {
+	t.Parallel()
 	locct := new(locTestContainer)
 	locct.writeHorizontalAccuracy()
 	msg := formatter.CreateEmpltyMessage()
@@ -281,6 +284,7 @@ func TestWriteLocationHorizontalAccuracy(t *testing.T) {
 }
 
 func TestWriteLocationLivePeriod(t *testing.T) {
+	t.Parallel()
 	locct := new(locTestContainer)
 	locct.writeLivePeriod()
 	msg := formatter.CreateEmpltyMessage()
@@ -288,6 +292,7 @@ func TestWriteLocationLivePeriod(t *testing.T) {
 }
 
 func TestWriteLocationHeading(t *testing.T) {
+	t.Parallel()
 	locct := new(locTestContainer)
 	locct.writeHeading()
 	msg := formatter.CreateEmpltyMessage()
@@ -295,6 +300,7 @@ func TestWriteLocationHeading(t *testing.T) {
 }
 
 func TestWriteLocationProximityAlertRadius(t *testing.T) {
+	t.Parallel()
 	locct := new(locTestContainer)
 	locct.writeProximityAlertRadius()
 	msg := formatter.CreateEmpltyMessage()
@@ -302,6 +308,7 @@ func TestWriteLocationProximityAlertRadius(t *testing.T) {
 }
 
 func TestWriteLocationTitle(t *testing.T) {
+	t.Parallel()
 	locct := new(locTestContainer)
 	locct.writeTitle()
 	msg := formatter.CreateEmpltyMessage()
@@ -309,6 +316,7 @@ func TestWriteLocationTitle(t *testing.T) {
 }
 
 func TestWriteLocationAddress(t *testing.T) {
+	t.Parallel()
 	locct := new(locTestContainer)
 	locct.writeAddress()
 	msg := formatter.CreateEmpltyMessage()
@@ -323,6 +331,7 @@ func TestWriteLocationFoursquareID(t *testing.T) {
 }
 
 func TestWriteLocationFoursquareType(t *testing.T) {
+	t.Parallel()
 	locct := new(locTestContainer)
 	locct.writeFoursquareType()
 	msg := formatter.CreateEmpltyMessage()
@@ -330,6 +339,7 @@ func TestWriteLocationFoursquareType(t *testing.T) {
 }
 
 func TestWriteLocationGooglePlaceID(t *testing.T) {
+	t.Parallel()
 	locct := new(locTestContainer)
 	locct.writeGooglePlaceID()
 	msg := formatter.CreateEmpltyMessage()
@@ -337,6 +347,7 @@ func TestWriteLocationGooglePlaceID(t *testing.T) {
 }
 
 func TestWriteLocationGooglePlaceType(t *testing.T) {
+	t.Parallel()
 	locct := new(locTestContainer)
 	locct.writeGooglePlaceType()
 	msg := formatter.CreateEmpltyMessage()

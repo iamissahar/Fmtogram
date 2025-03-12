@@ -10,8 +10,8 @@ import (
 	"net/url"
 	"reflect"
 
-	"github.com/l1qwie/Fmtogram/formatter/methods"
-	"github.com/l1qwie/Fmtogram/types"
+	"github.com/iamissahar/Fmtogram/formatter/methods"
+	"github.com/iamissahar/Fmtogram/types"
 )
 
 func CreateMessage(tg *types.Telegram, botID string) *Message {
@@ -266,9 +266,7 @@ func (sh *stickerHolder) single(wr *multipart.Writer, buf *bytes.Buffer, content
 	)
 	if sh.amount != 0 {
 		if sh.atLeastOnce {
-			if err = sh.storage[sh.i-1].proccessFile(wr, contenttype, false); err == nil {
-				queryStr, err = putUrlValues(sh.storage[sh.i-1])
-			}
+			err = sh.storage[sh.i-1].proccessFile(wr, contenttype, false)
 		} else {
 			if jsn, err = json.Marshal(sh.storage[sh.i-1]); err == nil {
 				buf.Write(jsn)
@@ -358,7 +356,8 @@ func travers(msg *Message) (string, error) {
 
 	for i := 0; i < len(media) && err == nil; i++ {
 		if media[i] != nil {
-			if (msg.fm.mh.amount == 1) || (msg.fm.sticker.amount == 1) {
+			if (msg.fm.mh.amount == 1 && msg.fm.method != methods.PaidMedia) ||
+				(msg.fm.sticker.amount == 1 && msg.fm.method != methods.CreateNewStickerSet) {
 				queryArr[cntr], err = media[i].single(msg.fm.writer, msg.fm.buf, &msg.fm.contentType)
 				cntr++
 			} else {

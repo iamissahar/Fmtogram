@@ -3,7 +3,7 @@ package unit
 import (
 	"testing"
 
-	"github.com/l1qwie/Fmtogram/formatter"
+	"github.com/iamissahar/Fmtogram/formatter"
 )
 
 type gameT struct {
@@ -80,13 +80,13 @@ func (gametc *gameTestContainer) writeDisableEditMessage() {
 func (pay *gameT) startTest(part string, i int, t *testing.T) {
 	switch f := pay.testedFunc.(type) {
 	case func(string) error:
-		printTestLog(part, pay.name, pay.codeErr, pay.str, pay.isExpectedErr, i)
+		printTestLog(part, pay.name, pay.codeErr, pay.str, pay.isExpectedErr, i, t)
 		checkError(f(pay.str), pay.isExpectedErr, pay.codeErr, t)
 	case func(int) error:
-		printTestLog(part, pay.name, pay.codeErr, pay.integer, pay.isExpectedErr, i)
+		printTestLog(part, pay.name, pay.codeErr, pay.integer, pay.isExpectedErr, i, t)
 		checkError(f(pay.integer), pay.isExpectedErr, pay.codeErr, t)
 	case func() error:
-		printTestLog(part, pay.name, pay.codeErr, true, pay.isExpectedErr, i)
+		printTestLog(part, pay.name, pay.codeErr, true, pay.isExpectedErr, i, t)
 		checkError(f(), pay.isExpectedErr, pay.codeErr, t)
 	default:
 		t.Fatal("unexpected type of tested function")
@@ -124,6 +124,7 @@ func (gametc *gameTestContainer) mainLogic(msg *formatter.Message, t *testing.T)
 }
 
 func TestGameWriteShortName(t *testing.T) {
+	t.Parallel()
 	gametc := new(gameTestContainer)
 	gametc.writeShortName()
 	msg := formatter.CreateEmpltyMessage()
@@ -131,6 +132,7 @@ func TestGameWriteShortName(t *testing.T) {
 }
 
 func TestGameWriteScore(t *testing.T) {
+	t.Parallel()
 	gametc := new(gameTestContainer)
 	gametc.writeScore()
 	msg := formatter.CreateEmpltyMessage()
@@ -138,6 +140,7 @@ func TestGameWriteScore(t *testing.T) {
 }
 
 func TestGameWriteForce(t *testing.T) {
+	t.Parallel()
 	gametc := new(gameTestContainer)
 	gametc.writeForce()
 	msg := formatter.CreateEmpltyMessage()
@@ -145,6 +148,7 @@ func TestGameWriteForce(t *testing.T) {
 }
 
 func TestGameWriteDisableEditMessage(t *testing.T) {
+	t.Parallel()
 	gametc := new(gameTestContainer)
 	gametc.writeDisableEditMessage()
 	msg := formatter.CreateEmpltyMessage()

@@ -3,7 +3,7 @@ package unit
 import (
 	"testing"
 
-	"github.com/l1qwie/Fmtogram/formatter"
+	"github.com/iamissahar/Fmtogram/formatter"
 )
 
 type videonoteT struct {
@@ -55,7 +55,7 @@ func putWriteVideoNoteThumbnailID(vdntc vdnTestContainer, vdn formatter.IVideoNo
 
 func (vdntc *vdnTestContainer) writeVideoNoteStorage() {
 	vdntc.name = "(IVideoNote).WriteVideoNoteStorage"
-	vdntc.inputStr = []string{"../media_test/prichinatryski.mp4", "", "../media_test/tel-aviv.jpg", "../media_test/prichinatryski.mp4", "../media_test/prichinatryski.mp4"}
+	vdntc.inputStr = []string{"../media/prichinatryski.mp4", "", "../media/tel-aviv.jpg", "../media/prichinatryski.mp4", "../media/prichinatryski.mp4"}
 	vdntc.isExpectedErr = []bool{false, true, true, false, true}
 	vdntc.codeErr = []string{"", "20", "12", "", "10"}
 	vdntc.amount, vdntc.until = 5, 3
@@ -100,7 +100,7 @@ func (vdntc *vdnTestContainer) writeLength() {
 
 func (vdntc *vdnTestContainer) writeThumbnail() {
 	vdntc.name = "(IVideoNote).WriteThumbnail"
-	vdntc.inputStr = []string{"../media_test/tel-aviv.jpg", "", "../media_test/sound.mp3", "../media_test/tel-aviv.jpg", "../media_test/tel-aviv.jpg"}
+	vdntc.inputStr = []string{"../media/tel-aviv.jpg", "", "../media/sound.mp3", "../media/tel-aviv.jpg", "../media/tel-aviv.jpg"}
 	vdntc.isExpectedErr = []bool{false, true, true, false, true}
 	vdntc.codeErr = []string{"", "20", "12", "", "10"}
 	vdntc.amount, vdntc.until = 5, 3
@@ -143,10 +143,10 @@ func (vdn *videonoteT) callIntF(testedF func(int) error, t *testing.T) {
 func (vdn *videonoteT) startTest(part string, i int, t *testing.T) {
 	switch f := vdn.testedFunc.(type) {
 	case func(string) error:
-		printTestLog(part, vdn.name, vdn.codeErr, vdn.str, vdn.isExpectedErr, i)
+		printTestLog(part, vdn.name, vdn.codeErr, vdn.str, vdn.isExpectedErr, i, t)
 		vdn.callStrF(f, t)
 	case func(int) error:
-		printTestLog(part, vdn.name, vdn.codeErr, vdn.integer, vdn.isExpectedErr, i)
+		printTestLog(part, vdn.name, vdn.codeErr, vdn.integer, vdn.isExpectedErr, i, t)
 		vdn.callIntF(f, t)
 	default:
 		t.Fatal("unexpected type of tested function")
@@ -178,6 +178,7 @@ func mainVideoNoteLogic(msg *formatter.Message, vdntc vdnTestContainer, t *testi
 }
 
 func TestWriteVideoNoteStorage(t *testing.T) {
+	t.Parallel()
 	vdntc := new(vdnTestContainer)
 	vdntc.writeVideoNoteStorage()
 	msg := formatter.CreateEmpltyMessage()
@@ -185,6 +186,7 @@ func TestWriteVideoNoteStorage(t *testing.T) {
 }
 
 func TestWriteVideoNoteTelegram(t *testing.T) {
+	t.Parallel()
 	vdntc := new(vdnTestContainer)
 	vdntc.writeVideoNoteTelegram()
 	msg := formatter.CreateEmpltyMessage()
@@ -192,6 +194,7 @@ func TestWriteVideoNoteTelegram(t *testing.T) {
 }
 
 func TestWriteVideoNoteInternet(t *testing.T) {
+	t.Parallel()
 	vdntc := new(vdnTestContainer)
 	vdntc.writeVideoNoteInternet()
 	msg := formatter.CreateEmpltyMessage()
@@ -199,6 +202,7 @@ func TestWriteVideoNoteInternet(t *testing.T) {
 }
 
 func TestWriteVideoNoteDuration(t *testing.T) {
+	t.Parallel()
 	vdntc := new(vdnTestContainer)
 	vdntc.writeDuration()
 	msg := formatter.CreateEmpltyMessage()
@@ -206,6 +210,7 @@ func TestWriteVideoNoteDuration(t *testing.T) {
 }
 
 func TestWriteVideoNoteLength(t *testing.T) {
+	t.Parallel()
 	vdntc := new(vdnTestContainer)
 	vdntc.writeLength()
 	msg := formatter.CreateEmpltyMessage()
@@ -213,6 +218,7 @@ func TestWriteVideoNoteLength(t *testing.T) {
 }
 
 func TestWriteVideoNoteThumbnail(t *testing.T) {
+	t.Parallel()
 	vdntc := new(vdnTestContainer)
 	vdntc.writeThumbnail()
 	msg := formatter.CreateEmpltyMessage()
@@ -220,6 +226,7 @@ func TestWriteVideoNoteThumbnail(t *testing.T) {
 }
 
 func TestWriteVideoNoteThumbnailID(t *testing.T) {
+	t.Parallel()
 	vdntc := new(vdnTestContainer)
 	vdntc.writeThumbnailID()
 	msg := formatter.CreateEmpltyMessage()

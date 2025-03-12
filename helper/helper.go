@@ -1,8 +1,8 @@
 package helper
 
 import (
-	"github.com/l1qwie/Fmtogram/executer"
-	"github.com/l1qwie/Fmtogram/types"
+	"github.com/iamissahar/Fmtogram/executer"
+	"github.com/iamissahar/Fmtogram/types"
 )
 
 func IsWorking() (*types.User, error) {

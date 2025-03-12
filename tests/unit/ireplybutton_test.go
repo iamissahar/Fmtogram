@@ -3,8 +3,8 @@ package unit
 import (
 	"testing"
 
-	"github.com/l1qwie/Fmtogram/formatter"
-	"github.com/l1qwie/Fmtogram/types"
+	"github.com/iamissahar/Fmtogram/formatter"
+	"github.com/iamissahar/Fmtogram/types"
 )
 
 type replyButtonT struct {
@@ -204,22 +204,22 @@ func (rpb *replyButtonT) callBoolF(f func() error, t *testing.T) {
 func (rpb *replyButtonT) startTest(part string, i int, t *testing.T) {
 	switch f := rpb.testedFunc.(type) {
 	case func(string) error:
-		printTestLog(part, rpb.name, rpb.codeErr, rpb.str, rpb.isExpectedErr, i)
+		printTestLog(part, rpb.name, rpb.codeErr, rpb.str, rpb.isExpectedErr, i, t)
 		rpb.callStrF(f, t)
 	case func(*types.KeyboardButtonRequestChat) error:
-		printTestLog(part, rpb.name, rpb.codeErr, rpb.rchat, rpb.isExpectedErr, i)
+		printTestLog(part, rpb.name, rpb.codeErr, rpb.rchat, rpb.isExpectedErr, i, t)
 		rpb.callRChatF(f, t)
 	case func(*types.KeyboardButtonPollType) error:
-		printTestLog(part, rpb.name, rpb.codeErr, rpb.rpoll, rpb.isExpectedErr, i)
+		printTestLog(part, rpb.name, rpb.codeErr, rpb.rpoll, rpb.isExpectedErr, i, t)
 		rpb.callRPollF(f, t)
 	case func(*types.KeyboardButtonRequestUsers) error:
-		printTestLog(part, rpb.name, rpb.codeErr, rpb.rusers, rpb.isExpectedErr, i)
+		printTestLog(part, rpb.name, rpb.codeErr, rpb.rusers, rpb.isExpectedErr, i, t)
 		rpb.callRUsersF(f, t)
 	case func(*types.WebAppInfo) error:
-		printTestLog(part, rpb.name, rpb.codeErr, rpb.webapp, rpb.isExpectedErr, i)
+		printTestLog(part, rpb.name, rpb.codeErr, rpb.webapp, rpb.isExpectedErr, i, t)
 		rpb.callWebAppF(f, t)
 	case func() error:
-		printTestLog(part, rpb.name, rpb.codeErr, true, rpb.isExpectedErr, i)
+		printTestLog(part, rpb.name, rpb.codeErr, true, rpb.isExpectedErr, i, t)
 		rpb.callBoolF(f, t)
 	default:
 		t.Logf("%T", f)
@@ -270,6 +270,7 @@ func (rpbtc *rpbTestContainer) mainLogic(msg *formatter.Message, t *testing.T) {
 }
 
 func TestRButtonWriteRequestChat(t *testing.T) {
+	t.Parallel()
 	rpbtc := new(rpbTestContainer)
 	rpbtc.writeRequestChat()
 	msg := formatter.CreateEmpltyMessage()
@@ -277,6 +278,7 @@ func TestRButtonWriteRequestChat(t *testing.T) {
 }
 
 func TestRButtonWriteRequestContact(t *testing.T) {
+	t.Parallel()
 	rpbtc := new(rpbTestContainer)
 	rpbtc.writeRequestContact()
 	msg := formatter.CreateEmpltyMessage()
@@ -284,6 +286,7 @@ func TestRButtonWriteRequestContact(t *testing.T) {
 }
 
 func TestRButtonWriteRequestLocation(t *testing.T) {
+	t.Parallel()
 	rpbtc := new(rpbTestContainer)
 	rpbtc.writeRequestLocation()
 	msg := formatter.CreateEmpltyMessage()
@@ -291,6 +294,7 @@ func TestRButtonWriteRequestLocation(t *testing.T) {
 }
 
 func TestRButtonWriteRequestPoll(t *testing.T) {
+	t.Parallel()
 	rpbtc := new(rpbTestContainer)
 	rpbtc.writeRequestPoll()
 	msg := formatter.CreateEmpltyMessage()
@@ -298,6 +302,7 @@ func TestRButtonWriteRequestPoll(t *testing.T) {
 }
 
 func TestRButtonWriteRequestUsers(t *testing.T) {
+	t.Parallel()
 	rpbtc := new(rpbTestContainer)
 	rpbtc.writeRequestUsers()
 	msg := formatter.CreateEmpltyMessage()
@@ -305,6 +310,7 @@ func TestRButtonWriteRequestUsers(t *testing.T) {
 }
 
 func TestRButtonWriteString(t *testing.T) {
+	t.Parallel()
 	rpbtc := new(rpbTestContainer)
 	rpbtc.writeString()
 	msg := formatter.CreateEmpltyMessage()
@@ -312,6 +318,7 @@ func TestRButtonWriteString(t *testing.T) {
 }
 
 func TestRButtonWriteWebApp(t *testing.T) {
+	t.Parallel()
 	rpbtc := new(rpbTestContainer)
 	rpbtc.writeWebApp()
 	msg := formatter.CreateEmpltyMessage()

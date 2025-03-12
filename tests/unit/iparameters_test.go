@@ -6,8 +6,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/l1qwie/Fmtogram/formatter"
-	"github.com/l1qwie/Fmtogram/types"
+	"github.com/iamissahar/Fmtogram/formatter"
+	"github.com/iamissahar/Fmtogram/types"
 )
 
 type paramsT struct {
@@ -475,10 +475,10 @@ func (prmtc *prmTestContainer) writeAction() {
 
 func (prmtc *prmTestContainer) writeReaction() {
 	prmtc.name = "(IParameters).WriteReaction"
-	prmtc.inputReaction = [][]*types.ReactionType{{{ReactionTypeEmoji: nil}, {ReactionTypeEmoji: nil}},
+	prmtc.inputReaction = [][]*types.ReactionType{{{Type: "type", Emoji: "emoji"}},
 		nil,
-		{{ReactionTypeEmoji: nil}, nil, nil},
-		{{ReactionTypeEmoji: nil}, {ReactionTypeEmoji: nil}}, {{ReactionTypeEmoji: nil}, {ReactionTypeEmoji: nil}}}
+		{{Type: "type", Emoji: "emoji"}, nil, nil},
+		{{Type: "type", Emoji: "emoji"}, {Type: "type", Emoji: "emoji"}}, {{Type: "type", Emoji: "emoji"}, {Type: "type", Emoji: "emoji"}}}
 	prmtc.isExpectedErr = []bool{false, true, true, false, true}
 	prmtc.codeErr = []string{"", "20", "5", "", "10"}
 	prmtc.amount, prmtc.until = 5, 3
@@ -514,8 +514,8 @@ func (prmtc *prmTestContainer) writeLimit() {
 func (prmtc *prmTestContainer) writeEmojiStatusCustomEmojiID() {
 	prmtc.name = "(IParameters).WriteEmojiStatusCustomEmojiID"
 	prmtc.inputStr = []string{"kl;asdok-", "", "0-1230-1", "23828913819"}
-	prmtc.isExpectedErr = []bool{false, true, false, true}
-	prmtc.codeErr = []string{"", "20", "", "10"}
+	prmtc.isExpectedErr = []bool{false, false, false, true}
+	prmtc.codeErr = []string{"", "", "", "10"}
 	prmtc.amount, prmtc.until = 4, 2
 	prmtc.buildF = putParamWriteEmojiStatusCustomEmojiID
 }
@@ -669,7 +669,7 @@ func (prmtc *prmTestContainer) writeErrors() {
 func (prmtc *prmTestContainer) writeVideoStartTimestamp() {
 	prmtc.name = "(IParameters).WriteStartTimestamp()"
 	prmtc.inputInt = []int{23131, 0, -1231231, 893828, 22}
-	prmtc.isExpectedErr = []bool{false, true, false, true}
+	prmtc.isExpectedErr = []bool{false, true, true, false, true}
 	prmtc.codeErr = []string{"", "20", "20", "", "10"}
 	prmtc.amount, prmtc.until = 5, 3
 	prmtc.buildF = putWriteVideoStartTimestamp
@@ -713,41 +713,44 @@ func (prmtc *prmTestContainer) writeNeedsRepainting() {
 func (prm *paramsT) startTest(part string, i int, t *testing.T) {
 	switch f := prm.testedFunc.(type) {
 	case func(string) error:
-		printTestLog(part, prm.name, prm.codeErr, prm.str, prm.isExpectedErr, i)
+		printTestLog(part, prm.name, prm.codeErr, prm.str, prm.isExpectedErr, i, t)
 		checkError(f(prm.str), prm.isExpectedErr, prm.codeErr, t)
 	case func(int) error:
-		printTestLog(part, prm.name, prm.codeErr, prm.integer, prm.isExpectedErr, i)
+		printTestLog(part, prm.name, prm.codeErr, prm.integer, prm.isExpectedErr, i, t)
 		checkError(f(prm.integer), prm.isExpectedErr, prm.codeErr, t)
 	case func(time.Duration) error:
-		printTestLog(part, prm.name, prm.codeErr, prm.integer, prm.isExpectedErr, i)
+		printTestLog(part, prm.name, prm.codeErr, prm.integer, prm.isExpectedErr, i, t)
 		checkError(f(prm.date), prm.isExpectedErr, prm.codeErr, t)
 	case func([]*types.MessageEntity) error:
-		printTestLog(part, prm.name, prm.codeErr, prm.array, prm.isExpectedErr, i)
+		printTestLog(part, prm.name, prm.codeErr, prm.array, prm.isExpectedErr, i, t)
 		checkError(f(prm.array), prm.isExpectedErr, prm.codeErr, t)
 	case func([]int) error:
-		printTestLog(part, prm.name, prm.codeErr, prm.arrayInt, prm.isExpectedErr, i)
+		printTestLog(part, prm.name, prm.codeErr, prm.arrayInt, prm.isExpectedErr, i, t)
 		checkError(f(prm.arrayInt), prm.isExpectedErr, prm.codeErr, t)
 	case func() error:
-		printTestLog(part, prm.name, prm.codeErr, true, prm.isExpectedErr, i)
+		printTestLog(part, prm.name, prm.codeErr, true, prm.isExpectedErr, i, t)
 		checkError(f(), prm.isExpectedErr, prm.codeErr, t)
 	case func(*types.LinkPreviewOptions) error:
-		printTestLog(part, prm.name, prm.codeErr, prm.link, prm.isExpectedErr, i)
+		printTestLog(part, prm.name, prm.codeErr, prm.link, prm.isExpectedErr, i, t)
 		checkError(f(prm.link), prm.isExpectedErr, prm.codeErr, t)
 	case func(*types.ReplyParameters) error:
-		printTestLog(part, prm.name, prm.codeErr, prm.replyP, prm.isExpectedErr, i)
+		printTestLog(part, prm.name, prm.codeErr, prm.replyP, prm.isExpectedErr, i, t)
 		checkError(f(prm.replyP), prm.isExpectedErr, prm.codeErr, t)
 	case func([]*types.ReactionType) error:
-		printTestLog(part, prm.name, prm.codeErr, prm.reaction, prm.isExpectedErr, i)
+		printTestLog(part, prm.name, prm.codeErr, prm.reaction, prm.isExpectedErr, i, t)
 		checkError(f(prm.reaction), prm.isExpectedErr, prm.codeErr, t)
 	case func(*types.ChatPermissions) error:
-		printTestLog(part, prm.name, prm.codeErr, prm.permis, prm.isExpectedErr, i)
+		printTestLog(part, prm.name, prm.codeErr, prm.permis, prm.isExpectedErr, i, t)
 		checkError(f(prm.permis), prm.isExpectedErr, prm.codeErr, t)
 	case func(*types.ChatAdministratorRights) error:
-		printTestLog(part, prm.name, prm.codeErr, prm.adminrights, prm.isExpectedErr, i)
+		printTestLog(part, prm.name, prm.codeErr, prm.adminrights, prm.isExpectedErr, i, t)
 		checkError(f(prm.adminrights), prm.isExpectedErr, prm.codeErr, t)
 	case func([]*types.PassportElementError) error:
-		printTestLog(part, prm.name, prm.codeErr, prm.errors, prm.isExpectedErr, i)
+		printTestLog(part, prm.name, prm.codeErr, prm.errors, prm.isExpectedErr, i, t)
 		checkError(f(prm.errors), prm.isExpectedErr, prm.codeErr, t)
+	case func(string, string) error:
+		printTestLog(part, prm.name, prm.codeErr, prm.str, prm.isExpectedErr, i, t)
+		checkError(f("bot_nickname", prm.str), prm.isExpectedErr, prm.codeErr, t)
 	default:
 		t.Fatal("unexpected type of tested function")
 	}
@@ -780,6 +783,7 @@ func mainParametersLogic(msg *formatter.Message, prmtc prmTestContainer, t *test
 }
 
 func TestParamWriteDisableNotification(t *testing.T) {
+	t.Parallel()
 	prmtc := new(prmTestContainer)
 	prmtc.writeDisableNotification()
 	msg := formatter.CreateEmpltyMessage()
@@ -787,6 +791,7 @@ func TestParamWriteDisableNotification(t *testing.T) {
 }
 
 func TestParamWriteEntities(t *testing.T) {
+	t.Parallel()
 	prmtc := new(prmTestContainer)
 	prmtc.writeEntities()
 	msg := formatter.CreateEmpltyMessage()
@@ -794,6 +799,7 @@ func TestParamWriteEntities(t *testing.T) {
 }
 
 func TestParamWriteLinkPreviewOptions(t *testing.T) {
+	t.Parallel()
 	prmtc := new(prmTestContainer)
 	prmtc.writeLinkPreviewOptions()
 	msg := formatter.CreateEmpltyMessage()
@@ -801,6 +807,7 @@ func TestParamWriteLinkPreviewOptions(t *testing.T) {
 }
 
 func TestParamWriteMessageEffectID(t *testing.T) {
+	t.Parallel()
 	prmtc := new(prmTestContainer)
 	prmtc.writeMessageEffectID()
 	msg := formatter.CreateEmpltyMessage()
@@ -808,6 +815,7 @@ func TestParamWriteMessageEffectID(t *testing.T) {
 }
 
 func TestParamWriteMessageThreadID(t *testing.T) {
+	t.Parallel()
 	prmtc := new(prmTestContainer)
 	prmtc.writeMessageThreadID()
 	msg := formatter.CreateEmpltyMessage()
@@ -815,6 +823,7 @@ func TestParamWriteMessageThreadID(t *testing.T) {
 }
 
 func TestParamWriteMessageID(t *testing.T) {
+	t.Parallel()
 	prmtc := new(prmTestContainer)
 	prmtc.writeMessageID()
 	msg := formatter.CreateEmpltyMessage()
@@ -822,6 +831,7 @@ func TestParamWriteMessageID(t *testing.T) {
 }
 
 func TestParamWriteMessageIDs(t *testing.T) {
+	t.Parallel()
 	prmtc := new(prmTestContainer)
 	prmtc.writeMessageIDs()
 	msg := formatter.CreateEmpltyMessage()
@@ -829,6 +839,7 @@ func TestParamWriteMessageIDs(t *testing.T) {
 }
 
 func TestParamWriteCaption(t *testing.T) {
+	t.Parallel()
 	prmtc := new(prmTestContainer)
 	prmtc.writeCaption()
 	msg := formatter.CreateEmpltyMessage()
@@ -836,6 +847,7 @@ func TestParamWriteCaption(t *testing.T) {
 }
 
 func TestParamWriteParseMode(t *testing.T) {
+	t.Parallel()
 	prmtc := new(prmTestContainer)
 	prmtc.writeParseMode()
 	msg := formatter.CreateEmpltyMessage()
@@ -843,6 +855,7 @@ func TestParamWriteParseMode(t *testing.T) {
 }
 
 func TestParamWriteProtectContent(t *testing.T) {
+	t.Parallel()
 	prmtc := new(prmTestContainer)
 	prmtc.writeProtectContent()
 	msg := formatter.CreateEmpltyMessage()
@@ -850,6 +863,7 @@ func TestParamWriteProtectContent(t *testing.T) {
 }
 
 func TestParamWriteString(t *testing.T) {
+	t.Parallel()
 	prmtc := new(prmTestContainer)
 	prmtc.writeString()
 	msg := formatter.CreateEmpltyMessage()
@@ -857,6 +871,7 @@ func TestParamWriteString(t *testing.T) {
 }
 
 func TestParamWriteShowCaptionAboveMedia(t *testing.T) {
+	t.Parallel()
 	prmtc := new(prmTestContainer)
 	prmtc.writeShowCaptionAboveMedia()
 	msg := formatter.CreateEmpltyMessage()
@@ -864,6 +879,7 @@ func TestParamWriteShowCaptionAboveMedia(t *testing.T) {
 }
 
 func TestParamWriteReplyParameters(t *testing.T) {
+	t.Parallel()
 	prmtc := new(prmTestContainer)
 	prmtc.writeReplyParameters()
 	msg := formatter.CreateEmpltyMessage()
@@ -871,6 +887,7 @@ func TestParamWriteReplyParameters(t *testing.T) {
 }
 
 func TestParamWriteAllowPaidBroadcast(t *testing.T) {
+	t.Parallel()
 	prmtc := new(prmTestContainer)
 	prmtc.writeAllowPaidBroadcast()
 	msg := formatter.CreateEmpltyMessage()
@@ -878,6 +895,7 @@ func TestParamWriteAllowPaidBroadcast(t *testing.T) {
 }
 
 func TestParamWriteStarCount(t *testing.T) {
+	t.Parallel()
 	prmtc := new(prmTestContainer)
 	prmtc.writeStarCount()
 	msg := formatter.CreateEmpltyMessage()
@@ -885,6 +903,7 @@ func TestParamWriteStarCount(t *testing.T) {
 }
 
 func TestParamWritePayload(t *testing.T) {
+	t.Parallel()
 	prmtc := new(prmTestContainer)
 	prmtc.writePayload()
 	msg := formatter.CreateEmpltyMessage()
@@ -892,6 +911,7 @@ func TestParamWritePayload(t *testing.T) {
 }
 
 func TestParamWriteEmoji(t *testing.T) {
+	t.Parallel()
 	prmtc := new(prmTestContainer)
 	prmtc.writeEmoji()
 	msg := formatter.CreateEmpltyMessage()
@@ -899,6 +919,7 @@ func TestParamWriteEmoji(t *testing.T) {
 }
 
 func TestParamWriteAction(t *testing.T) {
+	t.Parallel()
 	prmtc := new(prmTestContainer)
 	prmtc.writeAction()
 	msg := formatter.CreateEmpltyMessage()
@@ -906,6 +927,7 @@ func TestParamWriteAction(t *testing.T) {
 }
 
 func TestParamWriteReaction(t *testing.T) {
+	t.Parallel()
 	prmtc := new(prmTestContainer)
 	prmtc.writeReaction()
 	msg := formatter.CreateEmpltyMessage()
@@ -913,6 +935,7 @@ func TestParamWriteReaction(t *testing.T) {
 }
 
 func TestParamWriteReactionIsBig(t *testing.T) {
+	t.Parallel()
 	prmtc := new(prmTestContainer)
 	prmtc.writeReactionIsBig()
 	msg := formatter.CreateEmpltyMessage()
@@ -920,6 +943,7 @@ func TestParamWriteReactionIsBig(t *testing.T) {
 }
 
 func TestParamWriteOffset(t *testing.T) {
+	t.Parallel()
 	prmtc := new(prmTestContainer)
 	prmtc.writeOffset()
 	msg := formatter.CreateEmpltyMessage()
@@ -927,6 +951,7 @@ func TestParamWriteOffset(t *testing.T) {
 }
 
 func TestParamWriteLimit(t *testing.T) {
+	t.Parallel()
 	prmtc := new(prmTestContainer)
 	prmtc.writeLimit()
 	msg := formatter.CreateEmpltyMessage()
@@ -934,6 +959,7 @@ func TestParamWriteLimit(t *testing.T) {
 }
 
 func TestParamWriteEmojiStatusCustomEmojiID(t *testing.T) {
+	t.Parallel()
 	prmtc := new(prmTestContainer)
 	prmtc.writeEmojiStatusCustomEmojiID()
 	msg := formatter.CreateEmpltyMessage()
@@ -941,6 +967,7 @@ func TestParamWriteEmojiStatusCustomEmojiID(t *testing.T) {
 }
 
 func TestParamWriteEmojiStatusExpirationDate(t *testing.T) {
+	t.Parallel()
 	prmtc := new(prmTestContainer)
 	prmtc.writeEmojiStatusExpirationDate()
 	msg := formatter.CreateEmpltyMessage()
@@ -948,6 +975,7 @@ func TestParamWriteEmojiStatusExpirationDate(t *testing.T) {
 }
 
 func TestParamWriteFileID(t *testing.T) {
+	t.Parallel()
 	prmtc := new(prmTestContainer)
 	prmtc.writeFileID()
 	msg := formatter.CreateEmpltyMessage()
@@ -955,6 +983,7 @@ func TestParamWriteFileID(t *testing.T) {
 }
 
 func TestParamWriteUntilDate(t *testing.T) {
+	t.Parallel()
 	prmtc := new(prmTestContainer)
 	prmtc.writeUntilDate()
 	msg := formatter.CreateEmpltyMessage()
@@ -962,6 +991,7 @@ func TestParamWriteUntilDate(t *testing.T) {
 }
 
 func TestParamWriteRevokeMessages(t *testing.T) {
+	t.Parallel()
 	prmtc := new(prmTestContainer)
 	prmtc.writeRevokeMessages()
 	msg := formatter.CreateEmpltyMessage()
@@ -969,6 +999,7 @@ func TestParamWriteRevokeMessages(t *testing.T) {
 }
 
 func TestParamWriteOnlyIfBanned(t *testing.T) {
+	t.Parallel()
 	prmtc := new(prmTestContainer)
 	prmtc.writeOnlyIfBanned()
 	msg := formatter.CreateEmpltyMessage()
@@ -976,6 +1007,7 @@ func TestParamWriteOnlyIfBanned(t *testing.T) {
 }
 
 func TestParamWritePermissions(t *testing.T) {
+	t.Parallel()
 	prmtc := new(prmTestContainer)
 	prmtc.writePermissions()
 	msg := formatter.CreateEmpltyMessage()
@@ -983,6 +1015,7 @@ func TestParamWritePermissions(t *testing.T) {
 }
 
 func TestParamWriteIndependentChatPermissions(t *testing.T) {
+	t.Parallel()
 	prmtc := new(prmTestContainer)
 	prmtc.writeIndependentChatPermissions()
 	msg := formatter.CreateEmpltyMessage()
@@ -990,6 +1023,7 @@ func TestParamWriteIndependentChatPermissions(t *testing.T) {
 }
 
 func TestParamWriteAdministratorRights(t *testing.T) {
+	t.Parallel()
 	prmtc := new(prmTestContainer)
 	prmtc.writeAdministratorRights()
 	msg := formatter.CreateEmpltyMessage()
@@ -997,6 +1031,7 @@ func TestParamWriteAdministratorRights(t *testing.T) {
 }
 
 func TestParamWriteCustomTitle(t *testing.T) {
+	t.Parallel()
 	prmtc := new(prmTestContainer)
 	prmtc.writeCustomTitle()
 	msg := formatter.CreateEmpltyMessage()
@@ -1004,6 +1039,7 @@ func TestParamWriteCustomTitle(t *testing.T) {
 }
 
 func TestParamWriteUserID(t *testing.T) {
+	t.Parallel()
 	prmtc := new(prmTestContainer)
 	prmtc.writeUserID()
 	msg := formatter.CreateEmpltyMessage()
@@ -1011,6 +1047,7 @@ func TestParamWriteUserID(t *testing.T) {
 }
 
 func TestParamWriteCallBackQueryID(t *testing.T) {
+	t.Parallel()
 	prmtc := new(prmTestContainer)
 	prmtc.writeCallBackQueryID()
 	msg := formatter.CreateEmpltyMessage()
@@ -1018,6 +1055,7 @@ func TestParamWriteCallBackQueryID(t *testing.T) {
 }
 
 func TestParamWriteShowAlert(t *testing.T) {
+	t.Parallel()
 	prmtc := new(prmTestContainer)
 	prmtc.writeShowAlert()
 	msg := formatter.CreateEmpltyMessage()
@@ -1025,6 +1063,7 @@ func TestParamWriteShowAlert(t *testing.T) {
 }
 
 func TestParamWriteURL(t *testing.T) {
+	t.Parallel()
 	prmtc := new(prmTestContainer)
 	prmtc.writeURL()
 	msg := formatter.CreateEmpltyMessage()
@@ -1032,6 +1071,7 @@ func TestParamWriteURL(t *testing.T) {
 }
 
 func TestParamWriteCacheTime(t *testing.T) {
+	t.Parallel()
 	prmtc := new(prmTestContainer)
 	prmtc.writeCacheTime()
 	msg := formatter.CreateEmpltyMessage()
@@ -1039,6 +1079,7 @@ func TestParamWriteCacheTime(t *testing.T) {
 }
 
 func TestParamWriteInlineMessageID(t *testing.T) {
+	t.Parallel()
 	prmtc := new(prmTestContainer)
 	prmtc.writeInlineMessageID()
 	msg := formatter.CreateEmpltyMessage()
@@ -1046,6 +1087,7 @@ func TestParamWriteInlineMessageID(t *testing.T) {
 }
 
 func TestParamWriteErrors(t *testing.T) {
+	t.Parallel()
 	prmtc := new(prmTestContainer)
 	prmtc.writeErrors()
 	msg := formatter.CreateEmpltyMessage()
@@ -1053,6 +1095,7 @@ func TestParamWriteErrors(t *testing.T) {
 }
 
 func TestVideoStartTimestamp(t *testing.T) {
+	t.Parallel()
 	prmtc := new(prmTestContainer)
 	prmtc.writeVideoStartTimestamp()
 	msg := formatter.CreateEmpltyMessage()
@@ -1060,6 +1103,7 @@ func TestVideoStartTimestamp(t *testing.T) {
 }
 
 func TestSetName(t *testing.T) {
+	t.Parallel()
 	prmtc := new(prmTestContainer)
 	prmtc.writeSetName()
 	msg := formatter.CreateEmpltyMessage()
@@ -1067,6 +1111,7 @@ func TestSetName(t *testing.T) {
 }
 
 func TestSetTitle(t *testing.T) {
+	t.Parallel()
 	prmtc := new(prmTestContainer)
 	prmtc.writeSetTitle()
 	msg := formatter.CreateEmpltyMessage()
@@ -1074,6 +1119,7 @@ func TestSetTitle(t *testing.T) {
 }
 
 func TestStickerWriteStickerType(t *testing.T) {
+	t.Parallel()
 	prmtc := new(prmTestContainer)
 	prmtc.writeStickerType()
 	msg := formatter.CreateEmpltyMessage()
@@ -1081,6 +1127,7 @@ func TestStickerWriteStickerType(t *testing.T) {
 }
 
 func TestStickerWriteNeedsRepainting(t *testing.T) {
+	t.Parallel()
 	prmtc := new(prmTestContainer)
 	prmtc.writeNeedsRepainting()
 	msg := formatter.CreateEmpltyMessage()

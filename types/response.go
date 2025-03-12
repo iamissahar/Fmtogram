@@ -111,11 +111,6 @@ type Error struct {
 	Description string `json:"description"`
 }
 
-type Telegram struct {
-	Ok     bool      `json:"ok"`
-	Result []*Update `json:"result,omitempty"`
-}
-
 type GetMe struct {
 	Ok     bool  `json:"ok"`
 	Result *User `json:"result,omitempty"`

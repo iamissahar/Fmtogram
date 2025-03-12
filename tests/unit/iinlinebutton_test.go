@@ -3,8 +3,8 @@ package unit
 import (
 	"testing"
 
-	"github.com/l1qwie/Fmtogram/formatter"
-	"github.com/l1qwie/Fmtogram/types"
+	"github.com/iamissahar/Fmtogram/formatter"
+	"github.com/iamissahar/Fmtogram/types"
 )
 
 type inlineButtonT struct {
@@ -164,22 +164,22 @@ func (inbtc *inbTestContainer) writeWebApp() {
 func (inb *inlineButtonT) startTest(part string, i int, t *testing.T) {
 	switch f := inb.testedFunc.(type) {
 	case func(string) error:
-		printTestLog(part, inb.name, inb.codeErr, inb.str, inb.isExpectedErr, i)
+		printTestLog(part, inb.name, inb.codeErr, inb.str, inb.isExpectedErr, i, t)
 		checkError(f(inb.str), inb.isExpectedErr, inb.codeErr, t)
 	case func(*types.CallbackGame) error:
-		printTestLog(part, inb.name, inb.codeErr, inb.game, inb.isExpectedErr, i)
+		printTestLog(part, inb.name, inb.codeErr, inb.game, inb.isExpectedErr, i, t)
 		checkError(f(inb.game), inb.isExpectedErr, inb.codeErr, t)
 	case func(*types.LoginUrl) error:
-		printTestLog(part, inb.name, inb.codeErr, inb.login, inb.isExpectedErr, i)
+		printTestLog(part, inb.name, inb.codeErr, inb.login, inb.isExpectedErr, i, t)
 		checkError(f(inb.login), inb.isExpectedErr, inb.codeErr, t)
 	case func(*types.SwitchInlineQueryChosenChat) error:
-		printTestLog(part, inb.name, inb.codeErr, inb.sw, inb.isExpectedErr, i)
+		printTestLog(part, inb.name, inb.codeErr, inb.sw, inb.isExpectedErr, i, t)
 		checkError(f(inb.sw), inb.isExpectedErr, inb.codeErr, t)
 	case func(*types.WebAppInfo) error:
-		printTestLog(part, inb.name, inb.codeErr, inb.webapp, inb.isExpectedErr, i)
+		printTestLog(part, inb.name, inb.codeErr, inb.webapp, inb.isExpectedErr, i, t)
 		checkError(f(inb.webapp), inb.isExpectedErr, inb.codeErr, t)
 	case func() error:
-		printTestLog(part, inb.name, inb.codeErr, true, inb.isExpectedErr, i)
+		printTestLog(part, inb.name, inb.codeErr, true, inb.isExpectedErr, i, t)
 		checkError(f(), inb.isExpectedErr, inb.codeErr, t)
 	default:
 		t.Fatalf("unexpected type of tested function: %T", f)
@@ -229,6 +229,7 @@ func (inbtc *inbTestContainer) mainLogic(msg *formatter.Message, t *testing.T) {
 }
 
 func TestIButtonWriteCallbackData(t *testing.T) {
+	t.Parallel()
 	inbtc := new(inbTestContainer)
 	inbtc.writeCallbackData()
 	msg := formatter.CreateEmpltyMessage()
@@ -236,6 +237,7 @@ func TestIButtonWriteCallbackData(t *testing.T) {
 }
 
 func TestIButtonWriteCallbackGame(t *testing.T) {
+	t.Parallel()
 	inbtc := new(inbTestContainer)
 	inbtc.writeCallbackGame()
 	msg := formatter.CreateEmpltyMessage()
@@ -243,6 +245,7 @@ func TestIButtonWriteCallbackGame(t *testing.T) {
 }
 
 func TestIButttonWriteLoginUrl(t *testing.T) {
+	t.Parallel()
 	inbtc := new(inbTestContainer)
 	inbtc.writeLoginUrl()
 	msg := formatter.CreateEmpltyMessage()
@@ -250,6 +253,7 @@ func TestIButttonWriteLoginUrl(t *testing.T) {
 }
 
 func TestIButtonWritePay(t *testing.T) {
+	t.Parallel()
 	inbtc := new(inbTestContainer)
 	inbtc.writePay()
 	msg := formatter.CreateEmpltyMessage()
@@ -257,6 +261,7 @@ func TestIButtonWritePay(t *testing.T) {
 }
 
 func TestIButtonWriteString(t *testing.T) {
+	t.Parallel()
 	inbtc := new(inbTestContainer)
 	inbtc.writeString()
 	msg := formatter.CreateEmpltyMessage()
@@ -264,6 +269,7 @@ func TestIButtonWriteString(t *testing.T) {
 }
 
 func TestIButtonWriteSwitchInlineQuery(t *testing.T) {
+	t.Parallel()
 	inbtc := new(inbTestContainer)
 	inbtc.writeSwitchInlineQuery()
 	msg := formatter.CreateEmpltyMessage()
@@ -271,6 +277,7 @@ func TestIButtonWriteSwitchInlineQuery(t *testing.T) {
 }
 
 func TestIButtonWriteSwitchInlineQueryChosenChat(t *testing.T) {
+	t.Parallel()
 	inbtc := new(inbTestContainer)
 	inbtc.writeSwitchInlineQueryChosenChat()
 	msg := formatter.CreateEmpltyMessage()
@@ -278,6 +285,7 @@ func TestIButtonWriteSwitchInlineQueryChosenChat(t *testing.T) {
 }
 
 func TestIButtonWriteSwitchInlineQueryCurrentChat(t *testing.T) {
+	t.Parallel()
 	inbtc := new(inbTestContainer)
 	inbtc.writeSwitchInlineQueryCurrentChat()
 	msg := formatter.CreateEmpltyMessage()
@@ -285,6 +293,7 @@ func TestIButtonWriteSwitchInlineQueryCurrentChat(t *testing.T) {
 }
 
 func TestIButtonWriteURL(t *testing.T) {
+	t.Parallel()
 	inbtc := new(inbTestContainer)
 	inbtc.writeURL()
 	msg := formatter.CreateEmpltyMessage()
@@ -292,6 +301,7 @@ func TestIButtonWriteURL(t *testing.T) {
 }
 
 func TestIButtonWriteWebApp(t *testing.T) {
+	t.Parallel()
 	inbtc := new(inbTestContainer)
 	inbtc.writeWebApp()
 	msg := formatter.CreateEmpltyMessage()

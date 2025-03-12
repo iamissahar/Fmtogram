@@ -3,7 +3,7 @@ package logs
 import (
 	"log"
 
-	"github.com/l1qwie/Fmtogram/types"
+	"github.com/iamissahar/Fmtogram/types"
 )
 
 var Caption string

@@ -3,9 +3,9 @@ package formatter
 import (
 	"net/http"
 
-	"github.com/l1qwie/Fmtogram/formatter/methods"
-	"github.com/l1qwie/Fmtogram/logs"
-	"github.com/l1qwie/Fmtogram/types"
+	"github.com/iamissahar/Fmtogram/formatter/methods"
+	"github.com/iamissahar/Fmtogram/logs"
+	"github.com/iamissahar/Fmtogram/types"
 )
 
 // Added a photo interface to the message you're building

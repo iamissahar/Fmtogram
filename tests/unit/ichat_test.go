@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/l1qwie/Fmtogram/formatter"
+	"github.com/iamissahar/Fmtogram/formatter"
 )
 
 type chatT struct {
@@ -81,9 +81,9 @@ func (chtc *chTestContainer) writeBusinessConnectionID() {
 
 func (chtc *chTestContainer) writeChatID() {
 	chtc.name = "(IChat).WriteChatID()"
-	chtc.inputInt = []int{10230, 0, 2214, 666623}
-	chtc.isExpectedErr = []bool{false, true, false, true}
-	chtc.codeErr = []string{"", "20", "", "10"}
+	chtc.inputInt = []int{10230, 0, -2214, 666623}
+	chtc.isExpectedErr = []bool{false, false, false, true}
+	chtc.codeErr = []string{"", "", "", "10"}
 	chtc.amount, chtc.until = 4, 2
 	chtc.buildF = putChatWriteChatID
 }
@@ -145,13 +145,13 @@ func (chtc *chTestContainer) writeDescription() {
 func (ch *chatT) startTest(part string, i int, t *testing.T) {
 	switch f := ch.testedFunc.(type) {
 	case func(string) error:
-		printTestLog(part, ch.name, ch.codeErr, ch.str, ch.isExpectedErr, i)
+		printTestLog(part, ch.name, ch.codeErr, ch.str, ch.isExpectedErr, i, t)
 		checkError(f(ch.str), ch.isExpectedErr, ch.codeErr, t)
 	case func(int) error:
-		printTestLog(part, ch.name, ch.codeErr, ch.integer, ch.isExpectedErr, i)
+		printTestLog(part, ch.name, ch.codeErr, ch.integer, ch.isExpectedErr, i, t)
 		checkError(f(ch.integer), ch.isExpectedErr, ch.codeErr, t)
 	case func() error:
-		printTestLog(part, ch.name, ch.codeErr, true, ch.isExpectedErr, i)
+		printTestLog(part, ch.name, ch.codeErr, true, ch.isExpectedErr, i, t)
 		checkError(f(), ch.isExpectedErr, ch.codeErr, t)
 	default:
 		t.Fatal("unexpected type of tested function")
@@ -186,6 +186,7 @@ func (chtc *chTestContainer) mainLogic(msg *formatter.Message, t *testing.T) {
 }
 
 func TestChatWriteBusinessConnectionID(t *testing.T) {
+	t.Parallel()
 	chtc := new(chTestContainer)
 	chtc.writeBusinessConnectionID()
 	msg := formatter.CreateEmpltyMessage()
@@ -193,6 +194,7 @@ func TestChatWriteBusinessConnectionID(t *testing.T) {
 }
 
 func TestChatWriteChatID(t *testing.T) {
+	t.Parallel()
 	chtc := new(chTestContainer)
 	chtc.writeChatID()
 	msg := formatter.CreateEmpltyMessage()
@@ -200,6 +202,7 @@ func TestChatWriteChatID(t *testing.T) {
 }
 
 func TestChatWriteChatName(t *testing.T) {
+	t.Parallel()
 	chtc := new(chTestContainer)
 	chtc.writeChatName()
 	msg := formatter.CreateEmpltyMessage()
@@ -207,6 +210,7 @@ func TestChatWriteChatName(t *testing.T) {
 }
 
 func TestChatWriteFromChatID(t *testing.T) {
+	t.Parallel()
 	chtc := new(chTestContainer)
 	chtc.writeFromChatID()
 	msg := formatter.CreateEmpltyMessage()
@@ -214,6 +218,7 @@ func TestChatWriteFromChatID(t *testing.T) {
 }
 
 func TestChatWriteFromChatName(t *testing.T) {
+	t.Parallel()
 	chtc := new(chTestContainer)
 	chtc.writeFromChatName()
 	msg := formatter.CreateEmpltyMessage()
@@ -221,6 +226,7 @@ func TestChatWriteFromChatName(t *testing.T) {
 }
 
 func TestChatWriteSenderChatID(t *testing.T) {
+	t.Parallel()
 	chtc := new(chTestContainer)
 	chtc.writeSenderChatID()
 	msg := formatter.CreateEmpltyMessage()
@@ -228,6 +234,7 @@ func TestChatWriteSenderChatID(t *testing.T) {
 }
 
 func TestChatWriteTitle(t *testing.T) {
+	t.Parallel()
 	chtc := new(chTestContainer)
 	chtc.writeTitle()
 	msg := formatter.CreateEmpltyMessage()
@@ -235,6 +242,7 @@ func TestChatWriteTitle(t *testing.T) {
 }
 
 func TestChatWriteDescription(t *testing.T) {
+	t.Parallel()
 	chtc := new(chTestContainer)
 	chtc.writeDescription()
 	msg := formatter.CreateEmpltyMessage()

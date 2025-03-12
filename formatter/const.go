@@ -1,8 +1,8 @@
 package formatter
 
 import (
-	"github.com/l1qwie/Fmtogram/formatter/methods"
-	"github.com/l1qwie/Fmtogram/types"
+	"github.com/iamissahar/Fmtogram/formatter/methods"
+	"github.com/iamissahar/Fmtogram/types"
 )
 
 const (

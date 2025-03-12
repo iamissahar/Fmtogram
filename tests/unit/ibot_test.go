@@ -4,8 +4,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/l1qwie/Fmtogram/formatter"
-	"github.com/l1qwie/Fmtogram/types"
+	"github.com/iamissahar/Fmtogram/formatter"
+	"github.com/iamissahar/Fmtogram/types"
 )
 
 type botT struct {
@@ -167,22 +167,22 @@ func (bottc *botTestContainer) writeForChannels() {
 func (bot *botT) startTest(part string, i int, t *testing.T) {
 	switch f := bot.testedFunc.(type) {
 	case func(string) error:
-		printTestLog(part, bot.name, bot.codeErr, bot.str, bot.isExpectedErr, i)
+		printTestLog(part, bot.name, bot.codeErr, bot.str, bot.isExpectedErr, i, t)
 		checkError(f(bot.str), bot.isExpectedErr, bot.codeErr, t)
 	case func([]*types.BotCommand) error:
-		printTestLog(part, bot.name, bot.codeErr, bot.commands, bot.isExpectedErr, i)
+		printTestLog(part, bot.name, bot.codeErr, bot.commands, bot.isExpectedErr, i, t)
 		checkError(f(bot.commands), bot.isExpectedErr, bot.codeErr, t)
 	case func(*types.BotCommandScope) error:
-		printTestLog(part, bot.name, bot.codeErr, bot.scope, bot.isExpectedErr, i)
+		printTestLog(part, bot.name, bot.codeErr, bot.scope, bot.isExpectedErr, i, t)
 		checkError(f(bot.scope), bot.isExpectedErr, bot.codeErr, t)
 	case func(*types.MenuButton) error:
-		printTestLog(part, bot.name, bot.codeErr, bot.mbutt, bot.isExpectedErr, i)
+		printTestLog(part, bot.name, bot.codeErr, bot.mbutt, bot.isExpectedErr, i, t)
 		checkError(f(bot.mbutt), bot.isExpectedErr, bot.codeErr, t)
 	case func(*types.ChatAdministratorRights) error:
-		printTestLog(part, bot.name, bot.codeErr, bot.rights, bot.isExpectedErr, i)
+		printTestLog(part, bot.name, bot.codeErr, bot.rights, bot.isExpectedErr, i, t)
 		checkError(f(bot.rights), bot.isExpectedErr, bot.codeErr, t)
 	case func() error:
-		printTestLog(part, bot.name, bot.codeErr, true, bot.isExpectedErr, i)
+		printTestLog(part, bot.name, bot.codeErr, true, bot.isExpectedErr, i, t)
 		checkError(f(), bot.isExpectedErr, bot.codeErr, t)
 	default:
 		t.Fatal("unexpected type of tested function")
@@ -216,6 +216,7 @@ func (bottc *botTestContainer) mainLogic(msg *formatter.Message, t *testing.T) {
 }
 
 func TestBotWriteCommands(t *testing.T) {
+	t.Parallel()
 	bottc := new(botTestContainer)
 	bottc.writeCommands()
 	msg := formatter.CreateEmpltyMessage()
@@ -223,6 +224,7 @@ func TestBotWriteCommands(t *testing.T) {
 }
 
 func TestBotWriteScope(t *testing.T) {
+	t.Parallel()
 	bottc := new(botTestContainer)
 	bottc.writeScope()
 	msg := formatter.CreateEmpltyMessage()
@@ -230,6 +232,7 @@ func TestBotWriteScope(t *testing.T) {
 }
 
 func TestBotWriteLanguage(t *testing.T) {
+	t.Parallel()
 	bottc := new(botTestContainer)
 	bottc.writeLanguage()
 	msg := formatter.CreateEmpltyMessage()
@@ -237,6 +240,7 @@ func TestBotWriteLanguage(t *testing.T) {
 }
 
 func TestBotWriteName(t *testing.T) {
+	t.Parallel()
 	bottc := new(botTestContainer)
 	bottc.writeName()
 	msg := formatter.CreateEmpltyMessage()
@@ -244,6 +248,7 @@ func TestBotWriteName(t *testing.T) {
 }
 
 func TestBotWriteDescription(t *testing.T) {
+	t.Parallel()
 	bottc := new(botTestContainer)
 	bottc.writeDescription()
 	msg := formatter.CreateEmpltyMessage()
@@ -251,6 +256,7 @@ func TestBotWriteDescription(t *testing.T) {
 }
 
 func TestBotWriteShortDescription(t *testing.T) {
+	t.Parallel()
 	bottc := new(botTestContainer)
 	bottc.writeShortDescription()
 	msg := formatter.CreateEmpltyMessage()
@@ -258,6 +264,7 @@ func TestBotWriteShortDescription(t *testing.T) {
 }
 
 func TestBotWriteMenuButton(t *testing.T) {
+	t.Parallel()
 	bottc := new(botTestContainer)
 	bottc.writeMenuButton()
 	msg := formatter.CreateEmpltyMessage()
@@ -265,6 +272,7 @@ func TestBotWriteMenuButton(t *testing.T) {
 }
 
 func TestBotWriteRights(t *testing.T) {
+	t.Parallel()
 	bottc := new(botTestContainer)
 	bottc.writeRights()
 	msg := formatter.CreateEmpltyMessage()
@@ -272,6 +280,7 @@ func TestBotWriteRights(t *testing.T) {
 }
 
 func TestBotWriteForChannels(t *testing.T) {
+	t.Parallel()
 	bottc := new(botTestContainer)
 	bottc.writeForChannels()
 	msg := formatter.CreateEmpltyMessage()

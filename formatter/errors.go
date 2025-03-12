@@ -1,6 +1,6 @@
 package formatter
 
-import "github.com/l1qwie/Fmtogram/fmerrors"
+import "github.com/iamissahar/Fmtogram/fmerrors"
 
 func code01() error {
 	err := new(fmerrors.FME)

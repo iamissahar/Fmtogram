@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"os"
 
-	"github.com/l1qwie/Fmtogram/formatter/methods"
+	"github.com/iamissahar/Fmtogram/formatter/methods"
 )
 
 var matrix [7][7]int

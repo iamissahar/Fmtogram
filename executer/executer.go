@@ -8,8 +8,8 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/l1qwie/Fmtogram/fmerrors"
-	"github.com/l1qwie/Fmtogram/types"
+	"github.com/iamissahar/Fmtogram/fmerrors"
+	"github.com/iamissahar/Fmtogram/types"
 )
 
 const (

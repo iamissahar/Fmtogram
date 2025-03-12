@@ -4,8 +4,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/l1qwie/Fmtogram/formatter"
-	"github.com/l1qwie/Fmtogram/types"
+	"github.com/iamissahar/Fmtogram/formatter"
+	"github.com/iamissahar/Fmtogram/types"
 )
 
 const (
@@ -80,7 +80,7 @@ func putWriteTitle(at audiotest, ad formatter.IAudio, i int) *audio {
 
 func (t *audiotest) writeAudioStorage() {
 	t.name = "(IAudio).WriteAudioStorage"
-	t.inputStr = []string{"../media_test/sound.mp3", "", "../media_test/tel-aviv.jpg", "../media_test/sound.mp3", "../media_test/sound.mp3"}
+	t.inputStr = []string{"../media/sound.mp3", "", "../media/tel-aviv.jpg", "../media/sound.mp3", "../media/sound.mp3"}
 	t.isExpectedErr = []bool{false, true, true, false, true}
 	t.codeErr = []string{"", "20", "12", "", "10"}
 	t.amount, t.until = 5, 3
@@ -156,7 +156,7 @@ func (t *audiotest) writePerformer() {
 
 func (t *audiotest) writeThumbnail() {
 	t.name = "(IAudio).WriteThumbnail"
-	t.inputStr = []string{"../media_test/tel-aviv.jpg", "", "../media_test/sound.mp3", "../media_test/tel-aviv.jpg", "../media_test/tel-aviv.jpg"}
+	t.inputStr = []string{"../media/tel-aviv.jpg", "", "../media/sound.mp3", "../media/tel-aviv.jpg", "../media/tel-aviv.jpg"}
 	t.isExpectedErr = []bool{false, true, true, false, true}
 	t.codeErr = []string{"", "20", "12", "", "10"}
 	t.amount, t.until = 5, 3
@@ -164,7 +164,7 @@ func (t *audiotest) writeThumbnail() {
 }
 
 func (t *audiotest) writeThumbnailID() {
-	t.name = "(IAudio).WriteThumbnail"
+	t.name = "(IAudio).WriteThumbnailID"
 	t.inputStr = []string{"AO:KSDKLASLDK:LAKSDA", "", "ASL:KDKL:ASD:KLASDASD", "A:OLD:IOLASOIP:FDIKOA:KLKL::KOL"}
 	t.isExpectedErr = []bool{false, true, false, true}
 	t.codeErr = []string{"", "20", "", "10"}
@@ -220,13 +220,13 @@ func (ad *audio) callSliceF(testedFunc func([]*types.MessageEntity) error, t *te
 func (ad *audio) startTest(part string, i int, t *testing.T) {
 	switch f := ad.testedFunc.(type) {
 	case func(string) error:
-		printTestLog(part, ad.name, ad.codeErr, ad.str, ad.isExpectedErr, i)
+		printTestLog(part, ad.name, ad.codeErr, ad.str, ad.isExpectedErr, i, t)
 		ad.callStrF(f, t)
 	case func(int) error:
-		printTestLog(part, ad.name, ad.codeErr, ad.integer, ad.isExpectedErr, i)
+		printTestLog(part, ad.name, ad.codeErr, ad.integer, ad.isExpectedErr, i, t)
 		ad.callIntF(f, t)
 	case func([]*types.MessageEntity) error:
-		printTestLog(part, ad.name, ad.codeErr, ad.array, ad.isExpectedErr, i)
+		printTestLog(part, ad.name, ad.codeErr, ad.array, ad.isExpectedErr, i, t)
 		ad.callSliceF(f, t)
 	default:
 		t.Fatal("unexpected type of tested function")
@@ -258,6 +258,7 @@ func mainAudioLogic(msg *formatter.Message, at audiotest, t *testing.T) {
 }
 
 func TestWriteAudioStorage(t *testing.T) {
+	t.Parallel()
 	at := new(audiotest)
 	at.writeAudioStorage()
 	msg := formatter.CreateEmpltyMessage()
@@ -265,6 +266,7 @@ func TestWriteAudioStorage(t *testing.T) {
 }
 
 func TestWriteAudioTelegram(t *testing.T) {
+	t.Parallel()
 	at := new(audiotest)
 	at.writeAudioTelegram()
 	msg := formatter.CreateEmpltyMessage()
@@ -272,6 +274,7 @@ func TestWriteAudioTelegram(t *testing.T) {
 }
 
 func TestWriteAudioInternet(t *testing.T) {
+	t.Parallel()
 	at := new(audiotest)
 	at.writeAudioInternet()
 	msg := formatter.CreateEmpltyMessage()
@@ -279,6 +282,7 @@ func TestWriteAudioInternet(t *testing.T) {
 }
 
 func TestAudioWriteCaption(t *testing.T) {
+	t.Parallel()
 	at := new(audiotest)
 	at.writeCaption()
 	msg := formatter.CreateEmpltyMessage()
@@ -286,6 +290,7 @@ func TestAudioWriteCaption(t *testing.T) {
 }
 
 func TestAudioWriteEntitiesCaption(t *testing.T) {
+	t.Parallel()
 	at := new(audiotest)
 	at.writeCaptionEntities()
 	msg := formatter.CreateEmpltyMessage()
@@ -293,6 +298,7 @@ func TestAudioWriteEntitiesCaption(t *testing.T) {
 }
 
 func TestAudioWriteDuration(t *testing.T) {
+	t.Parallel()
 	at := new(audiotest)
 	at.writeDuration()
 	msg := formatter.CreateEmpltyMessage()
@@ -300,6 +306,7 @@ func TestAudioWriteDuration(t *testing.T) {
 }
 
 func TestAudioWriteParseMode(t *testing.T) {
+	t.Parallel()
 	at := new(audiotest)
 	at.writeParseMode()
 	msg := formatter.CreateEmpltyMessage()
@@ -307,6 +314,7 @@ func TestAudioWriteParseMode(t *testing.T) {
 }
 
 func TestAudioWritePerformer(t *testing.T) {
+	t.Parallel()
 	at := new(audiotest)
 	at.writePerformer()
 	msg := formatter.CreateEmpltyMessage()
@@ -314,6 +322,7 @@ func TestAudioWritePerformer(t *testing.T) {
 }
 
 func TestAudioWriteThumbnail(t *testing.T) {
+	t.Parallel()
 	at := new(audiotest)
 	at.writeThumbnail()
 	msg := formatter.CreateEmpltyMessage()
@@ -321,6 +330,7 @@ func TestAudioWriteThumbnail(t *testing.T) {
 }
 
 func TestAudioWriteThumbnailID(t *testing.T) {
+	t.Parallel()
 	at := new(audiotest)
 	at.writeThumbnailID()
 	msg := formatter.CreateEmpltyMessage()
@@ -328,6 +338,7 @@ func TestAudioWriteThumbnailID(t *testing.T) {
 }
 
 func TestAudioWriteTitle(t *testing.T) {
+	t.Parallel()
 	at := new(audiotest)
 	at.writeTitle()
 	msg := formatter.CreateEmpltyMessage()

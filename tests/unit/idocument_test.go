@@ -3,8 +3,8 @@ package unit
 import (
 	"testing"
 
-	"github.com/l1qwie/Fmtogram/formatter"
-	"github.com/l1qwie/Fmtogram/types"
+	"github.com/iamissahar/Fmtogram/formatter"
+	"github.com/iamissahar/Fmtogram/types"
 )
 
 type documentT struct {
@@ -64,7 +64,7 @@ func putWriteDocumentThumbnailID(doctc docTestContainer, doc formatter.IDocument
 
 func (doctc *docTestContainer) writeDocumentStorage() {
 	doctc.name = "(IDocument).WriteDocumentStorage"
-	doctc.inputStr = []string{"../media_test/Resume.pdf", "", "../media_test/sound.mp3", "../media_test/Resume.pdf", "../media_test/Resume.pdf"}
+	doctc.inputStr = []string{"../media/Resume.pdf", "", "../media/sound.mp3", "../media/Resume.pdf", "../media/Resume.pdf"}
 	doctc.isExpectedErr = []bool{false, true, false, false, true}
 	doctc.codeErr = []string{"", "20", "", "", "10"}
 	doctc.amount, doctc.until = 5, 3
@@ -130,7 +130,7 @@ func (doctc *docTestContainer) writeParseMode() {
 
 func (doctc *docTestContainer) writeThumbnail() {
 	doctc.name = "(IDocument).WriteThumbnail"
-	doctc.inputStr = []string{"../media_test/tel-aviv.jpg", "", "../media_test/sound.mp3", "../media_test/tel-aviv.jpg", "../media_test/tel-aviv.jpg"}
+	doctc.inputStr = []string{"../media/tel-aviv.jpg", "", "../media/sound.mp3", "../media/tel-aviv.jpg", "../media/tel-aviv.jpg"}
 	doctc.isExpectedErr = []bool{false, true, true, false, true}
 	doctc.codeErr = []string{"", "20", "12", "", "10"}
 	doctc.amount, doctc.until = 5, 3
@@ -138,7 +138,7 @@ func (doctc *docTestContainer) writeThumbnail() {
 }
 
 func (doctc *docTestContainer) writeThumbnailID() {
-	doctc.name = "(IDocument).WriteThumbnail"
+	doctc.name = "(IDocument).WriteThumbnailID"
 	doctc.inputStr = []string{".:KLKL:ASK:LDKL:ASD:KLK:LL:KKL:SAHJDAHSDGHAD", "", "ASDKJKJASDHJKASDJ", ".asdaasfaDJKLASJHKDA"}
 	doctc.isExpectedErr = []bool{false, true, false, true}
 	doctc.codeErr = []string{"", "20", "", "10"}
@@ -185,13 +185,13 @@ func (doc *documentT) callBoolF(testedF func() error, t *testing.T) {
 func (doc *documentT) startTest(part string, i int, t *testing.T) {
 	switch f := doc.testedFunc.(type) {
 	case func(string) error:
-		printTestLog(part, doc.name, doc.codeErr, doc.str, doc.isExpectedErr, i)
+		printTestLog(part, doc.name, doc.codeErr, doc.str, doc.isExpectedErr, i, t)
 		doc.callStrF(f, t)
 	case func([]*types.MessageEntity) error:
-		printTestLog(part, doc.name, doc.codeErr, doc.array, doc.isExpectedErr, i)
+		printTestLog(part, doc.name, doc.codeErr, doc.array, doc.isExpectedErr, i, t)
 		doc.callSliceF(f, t)
 	case func() error:
-		printTestLog(part, doc.name, doc.codeErr, true, doc.isExpectedErr, i)
+		printTestLog(part, doc.name, doc.codeErr, true, doc.isExpectedErr, i, t)
 		doc.callBoolF(f, t)
 	default:
 		t.Fatal("unexpected type of tested function")
@@ -223,6 +223,7 @@ func mainDocumentLogic(msg *formatter.Message, doctc docTestContainer, t *testin
 }
 
 func TestWriteDocumentStorage(t *testing.T) {
+	t.Parallel()
 	doctc := new(docTestContainer)
 	doctc.writeDocumentStorage()
 	msg := formatter.CreateEmpltyMessage()
@@ -230,6 +231,7 @@ func TestWriteDocumentStorage(t *testing.T) {
 }
 
 func TestWriteDocumentTelegram(t *testing.T) {
+	t.Parallel()
 	doctc := new(docTestContainer)
 	doctc.writeDocumentTelegram()
 	msg := formatter.CreateEmpltyMessage()
@@ -237,6 +239,7 @@ func TestWriteDocumentTelegram(t *testing.T) {
 }
 
 func TestWriteDocumentInternet(t *testing.T) {
+	t.Parallel()
 	doctc := new(docTestContainer)
 	doctc.writeDocumentInternet()
 	msg := formatter.CreateEmpltyMessage()
@@ -244,6 +247,7 @@ func TestWriteDocumentInternet(t *testing.T) {
 }
 
 func TestWriteDocumentCaption(t *testing.T) {
+	t.Parallel()
 	doctc := new(docTestContainer)
 	doctc.writeCaption()
 	msg := formatter.CreateEmpltyMessage()
@@ -251,6 +255,7 @@ func TestWriteDocumentCaption(t *testing.T) {
 }
 
 func TestWriteDocumentCaptionEntities(t *testing.T) {
+	t.Parallel()
 	doctc := new(docTestContainer)
 	doctc.writeCaptionEntities()
 	msg := formatter.CreateEmpltyMessage()
@@ -258,6 +263,7 @@ func TestWriteDocumentCaptionEntities(t *testing.T) {
 }
 
 func TestWriteDocumentDisableContentTypeDetection(t *testing.T) {
+	t.Parallel()
 	doctc := new(docTestContainer)
 	doctc.writeDisableContentTypeDetection()
 	msg := formatter.CreateEmpltyMessage()
@@ -265,6 +271,7 @@ func TestWriteDocumentDisableContentTypeDetection(t *testing.T) {
 }
 
 func TestWriteDocumentParseMode(t *testing.T) {
+	t.Parallel()
 	doctc := new(docTestContainer)
 	doctc.writeParseMode()
 	msg := formatter.CreateEmpltyMessage()
@@ -272,6 +279,7 @@ func TestWriteDocumentParseMode(t *testing.T) {
 }
 
 func TestWriteDocumentThumbnail(t *testing.T) {
+	t.Parallel()
 	vdtc := new(docTestContainer)
 	vdtc.writeThumbnail()
 	msg := formatter.CreateEmpltyMessage()
@@ -279,6 +287,7 @@ func TestWriteDocumentThumbnail(t *testing.T) {
 }
 
 func TestWriteDocumentThumbnailID(t *testing.T) {
+	t.Parallel()
 	vdtc := new(docTestContainer)
 	vdtc.writeThumbnailID()
 	msg := formatter.CreateEmpltyMessage()

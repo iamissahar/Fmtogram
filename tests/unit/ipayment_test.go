@@ -5,8 +5,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/l1qwie/Fmtogram/formatter"
-	"github.com/l1qwie/Fmtogram/types"
+	"github.com/iamissahar/Fmtogram/formatter"
+	"github.com/iamissahar/Fmtogram/types"
 )
 
 type paymentT struct {
@@ -200,8 +200,8 @@ func (paytc *payTestContainer) writePayload() {
 func (paytc *payTestContainer) writeProviderToken() {
 	paytc.name = "(IPayment).WriteProviderToken()"
 	paytc.inputStr = []string{"asdasdasdad", "", "ASKLJDAKSJLFJKLASJKLD", "AS:>DLKAWIO$*(AS)(ED()ASD)*()"}
-	paytc.isExpectedErr = []bool{false, true, false, true}
-	paytc.codeErr = []string{"", "20", "", "10"}
+	paytc.isExpectedErr = []bool{false, false, false, true}
+	paytc.codeErr = []string{"", "", "", "10"}
 	paytc.amount, paytc.until = 4, 2
 	paytc.buildF = paytc.providerToken
 }
@@ -254,8 +254,8 @@ func (paytc *payTestContainer) writeSuggestedTipAmounts() {
 func (paytc *payTestContainer) writeStartParameter() {
 	paytc.name = "(IPayment).WriteStartParameter()"
 	paytc.inputStr = []string{"asdasdasdad", "", "ASKLJDAKSJLFJKLASJKLD", "AS:>DLKAWIO$*(AS)(ED()ASD)*()"}
-	paytc.isExpectedErr = []bool{false, true, false, true}
-	paytc.codeErr = []string{"", "20", "", "10"}
+	paytc.isExpectedErr = []bool{false, false, false, true}
+	paytc.codeErr = []string{"", "", "", "10"}
 	paytc.amount, paytc.until = 4, 2
 	paytc.buildF = paytc.startParameter
 }
@@ -425,23 +425,28 @@ func (paytc *payTestContainer) writeIsCanceled() {
 func (pay *paymentT) startTest(part string, i int, t *testing.T) {
 	switch f := pay.testedFunc.(type) {
 	case func(string) error:
-		printTestLog(part, pay.name, pay.codeErr, pay.str, pay.isExpectedErr, i)
+		printTestLog(part, pay.name, pay.codeErr, pay.str, pay.isExpectedErr, i, t)
 		checkError(f(pay.str), pay.isExpectedErr, pay.codeErr, t)
 	case func(int) error:
-		printTestLog(part, pay.name, pay.codeErr, pay.integer, pay.isExpectedErr, i)
+		printTestLog(part, pay.name, pay.codeErr, pay.integer, pay.isExpectedErr, i, t)
 		checkError(f(pay.integer), pay.isExpectedErr, pay.codeErr, t)
 	case func([]*types.LabeledPrice) error:
-		printTestLog(part, pay.name, pay.codeErr, pay.prices, pay.isExpectedErr, i)
+		printTestLog(part, pay.name, pay.codeErr, pay.prices, pay.isExpectedErr, i, t)
 		checkError(f(pay.prices), pay.isExpectedErr, pay.codeErr, t)
 	case func([]*types.ShippingOption) error:
-		printTestLog(part, pay.name, pay.codeErr, pay.shOpt, pay.isExpectedErr, i)
+		printTestLog(part, pay.name, pay.codeErr, pay.shOpt, pay.isExpectedErr, i, t)
 		checkError(f(pay.shOpt), pay.isExpectedErr, pay.codeErr, t)
 	case func([]int) error:
-		printTestLog(part, pay.name, pay.codeErr, pay.arrInt, pay.isExpectedErr, i)
+		printTestLog(part, pay.name, pay.codeErr, pay.arrInt, pay.isExpectedErr, i, t)
 		checkError(f(pay.arrInt), pay.isExpectedErr, pay.codeErr, t)
 	case func() error:
-		printTestLog(part, pay.name, pay.codeErr, true, pay.isExpectedErr, i)
+		printTestLog(part, pay.name, pay.codeErr, true, pay.isExpectedErr, i, t)
 		checkError(f(), pay.isExpectedErr, pay.codeErr, t)
+	case func(bool) error:
+		printTestLog(part, pay.name, pay.codeErr, false, pay.isExpectedErr, i, t)
+		checkError(f(false), pay.isExpectedErr, pay.codeErr, t)
+	case func():
+
 	default:
 		t.Fatal("unexpected type of tested function")
 	}
@@ -478,6 +483,7 @@ func (paytc *payTestContainer) mainLogic(msg *formatter.Message, t *testing.T) {
 }
 
 func TestPaymentWriteTitle(t *testing.T) {
+	t.Parallel()
 	paytc := new(payTestContainer)
 	paytc.writeTitle()
 	msg := formatter.CreateEmpltyMessage()
@@ -485,6 +491,7 @@ func TestPaymentWriteTitle(t *testing.T) {
 }
 
 func TestPaymentWriteDescription(t *testing.T) {
+	t.Parallel()
 	paytc := new(payTestContainer)
 	paytc.writeDescription()
 	msg := formatter.CreateEmpltyMessage()
@@ -492,6 +499,7 @@ func TestPaymentWriteDescription(t *testing.T) {
 }
 
 func TestPaymentWritePayload(t *testing.T) {
+	t.Parallel()
 	paytc := new(payTestContainer)
 	paytc.writePayload()
 	msg := formatter.CreateEmpltyMessage()
@@ -499,6 +507,7 @@ func TestPaymentWritePayload(t *testing.T) {
 }
 
 func TestPaymentWriteProviderToken(t *testing.T) {
+	t.Parallel()
 	paytc := new(payTestContainer)
 	paytc.writeProviderToken()
 	msg := formatter.CreateEmpltyMessage()
@@ -506,6 +515,7 @@ func TestPaymentWriteProviderToken(t *testing.T) {
 }
 
 func TestPaymentWriteCurrency(t *testing.T) {
+	t.Parallel()
 	for key := range formatter.Currencies {
 		paytc := new(payTestContainer)
 		paytc.writeCurrency(key)
@@ -515,6 +525,7 @@ func TestPaymentWriteCurrency(t *testing.T) {
 }
 
 func TestPaymentWritePrices(t *testing.T) {
+	t.Parallel()
 	paytc := new(payTestContainer)
 	paytc.writePrices()
 	msg := formatter.CreateEmpltyMessage()
@@ -522,6 +533,7 @@ func TestPaymentWritePrices(t *testing.T) {
 }
 
 func TestPaymentWriteSubscriptionPeriod(t *testing.T) {
+	t.Parallel()
 	paytc := new(payTestContainer)
 	paytc.writeSubscriptionPeriod()
 	msg := formatter.CreateEmpltyMessage()
@@ -529,6 +541,7 @@ func TestPaymentWriteSubscriptionPeriod(t *testing.T) {
 }
 
 func TestPaymentWriteMaxTipAmount(t *testing.T) {
+	t.Parallel()
 	paytc := new(payTestContainer)
 	paytc.writeMaxTipAmount()
 	msg := formatter.CreateEmpltyMessage()
@@ -536,6 +549,7 @@ func TestPaymentWriteMaxTipAmount(t *testing.T) {
 }
 
 func TestPaymentWriteSuggestedTipAmounts(t *testing.T) {
+	t.Parallel()
 	paytc := new(payTestContainer)
 	paytc.writeSuggestedTipAmounts()
 	msg := formatter.CreateEmpltyMessage()
@@ -543,6 +557,7 @@ func TestPaymentWriteSuggestedTipAmounts(t *testing.T) {
 }
 
 func TestPaymentWriteStartParameter(t *testing.T) {
+	t.Parallel()
 	paytc := new(payTestContainer)
 	paytc.writeStartParameter()
 	msg := formatter.CreateEmpltyMessage()
@@ -550,6 +565,7 @@ func TestPaymentWriteStartParameter(t *testing.T) {
 }
 
 func TestPaymentWriteProviderData(t *testing.T) {
+	t.Parallel()
 	paytc := new(payTestContainer)
 	paytc.writeProviderData()
 	msg := formatter.CreateEmpltyMessage()
@@ -557,6 +573,7 @@ func TestPaymentWriteProviderData(t *testing.T) {
 }
 
 func TestPaymentWritePhotoUrl(t *testing.T) {
+	t.Parallel()
 	paytc := new(payTestContainer)
 	paytc.writePhotoUrl()
 	msg := formatter.CreateEmpltyMessage()
@@ -564,6 +581,7 @@ func TestPaymentWritePhotoUrl(t *testing.T) {
 }
 
 func TestPaymentWritePhotoSize(t *testing.T) {
+	t.Parallel()
 	paytc := new(payTestContainer)
 	paytc.writePhotoSize()
 	msg := formatter.CreateEmpltyMessage()
@@ -571,6 +589,7 @@ func TestPaymentWritePhotoSize(t *testing.T) {
 }
 
 func TestPaymentWritePhotoWidth(t *testing.T) {
+	t.Parallel()
 	paytc := new(payTestContainer)
 	paytc.writePhotoWidth()
 	msg := formatter.CreateEmpltyMessage()
@@ -578,6 +597,7 @@ func TestPaymentWritePhotoWidth(t *testing.T) {
 }
 
 func TestPaymentWritePhotoHeight(t *testing.T) {
+	t.Parallel()
 	paytc := new(payTestContainer)
 	paytc.writePhotoHeight()
 	msg := formatter.CreateEmpltyMessage()
@@ -585,6 +605,7 @@ func TestPaymentWritePhotoHeight(t *testing.T) {
 }
 
 func TestPaymentWriteNeedName(t *testing.T) {
+	t.Parallel()
 	paytc := new(payTestContainer)
 	paytc.writeNeedName()
 	msg := formatter.CreateEmpltyMessage()
@@ -592,6 +613,7 @@ func TestPaymentWriteNeedName(t *testing.T) {
 }
 
 func TestPaymentWriteNeedPhoneNumber(t *testing.T) {
+	t.Parallel()
 	paytc := new(payTestContainer)
 	paytc.writeNeedPhoneNumber()
 	msg := formatter.CreateEmpltyMessage()
@@ -599,6 +621,7 @@ func TestPaymentWriteNeedPhoneNumber(t *testing.T) {
 }
 
 func TestPaymentWriteNeedEmail(t *testing.T) {
+	t.Parallel()
 	paytc := new(payTestContainer)
 	paytc.writeNeedEmail()
 	msg := formatter.CreateEmpltyMessage()
@@ -606,6 +629,7 @@ func TestPaymentWriteNeedEmail(t *testing.T) {
 }
 
 func TestPaymentWriteNeedShippingAddress(t *testing.T) {
+	t.Parallel()
 	paytc := new(payTestContainer)
 	paytc.writeNeedShippingAddress()
 	msg := formatter.CreateEmpltyMessage()
@@ -613,6 +637,7 @@ func TestPaymentWriteNeedShippingAddress(t *testing.T) {
 }
 
 func TestPaymentWriteSendPhoneNumberToProvider(t *testing.T) {
+	t.Parallel()
 	paytc := new(payTestContainer)
 	paytc.writeSendPhoneNumberToProvider()
 	msg := formatter.CreateEmpltyMessage()
@@ -620,6 +645,7 @@ func TestPaymentWriteSendPhoneNumberToProvider(t *testing.T) {
 }
 
 func TestPaymentWriteSendEmailToProvider(t *testing.T) {
+	t.Parallel()
 	paytc := new(payTestContainer)
 	paytc.writeSendEmailToProvider()
 	msg := formatter.CreateEmpltyMessage()
@@ -627,6 +653,7 @@ func TestPaymentWriteSendEmailToProvider(t *testing.T) {
 }
 
 func TestPaymentWriteIsFlexible(t *testing.T) {
+	t.Parallel()
 	paytc := new(payTestContainer)
 	paytc.writeIsFlexiable()
 	msg := formatter.CreateEmpltyMessage()
@@ -634,6 +661,7 @@ func TestPaymentWriteIsFlexible(t *testing.T) {
 }
 
 func TestPaymentWriteShippingID(t *testing.T) {
+	t.Parallel()
 	paytc := new(payTestContainer)
 	paytc.writeShippingID()
 	msg := formatter.CreateEmpltyMessage()
@@ -641,6 +669,7 @@ func TestPaymentWriteShippingID(t *testing.T) {
 }
 
 func TestPaymentWriteOK(t *testing.T) {
+	t.Parallel()
 	paytc := new(payTestContainer)
 	paytc.writeOK()
 	msg := formatter.CreateEmpltyMessage()
@@ -648,6 +677,7 @@ func TestPaymentWriteOK(t *testing.T) {
 }
 
 func TestPaymentWriteShippingOptions(t *testing.T) {
+	t.Parallel()
 	paytc := new(payTestContainer)
 	paytc.writeShippingOptions()
 	msg := formatter.CreateEmpltyMessage()
@@ -655,6 +685,7 @@ func TestPaymentWriteShippingOptions(t *testing.T) {
 }
 
 func TestPaymentWriteErrorMessage(t *testing.T) {
+	t.Parallel()
 	paytc := new(payTestContainer)
 	paytc.writeErrorMessage()
 	msg := formatter.CreateEmpltyMessage()
@@ -662,6 +693,7 @@ func TestPaymentWriteErrorMessage(t *testing.T) {
 }
 
 func TestPaymentWritePreCheckoutID(t *testing.T) {
+	t.Parallel()
 	paytc := new(payTestContainer)
 	paytc.writePreCheckoutID()
 	msg := formatter.CreateEmpltyMessage()
@@ -669,6 +701,7 @@ func TestPaymentWritePreCheckoutID(t *testing.T) {
 }
 
 func TestPaymentWriteTelegramPaymentChargeID(t *testing.T) {
+	t.Parallel()
 	paytc := new(payTestContainer)
 	paytc.writeTelegramPaymentChargeID()
 	msg := formatter.CreateEmpltyMessage()
@@ -676,6 +709,7 @@ func TestPaymentWriteTelegramPaymentChargeID(t *testing.T) {
 }
 
 func TestPaymentWriteIsCaneled(t *testing.T) {
+	t.Parallel()
 	paytc := new(payTestContainer)
 	paytc.writeIsCanceled()
 	msg := formatter.CreateEmpltyMessage()

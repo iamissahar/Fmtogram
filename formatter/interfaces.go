@@ -5,7 +5,7 @@ import (
 	"mime/multipart"
 	"time"
 
-	"github.com/l1qwie/Fmtogram/types"
+	"github.com/iamissahar/Fmtogram/types"
 )
 
 type handlerMedia interface {
@@ -21,6 +21,444 @@ type handleFiles interface {
 type kb interface {
 	get() ([]byte, error)
 	isOK() error
+}
+
+type IMessage interface {
+	// Unique message identifier inside this chat. In specific instances
+	// (e.g., message containing a video sent to a big chat), the server might
+	// automatically schedule a message instead of sending it immediately. In such cases,
+	// this field will be 0 and the relevant message will be unusable until it is actually sent
+	ID() int
+
+	// Sender of the message; may be empty for messages sent to channels. For backward
+	// compatibility, if the message was sent on behalf of a chat, the field contains a
+	// fake sender user in non-channel chats
+	Sender() *types.User
+
+	// Chat the message belongs to
+	Chat() *types.Chat
+
+	// Date the message was sent in Unix time. It is always a positive number, representing
+	// a valid date and a special framework of golang for working with time
+	Date() (unix int, t time.Time)
+
+	// For replies in the same chat and message thread, the original message.
+	// Note that the IMessage interface from this function will not contain further
+	// Reply() fields even if it itself is a reply.
+	Reply() IMessage
+
+	// For text messages, the actual UTF-8 text of the message
+	Text() string
+
+	// Message is an audio file, information about the file
+	Audio() *types.Audio
+
+	// Message is a general file, information about the file
+	Document() *types.Document
+
+	// Message contains paid media; information about the paid media (photo or video)
+	PaidMedia() *types.PaidMediaInfo
+
+	// Message is a photo, available sizes of the photo
+	Photo() []*types.PhotoSize
+
+	// Message is a sticker, information about the sticker
+	Sticker() *types.Sticker
+
+	// Message is a forwarded story
+	Story() *types.Story
+
+	// Message is a video, information about the video
+	Video() *types.Video
+
+	// Message is a video note, information about the video message
+	VideoNote() *types.VideoNote
+
+	// Message is a voice message, information about the file
+	Voice() *types.Voice
+
+	// The whole other data that isn't specified in this interface
+	Message() *types.Message
+}
+
+type IBusiness interface {
+	// Unique identifier of the business connection
+	ID() string
+
+	// Business account user that created the business connection
+	Sender() *types.User
+
+	// Identifier of a private chat with the user who created the business connection.
+	// This number may have more than 32 significant bits and some programming languages
+	// may have difficulty/silent defects in interpreting it. But it has at most 52 significant bits
+	SenderChatID() int64
+
+	// Date the connection was established in Unix time and a special framework of golang for working with time
+	Date() (unix int, t time.Time)
+
+	// True, if the bot can act on behalf of the business account in chats that were active in the last 24 hours
+	CanReply() bool
+
+	// True, if the connection is active
+	IsEnabled() bool
+}
+
+type IBusinessMessage interface {
+	// Unique identifier of the business connection
+	ConnectionID() string
+
+	// Information about a chat in the business account. The bot may not have access to the chat or the corresponding user.
+	Chat() *types.Chat
+
+	// The list of identifiers of deleted messages in the chat of the business account
+	MessageIDs() []int
+}
+
+type IMessageReaction interface {
+	// The chat containing the message the user reacted to
+	Chat() *types.Chat
+
+	// Unique identifier of the message inside the chat
+	MessageID() int
+
+	// The user that changed the reaction, if the user isn't anonymous
+	Sender() *types.User
+
+	// The chat on behalf of which the reaction was changed, if the user is anonymous
+	ActorChat() *types.Chat
+
+	// Date of the change in Unix time and a special framework of golang for working with time
+	Date() (unix int, t time.Time)
+
+	// Previous list of reaction types that were set by the sender
+	OldReaction() []*types.ReactionType
+
+	// New list of reaction types that have been set by the sender
+	NewReaction() []*types.ReactionType
+}
+
+type IMessageReactionCount interface {
+	// The chat containing the message
+	Chat() *types.Chat
+
+	// Unique message identifier inside the chat
+	MessageID() int
+
+	// Date of the change in Unix time and a special framework of golang for working with time
+	Date() (unix int, t time.Time)
+
+	// List of reactions that are present on the message
+	Reactions() []*types.ReactionCount
+}
+
+type IInlineQuery interface {
+	// Unique identifier for this query
+	ID() string
+
+	// Sender
+	Sender() *types.User
+
+	// 	Text of the query (up to 256 characters)
+	Query() string
+
+	// Offset of the results to be returned, can be controlled by the bot
+	Offset() string
+	// Type of the chat from which the inline query was sent. Can be either “sender” for a private chat with the
+	// inline query sender, “private”, “group”, “supergroup”, or “channel”. The chat type should be always known
+	// for requests sent from official clients and most third-party clients, unless the request was sent from a secret chat
+	ChatType() string
+
+	// Sender location, only for bots that request user location
+	Location() *types.Location
+}
+
+type IInlineResult interface {
+	// The unique identifier for the result that was chosen
+	ID() string
+
+	// The sender of the request that chose the result
+	Sender() *types.User
+
+	// Sender location, only for bots that require user location
+	Location() *types.Location
+
+	// Identifier of the sent inline message. Available only if there is (formatter.IKeyboard).Inline() attached to the message.
+	// Will be also received in callback queries and can be used to edit the message.
+	InlineMessageID() string
+
+	// The query that was used to obtain the result
+	Query() string
+}
+
+// After the user presses a callback button, Telegram clients will display a progress bar until
+// you call methods.AnswerCallbackQuery. It is, therefore, necessary to react by calling methods.AnswerCallbackQuery
+// even if no notification to the user is needed (e.g., without specifying any of the optional parameters).
+type ICallbackQuery interface {
+	// Unique identifier for this query
+	ID() string
+
+	// Sender
+	Sender() *types.User
+
+	// Message sent by the bot with the callback button that originated the query
+	Message() *types.MaybeInaccessibleMessage
+
+	// Identifier of the message sent via the bot in inline mode, that originated the query.
+	InlineMessageID() string
+
+	// Global identifier, uniquely corresponding to the chat to which the message with the callback
+	// button was sent. Useful for high scores in games.
+	ChatInstance() string
+
+	// Data associated with the callback button. Be aware that the message originated the query can
+	// contain no callback buttons with this data.
+	Data() string
+
+	// Short name of a Game to be returned, serves as the unique identifier for the game
+	GameShortName() string
+}
+
+type IShippingQuery interface {
+	// Unique query identifier
+	ID() string
+
+	// User who sent the query
+	Sender() *types.User
+
+	// 	Bot-specified invoice payload
+	InvoicePayload() string
+
+	// User specified shipping address
+	SHippingAddress() *types.ShippingAddress
+}
+
+type IPreCheckoutQuery interface {
+	// Unique query identifier
+	ID() string
+
+	// User who sent the query
+	Sender() *types.User
+
+	// Three-letter ISO 4217 currency code, or “XTR” for payments in Telegram Stars
+	Currency() string
+
+	// Total price in the smallest units of the currency (integer, not float/double). For example,
+	// for a price of US$ 1.45 pass amount = 145. See the exp parameter in currencies.json, it shows
+	// the number of digits past the decimal point for each currency (2 for the majority of currencies).
+	TotalAmount() int
+
+	// Bot-specified invoice payload
+	InvoicePayload() string
+
+	// Identifier of the shipping option chosen by the user
+	ShippingOptionID() string
+
+	// Order information provided by the user
+	OrderInfo() *types.OrderInfo
+}
+
+type IPaidMedia interface {
+	// User who purchased the media
+	Sender() *types.User
+
+	// Bot-specified paid media payload
+	Payload() string
+}
+
+type IPollUpdate interface {
+	// Unique poll identifier
+	ID() string
+
+	// Poll question, 1-300 characters
+	Question() string
+
+	// Poll type, currently can be “regular” or “quiz”
+	Type() string
+
+	// Slice of poll options
+	Options() []*types.PollOption
+
+	// True, if the poll is closed
+	IsClosed() bool
+
+	// 0-based identifier of the correct answer option. Available only for polls in the quiz mode,
+	// which are closed, or was sent (not forwarded) by the bot or to the private chat with the bot.
+	CorrectOptionID() string
+
+	// Text that is shown when a user chooses an incorrect answer or taps on the lamp icon in a quiz-style poll, 0-200 characters
+	Explanation() string
+
+	// All other possible data
+	Poll() *types.Poll
+}
+
+type IPollAnswer interface {
+	// Unique poll identifier
+	ID() string
+
+	// The chat that changed the answer to the poll, if the voter is anonymous
+	VoterChat() *types.Chat
+
+	// The user that changed the answer to the poll, if the voter isn't anonymous
+	Sender() *types.User
+
+	// 0-based identifiers of chosen answer options. May be empty if the vote was retracted.
+	OptionIDs() []string
+}
+
+type IChatMember interface {
+	// Chat the user belongs to
+	Chat() *types.Chat
+
+	// Performer of the action, which resulted in the change
+	Sender() *types.User
+
+	// Date of the change in Unix time and a special framework of golang for working with time
+	Date() (unix int, t time.Time)
+
+	// Previous information about the chat member
+	OldMember() *types.ChatMember
+
+	// New information about the chat member
+	NewMemmber() *types.ChatMember
+
+	// Chat invite link, which was used by the user to join the chat; for joining by invite link events only.
+	InviteLink() *types.ChatInviteLink
+
+	// True, if the user joined the chat after sending a direct join request without using an invite link and being approved by an administrator
+	ViaJoinRequest() bool
+	// True, if the user joined the chat via a chat folder invite link
+	ViaChatFolderInviteLink() bool
+}
+
+type IJoinRequest interface {
+	// Chat to which the request was sent
+	Chat() *types.Chat
+
+	// User that sent the join request
+	Sender() *types.User
+
+	// Identifier of a private chat with the user who sent the join request. This number may have more
+	// than 32 significant bits and some programming languages may have difficulty/silent defects in
+	// interpreting it. But it has at most 52 significant bits, so a 64-bit integer or double-precision
+	// float type are safe for storing this identifier. The bot can use this identifier for 5 minutes to
+	// send messages until the join request is processed, assuming no other administrator contacted the user.
+	UserChatID() int
+
+	// Date the request was sent in Unix time and a special framework of golang for working with time
+	Date() (unix int, t time.Time)
+
+	// Bio of the user.
+	Bio() string
+
+	// Chat invite link that was used by the user to send the join request
+	InviteLink() *types.ChatInviteLink
+}
+
+type IBoostUpdate interface {
+	// Chat which was boosted
+	Chat() *types.Chat
+
+	// Information about the chat boost
+	Boost() *types.ChatBoost
+}
+
+type IBoostRemove interface {
+	// Chat which was boosted
+	Chat() *types.Chat
+
+	// Unique identifier of the boost
+	BoostID() string
+
+	// Point in time (Unix timestamp) when the boost was removed and a special framework of golang for working with time
+	RemoveDate() (unix int, t time.Time)
+
+	// Source of the removed boost
+	Source() *types.ChatBoostSource
+}
+
+type ITelegram interface {
+	// The update's unique identifier. Update identifiers start from a certain positive number and increase sequentially.
+	// This identifier becomes especially handy if you're using webhooks, since it allows you to ignore repeated updates
+	// or to restore the correct update sequence, should they get out of order. If there are no new updates for at least
+	// a week, then identifier of the next update will be chosen randomly instead of sequentially.
+	ID() int
+
+	// New incoming message of any kind - text, photo, sticker, etc.
+	Message() IMessage
+
+	// New version of a message that is known to the bot and was edited. This update may at times be triggered by
+	// changes to message fields that are either unavailable or not actively used by your bot.
+	EditedMessage() IMessage
+
+	// New incoming channel post of any kind - text, photo, sticker, etc.
+	ChannelPost() IMessage
+
+	// New version of a channel post that is known to the bot and was edited. This update may at times be
+	// triggered by changes to message fields that are either unavailable or not actively used by your bot.
+	EditedChannelPost() IMessage
+
+	// The bot was connected to or disconnected from a business account, or a user edited an existing connection with the bot
+	BusinessConnection() IBusiness
+
+	// New message from a connected business account
+	BusinessMessage() IMessage
+
+	// New version of a message from a connected business account
+	EditedBusinessMessage() IMessage
+
+	// Messages were deleted from a connected business account
+	DeletedBusinessMessages() IBusinessMessage
+
+	// A reaction to a message was changed by a user. The bot must be an administrator in the chat.
+	// The update isn't received for reactions set by bots.
+	MessageReaction() IMessageReaction
+
+	// Reactions to a message with anonymous reactions were changed. The bot must be an administrator in the
+	// chat. The data is grouped and can be sent with delay up to a few minutes.
+	MessageReactionCount() IMessageReactionCount
+
+	// New incoming inline query
+	InlineQuery() IInlineQuery
+
+	// The result of an inline query that was chosen by a user and sent to their chat partner.
+	// Please see our documentation on the feedback collecting for details on how to enable these updates for your bot.
+	ChosenInlineResult() IInlineResult
+
+	// New incoming callback query
+	CallbackQuery() ICallbackQuery
+
+	// New incoming shipping query. Only for invoices with flexible price
+	ShippingQuery() IShippingQuery
+
+	// New incoming pre-checkout query. Contains full information about checkout
+	PreCheckoutQuery() IPreCheckoutQuery
+
+	// A user purchased paid media with a non-empty payload sent by the bot in a non-channel chat
+	PurchasedPaidMedia() IPaidMedia
+
+	// New poll state. Bots receive only updates about manually stopped polls and polls, which are sent by the bot
+	Poll() IPollUpdate
+
+	// A user changed their answer in a non-anonymous poll. Bots receive new votes only in polls that were sent by the bot itself.
+	PollAnswer() IPollAnswer
+
+	// The bot's chat member status was updated in a chat. For private chats, this data is received
+	// only when the bot is blocked or unblocked by the user.
+	MyChatMember() IChatMember
+
+	// A chat member's status was updated in a chat. The bot must be an administrator in the chat.
+	ChatMember() IChatMember
+
+	// A request to join the chat has been sent. The bot must have the
+	// types.ChatAdministratorRights.CanInviteUsers administrator right in the chat to receive this data.
+	ChatJoinRequest() IJoinRequest
+
+	// A chat boost was added or changed. The bot must be an administrator in the chat to receive this data.
+	ChatBoost() IBoostUpdate
+
+	// A boost was removed from a chat. The bot must be an administrator in the chat to receive this data.
+	RemovedChatBoost() IBoostRemove
 }
 
 type IGet interface {

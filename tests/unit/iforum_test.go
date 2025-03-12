@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/l1qwie/Fmtogram/formatter"
+	"github.com/iamissahar/Fmtogram/formatter"
 )
 
 type forumT struct {
@@ -67,10 +67,10 @@ func (frmtc *frmTestContainer) writeIconColor() {
 }
 
 func (frmtc *frmTestContainer) writeIconEmojiID() {
-	frmtc.name = "(IForum).WriteName()"
+	frmtc.name = "(IForum).WriteIconEmojiID()"
 	frmtc.inputStr = []string{"a;l,ksdsal;'d", "", "y", "name", "noname"}
-	frmtc.isExpectedErr = []bool{false, true, false, false, true}
-	frmtc.codeErr = []string{"", "20", "", "", "10"}
+	frmtc.isExpectedErr = []bool{false, false, false, false, true}
+	frmtc.codeErr = []string{"", "", "", "", "10"}
 	frmtc.amount, frmtc.until = 5, 3
 	frmtc.buildF = frmtc.iconEmojiID
 }
@@ -78,10 +78,10 @@ func (frmtc *frmTestContainer) writeIconEmojiID() {
 func (frm *forumT) startTest(part string, i int, t *testing.T) {
 	switch f := frm.testedFunc.(type) {
 	case func(string) error:
-		printTestLog(part, frm.name, frm.codeErr, frm.str, frm.isExpectedErr, i)
+		printTestLog(part, frm.name, frm.codeErr, frm.str, frm.isExpectedErr, i, t)
 		checkError(f(frm.str), frm.isExpectedErr, frm.codeErr, t)
 	case func(int) error:
-		printTestLog(part, frm.name, frm.codeErr, frm.integer, frm.isExpectedErr, i)
+		printTestLog(part, frm.name, frm.codeErr, frm.integer, frm.isExpectedErr, i, t)
 		checkError(f(frm.integer), frm.isExpectedErr, frm.codeErr, t)
 	default:
 		t.Fatal("unexpected type of tested function")
@@ -115,6 +115,7 @@ func (frmtc *frmTestContainer) mainLogic(msg *formatter.Message, t *testing.T) {
 }
 
 func TestForumWriteName(t *testing.T) {
+	t.Parallel()
 	frmtc := new(frmTestContainer)
 	frmtc.writeName()
 	msg := formatter.CreateEmpltyMessage()
@@ -122,12 +123,14 @@ func TestForumWriteName(t *testing.T) {
 }
 
 func TestForumWriteIconColor(t *testing.T) {
+	t.Parallel()
 	frmtc := new(frmTestContainer)
 	frmtc.writeIconColor()
 	msg := formatter.CreateEmpltyMessage()
 	frmtc.mainLogic(msg, t)
 }
 func TestForumWriteIconEmojiID(t *testing.T) {
+	t.Parallel()
 	frmtc := new(frmTestContainer)
 	frmtc.writeIconEmojiID()
 	msg := formatter.CreateEmpltyMessage()

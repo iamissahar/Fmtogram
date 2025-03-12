@@ -7,10 +7,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/l1qwie/Fmtogram/executer"
-	"github.com/l1qwie/Fmtogram/formatter/methods"
-	"github.com/l1qwie/Fmtogram/testbotdata"
-	"github.com/l1qwie/Fmtogram/types"
+	"github.com/iamissahar/Fmtogram/executer"
+	"github.com/iamissahar/Fmtogram/formatter/methods"
+	"github.com/iamissahar/Fmtogram/testbotdata"
+	"github.com/iamissahar/Fmtogram/types"
 )
 
 func msgRReq(t *testing.T) {
@@ -55,12 +55,7 @@ func msgRAll(t *testing.T) {
 	if err = tc.prm.WriteMessageID(testbotdata.MessageID[tc.token]); err != nil {
 		t.Fatal(err)
 	}
-	if err = tc.prm.WriteReaction([]*types.ReactionType{{
-		ReactionTypeEmoji: &types.ReactionTypeEmoji{
-			Type:  "emoji",
-			Emoji: "💩",
-		},
-	}}); err != nil {
+	if err = tc.prm.WriteReaction([]*types.ReactionType{{Type: "emoji", Emoji: "💩"}}); err != nil {
 		t.Fatal(err)
 	}
 	if err = tc.msg.AddMethod(methods.MessageReaction); err != nil {
@@ -93,7 +88,7 @@ func uppReq(t *testing.T) {
 	tc.whattocheck[status] = struct{}{}
 	tc.whattocheck[errr] = struct{}{}
 	tc.whattocheck[profph] = struct{}{}
-	if err = tc.prm.WriteUserID(testybotid); err != nil {
+	if err = tc.prm.WriteUserID(chatid); err != nil {
 		t.Fatal(err)
 	}
 	if err = tc.msg.AddMethod(methods.UserProfilePhotos); err != nil {
@@ -118,7 +113,7 @@ func uppAll(t *testing.T) {
 	tc.whattocheck[status] = struct{}{}
 	tc.whattocheck[errr] = struct{}{}
 	tc.whattocheck[profph] = struct{}{}
-	if err = tc.prm.WriteUserID(testybotid); err != nil {
+	if err = tc.prm.WriteUserID(chatid); err != nil {
 		t.Fatal(err)
 	}
 	if err = tc.prm.WriteLimit(8); err != nil {
@@ -153,7 +148,7 @@ func uesReq(t *testing.T) {
 	tc.init()
 	tc.whattocheck[status] = struct{}{}
 	tc.whattocheck[errr] = struct{}{}
-	if err = tc.prm.WriteUserID(testybotid); err != nil {
+	if err = tc.prm.WriteUserID(chatid); err != nil {
 		t.Fatal(err)
 	}
 	if err = tc.msg.AddMethod(methods.UserEmojiStatus); err != nil {

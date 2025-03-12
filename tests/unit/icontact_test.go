@@ -3,7 +3,7 @@ package unit
 import (
 	"testing"
 
-	"github.com/l1qwie/Fmtogram/formatter"
+	"github.com/iamissahar/Fmtogram/formatter"
 )
 
 type contactT struct {
@@ -75,7 +75,7 @@ func (conct *conTestContainer) writeVCard() {
 	conct.buildF = putWriteContactVCard
 }
 func (con *contactT) startTest(part string, i int, t *testing.T) {
-	printTestLog(part, con.name, con.codeErr, con.str, con.isExpectedErr, i)
+	printTestLog(part, con.name, con.codeErr, con.str, con.isExpectedErr, i, t)
 	if !con.isExpectedErr {
 		if err := con.testedFunc(con.str); err != nil {
 			t.Fatal(err)
@@ -112,6 +112,7 @@ func mainContactLogic(msg *formatter.Message, contc conTestContainer, t *testing
 }
 
 func TestWriteContactPhoneNumber(t *testing.T) {
+	t.Parallel()
 	contc := new(conTestContainer)
 	contc.writePhoneNumber()
 	msg := formatter.CreateEmpltyMessage()
@@ -119,6 +120,7 @@ func TestWriteContactPhoneNumber(t *testing.T) {
 }
 
 func TestWriteContactFirstName(t *testing.T) {
+	t.Parallel()
 	contc := new(conTestContainer)
 	contc.writeFirstName()
 	msg := formatter.CreateEmpltyMessage()
@@ -126,6 +128,7 @@ func TestWriteContactFirstName(t *testing.T) {
 }
 
 func TestWriteContactLastName(t *testing.T) {
+	t.Parallel()
 	contc := new(conTestContainer)
 	contc.writeLastName()
 	msg := formatter.CreateEmpltyMessage()
@@ -133,6 +136,7 @@ func TestWriteContactLastName(t *testing.T) {
 }
 
 func TestWriteContactVCard(t *testing.T) {
+	t.Parallel()
 	contc := new(conTestContainer)
 	contc.writeVCard()
 	msg := formatter.CreateEmpltyMessage()

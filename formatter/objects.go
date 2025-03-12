@@ -1,8 +1,6 @@
 package formatter
 
-import (
-	"github.com/l1qwie/Fmtogram/types"
-)
+import "github.com/iamissahar/Fmtogram/types"
 
 type photo struct {
 	Type                  string                 `json:"type,omitempty" field:"type" ifempty:"false"`

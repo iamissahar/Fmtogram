@@ -3,8 +3,8 @@ package unit
 import (
 	"testing"
 
-	"github.com/l1qwie/Fmtogram/formatter"
-	"github.com/l1qwie/Fmtogram/types"
+	"github.com/iamissahar/Fmtogram/formatter"
+	"github.com/iamissahar/Fmtogram/types"
 )
 
 type photoT struct {
@@ -60,7 +60,7 @@ func putWritePhotoHasSpoiler(pt phTestContainer, ph formatter.IPhoto, i int) *ph
 
 func (t *phTestContainer) writePhotoStorage() {
 	t.name = "(IPhoto).WritePhotoStorage"
-	t.inputStr = []string{"../media_test/tel-aviv.jpg", "", "../media_test/sound.mp3", "../media_test/tel-aviv.jpg", "../media_test/photo1.jpg"}
+	t.inputStr = []string{"../media/tel-aviv.jpg", "", "../media/sound.mp3", "../media/tel-aviv.jpg", "../media/photo1.jpg"}
 	t.isExpectedErr = []bool{false, true, true, false, true}
 	t.codeErr = []string{"", "20", "12", "", "10"}
 	t.amount, t.until = 5, 3
@@ -171,13 +171,13 @@ func (ph *photoT) callSliceF(testedFunc func([]*types.MessageEntity) error, data
 func (ph *photoT) startTest(part string, i int, t *testing.T) {
 	switch f := ph.testedFunc.(type) {
 	case func(string) error:
-		printTestLog(part, ph.name, ph.codeErr, ph.str, ph.isExpectedErr, i)
+		printTestLog(part, ph.name, ph.codeErr, ph.str, ph.isExpectedErr, i, t)
 		ph.callStrF(f, ph.str, t)
 	case func([]*types.MessageEntity) error:
-		printTestLog(part, ph.name, ph.codeErr, ph.array, ph.isExpectedErr, i)
+		printTestLog(part, ph.name, ph.codeErr, ph.array, ph.isExpectedErr, i, t)
 		ph.callSliceF(f, ph.array, t)
 	case func() error:
-		printTestLog(part, ph.name, ph.codeErr, true, ph.isExpectedErr, i)
+		printTestLog(part, ph.name, ph.codeErr, true, ph.isExpectedErr, i, t)
 		ph.callBoolF(f, t)
 	default:
 		t.Fatal("unexpected type of tested function")
@@ -209,6 +209,7 @@ func mainPhotoLogic(msg *formatter.Message, pt phTestContainer, t *testing.T) {
 }
 
 func TestWritePhotoStorage(t *testing.T) {
+	t.Parallel()
 	pt := new(phTestContainer)
 	pt.writePhotoStorage()
 	msg := formatter.CreateEmpltyMessage()
@@ -216,6 +217,7 @@ func TestWritePhotoStorage(t *testing.T) {
 }
 
 func TestWritePhotoTelegram(t *testing.T) {
+	t.Parallel()
 	pt := new(phTestContainer)
 	pt.writePhotoTelegram()
 	msg := formatter.CreateEmpltyMessage()
@@ -223,6 +225,7 @@ func TestWritePhotoTelegram(t *testing.T) {
 }
 
 func TestWritePhotoInternet(t *testing.T) {
+	t.Parallel()
 	pt := new(phTestContainer)
 	pt.writePhotoInternet()
 	msg := formatter.CreateEmpltyMessage()
@@ -230,6 +233,7 @@ func TestWritePhotoInternet(t *testing.T) {
 }
 
 func TestWritePhotoCaption(t *testing.T) {
+	t.Parallel()
 	pt := new(phTestContainer)
 	pt.writeCaption()
 	msg := formatter.CreateEmpltyMessage()
@@ -237,6 +241,7 @@ func TestWritePhotoCaption(t *testing.T) {
 }
 
 func TestWritePhotoParseMode(t *testing.T) {
+	t.Parallel()
 	pt := new(phTestContainer)
 	pt.writeParseMode()
 	msg := formatter.CreateEmpltyMessage()
@@ -244,6 +249,7 @@ func TestWritePhotoParseMode(t *testing.T) {
 }
 
 func TestWritePhotoCaptionEntities(t *testing.T) {
+	t.Parallel()
 	pt := new(phTestContainer)
 	pt.writeCaptionEntities()
 	msg := formatter.CreateEmpltyMessage()
@@ -251,12 +257,14 @@ func TestWritePhotoCaptionEntities(t *testing.T) {
 }
 
 func TestWritePhotoShowCaptionAboveMedia(t *testing.T) {
+	t.Parallel()
 	pt := new(phTestContainer)
 	pt.writeShowCaptionAboveMedia()
 	msg := formatter.CreateEmpltyMessage()
 	mainPhotoLogic(msg, *pt, t)
 }
 func TestWritePhotoHasSpoiler(t *testing.T) {
+	t.Parallel()
 	pt := new(phTestContainer)
 	pt.writeHasSpoiler()
 	msg := formatter.CreateEmpltyMessage()

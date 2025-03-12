@@ -1,3 +1,3 @@
-module github.com/l1qwie/Fmtogram
+module github.com/iamissahar/Fmtogram
 
 go 1.22.4

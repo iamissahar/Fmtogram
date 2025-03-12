@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/l1qwie/Fmtogram/formatter"
+	"github.com/iamissahar/Fmtogram/formatter"
 )
 
 type linkT struct {
@@ -132,16 +132,16 @@ func (linktc *linkTestContainer) writeSubscriptionPrice() {
 func (link *linkT) startTest(part string, i int, t *testing.T) {
 	switch f := link.testedFunc.(type) {
 	case func(string) error:
-		printTestLog(part, link.name, link.codeErr, link.str, link.isExpectedErr, i)
+		printTestLog(part, link.name, link.codeErr, link.str, link.isExpectedErr, i, t)
 		checkError(f(link.str), link.isExpectedErr, link.codeErr, t)
 	case func(int) error:
-		printTestLog(part, link.name, link.codeErr, link.integer, link.isExpectedErr, i)
+		printTestLog(part, link.name, link.codeErr, link.integer, link.isExpectedErr, i, t)
 		checkError(f(link.integer), link.isExpectedErr, link.codeErr, t)
 	case func(time.Duration) error:
-		printTestLog(part, link.name, link.codeErr, link.date, link.isExpectedErr, i)
+		printTestLog(part, link.name, link.codeErr, link.date, link.isExpectedErr, i, t)
 		checkError(f(link.date), link.isExpectedErr, link.codeErr, t)
 	case func() error:
-		printTestLog(part, link.name, link.codeErr, true, link.isExpectedErr, i)
+		printTestLog(part, link.name, link.codeErr, true, link.isExpectedErr, i, t)
 		checkError(f(), link.isExpectedErr, link.codeErr, t)
 	}
 }
@@ -174,6 +174,7 @@ func (linktc *linkTestContainer) mainLogic(msg *formatter.Message, t *testing.T)
 }
 
 func TestLinkWriteName(t *testing.T) {
+	t.Parallel()
 	linktc := new(linkTestContainer)
 	linktc.writeName()
 	msg := formatter.CreateEmpltyMessage()
@@ -181,6 +182,7 @@ func TestLinkWriteName(t *testing.T) {
 }
 
 func TestLinWriteExpireDate(t *testing.T) {
+	t.Parallel()
 	linktc := new(linkTestContainer)
 	linktc.writeExpireDate()
 	msg := formatter.CreateEmpltyMessage()
@@ -188,6 +190,7 @@ func TestLinWriteExpireDate(t *testing.T) {
 }
 
 func TestLinkWriteMemberLimit(t *testing.T) {
+	t.Parallel()
 	linktc := new(linkTestContainer)
 	linktc.writeMemberLimit()
 	msg := formatter.CreateEmpltyMessage()
@@ -195,6 +198,7 @@ func TestLinkWriteMemberLimit(t *testing.T) {
 }
 
 func TestLinkWriteJoinRequest(t *testing.T) {
+	t.Parallel()
 	linktc := new(linkTestContainer)
 	linktc.writeJoinRequest()
 	msg := formatter.CreateEmpltyMessage()
@@ -202,6 +206,7 @@ func TestLinkWriteJoinRequest(t *testing.T) {
 }
 
 func TestLinkWriteIniveLink(t *testing.T) {
+	t.Parallel()
 	linktc := new(linkTestContainer)
 	linktc.writeIniveLink()
 	msg := formatter.CreateEmpltyMessage()
@@ -209,6 +214,7 @@ func TestLinkWriteIniveLink(t *testing.T) {
 }
 
 func TestLinkWriteSubscriptionPeriod(t *testing.T) {
+	t.Parallel()
 	linktc := new(linkTestContainer)
 	linktc.writeSubscriptionPeriod()
 	msg := formatter.CreateEmpltyMessage()
@@ -216,6 +222,7 @@ func TestLinkWriteSubscriptionPeriod(t *testing.T) {
 }
 
 func TestLinkWriteSubscriptionPrice(t *testing.T) {
+	t.Parallel()
 	linktc := new(linkTestContainer)
 	linktc.writeSubscriptionPrice()
 	msg := formatter.CreateEmpltyMessage()

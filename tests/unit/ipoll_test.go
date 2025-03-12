@@ -4,8 +4,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/l1qwie/Fmtogram/formatter"
-	"github.com/l1qwie/Fmtogram/types"
+	"github.com/iamissahar/Fmtogram/formatter"
+	"github.com/iamissahar/Fmtogram/types"
 )
 
 type pollT struct {
@@ -285,20 +285,23 @@ func (poll *pollT) callBoolF(testedF func() error, t *testing.T) {
 func (poll *pollT) startTest(part string, i int, t *testing.T) {
 	switch f := poll.testedFunc.(type) {
 	case func(string) error:
-		printTestLog(part, poll.name, poll.codeErr, poll.str, poll.isExpectedErr, i)
+		printTestLog(part, poll.name, poll.codeErr, poll.str, poll.isExpectedErr, i, t)
 		poll.callStrF(f, t)
 	case func(int) error:
-		printTestLog(part, poll.name, poll.codeErr, poll.integer, poll.isExpectedErr, i)
+		printTestLog(part, poll.name, poll.codeErr, poll.integer, poll.isExpectedErr, i, t)
 		poll.callIntF(f, t)
 	case func([]*types.MessageEntity) error:
-		printTestLog(part, poll.name, poll.codeErr, poll.array, poll.isExpectedErr, i)
+		printTestLog(part, poll.name, poll.codeErr, poll.array, poll.isExpectedErr, i, t)
 		poll.callSliceF(f, t)
 	case func([]*types.PollOption) error:
-		printTestLog(part, poll.name, poll.codeErr, poll.array2, poll.isExpectedErr, i)
+		printTestLog(part, poll.name, poll.codeErr, poll.array2, poll.isExpectedErr, i, t)
 		poll.callSliceF2(f, t)
 	case func() error:
-		printTestLog(part, poll.name, poll.codeErr, true, poll.isExpectedErr, i)
+		printTestLog(part, poll.name, poll.codeErr, true, poll.isExpectedErr, i, t)
 		poll.callBoolF(f, t)
+	case func(bool) error:
+		printTestLog(part, poll.name, poll.codeErr, false, poll.isExpectedErr, i, t)
+		checkError(f(false), poll.isExpectedErr, poll.codeErr, t)
 	default:
 		t.Fatal("unexpected type of tested function")
 	}
@@ -329,6 +332,7 @@ func mainPollLogic(msg *formatter.Message, polltc pollTestContainer, t *testing.
 }
 
 func TestWritePollQuestion(t *testing.T) {
+	t.Parallel()
 	pollct := new(pollTestContainer)
 	pollct.writeQuestion()
 	msg := formatter.CreateEmpltyMessage()
@@ -336,6 +340,7 @@ func TestWritePollQuestion(t *testing.T) {
 }
 
 func TestWritePollQuestionParseMode(t *testing.T) {
+	t.Parallel()
 	pollct := new(pollTestContainer)
 	pollct.writeQuestionParseMode()
 	msg := formatter.CreateEmpltyMessage()
@@ -343,6 +348,7 @@ func TestWritePollQuestionParseMode(t *testing.T) {
 }
 
 func TestWritePollQuestionEntities(t *testing.T) {
+	t.Parallel()
 	pollct := new(pollTestContainer)
 	pollct.writeQuestionEntities()
 	msg := formatter.CreateEmpltyMessage()
@@ -350,6 +356,7 @@ func TestWritePollQuestionEntities(t *testing.T) {
 }
 
 func TestWritePollOptions(t *testing.T) {
+	t.Parallel()
 	pollct := new(pollTestContainer)
 	pollct.writeOptions()
 	msg := formatter.CreateEmpltyMessage()
@@ -357,6 +364,7 @@ func TestWritePollOptions(t *testing.T) {
 }
 
 func TestWritePollAnonymous(t *testing.T) {
+	t.Parallel()
 	pollct := new(pollTestContainer)
 	pollct.writeAnonymous()
 	msg := formatter.CreateEmpltyMessage()
@@ -364,6 +372,7 @@ func TestWritePollAnonymous(t *testing.T) {
 }
 
 func TestWritePollType(t *testing.T) {
+	t.Parallel()
 	pollct := new(pollTestContainer)
 	pollct.writeType()
 	msg := formatter.CreateEmpltyMessage()
@@ -371,6 +380,7 @@ func TestWritePollType(t *testing.T) {
 }
 
 func TestWritePollAllowMultipleAnswers(t *testing.T) {
+	t.Parallel()
 	pollct := new(pollTestContainer)
 	pollct.writeAllowMultipleAnswers()
 	msg := formatter.CreateEmpltyMessage()
@@ -378,6 +388,7 @@ func TestWritePollAllowMultipleAnswers(t *testing.T) {
 }
 
 func TestWritePollCorrectOptionID(t *testing.T) {
+	t.Parallel()
 	pollct := new(pollTestContainer)
 	pollct.writeCorrectOptionID()
 	msg := formatter.CreateEmpltyMessage()
@@ -385,6 +396,7 @@ func TestWritePollCorrectOptionID(t *testing.T) {
 }
 
 func TestWritePollExplanation(t *testing.T) {
+	t.Parallel()
 	pollct := new(pollTestContainer)
 	pollct.writeExplanation()
 	msg := formatter.CreateEmpltyMessage()
@@ -392,6 +404,7 @@ func TestWritePollExplanation(t *testing.T) {
 }
 
 func TestWritePollExplanationParseMode(t *testing.T) {
+	t.Parallel()
 	pollct := new(pollTestContainer)
 	pollct.writeExplanationParseMode()
 	msg := formatter.CreateEmpltyMessage()
@@ -399,6 +412,7 @@ func TestWritePollExplanationParseMode(t *testing.T) {
 }
 
 func TestWritePollExplanationEntities(t *testing.T) {
+	t.Parallel()
 	pollct := new(pollTestContainer)
 	pollct.writeExplanationEntities()
 	msg := formatter.CreateEmpltyMessage()
@@ -406,6 +420,7 @@ func TestWritePollExplanationEntities(t *testing.T) {
 }
 
 func TestWritePollOpenPeriod(t *testing.T) {
+	t.Parallel()
 	pollct := new(pollTestContainer)
 	pollct.writeOpenPeriod()
 	msg := formatter.CreateEmpltyMessage()
@@ -413,6 +428,7 @@ func TestWritePollOpenPeriod(t *testing.T) {
 }
 
 func TestWritePollCloseDate(t *testing.T) {
+	t.Parallel()
 	pollct := new(pollTestContainer)
 	pollct.writeCloseDate()
 	msg := formatter.CreateEmpltyMessage()
@@ -420,6 +436,7 @@ func TestWritePollCloseDate(t *testing.T) {
 }
 
 func TestWritePollClosed(t *testing.T) {
+	t.Parallel()
 	pollct := new(pollTestContainer)
 	pollct.writeClosed()
 	msg := formatter.CreateEmpltyMessage()
