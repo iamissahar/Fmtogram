@@ -4,16 +4,15 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/iamissahar/Fmtogram/formatter"
-	"github.com/iamissahar/Fmtogram/types"
+	fmtogram "github.com/iamissahar/Fmtogram"
 )
 
 type pollT struct {
 	name          string
 	str           string
 	integer       int
-	array         []*types.MessageEntity
-	array2        []*types.PollOption
+	array         []*fmtogram.MessageEntity
+	array2        []*fmtogram.PollOption
 	testedFunc    interface{}
 	isExpectedErr bool
 	codeErr       string
@@ -23,67 +22,67 @@ type pollTestContainer struct {
 	name          string
 	inputStr      []string
 	inputInt      []int
-	inputArr      [][]*types.MessageEntity
-	inputArr2     [][]*types.PollOption
+	inputArr      [][]*fmtogram.MessageEntity
+	inputArr2     [][]*fmtogram.PollOption
 	isExpectedErr []bool
 	codeErr       []string
 	amount, until int
-	buildF        func(polltc pollTestContainer, poll formatter.IPoll, i int) *pollT
+	buildF        func(polltc pollTestContainer, poll fmtogram.IPoll, i int) *pollT
 }
 
-func putWritePollQuestion(polltc pollTestContainer, poll formatter.IPoll, i int) *pollT {
+func putWritePollQuestion(polltc pollTestContainer, poll fmtogram.IPoll, i int) *pollT {
 	return &pollT{polltc.name, polltc.inputStr[i], 0, nil, nil, poll.WriteQuestion, polltc.isExpectedErr[i], polltc.codeErr[i]}
 }
 
-func putWritePollQuestionParseMode(polltc pollTestContainer, poll formatter.IPoll, i int) *pollT {
+func putWritePollQuestionParseMode(polltc pollTestContainer, poll fmtogram.IPoll, i int) *pollT {
 	return &pollT{polltc.name, polltc.inputStr[i], 0, nil, nil, poll.WriteQuestionParseMode, polltc.isExpectedErr[i], polltc.codeErr[i]}
 }
 
-func putWritePollQuestionEntities(polltc pollTestContainer, poll formatter.IPoll, i int) *pollT {
+func putWritePollQuestionEntities(polltc pollTestContainer, poll fmtogram.IPoll, i int) *pollT {
 	return &pollT{polltc.name, "", 0, polltc.inputArr[i], nil, poll.WriteQuestionEntities, polltc.isExpectedErr[i], polltc.codeErr[i]}
 }
 
-func putWritePollOptions(polltc pollTestContainer, poll formatter.IPoll, i int) *pollT {
+func putWritePollOptions(polltc pollTestContainer, poll fmtogram.IPoll, i int) *pollT {
 	return &pollT{polltc.name, "", 0, nil, polltc.inputArr2[i], poll.WriteOptions, polltc.isExpectedErr[i], polltc.codeErr[i]}
 }
 
-func putWritePollAnonymous(polltc pollTestContainer, poll formatter.IPoll, i int) *pollT {
+func putWritePollAnonymous(polltc pollTestContainer, poll fmtogram.IPoll, i int) *pollT {
 	return &pollT{polltc.name, "", 0, nil, nil, poll.WriteAnonymous, polltc.isExpectedErr[i], polltc.codeErr[i]}
 }
 
-func putWritePollType(polltc pollTestContainer, poll formatter.IPoll, i int) *pollT {
+func putWritePollType(polltc pollTestContainer, poll fmtogram.IPoll, i int) *pollT {
 	return &pollT{polltc.name, polltc.inputStr[i], 0, nil, nil, poll.WriteType, polltc.isExpectedErr[i], polltc.codeErr[i]}
 }
 
-func putWritePollAllowMultipleAnswers(polltc pollTestContainer, poll formatter.IPoll, i int) *pollT {
+func putWritePollAllowMultipleAnswers(polltc pollTestContainer, poll fmtogram.IPoll, i int) *pollT {
 	return &pollT{polltc.name, "", 0, nil, nil, poll.WriteAllowMultipleAnswers, polltc.isExpectedErr[i], polltc.codeErr[i]}
 }
 
-func putWritePollCorrectOptionID(polltc pollTestContainer, poll formatter.IPoll, i int) *pollT {
+func putWritePollCorrectOptionID(polltc pollTestContainer, poll fmtogram.IPoll, i int) *pollT {
 	return &pollT{polltc.name, polltc.inputStr[i], 0, nil, nil, poll.WriteCorrectOptionID, polltc.isExpectedErr[i], polltc.codeErr[i]}
 }
 
-func putWritePollExplanation(polltc pollTestContainer, poll formatter.IPoll, i int) *pollT {
+func putWritePollExplanation(polltc pollTestContainer, poll fmtogram.IPoll, i int) *pollT {
 	return &pollT{polltc.name, polltc.inputStr[i], 0, nil, nil, poll.WriteExplanation, polltc.isExpectedErr[i], polltc.codeErr[i]}
 }
 
-func putWritePollExplanationParseMode(polltc pollTestContainer, poll formatter.IPoll, i int) *pollT {
+func putWritePollExplanationParseMode(polltc pollTestContainer, poll fmtogram.IPoll, i int) *pollT {
 	return &pollT{polltc.name, polltc.inputStr[i], 0, nil, nil, poll.WriteExplanationParseMode, polltc.isExpectedErr[i], polltc.codeErr[i]}
 }
 
-func putWritePollExplanationEntities(polltc pollTestContainer, poll formatter.IPoll, i int) *pollT {
+func putWritePollExplanationEntities(polltc pollTestContainer, poll fmtogram.IPoll, i int) *pollT {
 	return &pollT{polltc.name, "", 0, polltc.inputArr[i], nil, poll.WriteExplanationEntities, polltc.isExpectedErr[i], polltc.codeErr[i]}
 }
 
-func putWritePollOpenPeriod(polltc pollTestContainer, poll formatter.IPoll, i int) *pollT {
+func putWritePollOpenPeriod(polltc pollTestContainer, poll fmtogram.IPoll, i int) *pollT {
 	return &pollT{polltc.name, "", polltc.inputInt[i], nil, nil, poll.WriteOpenPeriod, polltc.isExpectedErr[i], polltc.codeErr[i]}
 }
 
-func putWritePollCloseDate(polltc pollTestContainer, poll formatter.IPoll, i int) *pollT {
+func putWritePollCloseDate(polltc pollTestContainer, poll fmtogram.IPoll, i int) *pollT {
 	return &pollT{polltc.name, "", polltc.inputInt[i], nil, nil, poll.WriteCloseDate, polltc.isExpectedErr[i], polltc.codeErr[i]}
 }
 
-func putWritePollClosed(polltc pollTestContainer, poll formatter.IPoll, i int) *pollT {
+func putWritePollClosed(polltc pollTestContainer, poll fmtogram.IPoll, i int) *pollT {
 	return &pollT{polltc.name, "", 0, nil, nil, poll.WriteClosed, polltc.isExpectedErr[i], polltc.codeErr[i]}
 }
 
@@ -98,7 +97,7 @@ func (pollct *pollTestContainer) writeQuestion() {
 
 func (pollct *pollTestContainer) writeQuestionParseMode() {
 	pollct.name = "(IPoll).WriteQuestionParseMode"
-	pollct.inputStr = []string{types.HTML, types.Markdown, types.MarkdownV2, "", "something else", types.HTML, types.Markdown}
+	pollct.inputStr = []string{fmtogram.HTML, fmtogram.Markdown, fmtogram.MarkdownV2, "", "something else", fmtogram.HTML, fmtogram.Markdown}
 	pollct.isExpectedErr = []bool{false, false, false, true, true, false, true}
 	pollct.codeErr = []string{"", "", "", "20", "20", "", "10"}
 	pollct.amount, pollct.until = 7, 5
@@ -107,7 +106,7 @@ func (pollct *pollTestContainer) writeQuestionParseMode() {
 
 func (pollct *pollTestContainer) writeQuestionEntities() {
 	pollct.name = "(IPoll).WriteQuestionEntities"
-	pollct.inputArr = [][]*types.MessageEntity{
+	pollct.inputArr = [][]*fmtogram.MessageEntity{
 		{{Type: "text_link", Offset: 0, Length: 7, Url: "https://youtube.com"}},
 		{},
 		{{Type: "text_link", Offset: 0, Length: 7, Url: "https://youtube.com"}, nil, nil},
@@ -120,7 +119,7 @@ func (pollct *pollTestContainer) writeQuestionEntities() {
 
 func (pollct *pollTestContainer) writeOptions() {
 	pollct.name = "(IPoll).WriteOptions"
-	pollct.inputArr2 = [][]*types.PollOption{
+	pollct.inputArr2 = [][]*fmtogram.PollOption{
 		{{Text: "Option 1"}, {Text: "Option 2"}, {Text: "Option 3"}},
 		{},
 		{{Text: "Option 3"}, nil, nil},
@@ -176,7 +175,7 @@ func (pollct *pollTestContainer) writeExplanation() {
 
 func (pollct *pollTestContainer) writeExplanationParseMode() {
 	pollct.name = "(IPoll).WriteExplanationParseMode"
-	pollct.inputStr = []string{types.HTML, types.Markdown, types.MarkdownV2, "", "something else", types.HTML, types.Markdown}
+	pollct.inputStr = []string{fmtogram.HTML, fmtogram.Markdown, fmtogram.MarkdownV2, "", "something else", fmtogram.HTML, fmtogram.Markdown}
 	pollct.isExpectedErr = []bool{false, false, false, true, true, false, true}
 	pollct.codeErr = []string{"", "", "", "20", "20", "", "10"}
 	pollct.amount, pollct.until = 7, 5
@@ -185,7 +184,7 @@ func (pollct *pollTestContainer) writeExplanationParseMode() {
 
 func (pollct *pollTestContainer) writeExplanationEntities() {
 	pollct.name = "(IPoll).WriteExplanationEntities"
-	pollct.inputArr = [][]*types.MessageEntity{
+	pollct.inputArr = [][]*fmtogram.MessageEntity{
 		{{Type: "text_link", Offset: 0, Length: 7, Url: "https://youtube.com"}},
 		{},
 		{{Type: "text_link", Offset: 0, Length: 7, Url: "https://youtube.com"}, nil, nil},
@@ -246,7 +245,7 @@ func (poll *pollT) callIntF(testedF func(int) error, t *testing.T) {
 	}
 }
 
-func (poll *pollT) callSliceF(testedF func([]*types.MessageEntity) error, t *testing.T) {
+func (poll *pollT) callSliceF(testedF func([]*fmtogram.MessageEntity) error, t *testing.T) {
 	if !poll.isExpectedErr {
 		if err := testedF(poll.array); err != nil {
 			t.Fatalf(errMsg, err)
@@ -258,7 +257,7 @@ func (poll *pollT) callSliceF(testedF func([]*types.MessageEntity) error, t *tes
 	}
 }
 
-func (poll *pollT) callSliceF2(testedF func([]*types.PollOption) error, t *testing.T) {
+func (poll *pollT) callSliceF2(testedF func([]*fmtogram.PollOption) error, t *testing.T) {
 	if !poll.isExpectedErr {
 		if err := testedF(poll.array2); err != nil {
 			t.Fatalf(errMsg, err)
@@ -290,10 +289,10 @@ func (poll *pollT) startTest(part string, i int, t *testing.T) {
 	case func(int) error:
 		printTestLog(part, poll.name, poll.codeErr, poll.integer, poll.isExpectedErr, i, t)
 		poll.callIntF(f, t)
-	case func([]*types.MessageEntity) error:
+	case func([]*fmtogram.MessageEntity) error:
 		printTestLog(part, poll.name, poll.codeErr, poll.array, poll.isExpectedErr, i, t)
 		poll.callSliceF(f, t)
-	case func([]*types.PollOption) error:
+	case func([]*fmtogram.PollOption) error:
 		printTestLog(part, poll.name, poll.codeErr, poll.array2, poll.isExpectedErr, i, t)
 		poll.callSliceF2(f, t)
 	case func() error:
@@ -307,16 +306,16 @@ func (poll *pollT) startTest(part string, i int, t *testing.T) {
 	}
 }
 
-func (polltc *pollTestContainer) createTestArrays(msg *formatter.Message) ([]UnitTest, []UnitTest) {
-	var poll formatter.IPoll
+func (polltc *pollTestContainer) createTestArrays(msg *fmtogram.Message) ([]UnitTest, []UnitTest) {
+	var poll fmtogram.IPoll
 	a, b := make([]UnitTest, polltc.until), make([]UnitTest, polltc.amount-polltc.until)
 	for i, j := 0, 0; i < polltc.amount; i++ {
 		if i < polltc.until {
-			poll = msg.NewPoll()
+			poll = fmtogram.NewPoll()
 			a[i] = polltc.buildF(*polltc, poll, i)
 		} else {
 			if j%2 == 0 {
-				poll = msg.NewPoll()
+				poll = fmtogram.NewPoll()
 			}
 			b[j] = polltc.buildF(*polltc, poll, i)
 			j++
@@ -325,7 +324,7 @@ func (polltc *pollTestContainer) createTestArrays(msg *formatter.Message) ([]Uni
 	return a, b
 }
 
-func mainPollLogic(msg *formatter.Message, polltc pollTestContainer, t *testing.T) {
+func mainPollLogic(msg *fmtogram.Message, polltc pollTestContainer, t *testing.T) {
 	pollimationcontainer, doublecontainer := polltc.createTestArrays(msg)
 	check(pollimationcontainer, t)
 	doubleCheck(doublecontainer, t)
@@ -335,7 +334,7 @@ func TestWritePollQuestion(t *testing.T) {
 	t.Parallel()
 	pollct := new(pollTestContainer)
 	pollct.writeQuestion()
-	msg := formatter.CreateEmpltyMessage()
+	msg := fmtogram.CreateEmpltyMessage()
 	mainPollLogic(msg, *pollct, t)
 }
 
@@ -343,7 +342,7 @@ func TestWritePollQuestionParseMode(t *testing.T) {
 	t.Parallel()
 	pollct := new(pollTestContainer)
 	pollct.writeQuestionParseMode()
-	msg := formatter.CreateEmpltyMessage()
+	msg := fmtogram.CreateEmpltyMessage()
 	mainPollLogic(msg, *pollct, t)
 }
 
@@ -351,7 +350,7 @@ func TestWritePollQuestionEntities(t *testing.T) {
 	t.Parallel()
 	pollct := new(pollTestContainer)
 	pollct.writeQuestionEntities()
-	msg := formatter.CreateEmpltyMessage()
+	msg := fmtogram.CreateEmpltyMessage()
 	mainPollLogic(msg, *pollct, t)
 }
 
@@ -359,7 +358,7 @@ func TestWritePollOptions(t *testing.T) {
 	t.Parallel()
 	pollct := new(pollTestContainer)
 	pollct.writeOptions()
-	msg := formatter.CreateEmpltyMessage()
+	msg := fmtogram.CreateEmpltyMessage()
 	mainPollLogic(msg, *pollct, t)
 }
 
@@ -367,7 +366,7 @@ func TestWritePollAnonymous(t *testing.T) {
 	t.Parallel()
 	pollct := new(pollTestContainer)
 	pollct.writeAnonymous()
-	msg := formatter.CreateEmpltyMessage()
+	msg := fmtogram.CreateEmpltyMessage()
 	mainPollLogic(msg, *pollct, t)
 }
 
@@ -375,7 +374,7 @@ func TestWritePollType(t *testing.T) {
 	t.Parallel()
 	pollct := new(pollTestContainer)
 	pollct.writeType()
-	msg := formatter.CreateEmpltyMessage()
+	msg := fmtogram.CreateEmpltyMessage()
 	mainPollLogic(msg, *pollct, t)
 }
 
@@ -383,7 +382,7 @@ func TestWritePollAllowMultipleAnswers(t *testing.T) {
 	t.Parallel()
 	pollct := new(pollTestContainer)
 	pollct.writeAllowMultipleAnswers()
-	msg := formatter.CreateEmpltyMessage()
+	msg := fmtogram.CreateEmpltyMessage()
 	mainPollLogic(msg, *pollct, t)
 }
 
@@ -391,7 +390,7 @@ func TestWritePollCorrectOptionID(t *testing.T) {
 	t.Parallel()
 	pollct := new(pollTestContainer)
 	pollct.writeCorrectOptionID()
-	msg := formatter.CreateEmpltyMessage()
+	msg := fmtogram.CreateEmpltyMessage()
 	mainPollLogic(msg, *pollct, t)
 }
 
@@ -399,7 +398,7 @@ func TestWritePollExplanation(t *testing.T) {
 	t.Parallel()
 	pollct := new(pollTestContainer)
 	pollct.writeExplanation()
-	msg := formatter.CreateEmpltyMessage()
+	msg := fmtogram.CreateEmpltyMessage()
 	mainPollLogic(msg, *pollct, t)
 }
 
@@ -407,7 +406,7 @@ func TestWritePollExplanationParseMode(t *testing.T) {
 	t.Parallel()
 	pollct := new(pollTestContainer)
 	pollct.writeExplanationParseMode()
-	msg := formatter.CreateEmpltyMessage()
+	msg := fmtogram.CreateEmpltyMessage()
 	mainPollLogic(msg, *pollct, t)
 }
 
@@ -415,7 +414,7 @@ func TestWritePollExplanationEntities(t *testing.T) {
 	t.Parallel()
 	pollct := new(pollTestContainer)
 	pollct.writeExplanationEntities()
-	msg := formatter.CreateEmpltyMessage()
+	msg := fmtogram.CreateEmpltyMessage()
 	mainPollLogic(msg, *pollct, t)
 }
 
@@ -423,7 +422,7 @@ func TestWritePollOpenPeriod(t *testing.T) {
 	t.Parallel()
 	pollct := new(pollTestContainer)
 	pollct.writeOpenPeriod()
-	msg := formatter.CreateEmpltyMessage()
+	msg := fmtogram.CreateEmpltyMessage()
 	mainPollLogic(msg, *pollct, t)
 }
 
@@ -431,7 +430,7 @@ func TestWritePollCloseDate(t *testing.T) {
 	t.Parallel()
 	pollct := new(pollTestContainer)
 	pollct.writeCloseDate()
-	msg := formatter.CreateEmpltyMessage()
+	msg := fmtogram.CreateEmpltyMessage()
 	mainPollLogic(msg, *pollct, t)
 }
 
@@ -439,6 +438,6 @@ func TestWritePollClosed(t *testing.T) {
 	t.Parallel()
 	pollct := new(pollTestContainer)
 	pollct.writeClosed()
-	msg := formatter.CreateEmpltyMessage()
+	msg := fmtogram.CreateEmpltyMessage()
 	mainPollLogic(msg, *pollct, t)
 }

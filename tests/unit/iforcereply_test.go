@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/iamissahar/Fmtogram/formatter"
+	fmtogram "github.com/iamissahar/Fmtogram"
 )
 
 type forceReplyT struct {
@@ -21,18 +21,18 @@ type frpTestContainer struct {
 	isExpectedErr []bool
 	codeErr       []string
 	amount, until int
-	buildF        func(frptc frpTestContainer, frp formatter.IForceReply, i int) *forceReplyT
+	buildF        func(frptc frpTestContainer, frp fmtogram.IForceReply, i int) *forceReplyT
 }
 
-func putFReplyWriteForceReply(frptc frpTestContainer, frp formatter.IForceReply, i int) *forceReplyT {
+func putFReplyWriteForceReply(frptc frpTestContainer, frp fmtogram.IForceReply, i int) *forceReplyT {
 	return &forceReplyT{frptc.name, "", frp.WriteForceReply, frptc.isExpectedErr[i], frptc.codeErr[i]}
 }
 
-func putFReplyWriteInputFieldPlaceholder(frptc frpTestContainer, frp formatter.IForceReply, i int) *forceReplyT {
+func putFReplyWriteInputFieldPlaceholder(frptc frpTestContainer, frp fmtogram.IForceReply, i int) *forceReplyT {
 	return &forceReplyT{frptc.name, frptc.inputStr[i], frp.WriteInputFieldPlaceholder, frptc.isExpectedErr[i], frptc.codeErr[i]}
 }
 
-func putFReplyWriteSelective(frptc frpTestContainer, frp formatter.IForceReply, i int) *forceReplyT {
+func putFReplyWriteSelective(frptc frpTestContainer, frp fmtogram.IForceReply, i int) *forceReplyT {
 	return &forceReplyT{frptc.name, "", frp.WriteSelective, frptc.isExpectedErr[i], frptc.codeErr[i]}
 }
 
@@ -74,19 +74,19 @@ func (frp *forceReplyT) startTest(part string, i int, t *testing.T) {
 	}
 }
 
-func (frptc *frpTestContainer) createTestArrays(msg *formatter.Message, t *testing.T) ([]UnitTest, []UnitTest) {
-	var kb formatter.IForceReply
+func (frptc *frpTestContainer) createTestArrays(msg *fmtogram.Message, t *testing.T) ([]UnitTest, []UnitTest) {
+	var kb fmtogram.IForceReply
 	var err error
 	a, b := make([]UnitTest, frptc.until), make([]UnitTest, frptc.amount-frptc.until)
 	for i, j := 0, 0; i < frptc.amount; i++ {
 		if i < frptc.until {
-			if kb, err = msg.NewKeyboard().WriteForceReply(); err != nil {
+			if kb, err = fmtogram.NewKeyboard().WriteForceReply(); err != nil {
 				t.Fatal(err)
 			}
 			a[i] = frptc.buildF(*frptc, kb, i)
 		} else {
 			if j%2 == 0 {
-				if kb, err = msg.NewKeyboard().WriteForceReply(); err != nil {
+				if kb, err = fmtogram.NewKeyboard().WriteForceReply(); err != nil {
 					t.Fatal(err)
 				}
 			}
@@ -97,7 +97,7 @@ func (frptc *frpTestContainer) createTestArrays(msg *formatter.Message, t *testi
 	return a, b
 }
 
-func (frptc *frpTestContainer) mainLogic(msg *formatter.Message, t *testing.T) {
+func (frptc *frpTestContainer) mainLogic(msg *fmtogram.Message, t *testing.T) {
 	rpumentcontainer, doublecontainer := frptc.createTestArrays(msg, t)
 	check(rpumentcontainer, t)
 	doubleCheck(doublecontainer, t)
@@ -107,7 +107,7 @@ func TestForceReplyWriteForceReply(t *testing.T) {
 	t.Parallel()
 	frptc := new(frpTestContainer)
 	frptc.writeForceReply()
-	msg := formatter.CreateEmpltyMessage()
+	msg := fmtogram.CreateEmpltyMessage()
 	frptc.mainLogic(msg, t)
 }
 
@@ -115,7 +115,7 @@ func TestForceReplyWriteInputFieldPlaceholder(t *testing.T) {
 	t.Parallel()
 	frptc := new(frpTestContainer)
 	frptc.writeInputFieldPlaceholder()
-	msg := formatter.CreateEmpltyMessage()
+	msg := fmtogram.CreateEmpltyMessage()
 	frptc.mainLogic(msg, t)
 }
 
@@ -123,6 +123,6 @@ func TestForceReplyWriteSelective(t *testing.T) {
 	t.Parallel()
 	frptc := new(frpTestContainer)
 	frptc.writeSelective()
-	msg := formatter.CreateEmpltyMessage()
+	msg := fmtogram.CreateEmpltyMessage()
 	frptc.mainLogic(msg, t)
 }

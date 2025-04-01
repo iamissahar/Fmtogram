@@ -552,11 +552,12 @@ const (
 
 	// Use this method when you need to tell the user that something is happening on
 	// the bot's side. The status is set for 5 seconds or less (when a message arrives from your bot,
-	// Telegram clients clear its typing status)
-	// 	Example: The an ImageBot needs some time to process a request and upload the image.
-	// 	Instead of sending a text message along the lines of “Retrieving image, please wait…”,
-	// 	the bot may use ChatAction method with (formatter.IParameters).WriteAction(types.Action[1]). The user will see a
-	// 	“sending photo” status for the bot. Parameters:
+	// Telegram clients clear its typing status).
+	//
+	// Example: The an ImageBot needs some time to process a request and upload the image.
+	// Instead of sending a text message along the lines of “Retrieving image, please wait…”,
+	// the bot may use ChatAction method with (formatter.IParameters).WriteAction(types.Action[1]). The user will see a
+	// “sending photo” status for the bot. Parameters:
 	// 	(formatter.IChat).WriteBusinessConnectionID() [Optional]
 	// 	(formatter.IChat).WriteChatID or (formatter.IChat).WriteChatName() [Required]
 	// 	(formatter.IParameters).WriteMessageThreadID() [Optional]

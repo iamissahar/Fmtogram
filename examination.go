@@ -1,10 +1,10 @@
-package formatter
+package fmtogram
 
 import (
 	"bytes"
 	"os"
 
-	"github.com/iamissahar/Fmtogram/formatter/methods"
+	"github.com/iamissahar/Fmtogram/methods"
 )
 
 var matrix [7][7]int

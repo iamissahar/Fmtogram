@@ -1,11 +1,9 @@
-package formatter
+package fmtogram
 
 import (
 	"bytes"
 	"mime/multipart"
 	"time"
-
-	"github.com/iamissahar/Fmtogram/types"
 )
 
 type handlerMedia interface {
@@ -23,6 +21,62 @@ type kb interface {
 	isOK() error
 }
 
+// Use this interface to specify a URL and receive incoming updates via an outgoing webhook. Whenever there is an update for
+// the bot, Telegram will send an HTTPS POST request to the specified URL, containing a JSON-serialized Update [https://core.telegram.org/bots/api#update].
+// In case of an unsuccessful request (a request with response HTTP status code different from 2XY), we will repeat the request and give
+// up after a reasonable amount of attempts. If you'd like to make sure that the webhook
+// was set by you, you can specify secret data in the parameter secret_token. If specified, the request will contain a
+// header “X-Telegram-Bot-Api-Secret-Token” with the secret token as content.
+type IWebHook interface {
+	// HTTPS URL to send updates to. Use an empty string to remove webhook integration
+	WriteUrl(url string) error
+
+	// Upload your public key certificate so that the root certificate in use can be checked. See
+	// Telegram team's self-signed guide for details:
+	// https://core.telegram.org/bots/self-signed
+	WriteCertificate(path string) error
+
+	// The fixed IP address which will be used to send webhook requests instead of the IP address resolved through DNS
+	WriteIPAddress(ip string) error
+
+	// The maximum allowed number of simultaneous HTTPS connections to the webhook for update delivery, 1-100.
+	// Defaults to 40. Use lower values to limit the load on your bot's server, and higher values to increase your bot's throughput.
+	WriteMaxConnections(max int) error
+
+	// A JSON-serialized list of the update types you want your bot to receive. For example, specify ["message",
+	// "edited_channel_post", "callback_query"] to only receive updates of these  See Update[https://core.telegram.org/bots/api#update] for a complete list of
+	// available update  Specify an empty list to receive all update types except chat_member, message_reaction,
+	// and message_reaction_count (default). If not specified, the previous setting will be used. Please note that this
+	// parameter doesn't affect updates created before the call to the setWebhook, so unwanted updates may be received
+	// for a short period of time.
+	WriteAllowedUpdates(upds []string) error
+
+	// Call it to drop all pending updates
+	WriteDropPendingUpdates() error
+
+	// A secret token to be sent in a header “X-Telegram-Bot-Api-Secret-Token” in every webhook request, 1-256 characters.
+	// Only characters A-Z, a-z, 0-9, _ and - are allowed. The header is useful to ensure that the request comes from a
+	// webhook set by you.
+	WriteSecretToken(token string) error
+
+	// Call  this function when you're ready to set a webhook. Requires only WriteUrl(), but it's possible to use
+	// all "Write" functions.
+	Set() error
+
+	// Call this function to delete a webhook. Doesn't require anything, but could be given WriteDropPendingUpdates()
+	Delete() error
+
+	// Call this function to get all information about a webhook. Doesn't require any data. If the bot is using usual update system,
+	// it will return an object with the url field empty.
+	Info() (inf *WebhookInfo, err error)
+
+	// Get status of the request after Set(), Delete() or Info()
+	GetStatus() bool
+
+	// Get error data of the request after Set(), Delete() or Info()
+	GetError() (code int, msg string)
+}
+
 type IMessage interface {
 	// Unique message identifier inside this chat. In specific instances
 	// (e.g., message containing a video sent to a big chat), the server might
@@ -33,10 +87,10 @@ type IMessage interface {
 	// Sender of the message; may be empty for messages sent to channels. For backward
 	// compatibility, if the message was sent on behalf of a chat, the field contains a
 	// fake sender user in non-channel chats
-	Sender() *types.User
+	Sender() *User
 
 	// Chat the message belongs to
-	Chat() *types.Chat
+	Chat() *Chat
 
 	// Date the message was sent in Unix time. It is always a positive number, representing
 	// a valid date and a special framework of golang for working with time
@@ -51,34 +105,34 @@ type IMessage interface {
 	Text() string
 
 	// Message is an audio file, information about the file
-	Audio() *types.Audio
+	Audio() *Audio
 
 	// Message is a general file, information about the file
-	Document() *types.Document
+	Document() *Document
 
 	// Message contains paid media; information about the paid media (photo or video)
-	PaidMedia() *types.PaidMediaInfo
+	PaidMedia() *PaidMediaInfo
 
 	// Message is a photo, available sizes of the photo
-	Photo() []*types.PhotoSize
+	Photo() []*PhotoSize
 
 	// Message is a sticker, information about the sticker
-	Sticker() *types.Sticker
+	Sticker() *Sticker
 
 	// Message is a forwarded story
-	Story() *types.Story
+	Story() *Story
 
 	// Message is a video, information about the video
-	Video() *types.Video
+	Video() *Video
 
 	// Message is a video note, information about the video message
-	VideoNote() *types.VideoNote
+	VideoNote() *VideoNote
 
 	// Message is a voice message, information about the file
-	Voice() *types.Voice
+	Voice() *Voice
 
 	// The whole other data that isn't specified in this interface
-	Message() *types.Message
+	Message() *Message
 }
 
 type IBusiness interface {
@@ -86,7 +140,7 @@ type IBusiness interface {
 	ID() string
 
 	// Business account user that created the business connection
-	Sender() *types.User
+	Sender() *User
 
 	// Identifier of a private chat with the user who created the business connection.
 	// This number may have more than 32 significant bits and some programming languages
@@ -108,7 +162,7 @@ type IBusinessMessage interface {
 	ConnectionID() string
 
 	// Information about a chat in the business account. The bot may not have access to the chat or the corresponding user.
-	Chat() *types.Chat
+	Chat() *Chat
 
 	// The list of identifiers of deleted messages in the chat of the business account
 	MessageIDs() []int
@@ -116,30 +170,30 @@ type IBusinessMessage interface {
 
 type IMessageReaction interface {
 	// The chat containing the message the user reacted to
-	Chat() *types.Chat
+	Chat() *Chat
 
 	// Unique identifier of the message inside the chat
 	MessageID() int
 
 	// The user that changed the reaction, if the user isn't anonymous
-	Sender() *types.User
+	Sender() *User
 
 	// The chat on behalf of which the reaction was changed, if the user is anonymous
-	ActorChat() *types.Chat
+	ActorChat() *Chat
 
 	// Date of the change in Unix time and a special framework of golang for working with time
 	Date() (unix int, t time.Time)
 
 	// Previous list of reaction types that were set by the sender
-	OldReaction() []*types.ReactionType
+	OldReaction() []*ReactionType
 
 	// New list of reaction types that have been set by the sender
-	NewReaction() []*types.ReactionType
+	NewReaction() []*ReactionType
 }
 
 type IMessageReactionCount interface {
 	// The chat containing the message
-	Chat() *types.Chat
+	Chat() *Chat
 
 	// Unique message identifier inside the chat
 	MessageID() int
@@ -148,7 +202,7 @@ type IMessageReactionCount interface {
 	Date() (unix int, t time.Time)
 
 	// List of reactions that are present on the message
-	Reactions() []*types.ReactionCount
+	Reactions() []*ReactionCount
 }
 
 type IInlineQuery interface {
@@ -156,7 +210,7 @@ type IInlineQuery interface {
 	ID() string
 
 	// Sender
-	Sender() *types.User
+	Sender() *User
 
 	// 	Text of the query (up to 256 characters)
 	Query() string
@@ -169,7 +223,7 @@ type IInlineQuery interface {
 	ChatType() string
 
 	// Sender location, only for bots that request user location
-	Location() *types.Location
+	Location() *Location
 }
 
 type IInlineResult interface {
@@ -177,10 +231,10 @@ type IInlineResult interface {
 	ID() string
 
 	// The sender of the request that chose the result
-	Sender() *types.User
+	Sender() *User
 
 	// Sender location, only for bots that require user location
-	Location() *types.Location
+	Location() *Location
 
 	// Identifier of the sent inline message. Available only if there is (formatter.IKeyboard).Inline() attached to the message.
 	// Will be also received in callback queries and can be used to edit the message.
@@ -198,10 +252,10 @@ type ICallbackQuery interface {
 	ID() string
 
 	// Sender
-	Sender() *types.User
+	Sender() *User
 
 	// Message sent by the bot with the callback button that originated the query
-	Message() *types.MaybeInaccessibleMessage
+	Message() *MaybeInaccessibleMessage
 
 	// Identifier of the message sent via the bot in inline mode, that originated the query.
 	InlineMessageID() string
@@ -223,13 +277,13 @@ type IShippingQuery interface {
 	ID() string
 
 	// User who sent the query
-	Sender() *types.User
+	Sender() *User
 
 	// 	Bot-specified invoice payload
 	InvoicePayload() string
 
 	// User specified shipping address
-	SHippingAddress() *types.ShippingAddress
+	ShippingAddress() *ShippingAddress
 }
 
 type IPreCheckoutQuery interface {
@@ -237,7 +291,7 @@ type IPreCheckoutQuery interface {
 	ID() string
 
 	// User who sent the query
-	Sender() *types.User
+	Sender() *User
 
 	// Three-letter ISO 4217 currency code, or “XTR” for payments in Telegram Stars
 	Currency() string
@@ -254,12 +308,12 @@ type IPreCheckoutQuery interface {
 	ShippingOptionID() string
 
 	// Order information provided by the user
-	OrderInfo() *types.OrderInfo
+	OrderInfo() *OrderInfo
 }
 
 type IPaidMedia interface {
 	// User who purchased the media
-	Sender() *types.User
+	Sender() *User
 
 	// Bot-specified paid media payload
 	Payload() string
@@ -276,7 +330,7 @@ type IPollUpdate interface {
 	Type() string
 
 	// Slice of poll options
-	Options() []*types.PollOption
+	Options() []*PollOption
 
 	// True, if the poll is closed
 	IsClosed() bool
@@ -289,7 +343,7 @@ type IPollUpdate interface {
 	Explanation() string
 
 	// All other possible data
-	Poll() *types.Poll
+	Poll() *Poll
 }
 
 type IPollAnswer interface {
@@ -297,10 +351,10 @@ type IPollAnswer interface {
 	ID() string
 
 	// The chat that changed the answer to the poll, if the voter is anonymous
-	VoterChat() *types.Chat
+	VoterChat() *Chat
 
 	// The user that changed the answer to the poll, if the voter isn't anonymous
-	Sender() *types.User
+	Sender() *User
 
 	// 0-based identifiers of chosen answer options. May be empty if the vote was retracted.
 	OptionIDs() []string
@@ -308,42 +362,43 @@ type IPollAnswer interface {
 
 type IChatMember interface {
 	// Chat the user belongs to
-	Chat() *types.Chat
+	Chat() *Chat
 
 	// Performer of the action, which resulted in the change
-	Sender() *types.User
+	Sender() *User
 
 	// Date of the change in Unix time and a special framework of golang for working with time
 	Date() (unix int, t time.Time)
 
 	// Previous information about the chat member
-	OldMember() *types.ChatMember
+	OldMember() *ChatMember
 
 	// New information about the chat member
-	NewMemmber() *types.ChatMember
+	NewMemmber() *ChatMember
 
 	// Chat invite link, which was used by the user to join the chat; for joining by invite link events only.
-	InviteLink() *types.ChatInviteLink
+	InviteLink() *ChatInviteLink
 
 	// True, if the user joined the chat after sending a direct join request without using an invite link and being approved by an administrator
 	ViaJoinRequest() bool
+
 	// True, if the user joined the chat via a chat folder invite link
 	ViaChatFolderInviteLink() bool
 }
 
 type IJoinRequest interface {
 	// Chat to which the request was sent
-	Chat() *types.Chat
+	Chat() *Chat
 
 	// User that sent the join request
-	Sender() *types.User
+	Sender() *User
 
 	// Identifier of a private chat with the user who sent the join request. This number may have more
 	// than 32 significant bits and some programming languages may have difficulty/silent defects in
 	// interpreting it. But it has at most 52 significant bits, so a 64-bit integer or double-precision
 	// float type are safe for storing this identifier. The bot can use this identifier for 5 minutes to
 	// send messages until the join request is processed, assuming no other administrator contacted the user.
-	UserChatID() int
+	UserChatID() int64
 
 	// Date the request was sent in Unix time and a special framework of golang for working with time
 	Date() (unix int, t time.Time)
@@ -352,20 +407,20 @@ type IJoinRequest interface {
 	Bio() string
 
 	// Chat invite link that was used by the user to send the join request
-	InviteLink() *types.ChatInviteLink
+	InviteLink() *ChatInviteLink
 }
 
 type IBoostUpdate interface {
 	// Chat which was boosted
-	Chat() *types.Chat
+	Chat() *Chat
 
 	// Information about the chat boost
-	Boost() *types.ChatBoost
+	Boost() *ChatBoost
 }
 
 type IBoostRemove interface {
 	// Chat which was boosted
-	Chat() *types.Chat
+	Chat() *Chat
 
 	// Unique identifier of the boost
 	BoostID() string
@@ -374,7 +429,7 @@ type IBoostRemove interface {
 	RemoveDate() (unix int, t time.Time)
 
 	// Source of the removed boost
-	Source() *types.ChatBoostSource
+	Source() *ChatBoostSource
 }
 
 type ITelegram interface {
@@ -451,7 +506,7 @@ type ITelegram interface {
 	ChatMember() IChatMember
 
 	// A request to join the chat has been sent. The bot must have the
-	// types.ChatAdministratorRights.CanInviteUsers administrator right in the chat to receive this data.
+	// ChatAdministratorRights.CanInviteUsers administrator right in the chat to receive this data.
 	ChatJoinRequest() IJoinRequest
 
 	// A chat boost was added or changed. The bot must be an administrator in the chat to receive this data.
@@ -464,48 +519,48 @@ type ITelegram interface {
 type IGet interface {
 	Status() bool
 	Error() (code int, msg string)
-	Chat() *types.Chat
-	Sender() *types.User
+	Chat() *Chat
+	Sender() *User
 	Date() int
 	MessageID() int
 	MessageIDs() []int
 	Replyed() IGet
-	ForwardOrigin() *types.MessageOrigin
-	Photo() []*types.PhotoSize
-	Audio() *types.Audio
-	Document() *types.Document
-	Video() *types.Video
-	Animation() *types.Animation
-	Voice() *types.Voice
-	VideoNote() *types.VideoNote
-	PaidMedia() *types.PaidMedia
+	ForwardOrigin() *MessageOrigin
+	Photo() []*PhotoSize
+	Audio() *Audio
+	Document() *Document
+	Video() *Video
+	Animation() *Animation
+	Voice() *Voice
+	VideoNote() *VideoNote
+	PaidMedia() *PaidMedia
 	MediaGroupID() string
-	Photos() [][]*types.PhotoSize
-	Videos() []*types.Video
-	Audios() []*types.Audio
-	Documents() []*types.Document
-	Poll() *types.Poll
-	Dice() *types.Dice
-	ProfilePhotos() *types.UserProfilePhotos
-	File() *types.File
-	Stickers() []*types.Sticker
-	Gifts() []*types.Gift
-	Message() *types.Message
-	Messages() []*types.Message
+	Photos() [][]*PhotoSize
+	Videos() []*Video
+	Audios() []*Audio
+	Documents() []*Document
+	Poll() *Poll
+	Dice() *Dice
+	ProfilePhotos() *UserProfilePhotos
+	File() *File
+	Stickers() []*Sticker
+	Gifts() []*Gift
+	Message() *TelegramMessage
+	Messages() []*TelegramMessage
 	String() string
-	InviteLink() *types.ChatInviteLink
-	ChatInfo() *types.ChatFullInfo
-	Members() []*types.ChatMember
+	InviteLink() *ChatInviteLink
+	ChatInfo() *ChatFullInfo
+	Members() []*ChatMember
 	Integer() *int
-	Forum() *types.ForumTopic
-	Boosts() []*types.ChatBoost
-	BusinessConnection() *types.BusinessConnection
-	Commands() []*types.BotCommand
-	MenuButton() *types.MenuButton
-	AdminRights() *types.ChatAdministratorRights
-	PreparedInlineMessage() *types.PreparedInlineMessage
-	StarTransaction() *types.StarTransaction
-	Score() []*types.GameHighScore
+	Forum() *ForumTopic
+	Boosts() []*ChatBoost
+	BusinessConnection() *BusinessConnection
+	Commands() []*BotCommand
+	MenuButton() *MenuButton
+	AdminRights() *ChatAdministratorRights
+	PreparedInlineMessage() *PreparedInlineMessage
+	StarTransaction() *StarTransaction
+	Score() []*GameHighScore
 	Request() string
 	Response() string
 }
@@ -534,11 +589,11 @@ type IPhoto interface {
 	WriteCaption(caption string) error
 
 	// Receives spicific kind of string. Adds some opportunity to transform the text-message.
-	// Parsemode can be only types.HTML, types.Markdown and types.MarkdownV2. Cannot be an empty string.
+	// Parsemode can be only HTML, Markdown and MarkdownV2. Cannot be an empty string.
 	WriteParseMode(parsemode string) error
 
 	// entities can't be an empty slice.
-	WriteCaptionEntities(entities []*types.MessageEntity) error
+	WriteCaptionEntities(entities []*MessageEntity) error
 
 	// Call it, if the caption must be shown above the message media (only if you copy a message that has Media Type). Ignored if a new caption isn't specified.
 	WriteShowCaptionAboveMedia() error
@@ -562,14 +617,14 @@ type IVideo interface {
 	// in MSGInformation interface
 	WriteCaption(caption string) error
 
-	WriteCaptionEntities(entities []*types.MessageEntity) error
+	WriteCaptionEntities(entities []*MessageEntity) error
 	WriteDuration(duration int) error
 
 	// Doesn't recieve anything. If the function was called, the photo will be blured
 	WriteHasSpoiler() error
 	WriteHeight(height int) error
 
-	// Receives spicific kind of string. Adds some opportunity to transform the text-message. There are 3 options: types.HTML, types.Markdown and...
+	// Receives spicific kind of string. Adds some opportunity to transform the text-message. There are 3 options: HTML, Markdown and...
 	WriteParseMode(parsemode string) error
 
 	// Call it, if the caption must be shown above the message media (only if you copy a message that has Media Type). Ignored if a new caption isn't specified.
@@ -603,12 +658,12 @@ type IAudio interface {
 	// Receives a string that will be a caption of the audio
 	WriteCaption(caption string) error
 
-	WriteCaptionEntities(entities []*types.MessageEntity) error
+	WriteCaptionEntities(entities []*MessageEntity) error
 
 	// Duration of the audio in seconds
 	WriteDuration(duration int) error
 
-	// Receives spicific kind of string. Adds some opportunity to transform the text-message. There are 3 options: types.HTML, types.Markdown and...
+	// Receives spicific kind of string. Adds some opportunity to transform the text-message. There are 3 options: HTML, Markdown and...
 	WriteParseMode(parsemode string) error
 
 	WritePerformer(performer string) error
@@ -635,10 +690,10 @@ type IDocument interface {
 	// in MSGInformation interface
 	WriteCaption(caption string) error
 
-	WriteCaptionEntities(entities []*types.MessageEntity) error
+	WriteCaptionEntities(entities []*MessageEntity) error
 	WriteDisableContentTypeDetection() error
 
-	// Receives spicific kind of string. Adds some opportunity to transform the text-message. There are 3 options: types.HTML, types.Markdown and...
+	// Receives spicific kind of string. Adds some opportunity to transform the text-message. There are 3 options: HTML, Markdown and...
 	WriteParseMode(parsemode string) error
 
 	WriteThumbnail(path string) error
@@ -772,10 +827,10 @@ type IPoll interface {
 
 	WriteQuestionParseMode(parseode string) error
 
-	WriteQuestionEntities(entities []*types.MessageEntity) error
+	WriteQuestionEntities(entities []*MessageEntity) error
 
 	// Receives a slice of 2-10 answer options
-	WriteOptions(options []*types.PollOption) error
+	WriteOptions(options []*PollOption) error
 
 	// Call it only if the poll needs to be anonymous
 	WriteAnonymous(yesno bool) error
@@ -795,7 +850,7 @@ type IPoll interface {
 
 	WriteExplanationParseMode(parsemode string) error
 
-	WriteExplanationEntities(entities []*types.MessageEntity) error
+	WriteExplanationEntities(entities []*MessageEntity) error
 
 	// Amount of time in seconds the poll will be active after creation, 5-600. Can't be used together with (formatter.IPoll).WriteCloseDate
 	WriteOpenPeriod(period int) error
@@ -816,35 +871,35 @@ type ISticker interface {
 
 	WriteAssociatedEmoji(emoji string) error
 
-	WriteAssociatedEmojies(emojies []string) error
+	// WriteAssociatedEmojies(emojies []string) error
 
-	WriteEmojiID(emojiID string) error
+	// WriteEmojiID(emojiID string) error
 
-	WriteEmojiIDs(emojiIDs []string) error
+	// WriteEmojiIDs(emojiIDs []string) error
 
-	WriteFormat(format string) error
+	// WriteFormat(format string) error
 
-	// New sticker position in the set, zero-based
-	WritePosition(pos string) error
+	// // New sticker position in the set, zero-based
+	// WritePosition(pos string) error
 
-	WriteOldSticker(stickerID string) error
+	// WriteOldSticker(stickerID string) error
 
-	// list of 0-20 search keywords for the sticker with total length of up to 64 characters
-	WriteKeywords(words []string) error
+	// // list of 0-20 search keywords for the sticker with total length of up to 64 characters
+	// WriteKeywords(words []string) error
 
-	WriteMaskPosition(maskpos *types.MaskPosition) error
+	// WriteMaskPosition(maskpos *MaskPosition) error
 
-	WriteThumbnailStorage(path string) error
+	// WriteThumbnailStorage(path string) error
 
-	WriteThumbnailTelegram(thumbnailID string) error
+	// WriteThumbnailTelegram(thumbnailID string) error
 
-	WriteThumbnailInternet(url string) error
+	// WriteThumbnailInternet(url string) error
 
-	WriteThumbnailFormat(format string) error
+	// WriteThumbnailFormat(format string) error
 
-	WriteGiftID(giftID string) error
+	// WriteGiftID(giftID string) error
 
-	WritePayForUpgrade() error
+	// WritePayForUpgrade() error
 }
 
 type IForum interface {
@@ -860,9 +915,9 @@ type IForum interface {
 
 type IBot interface {
 	// Recieves a slice of bot commands to be set as the list of the bot's commands. At most 100 commands can be specified.
-	WriteCommands(commands []*types.BotCommand) error
+	WriteCommands(commands []*BotCommand) error
 
-	WriteScope(scope *types.BotCommandScope) error
+	WriteScope(scope *BotCommandScope) error
 
 	// Recieves a two-letter ISO 639-1 language code.
 	WriteLanguage(lang string) error
@@ -876,9 +931,9 @@ type IBot interface {
 	// New short description for the bot; 0-120 characters. Pass an empty string to remove the dedicated short description for the given language.
 	WriteShortDescription(description string) error
 
-	WriteMenuButton(button *types.MenuButton) error
+	WriteMenuButton(button *MenuButton) error
 
-	WriteRights(rights *types.ChatAdministratorRights) error
+	WriteRights(rights *ChatAdministratorRights) error
 
 	WriteForChannels() error
 }
@@ -888,45 +943,45 @@ type IInlineMode interface {
 
 	WriteWebAppQueryID(queryID string) error
 
-	WriteCachedAudio(cachedAudio *types.InlineQueryResultCachedAudio) error
+	WriteCachedAudio(cachedAudio *InlineQueryResultCachedAudio) error
 
-	WriteCachedDocument(cachedDocument *types.InlineQueryResultCachedDocument) error
+	WriteCachedDocument(cachedDocument *InlineQueryResultCachedDocument) error
 
-	WriteCachedGif(cachedGif *types.InlineQueryResultCachedGif) error
+	WriteCachedGif(cachedGif *InlineQueryResultCachedGif) error
 
-	WriteCachedMpeg4Gif(cachedMpeg4Gif *types.InlineQueryResultCachedMpeg4Gif) error
+	WriteCachedMpeg4Gif(cachedMpeg4Gif *InlineQueryResultCachedMpeg4Gif) error
 
-	WriteCachedPhoto(cachedPhoto *types.InlineQueryResultCachedPhoto) error
+	WriteCachedPhoto(cachedPhoto *InlineQueryResultCachedPhoto) error
 
-	WriteCachedSticker(cachedSticker *types.InlineQueryResultCachedSticker) error
+	WriteCachedSticker(cachedSticker *InlineQueryResultCachedSticker) error
 
-	WriteCachedVideo(cachedVideo *types.InlineQueryResultCachedVideo) error
+	WriteCachedVideo(cachedVideo *InlineQueryResultCachedVideo) error
 
-	WriteCachedVoice(cachedVoice *types.InlineQueryResultCachedVoice) error
+	WriteCachedVoice(cachedVoice *InlineQueryResultCachedVoice) error
 
-	WriteArticle(art *types.InlineQueryResultArticle) error
+	WriteArticle(art *InlineQueryResultArticle) error
 
-	WriteAudio(ad *types.InlineQueryResultAudio) error
+	WriteAudio(ad *InlineQueryResultAudio) error
 
-	WriteContact(cont *types.InlineQueryResultContact) error
+	WriteContact(cont *InlineQueryResultContact) error
 
-	WriteGame(game *types.InlineQueryResultGame) error
+	WriteGame(game *InlineQueryResultGame) error
 
-	WriteDocument(doc *types.InlineQueryResultDocument) error
+	WriteDocument(doc *InlineQueryResultDocument) error
 
-	WriteGif(gif *types.InlineQueryResultGif) error
+	WriteGif(gif *InlineQueryResultGif) error
 
-	WriteLocation(loc *types.InlineQueryResultLocation) error
+	WriteLocation(loc *InlineQueryResultLocation) error
 
-	WriteMpeg4Gif(mpeg4gif *types.InlineQueryResultMpeg4Gif) error
+	WriteMpeg4Gif(mpeg4gif *InlineQueryResultMpeg4Gif) error
 
-	WritePhoto(ph *types.InlineQueryResultPhoto) error
+	WritePhoto(ph *InlineQueryResultPhoto) error
 
-	WriteVenue(ven *types.InlineQueryResultVenue) error
+	WriteVenue(ven *InlineQueryResultVenue) error
 
-	WriteVideo(vd *types.InlineQueryResultVideo) error
+	WriteVideo(vd *InlineQueryResultVideo) error
 
-	WriteVoice(vc *types.InlineQueryResultVoice) error
+	WriteVoice(vc *InlineQueryResultVoice) error
 
 	WriteCacheTime(time int) error
 
@@ -935,7 +990,7 @@ type IInlineMode interface {
 	WriteNextOffset(offset string) error
 
 	// Recieves an object that represents a button to be shown above inline query results. You must use exactly one of the optional fields.
-	WriteButton(but *types.InlineQueryResultsButton) error
+	WriteButton(but *InlineQueryResultsButton) error
 
 	WriteAllowUserChats() error
 
@@ -953,10 +1008,10 @@ type IParameters interface {
 	WriteDisableNotification() error
 
 	// Recieves a slice of special entities that appear in message text, which can be specified instead of WriteParseMode()
-	WriteEntities(entities []*types.MessageEntity) error
+	WriteEntities(entities []*MessageEntity) error
 
 	// Recieves a link preview generation options for the message
-	WriteLinkPreviewOptions(link *types.LinkPreviewOptions) error
+	WriteLinkPreviewOptions(link *LinkPreviewOptions) error
 
 	// Recieves an unique identifier of the message effect to be added to the message; for private chats only
 	WriteMessageEffectID(effectID string) error
@@ -973,7 +1028,7 @@ type IParameters interface {
 	// New caption for media, 0-1024 characters after entities parsing. If not specified, the original caption is kept
 	WriteCaption(caption string) error
 
-	// Receives spicific kind of string. Adds some opportunity to transform the text-message. There are 3 options: types.HTML, types.Markdown and...
+	// Receives spicific kind of string. Adds some opportunity to transform the text-message. There are 3 options: HTML, Markdown and...
 	WriteParseMode(parsemode string) error
 
 	// Doesn't recieve anything. If the function was called, the text-message will be protected from forwarding and saving
@@ -986,7 +1041,7 @@ type IParameters interface {
 	WriteShowCaptionAboveMedia() error
 
 	// Recieves a structure that has description of the message to reply to
-	WriteReplyParameters(replyPar *types.ReplyParameters) error
+	WriteReplyParameters(replyPar *ReplyParameters) error
 
 	// Call it to allow up to 1000 messages per second, ignoring broadcasting limits for a fee of 0.1 Telegram Stars per message. The relevant Stars will be withdrawn from the bot's balance
 	WriteAllowPaidBroadcast() error
@@ -998,19 +1053,19 @@ type IParameters interface {
 	WritePayload(payload string) error
 
 	// Use this only if you're going to use method methods.Dice. In anyother cases you'd prefer put emoji just in text message.
-	// All emojis that available for this function are in the types.Emojis array
+	// All emojis that available for this function are in the Emojis array
 	WriteEmoji(emoji string) error
 
-	// Type of action to broadcast. Choose one of types.Actions, depending on what the user is about to receive:
-	// types.Actions[0] for text messages, types.Actions[1] for photos, types.Actions[2] or types.Actions[3] for videos,
-	// types.Actions[4] or types.Actions[5] for voice notes, types.Actions[6] for general files, types.Actions[7]
-	// for stickers, types.Actions[8] for location data, types.Actions[9] or types.Actions[10] for video notes.
+	// Type of action to broadcast. Choose one of Actions, depending on what the user is about to receive:
+	// Actions[0] for text messages, Actions[1] for photos, Actions[2] or Actions[3] for videos,
+	// Actions[4] or Actions[5] for voice notes, Actions[6] for general files, Actions[7]
+	// for stickers, Actions[8] for location data, Actions[9] or Actions[10] for video notes.
 	WriteAction(action string) error
 
 	// Recieves a slice of reaction types to set on the message. Currently, as non-premium users,
 	// bots can set up to one reaction per message. A custom emoji reaction can be used if it is either
 	// already present on the message or explicitly allowed by chat administrators. Paid reactions can't be used by bots.
-	WriteReaction(reaction []*types.ReactionType) error
+	WriteReaction(reaction []*ReactionType) error
 
 	// Call it to set the reaction with a big animation
 	WriteReactionIsBig() error
@@ -1038,11 +1093,11 @@ type IParameters interface {
 	// Do nothing if the user is not banned
 	WriteOnlyIfBanned() error
 
-	WritePermissions(permissions *types.ChatPermissions) error
+	WritePermissions(permissions *ChatPermissions) error
 
 	WriteIndependentChatPermissions() error
 
-	WriteAdministratorRights(chAdminRights *types.ChatAdministratorRights) error
+	WriteAdministratorRights(chAdminRights *ChatAdministratorRights) error
 
 	// New custom title for the administrator; 0-16 characters, emoji are not allowed
 	WriteCustomTitle(title string) error
@@ -1063,7 +1118,7 @@ type IParameters interface {
 
 	WriteInlineMessageID(messageID string) error
 
-	WriteErrors(errors []*types.PassportElementError) error
+	WriteErrors(errors []*PassportElementError) error
 
 	WriteDescription(desc string) error
 
@@ -1186,7 +1241,7 @@ type IReply interface {
 // This interface represents one button of IReply interface. WriteString() is requied, and at most one of the rest functions must be used to specify type of the button. For simple text buttons, String can be used instead of this object to specify the button text.
 type IReplyButton interface {
 	// If specified, pressing the button will open a list of suitable users. Available in private chats only.
-	WriteRequestChat(rchat *types.KeyboardButtonRequestChat) error
+	WriteRequestChat(rchat *KeyboardButtonRequestChat) error
 
 	// Doesn't receives anything. If it is called, the user's phone number will be sent as a contact when the button is pressed. Available in private chats only.
 	WriteRequestContact() error
@@ -1195,16 +1250,16 @@ type IReplyButton interface {
 	WriteRequestLocation() error
 
 	// Receives a structure with some data. The user will be asked to create a poll and send it to the bot when the button is pressed. Available in private chats only.
-	WriteRequestPoll(rpoll *types.KeyboardButtonPollType) error
+	WriteRequestPoll(rpoll *KeyboardButtonPollType) error
 
 	// If specified, pressing the button will open a list of suitable users. Available in private chats only.
-	WriteRequestUsers(rusers *types.KeyboardButtonRequestUsers) error
+	WriteRequestUsers(rusers *KeyboardButtonRequestUsers) error
 
 	// The text content that will be on the button
 	WriteString(text string) error
 
 	// Receives a structure that describes Web App. Will be launched when the button is pressed. Available in private chats only.
-	WriteWebApp(webapp *types.WebAppInfo) error
+	WriteWebApp(webapp *WebAppInfo) error
 }
 
 // This interfaceinterface represents an inline keyboard that appears right next to the message it belongs to.
@@ -1228,10 +1283,10 @@ type IInlineButton interface {
 	// Receives the description of the game that will be launched when the user presses the button.
 	//
 	// This type of button must always be the first button in the first row
-	WriteCallbackGame(game *types.CallbackGame) error
+	WriteCallbackGame(game *CallbackGame) error
 
 	// Recieves an HTTPS URL structure used to automatically authorize the user.
-	WriteLoginUrl(logUrl *types.LoginUrl) error
+	WriteLoginUrl(logUrl *LoginUrl) error
 
 	// Specify True, to send a Pay button. Substrings “⭐” and “XTR” in the buttons's text will be replaced with a Telegram Star icon.
 	//
@@ -1250,7 +1305,7 @@ type IInlineButton interface {
 
 	// If set, pressing the button will prompt the user to select one of their chats of the specified type, open that chat and insert the bot's username and the specified inline query in the input field.
 	// Not supported for messages sent on behalf of a Telegram Business account.
-	WriteSwitchInlineQueryChosenChat(sw *types.SwitchInlineQueryChosenChat) error
+	WriteSwitchInlineQueryChosenChat(sw *SwitchInlineQueryChosenChat) error
 
 	// If set, pressing the button will insert the bot's username and the specified inline query in the current chat's input field. May be empty, in which case only the bot's username will be inserted.
 	//
@@ -1263,7 +1318,7 @@ type IInlineButton interface {
 
 	// Receives the description of the Web App that will be launched when the user presses the button. The Web App will be able to send an arbitrary message on behalf of the user using the method answerWebAppQuery.
 	// Available only in private chats between a user and the bot. Not supported for messages sent on behalf of a Telegram Business account.
-	WriteWebApp(webapp *types.WebAppInfo) error
+	WriteWebApp(webapp *WebAppInfo) error
 }
 
 type IForceReply interface {
@@ -1293,7 +1348,7 @@ type IPayment interface {
 
 	WriteCurrency(currency string) error
 
-	WritePrices(prices []*types.LabeledPrice) error
+	WritePrices(prices []*LabeledPrice) error
 
 	WriteSubscriptionPeriod(period int) error
 
@@ -1327,27 +1382,32 @@ type IPayment interface {
 
 	WriteIsFlexible() error
 
-	WriteShippingID(id string) error
+	// WriteShippingID(id string) error
 
-	WriteOK(b bool) error
+	// WriteOK(b bool) error
 
-	WriteShippingOptions(options []*types.ShippingOption) error
+	// WriteShippingOptions(options []*ShippingOption) error
 
-	WriteErrorMessage(msg string) error
+	// WriteErrorMessage(msg string) error
 
-	WritePreCheckoutID(id string) error
+	// WritePreCheckoutID(id string) error
 
-	WriteTelegramPaymentChargeID(id string) error
+	// WriteTelegramPaymentChargeID(id string) error
 
-	WriteIsCanceled() error
+	// WriteIsCanceled() error
 }
 
 type IGame interface {
 	WriteShortName(name string) error
 
-	WriteScore(score int) error
+	// WriteScore(score int) error
 
-	WriteForce() error
+	// WriteForce() error
 
-	WriteDisableEditMessage() error
+	// WriteDisableEditMessage() error
+}
+
+type IGift interface {
+	WriteID(id string) error
+	WritePayForUpgrade() error
 }

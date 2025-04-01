@@ -3,7 +3,7 @@ package unit
 import (
 	"testing"
 
-	"github.com/iamissahar/Fmtogram/formatter"
+	fmtogram "github.com/iamissahar/Fmtogram"
 )
 
 type animationT struct {
@@ -22,42 +22,42 @@ type anTestContainer struct {
 	isExpectedErr []bool
 	codeErr       []string
 	amount, until int
-	buildF        func(vdtc anTestContainer, vd formatter.IAnimation, i int) *animationT
+	buildF        func(vdtc anTestContainer, vd fmtogram.IAnimation, i int) *animationT
 }
 
-func putWriteAnimationStorage(antc anTestContainer, an formatter.IAnimation, i int) *animationT {
+func putWriteAnimationStorage(antc anTestContainer, an fmtogram.IAnimation, i int) *animationT {
 	return &animationT{antc.name, antc.inputStr[i], 0, an.WriteAnimationStorage, antc.isExpectedErr[i], antc.codeErr[i]}
 }
 
-func putWriteAnimationTelegram(antc anTestContainer, an formatter.IAnimation, i int) *animationT {
+func putWriteAnimationTelegram(antc anTestContainer, an fmtogram.IAnimation, i int) *animationT {
 	return &animationT{antc.name, antc.inputStr[i], 0, an.WriteAnimationTelegram, antc.isExpectedErr[i], antc.codeErr[i]}
 }
 
-func putWriteAnimationInternet(antc anTestContainer, an formatter.IAnimation, i int) *animationT {
+func putWriteAnimationInternet(antc anTestContainer, an fmtogram.IAnimation, i int) *animationT {
 	return &animationT{antc.name, antc.inputStr[i], 0, an.WriteAnimationInternet, antc.isExpectedErr[i], antc.codeErr[i]}
 }
 
-func putWriteAnimationDuration(antc anTestContainer, an formatter.IAnimation, i int) *animationT {
+func putWriteAnimationDuration(antc anTestContainer, an fmtogram.IAnimation, i int) *animationT {
 	return &animationT{antc.name, "", antc.inputInt[i], an.WriteDuration, antc.isExpectedErr[i], antc.codeErr[i]}
 }
 
-func putWriteAnimationWidth(antc anTestContainer, an formatter.IAnimation, i int) *animationT {
+func putWriteAnimationWidth(antc anTestContainer, an fmtogram.IAnimation, i int) *animationT {
 	return &animationT{antc.name, "", antc.inputInt[i], an.WriteWidth, antc.isExpectedErr[i], antc.codeErr[i]}
 }
 
-func putWriteAnimationHeight(antc anTestContainer, an formatter.IAnimation, i int) *animationT {
+func putWriteAnimationHeight(antc anTestContainer, an fmtogram.IAnimation, i int) *animationT {
 	return &animationT{antc.name, "", antc.inputInt[i], an.WriteHeight, antc.isExpectedErr[i], antc.codeErr[i]}
 }
 
-func putWriteAnimationThumbnail(antc anTestContainer, an formatter.IAnimation, i int) *animationT {
+func putWriteAnimationThumbnail(antc anTestContainer, an fmtogram.IAnimation, i int) *animationT {
 	return &animationT{antc.name, antc.inputStr[i], 0, an.WriteThumbnail, antc.isExpectedErr[i], antc.codeErr[i]}
 }
 
-func putWriteAnimationThumbnailID(antc anTestContainer, an formatter.IAnimation, i int) *animationT {
+func putWriteAnimationThumbnailID(antc anTestContainer, an fmtogram.IAnimation, i int) *animationT {
 	return &animationT{antc.name, antc.inputStr[i], 0, an.WriteThumbnailID, antc.isExpectedErr[i], antc.codeErr[i]}
 }
 
-func putWriteAnimationHasSpoiler(antc anTestContainer, an formatter.IAnimation, i int) *animationT {
+func putWriteAnimationHasSpoiler(antc anTestContainer, an fmtogram.IAnimation, i int) *animationT {
 	return &animationT{antc.name, "", 0, an.WriteHasSpoiler, antc.isExpectedErr[i], antc.codeErr[i]}
 }
 
@@ -193,16 +193,16 @@ func (an *animationT) startTest(part string, i int, t *testing.T) {
 	}
 }
 
-func (antc *anTestContainer) createTestArrays(msg *formatter.Message) ([]UnitTest, []UnitTest) {
-	var an formatter.IAnimation
+func (antc *anTestContainer) createTestArrays(msg *fmtogram.Message) ([]UnitTest, []UnitTest) {
+	var an fmtogram.IAnimation
 	a, b := make([]UnitTest, antc.until), make([]UnitTest, antc.amount-antc.until)
 	for i, j := 0, 0; i < antc.amount; i++ {
 		if i < antc.until {
-			an = msg.NewAnimation()
+			an = fmtogram.NewAnimation()
 			a[i] = antc.buildF(*antc, an, i)
 		} else {
 			if j%2 == 0 {
-				an = msg.NewAnimation()
+				an = fmtogram.NewAnimation()
 			}
 			b[j] = antc.buildF(*antc, an, i)
 			j++
@@ -211,7 +211,7 @@ func (antc *anTestContainer) createTestArrays(msg *formatter.Message) ([]UnitTes
 	return a, b
 }
 
-func mainAnimationLogic(msg *formatter.Message, antc anTestContainer, t *testing.T) {
+func mainAnimationLogic(msg *fmtogram.Message, antc anTestContainer, t *testing.T) {
 	animationcontainer, doublecontainer := antc.createTestArrays(msg)
 	check(animationcontainer, t)
 	doubleCheck(doublecontainer, t)
@@ -221,7 +221,7 @@ func TestWriteAnimationStorage(t *testing.T) {
 	t.Parallel()
 	antc := new(anTestContainer)
 	antc.writeAnimationStorage()
-	msg := formatter.CreateEmpltyMessage()
+	msg := fmtogram.CreateEmpltyMessage()
 	mainAnimationLogic(msg, *antc, t)
 }
 
@@ -229,7 +229,7 @@ func TestWriteAnimationTelegram(t *testing.T) {
 	t.Parallel()
 	antc := new(anTestContainer)
 	antc.writeAnimationTelegram()
-	msg := formatter.CreateEmpltyMessage()
+	msg := fmtogram.CreateEmpltyMessage()
 	mainAnimationLogic(msg, *antc, t)
 }
 
@@ -237,7 +237,7 @@ func TestWriteAnimationInternet(t *testing.T) {
 	t.Parallel()
 	antc := new(anTestContainer)
 	antc.writeAnimationInternet()
-	msg := formatter.CreateEmpltyMessage()
+	msg := fmtogram.CreateEmpltyMessage()
 	mainAnimationLogic(msg, *antc, t)
 }
 
@@ -245,7 +245,7 @@ func TestWriteAnimationDuration(t *testing.T) {
 	t.Parallel()
 	antc := new(anTestContainer)
 	antc.writeDuration()
-	msg := formatter.CreateEmpltyMessage()
+	msg := fmtogram.CreateEmpltyMessage()
 	mainAnimationLogic(msg, *antc, t)
 }
 
@@ -253,7 +253,7 @@ func TestWriteAnimationWidth(t *testing.T) {
 	t.Parallel()
 	antc := new(anTestContainer)
 	antc.writeWidth()
-	msg := formatter.CreateEmpltyMessage()
+	msg := fmtogram.CreateEmpltyMessage()
 	mainAnimationLogic(msg, *antc, t)
 }
 
@@ -261,7 +261,7 @@ func TestWriteAnimationHeight(t *testing.T) {
 	t.Parallel()
 	antc := new(anTestContainer)
 	antc.writeHeight()
-	msg := formatter.CreateEmpltyMessage()
+	msg := fmtogram.CreateEmpltyMessage()
 	mainAnimationLogic(msg, *antc, t)
 }
 
@@ -269,7 +269,7 @@ func TestWriteAnimationThumbnailStorage(t *testing.T) {
 	t.Parallel()
 	antc := new(anTestContainer)
 	antc.writeThumbnail()
-	msg := formatter.CreateEmpltyMessage()
+	msg := fmtogram.CreateEmpltyMessage()
 	mainAnimationLogic(msg, *antc, t)
 }
 
@@ -277,7 +277,7 @@ func TestWriteAnimationThumbnailTelegram(t *testing.T) {
 	t.Parallel()
 	antc := new(anTestContainer)
 	antc.writeThumbnailID()
-	msg := formatter.CreateEmpltyMessage()
+	msg := fmtogram.CreateEmpltyMessage()
 	mainAnimationLogic(msg, *antc, t)
 }
 
@@ -285,6 +285,6 @@ func TestWriteAnimationHasSpoiler(t *testing.T) {
 	t.Parallel()
 	antc := new(anTestContainer)
 	antc.writeHasSpoiler()
-	msg := formatter.CreateEmpltyMessage()
+	msg := fmtogram.CreateEmpltyMessage()
 	mainAnimationLogic(msg, *antc, t)
 }

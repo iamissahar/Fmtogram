@@ -1,4 +1,4 @@
-package formatter
+package fmtogram
 
 import (
 	"bytes"
@@ -22,7 +22,7 @@ type stickerHolder struct {
 }
 
 type formatter struct {
-	inf         *information
+	prm         *information
 	ch          *chat
 	kb          *keyboard
 	loc         *location
@@ -35,6 +35,7 @@ type formatter struct {
 	inlinemode  *inlinemode
 	payment     *payment
 	game        *game
+	gift        *gift
 	contentType string
 	writer      *multipart.Writer
 	mh          *mediaHolder

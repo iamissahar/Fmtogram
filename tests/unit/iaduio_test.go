@@ -4,8 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/iamissahar/Fmtogram/formatter"
-	"github.com/iamissahar/Fmtogram/types"
+	fmtogram "github.com/iamissahar/Fmtogram"
 )
 
 const (
@@ -17,7 +16,7 @@ type audio struct {
 	name          string
 	str           string
 	integer       int
-	array         []*types.MessageEntity
+	array         []*fmtogram.MessageEntity
 	testedFunc    interface{}
 	isExpectedErr bool
 	codeErr       string
@@ -27,54 +26,54 @@ type audiotest struct {
 	name          string
 	inputStr      []string
 	inputInt      []int
-	inputArr      [][]*types.MessageEntity
+	inputArr      [][]*fmtogram.MessageEntity
 	isExpectedErr []bool
 	codeErr       []string
 	amount, until int
-	buildF        func(at audiotest, ad formatter.IAudio, i int) *audio
+	buildF        func(at audiotest, ad fmtogram.IAudio, i int) *audio
 }
 
-func putWriteAudioStorage(at audiotest, ad formatter.IAudio, i int) *audio {
+func putWriteAudioStorage(at audiotest, ad fmtogram.IAudio, i int) *audio {
 	return &audio{at.name, at.inputStr[i], 0, nil, ad.WriteAudioStorage, at.isExpectedErr[i], at.codeErr[i]}
 }
 
-func putWriteAudioTelegram(at audiotest, ad formatter.IAudio, i int) *audio {
+func putWriteAudioTelegram(at audiotest, ad fmtogram.IAudio, i int) *audio {
 	return &audio{at.name, at.inputStr[i], 0, nil, ad.WriteAudioTelegram, at.isExpectedErr[i], at.codeErr[i]}
 }
 
-func putWriteAudioInternet(at audiotest, ad formatter.IAudio, i int) *audio {
+func putWriteAudioInternet(at audiotest, ad fmtogram.IAudio, i int) *audio {
 	return &audio{at.name, at.inputStr[i], 0, nil, ad.WriteAudioInternet, at.isExpectedErr[i], at.codeErr[i]}
 }
 
-func putWriteCaption(at audiotest, ad formatter.IAudio, i int) *audio {
+func putWriteCaption(at audiotest, ad fmtogram.IAudio, i int) *audio {
 	return &audio{at.name, at.inputStr[i], 0, nil, ad.WriteCaption, at.isExpectedErr[i], at.codeErr[i]}
 }
 
-func putWriteCaptionEntities(at audiotest, ad formatter.IAudio, i int) *audio {
+func putWriteCaptionEntities(at audiotest, ad fmtogram.IAudio, i int) *audio {
 	return &audio{at.name, "", 0, at.inputArr[i], ad.WriteCaptionEntities, at.isExpectedErr[i], at.codeErr[i]}
 }
 
-func putWriteDuration(at audiotest, ad formatter.IAudio, i int) *audio {
+func putWriteDuration(at audiotest, ad fmtogram.IAudio, i int) *audio {
 	return &audio{at.name, "", at.inputInt[i], nil, ad.WriteDuration, at.isExpectedErr[i], at.codeErr[i]}
 }
 
-func putWriteParseMode(at audiotest, ad formatter.IAudio, i int) *audio {
+func putWriteParseMode(at audiotest, ad fmtogram.IAudio, i int) *audio {
 	return &audio{at.name, at.inputStr[i], 0, nil, ad.WriteParseMode, at.isExpectedErr[i], at.codeErr[i]}
 }
 
-func putWritePerformer(at audiotest, ad formatter.IAudio, i int) *audio {
+func putWritePerformer(at audiotest, ad fmtogram.IAudio, i int) *audio {
 	return &audio{at.name, at.inputStr[i], 0, nil, ad.WritePerformer, at.isExpectedErr[i], at.codeErr[i]}
 }
 
-func putWriteThumbnail(at audiotest, ad formatter.IAudio, i int) *audio {
+func putWriteThumbnail(at audiotest, ad fmtogram.IAudio, i int) *audio {
 	return &audio{at.name, at.inputStr[i], 0, nil, ad.WriteThumbnail, at.isExpectedErr[i], at.codeErr[i]}
 }
 
-func putWriteThumbnailID(at audiotest, ad formatter.IAudio, i int) *audio {
+func putWriteThumbnailID(at audiotest, ad fmtogram.IAudio, i int) *audio {
 	return &audio{at.name, at.inputStr[i], 0, nil, ad.WriteThumbnailID, at.isExpectedErr[i], at.codeErr[i]}
 }
 
-func putWriteTitle(at audiotest, ad formatter.IAudio, i int) *audio {
+func putWriteTitle(at audiotest, ad fmtogram.IAudio, i int) *audio {
 	return &audio{at.name, at.inputStr[i], 0, nil, ad.WriteTitle, at.isExpectedErr[i], at.codeErr[i]}
 }
 
@@ -116,7 +115,7 @@ func (t *audiotest) writeCaption() {
 
 func (t *audiotest) writeCaptionEntities() {
 	t.name = "(IAudio).WriteCaptionEntities"
-	t.inputArr = [][]*types.MessageEntity{
+	t.inputArr = [][]*fmtogram.MessageEntity{
 		{{Type: "text_link", Offset: 0, Length: 7, Url: "https://youtube.com"}},
 		{},
 		{{Type: "text_link", Offset: 0, Length: 7, Url: "https://youtube.com"}, nil, nil},
@@ -138,7 +137,7 @@ func (t *audiotest) writeDuration() {
 
 func (t *audiotest) writeParseMode() {
 	t.name = "(IAudio).WriteParseMode"
-	t.inputStr = []string{types.HTML, types.Markdown, types.MarkdownV2, "", "something else", types.HTML, types.Markdown}
+	t.inputStr = []string{fmtogram.HTML, fmtogram.Markdown, fmtogram.MarkdownV2, "", "something else", fmtogram.HTML, fmtogram.Markdown}
 	t.isExpectedErr = []bool{false, false, false, true, true, false, true}
 	t.codeErr = []string{"", "", "", "20", "20", "", "10"}
 	t.amount, t.until = 7, 5
@@ -205,7 +204,7 @@ func (ad *audio) callIntF(testedFunc func(int) error, t *testing.T) {
 	}
 }
 
-func (ad *audio) callSliceF(testedFunc func([]*types.MessageEntity) error, t *testing.T) {
+func (ad *audio) callSliceF(testedFunc func([]*fmtogram.MessageEntity) error, t *testing.T) {
 	if !ad.isExpectedErr {
 		if err := testedFunc(ad.array); err != nil {
 			t.Fatalf(errMsg, err)
@@ -225,7 +224,7 @@ func (ad *audio) startTest(part string, i int, t *testing.T) {
 	case func(int) error:
 		printTestLog(part, ad.name, ad.codeErr, ad.integer, ad.isExpectedErr, i, t)
 		ad.callIntF(f, t)
-	case func([]*types.MessageEntity) error:
+	case func([]*fmtogram.MessageEntity) error:
 		printTestLog(part, ad.name, ad.codeErr, ad.array, ad.isExpectedErr, i, t)
 		ad.callSliceF(f, t)
 	default:
@@ -233,16 +232,16 @@ func (ad *audio) startTest(part string, i int, t *testing.T) {
 	}
 }
 
-func (at *audiotest) createTestArrays(msg *formatter.Message) ([]UnitTest, []UnitTest) {
-	var ad formatter.IAudio
+func (at *audiotest) createTestArrays(msg *fmtogram.Message) ([]UnitTest, []UnitTest) {
+	var ad fmtogram.IAudio
 	a, b := make([]UnitTest, at.until), make([]UnitTest, at.amount-at.until)
 	for i, j := 0, 0; i < at.amount; i++ {
 		if i < at.until {
-			ad = msg.NewAudio()
+			ad = fmtogram.NewAudio()
 			a[i] = at.buildF(*at, ad, i)
 		} else {
 			if j%2 == 0 {
-				ad = msg.NewAudio()
+				ad = fmtogram.NewAudio()
 			}
 			b[j] = at.buildF(*at, ad, i)
 			j++
@@ -251,7 +250,7 @@ func (at *audiotest) createTestArrays(msg *formatter.Message) ([]UnitTest, []Uni
 	return a, b
 }
 
-func mainAudioLogic(msg *formatter.Message, at audiotest, t *testing.T) {
+func mainAudioLogic(msg *fmtogram.Message, at audiotest, t *testing.T) {
 	audioholder, doubleaudio := at.createTestArrays(msg)
 	check(audioholder, t)
 	doubleCheck(doubleaudio, t)
@@ -261,7 +260,7 @@ func TestWriteAudioStorage(t *testing.T) {
 	t.Parallel()
 	at := new(audiotest)
 	at.writeAudioStorage()
-	msg := formatter.CreateEmpltyMessage()
+	msg := fmtogram.CreateEmpltyMessage()
 	mainAudioLogic(msg, *at, t)
 }
 
@@ -269,7 +268,7 @@ func TestWriteAudioTelegram(t *testing.T) {
 	t.Parallel()
 	at := new(audiotest)
 	at.writeAudioTelegram()
-	msg := formatter.CreateEmpltyMessage()
+	msg := fmtogram.CreateEmpltyMessage()
 	mainAudioLogic(msg, *at, t)
 }
 
@@ -277,7 +276,7 @@ func TestWriteAudioInternet(t *testing.T) {
 	t.Parallel()
 	at := new(audiotest)
 	at.writeAudioInternet()
-	msg := formatter.CreateEmpltyMessage()
+	msg := fmtogram.CreateEmpltyMessage()
 	mainAudioLogic(msg, *at, t)
 }
 
@@ -285,7 +284,7 @@ func TestAudioWriteCaption(t *testing.T) {
 	t.Parallel()
 	at := new(audiotest)
 	at.writeCaption()
-	msg := formatter.CreateEmpltyMessage()
+	msg := fmtogram.CreateEmpltyMessage()
 	mainAudioLogic(msg, *at, t)
 }
 
@@ -293,7 +292,7 @@ func TestAudioWriteEntitiesCaption(t *testing.T) {
 	t.Parallel()
 	at := new(audiotest)
 	at.writeCaptionEntities()
-	msg := formatter.CreateEmpltyMessage()
+	msg := fmtogram.CreateEmpltyMessage()
 	mainAudioLogic(msg, *at, t)
 }
 
@@ -301,7 +300,7 @@ func TestAudioWriteDuration(t *testing.T) {
 	t.Parallel()
 	at := new(audiotest)
 	at.writeDuration()
-	msg := formatter.CreateEmpltyMessage()
+	msg := fmtogram.CreateEmpltyMessage()
 	mainAudioLogic(msg, *at, t)
 }
 
@@ -309,7 +308,7 @@ func TestAudioWriteParseMode(t *testing.T) {
 	t.Parallel()
 	at := new(audiotest)
 	at.writeParseMode()
-	msg := formatter.CreateEmpltyMessage()
+	msg := fmtogram.CreateEmpltyMessage()
 	mainAudioLogic(msg, *at, t)
 }
 
@@ -317,7 +316,7 @@ func TestAudioWritePerformer(t *testing.T) {
 	t.Parallel()
 	at := new(audiotest)
 	at.writePerformer()
-	msg := formatter.CreateEmpltyMessage()
+	msg := fmtogram.CreateEmpltyMessage()
 	mainAudioLogic(msg, *at, t)
 }
 
@@ -325,7 +324,7 @@ func TestAudioWriteThumbnail(t *testing.T) {
 	t.Parallel()
 	at := new(audiotest)
 	at.writeThumbnail()
-	msg := formatter.CreateEmpltyMessage()
+	msg := fmtogram.CreateEmpltyMessage()
 	mainAudioLogic(msg, *at, t)
 }
 
@@ -333,7 +332,7 @@ func TestAudioWriteThumbnailID(t *testing.T) {
 	t.Parallel()
 	at := new(audiotest)
 	at.writeThumbnailID()
-	msg := formatter.CreateEmpltyMessage()
+	msg := fmtogram.CreateEmpltyMessage()
 	mainAudioLogic(msg, *at, t)
 }
 
@@ -341,6 +340,6 @@ func TestAudioWriteTitle(t *testing.T) {
 	t.Parallel()
 	at := new(audiotest)
 	at.writeTitle()
-	msg := formatter.CreateEmpltyMessage()
+	msg := fmtogram.CreateEmpltyMessage()
 	mainAudioLogic(msg, *at, t)
 }

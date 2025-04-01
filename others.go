@@ -1,4 +1,4 @@
-package types
+package fmtogram
 
 var (
 	BotID             string
@@ -17,6 +17,10 @@ const (
 	MarkdownV2  string = "MarkdownV2"
 	HTML        string = "HTML"
 	TelegramAPI string = "https://api.telegram.org/"
+	Privat      string = "privat"
+	Group       string = "group"
+	Supergroup  string = "supergroup"
+	Channel     string = "channel"
 )
 
 type ForumTopicClosed struct {
@@ -397,4 +401,16 @@ type MenuButton struct {
 type TelegramError struct {
 	Code    int    `json:"code"`
 	Message string `json:"message"`
+}
+
+type WebhookInfo struct {
+	URL                          string   `json:"url"`
+	HasCustomCertificate         bool     `json:"has_custom_certificate"`
+	PendingUpdateCount           int      `json:"pending_update_count"`
+	IPAddress                    string   `json:"ip_address,omitempty"`
+	LastErrorDate                int      `json:"last_error_date,omitempty"`
+	LastErrorMessage             string   `json:"last_error_message,omitempty"`
+	LastSynchronizationErrorDate int      `json:"last_synchronization_error_date,omitempty"`
+	MaxConnections               int      `json:"max_connections,omitempty"`
+	AllowedUpdates               []string `json:"allowed_updates,omitempty"`
 }

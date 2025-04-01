@@ -5,16 +5,15 @@ import (
 	"math/rand"
 	"testing"
 
-	"github.com/iamissahar/Fmtogram/formatter"
+	fmtogram "github.com/iamissahar/Fmtogram"
 	"github.com/iamissahar/Fmtogram/testbotdata"
-	"github.com/iamissahar/Fmtogram/types"
 )
 
 const (
 	chatid                                          int     = 738070596
 	photo, video, audio, document, together         int     = 0, 1, 2, 3, 4
 	link                                            string  = "https://t.me/+azuTu6sZ5CBjNzA6"
-	textformsg                                      string  = "There's some kind of text"
+	textformsg                                      string  = "There is some kind of text"
 	status, errr, chat, sender, date, msgid         int     = 0, 1, 2, 3, 4, 5
 	msgids, replyed, fororig, ph, ad, doc           int     = 6, 7, 8, 9, 10, 11
 	vd, anim, vc, vdn, paidm, groupid, phs          int     = 12, 13, 14, 15, 16, 17, 18
@@ -239,21 +238,21 @@ var botnames = map[string]string{
 }
 
 var (
-	parsemode       = []string{types.HTML, types.Markdown, types.MarkdownV2}
+	parsemode       = []string{fmtogram.HTML, fmtogram.Markdown, fmtogram.MarkdownV2}
 	groupnames      = []string{"A new group title/name", "What a cool name!", "something very very bad", "I don't like it at all"}
 	titles          = []string{"the new admin", "something like a cool title", "don't have any clue", "to find a really cool title"}
 	topicnames      = []string{"The Name", "No Name", "Something Like a Name", "Good Name", "Not a Good Name"}
-	entities        = []*types.MessageEntity{{Offset: 1, Length: 4, Type: "italic"}}
-	linkpopt        = &types.LinkPreviewOptions{IsDisabled: false, URL: "https://youtube.com"}
-	chatperm        = &types.ChatPermissions{CanSendMessages: &f}
-	botcomm         = []*types.BotCommand{{Command: "/start", Description: "Hello!"}, {Command: "/help", Description: "Help me!"}}
-	botcommscope    = &types.BotCommandScope{Type: "default"}
+	entities        = []*fmtogram.MessageEntity{{Offset: 1, Length: 4, Type: "italic"}}
+	linkpopt        = &fmtogram.LinkPreviewOptions{IsDisabled: false, URL: "https://youtube.com"}
+	chatperm        = &fmtogram.ChatPermissions{CanSendMessages: &f}
+	botcomm         = []*fmtogram.BotCommand{{Command: "/start", Description: "Hello!"}, {Command: "/help", Description: "Help me!"}}
+	botcommscope    = &fmtogram.BotCommandScope{Type: "default"}
 	emojies         = []string{"😁", "😢", "😊", "😄", "😝", "😉", "🙈", "😜", "😞"}
 	keywords        = []string{"Regular", "cool", "bad", "nothing", "etc"}
-	pollOpt         = []*types.PollOption{{Text: "Yes!", VoterCount: 66}, {Text: "No!", VoterCount: 12}}
+	pollOpt         = []*fmtogram.PollOption{{Text: "Yes!", VoterCount: 66}, {Text: "No!", VoterCount: 12}}
 	kbnames         = []string{"inline", "reply-markup", "force-reply"}
 	filenames       = []string{"storage", "telegram", "internet"}
-	kb              = []func(*testcase){inlineKb, replyKb, forceKb}
+	kb              = []func(*testcase, *testing.T){inlineKb, replyKb, forceKb}
 	addToMapPhoto   = []func(*testcase){photoIntoMap, photoIntoMap, photoIntoMap}
 	addToMapAudio   = []func(*testcase){audioIntoMap, audioIntoMap, audioIntoMap}
 	addToMapDoc     = []func(*testcase){docIntoMap, docIntoMap, docIntoMap}
@@ -263,83 +262,78 @@ var (
 	addToMapVdn     = []func(*testcase){vdnIntoMap, vdnIntoMap1, vdnIntoMap1}
 	addToMapVdn1    = []func(*testcase){vdnIntoMap1, vdnIntoMap1, vdnIntoMap1}
 	addToMapSticker = []func(*testcase){stckrIntoMap, stckrIntoMap, stckrIntoMap}
-	prices          = []*types.LabeledPrice{{Label: "Total", Amount: 1000}}
+	prices          = []*fmtogram.LabeledPrice{{Label: "Total", Amount: 1000}}
 )
 
 type mediagroup struct {
 	amout     int
-	photos    []formatter.IPhoto
-	videos    []formatter.IVideo
-	audios    []formatter.IAudio
-	documents []formatter.IDocument
-	phFunc    func(formatter.IPhoto) []func(string) error
-	vdFunc    func(formatter.IVideo) []func(string) error
-	adFunc    func(formatter.IAudio) []func(string) error
-	docFunc   func(formatter.IDocument) []func(string) error
+	photos    []fmtogram.IPhoto
+	videos    []fmtogram.IVideo
+	audios    []fmtogram.IAudio
+	documents []fmtogram.IDocument
+	phFunc    func(fmtogram.IPhoto) []func(string) error
+	vdFunc    func(fmtogram.IVideo) []func(string) error
+	adFunc    func(fmtogram.IAudio) []func(string) error
+	docFunc   func(fmtogram.IDocument) []func(string) error
 	all       bool
 }
 
 type testcase struct {
-	msg           *formatter.Message
-	prm           formatter.IParameters
-	ch            formatter.IChat
-	ph            formatter.IPhoto
-	vd            formatter.IVideo
-	an            formatter.IAnimation
-	get           formatter.IGet
-	ad            formatter.IAudio
-	dc            formatter.IDocument
-	vc            formatter.IVoice
-	vdn           formatter.IVideoNote
-	loc           formatter.ILocation
-	con           formatter.IContact
-	poll          formatter.IPoll
-	link          formatter.ILink
-	st            formatter.ISticker
-	fr            formatter.IForum
-	bot           formatter.IBot
-	inline        formatter.IInlineMode
-	pay           formatter.IPayment
-	game          formatter.IGame
-	mg            *mediagroup
-	addMedia      func(*testcase, *testing.T)
-	mediaF        func(*testcase) []func(string) error
-	mediadata     []string
-	thumbdata     []string
-	common        func(*testcase, *testcase, *testing.T)
-	thumb         bool
-	thumbnailF    func(*testcase) []func(string) error
-	code          [3]int
-	errmsg        [3]string
-	whattocheck   map[int]struct{}
-	withoutString bool
-	paid          bool
-	token         string
-	timetochange  chan struct{}
-	workdone      chan struct{}
-	getFuncs      []interface{}
+	bs              *fmtogram.BasicSettings
+	msg             *fmtogram.Message
+	ph              fmtogram.IPhoto
+	vd              fmtogram.IVideo
+	an              fmtogram.IAnimation
+	get             fmtogram.IGet
+	ad              fmtogram.IAudio
+	dc              fmtogram.IDocument
+	vc              fmtogram.IVoice
+	vdn             fmtogram.IVideoNote
+	loc             fmtogram.ILocation
+	con             fmtogram.IContact
+	poll            fmtogram.IPoll
+	st              fmtogram.ISticker
+	gift            fmtogram.IGift
+	pay             fmtogram.IPayment
+	mg              *mediagroup
+	addMedia        func(*testcase, *testing.T)
+	mediaF          func(*testcase) []func(string) error
+	mediadata       []string
+	thumbdata       []string
+	common          func(*testcase, *testcase, *testing.T)
+	thumb           bool
+	thumbnailF      func(*testcase) []func(string) error
+	code            [3]int
+	errmsg          [3]string
+	whattocheck     map[int]struct{}
+	withoutString   bool
+	paid            bool
+	timetochange    chan struct{}
+	workdone        chan struct{}
+	allowtocontinue chan struct{}
+	getFuncs        []interface{}
 }
 
-func (tc *testcase) getReplyPrm() *types.ReplyParameters {
-	return &types.ReplyParameters{MessageID: testbotdata.MessageID[tc.token], ChatID: chatid}
+func (tc *testcase) getReplyPrm() *fmtogram.ReplyParameters {
+	return &fmtogram.ReplyParameters{MessageID: testbotdata.MessageID[tc.bs.Token], ChatID: chatid}
 }
 
-func (tc *testcase) changeToken(d, dd map[string][]string) {
+func (tc *testcase) changeToken(d, dd map[string][]string, t *testing.T) {
 	for {
 		select {
 		case <-tc.workdone:
 			return
-		default:
-			<-tc.timetochange
-			tc.token = testbotdata.Tokens[rand.Intn(8)]
+		case <-tc.timetochange:
+			tc.bs.Token = testbotdata.Tokens[rand.Intn(9)]
+			t.Log("The token has been changed")
 			if d != nil {
-				tc.mediadata = d[tc.token]
+				tc.mediadata = d[tc.bs.Token]
 			}
 			if dd != nil {
-				tc.thumbdata = dd[tc.token]
+				tc.thumbdata = dd[tc.bs.Token]
 			}
+			tc.allowtocontinue <- struct{}{}
 		}
-
 	}
 }
 
@@ -353,33 +347,30 @@ func (tc *testcase) init() {
 	// tc.token = testbotdata.SpeakOnlyWithAnton_bot
 	// tc.token = testbotdata.LearnSpanishOrEnglish_bot
 	// tc.token = testbotdata.Testmy_bots_bot
-	tc.token = testbotdata.Tokens[rand.Intn(9)]
-	tc.msg = formatter.CreateEmpltyMessage()
-	tc.prm = tc.msg.NewParameters()
-	tc.ch = tc.msg.NewChat()
-	tc.ph = tc.msg.NewPhoto()
-	tc.ad = tc.msg.NewAudio()
-	tc.dc = tc.msg.NewDocument()
-	tc.vd = tc.msg.NewVideo()
-	tc.an = tc.msg.NewAnimation()
-	tc.vc = tc.msg.NewVoice()
-	tc.vdn = tc.msg.NewVideoNote()
-	tc.get = tc.msg.NewIGet()
-	tc.loc = tc.msg.NewLocation()
-	tc.con = tc.msg.NewContact()
-	tc.poll = tc.msg.NewPoll()
-	tc.link = tc.msg.NewLink()
-	tc.st = tc.msg.NewSticker()
-	tc.fr = tc.msg.NewForum()
-	tc.bot = tc.msg.NewBot()
-	tc.pay = tc.msg.NewPayment()
-	tc.inline = tc.msg.NewInlineMode()
-	tc.game = tc.msg.NewGame()
+	tc.bs = new(fmtogram.BasicSettings)
+	tc.bs.Token = testbotdata.Tokens[rand.Intn(9)]
+	tc.msg = fmtogram.NewMessage()
+	tc.ph = fmtogram.NewPhoto()
+	tc.ad = fmtogram.NewAudio()
+	tc.dc = fmtogram.NewDocument()
+	tc.vd = fmtogram.NewVideo()
+	tc.an = fmtogram.NewAnimation()
+	tc.vc = fmtogram.NewVoice()
+	tc.vdn = fmtogram.NewVideoNote()
+	tc.loc = fmtogram.NewLocation()
+	tc.con = fmtogram.NewContact()
+	tc.poll = fmtogram.NewPoll()
+	tc.st = fmtogram.NewSticker()
+	tc.pay = fmtogram.NewPayment()
+	tc.get = tc.msg.GetResults()
+	tc.gift = fmtogram.NewGift()
 	tc.whattocheck = make(map[int]struct{})
-	tc.timetochange = make(chan struct{})
+	tc.timetochange = make(chan struct{}, 1)
 	tc.workdone = make(chan struct{}, 1)
+	tc.allowtocontinue = make(chan struct{}, 1)
+	tc.allowtocontinue <- struct{}{}
 	tc.fillAllGetFunc()
-	// types.DEBUG = true
+	// fmtogram.DEBUG = true
 	// logs.DebugOrInfo()
 }
 
@@ -457,145 +448,145 @@ func (tc *testcase) checkResponse(j int) {
 			if g() == nil {
 				panic("Received []int result has unexpectedly been nil. Should've been anything else but nil")
 			}
-		case func() *types.Chat:
+		case func() *fmtogram.Chat:
 			if g() == nil {
-				panic("Received *types.Chat result has unexpectedly been nil. Should've been anything else but nil")
+				panic("Received *fmtogram.Chat result has unexpectedly been nil. Should've been anything else but nil")
 			}
-		case func() *types.User:
+		case func() *fmtogram.User:
 			if g() == nil {
-				panic("Received *types.User result has unexpectedly been nil. Should've been anything else but nil")
+				panic("Received *fmtogram.User result has unexpectedly been nil. Should've been anything else but nil")
 			}
-		case func() formatter.IGet:
+		case func() fmtogram.IGet:
 			if g() == nil {
-				panic("Received formatter.IGet result has unexpectedly been nil. Should've been anything else but nil")
+				panic("Received fmtogram.IGet result has unexpectedly been nil. Should've been anything else but nil")
 			}
-		case func() *types.MessageOrigin:
+		case func() *fmtogram.MessageOrigin:
 			if g() == nil {
-				panic("Received *types.MessageOrigin result has unexpectedly been nil. Should've been anything else but nil")
+				panic("Received *fmtogram.MessageOrigin result has unexpectedly been nil. Should've been anything else but nil")
 			}
-		case func() []*types.PhotoSize:
+		case func() []*fmtogram.PhotoSize:
 			if g() == nil {
-				panic("Received []*types.PhotoSize result has unexpectedly been nil. Should've been anything else but nil")
+				panic("Received []*fmtogram.PhotoSize result has unexpectedly been nil. Should've been anything else but nil")
 			}
-		case func() *types.Audio:
+		case func() *fmtogram.Audio:
 			if g() == nil {
-				panic("Received *types.Audio result has unexpectedly been nil. Should've been anything else but nil")
+				panic("Received *fmtogram.Audio result has unexpectedly been nil. Should've been anything else but nil")
 			}
-		case func() *types.Document:
+		case func() *fmtogram.Document:
 			if g() == nil {
-				panic("Received *types.Document result has unexpectedly been nil. Should've been anything else but nil")
+				panic("Received *fmtogram.Document result has unexpectedly been nil. Should've been anything else but nil")
 			}
-		case func() *types.Video:
+		case func() *fmtogram.Video:
 			if g() == nil {
-				panic("Received *types.Video result has unexpectedly been nil. Should've been anything else but nil")
+				panic("Received *fmtogram.Video result has unexpectedly been nil. Should've been anything else but nil")
 			}
-		case func() *types.Animation:
+		case func() *fmtogram.Animation:
 			if g() == nil {
-				panic("Received *types.Animation result has unexpectedly been nil. Should've been anything else but nil")
+				panic("Received *fmtogram.Animation result has unexpectedly been nil. Should've been anything else but nil")
 			}
-		case func() *types.Voice:
+		case func() *fmtogram.Voice:
 			if g() == nil {
-				panic("Received *types.Voice result has unexpectedly been nil. Should've been anything else but nil")
+				panic("Received *fmtogram.Voice result has unexpectedly been nil. Should've been anything else but nil")
 			}
-		case func() *types.VideoNote:
+		case func() *fmtogram.VideoNote:
 			if g() == nil {
-				panic("Received *types.VideoNote result has unexpectedly been nil. Should've been anything else but nil")
+				panic("Received *fmtogram.VideoNote result has unexpectedly been nil. Should've been anything else but nil")
 			}
-		case func() *types.PaidMedia:
+		case func() *fmtogram.PaidMedia:
 			if g() == nil {
-				panic("Received *types.PaidMedia result has unexpectedly been nil. Should've been anything else but nil")
+				panic("Received *fmtogram.PaidMedia result has unexpectedly been nil. Should've been anything else but nil")
 			}
-		case func() [][]*types.PhotoSize:
+		case func() [][]*fmtogram.PhotoSize:
 			if g() == nil {
-				panic("Received *[][]types.PhotoSize result has unexpectedly been nil. Should've been anything else but nil")
+				panic("Received *[][]fmtogram.PhotoSize result has unexpectedly been nil. Should've been anything else but nil")
 			}
-		case func() []*types.Video:
+		case func() []*fmtogram.Video:
 			if g() == nil {
-				panic("Received *[]types.Video result has unexpectedly been nil. Should've been anything else but nil")
+				panic("Received *[]fmtogram.Video result has unexpectedly been nil. Should've been anything else but nil")
 			}
-		case func() []*types.Audio:
+		case func() []*fmtogram.Audio:
 			if g() == nil {
-				panic("Received *[]types.Audio result has unexpectedly been nil. Should've been anything else but nil")
+				panic("Received *[]fmtogram.Audio result has unexpectedly been nil. Should've been anything else but nil")
 			}
-		case func() []*types.Document:
+		case func() []*fmtogram.Document:
 			if g() == nil {
-				panic("Received *[]types.Document result has unexpectedly been nil. Should've been anything else but nil")
+				panic("Received *[]fmtogram.Document result has unexpectedly been nil. Should've been anything else but nil")
 			}
-		case func() *types.Poll:
+		case func() *fmtogram.Poll:
 			if g() == nil {
-				panic("Received *types.Poll result has unexpectedly been nil. Should've been anything else but nil")
+				panic("Received *fmtogram.Poll result has unexpectedly been nil. Should've been anything else but nil")
 			}
-		case func() *types.Dice:
+		case func() *fmtogram.Dice:
 			if g() == nil {
-				panic("Received *types.Dice result has unexpectedly been nil. Should've been anything else but nil")
+				panic("Received *fmtogram.Dice result has unexpectedly been nil. Should've been anything else but nil")
 			}
-		case func() *types.UserProfilePhotos:
+		case func() *fmtogram.UserProfilePhotos:
 			if g() == nil {
-				panic("Received *types.UserProfilePhotos result has unexpectedly been nil. Should've been anything else but nil")
+				panic("Received *fmtogram.UserProfilePhotos result has unexpectedly been nil. Should've been anything else but nil")
 			}
-		case func() *types.File:
+		case func() *fmtogram.File:
 			if g() == nil {
-				panic("Received *types.File result has unexpectedly been nil. Should've been anything else but nil")
+				panic("Received *fmtogram.File result has unexpectedly been nil. Should've been anything else but nil")
 			}
-		case func() []*types.Sticker:
+		case func() []*fmtogram.Sticker:
 			if g() == nil {
-				panic("Received *types.Sticker result has unexpectedly been nil. Should've been anything else but nil")
+				panic("Received *fmtogram.Sticker result has unexpectedly been nil. Should've been anything else but nil")
 			}
-		case func() []*types.Gift:
+		case func() []*fmtogram.Gift:
 			if g() == nil {
-				panic("Received *[]types.Gift result has unexpectedly been nil. Should've been anything else but nil")
+				panic("Received *[]fmtogram.Gift result has unexpectedly been nil. Should've been anything else but nil")
 			}
-		case func() *types.Message:
+		case func() *fmtogram.Message:
 			if g() == nil {
-				panic("Received *types.Message result has unexpectedly been nil. Should've been anything else but nil")
+				panic("Received *fmtogram.Message result has unexpectedly been nil. Should've been anything else but nil")
 			}
-		case func() []*types.Message:
+		case func() []*fmtogram.Message:
 			if g() == nil {
-				panic("Received []*types.Message result has unexpectedly been nil. Should've been anything else but nil")
+				panic("Received []*fmtogram.Message result has unexpectedly been nil. Should've been anything else but nil")
 			}
-		case func() *types.ChatInviteLink:
+		case func() *fmtogram.ChatInviteLink:
 			if g() == nil {
-				panic("Received *types.ChatInviteLink result has unexpectedly been nil. Should've been anything else but nil")
+				panic("Received *fmtogram.ChatInviteLink result has unexpectedly been nil. Should've been anything else but nil")
 			}
-		case func() *types.ChatFullInfo:
+		case func() *fmtogram.ChatFullInfo:
 			if g() == nil {
-				panic("Received *types.ChatFullInfo result has unexpectedly been nil. Should've been anything else but nil")
+				panic("Received *fmtogram.ChatFullInfo result has unexpectedly been nil. Should've been anything else but nil")
 			}
-		case func() []*types.ChatMember:
+		case func() []*fmtogram.ChatMember:
 			if g() == nil {
-				panic("Received *types.ChatMember result has unexpectedly been nil. Should've been anything else but nil")
+				panic("Received *fmtogram.ChatMember result has unexpectedly been nil. Should've been anything else but nil")
 			}
-		case func() *types.ForumTopic:
+		case func() *fmtogram.ForumTopic:
 			if g() == nil {
-				panic("Received *types.ForumTopic result has unexpectedly been nil. Should've been anything else but nil")
+				panic("Received *fmtogram.ForumTopic result has unexpectedly been nil. Should've been anything else but nil")
 			}
-		case func() []*types.ChatBoost:
+		case func() []*fmtogram.ChatBoost:
 			if g() == nil {
-				panic("Received *types.ChatBoost result has unexpectedly been nil. Should've been anything else but nil")
+				panic("Received *fmtogram.ChatBoost result has unexpectedly been nil. Should've been anything else but nil")
 			}
-		case func() *types.BusinessConnection:
+		case func() *fmtogram.BusinessConnection:
 			if g() == nil {
-				panic("Received *types.BusinessConnection result has unexpectedly been nil. Should've been anything else but nil")
+				panic("Received *fmtogram.BusinessConnection result has unexpectedly been nil. Should've been anything else but nil")
 			}
-		case func() []*types.BotCommand:
+		case func() []*fmtogram.BotCommand:
 			if g() == nil {
-				panic("Received *types.BotCommand result has unexpectedly been nil. Should've been anything else but nil")
+				panic("Received *fmtogram.BotCommand result has unexpectedly been nil. Should've been anything else but nil")
 			}
-		case func() *types.MenuButton:
+		case func() *fmtogram.MenuButton:
 			if g() == nil {
-				panic("Received *types.MenuButton result has unexpectedly been nil. Should've been anything else but nil")
+				panic("Received *fmtogram.MenuButton result has unexpectedly been nil. Should've been anything else but nil")
 			}
-		case func() *types.ChatAdministratorRights:
+		case func() *fmtogram.ChatAdministratorRights:
 			if g() == nil {
-				panic("Received *types.ChatAdministratorRights result has unexpectedly been nil. Should've been anything else but nil")
+				panic("Received *fmtogram.ChatAdministratorRights result has unexpectedly been nil. Should've been anything else but nil")
 			}
-		case func() *types.StarTransaction:
+		case func() *fmtogram.StarTransaction:
 			if g() == nil {
-				panic("Received *types.StarTransaction result has unexpectedly been nil. Should've been anything else but nil")
+				panic("Received *fmtogram.StarTransaction result has unexpectedly been nil. Should've been anything else but nil")
 			}
-		case func() []*types.GameHighScore:
+		case func() []*fmtogram.GameHighScore:
 			if g() == nil {
-				panic("Received []*types.GameHighScore result has unexpectedly been nil. Should've been anything else but nil")
+				panic("Received []*fmtogram.GameHighScore result has unexpectedly been nil. Should've been anything else but nil")
 			}
 		}
 	}

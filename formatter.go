@@ -1,4 +1,4 @@
-package formatter
+package fmtogram
 
 import (
 	"bytes"
@@ -10,30 +10,118 @@ import (
 	"net/url"
 	"reflect"
 
-	"github.com/iamissahar/Fmtogram/formatter/methods"
-	"github.com/iamissahar/Fmtogram/types"
+	"github.com/iamissahar/Fmtogram/methods"
 )
 
-func CreateMessage(tg *types.Telegram, botID string) *Message {
-	m := new(Message)
-	m.fm = new(formatter)
-	m.fm.ch = &chat{ID: tg.Result[0].Message.Chat.ID}
-	m.fm.inf = &information{}
-	m.fm.mh = &mediaHolder{}
-	m.fm.sticker = &stickerHolder{}
-	m.fm.token = botID
-	return m
+// func CreateMessage(botID string) *Message {
+// 	m := new(Message)
+// 	m.fm = new(formatter)
+// 	m.fm.ch = &chat{}
+// 	m.fm.prm = &information{}
+// 	m.fm.mh = &mediaHolder{}
+// 	m.fm.sticker = &stickerHolder{}
+// 	m.fm.token = botID
+// 	return m
+// }
+
+// func CreateEmpltyMessage() *Message {
+// 	m := new(Message)
+// 	m.fm = new(formatter)
+// 	m.fm.ch = &chat{}
+// 	m.fm.prm = &information{}
+// 	m.fm.mh = &mediaHolder{}
+// 	m.fm.sticker = &stickerHolder{}
+// 	m.fm.token = BotID
+// 	return m
+// }
+
+func CreateWebHook() IWebHook {
+	return &webhook{}
 }
 
-func CreateEmpltyMessage() *Message {
-	m := new(Message)
-	m.fm = new(formatter)
-	m.fm.ch = &chat{}
-	m.fm.inf = &information{}
-	m.fm.mh = &mediaHolder{}
-	m.fm.sticker = &stickerHolder{}
-	m.fm.token = types.BotID
-	return m
+func (wh *webhook) send(method, query string) error {
+	var (
+		resp *http.Response
+		body []byte
+	)
+	if query != "" {
+		query = "?" + query
+	}
+	url := fmt.Sprint(TelegramAPI, "bot", wh.token, "/", method, query)
+	req, err := http.NewRequest(http.MethodPost, url, wh.buf)
+	req.Header.Set("Content-Type", wh.contenttype)
+	if err == nil {
+		cl := http.Client{}
+		resp, err = cl.Do(req)
+	}
+	if err == nil {
+		defer resp.Body.Close()
+		body, err = io.ReadAll(resp.Body)
+		if err == nil {
+			errResp := new(Error)
+			err = json.Unmarshal(body, errResp)
+			if !errResp.Ok {
+				wh.status, wh.errorcode, wh.errormsg = errResp.Ok, errResp.ErrorCode, errResp.Description
+				err = code22()
+			} else if err == nil {
+				if method == "setWebhook" || method == "deleteWebhook" {
+					sr := new(SimpleResponse)
+					err = json.Unmarshal(body, sr)
+					if err == nil {
+						wh.status = sr.Ok
+						if !sr.Result {
+							err = code22()
+						}
+					}
+				} else {
+					whi := new(WebhookResponse)
+					err = json.Unmarshal(body, whi)
+					wh.status, wh.info = whi.Ok, whi.Result
+				}
+			}
+		}
+	}
+	return err
+}
+
+func (wh *webhook) Set() error {
+	var (
+		body  []byte
+		err   error
+		query string
+	)
+	wh.buf = bytes.NewBuffer(nil)
+	wr := multipart.NewWriter(wh.buf)
+	if wh.Certificate != "" {
+		if err = wh.certificateJob(wr); err == nil {
+			query, err = putUrlValues(wh)
+			if err == nil {
+				err = wr.Close()
+			}
+		}
+	} else {
+		body, err = json.Marshal(wh)
+		wh.buf.Write(body)
+		wh.contenttype = "application/json"
+	}
+	if err == nil {
+		err = wh.send("setWebhook", query)
+	}
+	return err
+}
+
+func (wh *webhook) Delete() error {
+	var query string
+	if wh.DropPendingUpdates {
+		val := url.Values{}
+		val.Add("drop_pending_updates", "true")
+		query = val.Encode()
+	}
+	return wh.send("deleteWebhook", query)
+}
+
+func (wh *webhook) Info() (*WebhookInfo, error) {
+	return wh.info, wh.send("getWebhookInfo", "")
 }
 
 func checkAndAdd(values *url.Values, tofvalfield reflect.StructField, value string) {
@@ -156,7 +244,7 @@ func putUrlValues(data interface{}) (string, error) {
 	return queryString, err
 }
 
-func uniteStrings(query [14]string) (string, error) {
+func uniteStrings(query [15]string) (string, error) {
 	var (
 		val, v = url.Values{}, url.Values{}
 		err    error
@@ -308,8 +396,8 @@ func (sh *stickerHolder) multiple(wr *multipart.Writer, buf *bytes.Buffer, conte
 
 func travers(msg *Message) (string, error) {
 	var (
-		fields = [12]interface{}{msg.fm.inf, msg.fm.ch, msg.fm.kb, msg.fm.loc, msg.fm.con, msg.fm.poll,
-			msg.fm.link, msg.fm.forum, msg.fm.bot, msg.fm.inlinemode, msg.fm.payment, msg.fm.game}
+		fields = [13]interface{}{msg.fm.prm, msg.fm.ch, msg.fm.kb, msg.fm.loc, msg.fm.con, msg.fm.poll,
+			msg.fm.link, msg.fm.forum, msg.fm.bot, msg.fm.inlinemode, msg.fm.payment, msg.fm.game, msg.fm.gift}
 		media    = [2]handleFiles{msg.fm.mh, msg.fm.sticker}
 		err      error
 		queryStr string
@@ -323,23 +411,23 @@ func travers(msg *Message) (string, error) {
 			switch fields[i].(type) {
 			case *information:
 				if msg.fm.method == methods.PromoteMember {
-					if msg.fm.inf.AdminRights != nil {
-						msg.fm.inf.IsAnonymous = msg.fm.inf.AdminRights.IsAnonymous
-						msg.fm.inf.CanManageChat = msg.fm.inf.AdminRights.CanManageChat
-						msg.fm.inf.CanDeleteMessages = msg.fm.inf.AdminRights.CanDeleteMessages
-						msg.fm.inf.CanManageVideoChats = msg.fm.inf.AdminRights.CanManageVideoChats
-						msg.fm.inf.CanRestrictMembers = msg.fm.inf.AdminRights.CanRestrictMembers
-						msg.fm.inf.CanPromoteMembers = msg.fm.inf.AdminRights.CanPromoteMembers
-						msg.fm.inf.CanChangeInfo = msg.fm.inf.AdminRights.CanChangeInfo
-						msg.fm.inf.CanInviteUsers = msg.fm.inf.AdminRights.CanInviteUsers
-						msg.fm.inf.CanPostStories = msg.fm.inf.AdminRights.CanPostStories
-						msg.fm.inf.CanEditStories = msg.fm.inf.AdminRights.CanEditStories
-						msg.fm.inf.CanDeleteStories = msg.fm.inf.AdminRights.CanDeleteStories
-						msg.fm.inf.CanPostMessages = msg.fm.inf.AdminRights.CanPostMessages
-						msg.fm.inf.CanEditMessages = msg.fm.inf.AdminRights.CanEditMessages
-						msg.fm.inf.CanPinMessages = msg.fm.inf.AdminRights.CanPinMessages
-						msg.fm.inf.CanManageTopics = msg.fm.inf.AdminRights.CanManageTopics
-						msg.fm.inf.AdminRights = nil
+					if msg.fm.prm.AdminRights != nil {
+						msg.fm.prm.IsAnonymous = msg.fm.prm.AdminRights.IsAnonymous
+						msg.fm.prm.CanManageChat = msg.fm.prm.AdminRights.CanManageChat
+						msg.fm.prm.CanDeleteMessages = msg.fm.prm.AdminRights.CanDeleteMessages
+						msg.fm.prm.CanManageVideoChats = msg.fm.prm.AdminRights.CanManageVideoChats
+						msg.fm.prm.CanRestrictMembers = msg.fm.prm.AdminRights.CanRestrictMembers
+						msg.fm.prm.CanPromoteMembers = msg.fm.prm.AdminRights.CanPromoteMembers
+						msg.fm.prm.CanChangeInfo = msg.fm.prm.AdminRights.CanChangeInfo
+						msg.fm.prm.CanInviteUsers = msg.fm.prm.AdminRights.CanInviteUsers
+						msg.fm.prm.CanPostStories = msg.fm.prm.AdminRights.CanPostStories
+						msg.fm.prm.CanEditStories = msg.fm.prm.AdminRights.CanEditStories
+						msg.fm.prm.CanDeleteStories = msg.fm.prm.AdminRights.CanDeleteStories
+						msg.fm.prm.CanPostMessages = msg.fm.prm.AdminRights.CanPostMessages
+						msg.fm.prm.CanEditMessages = msg.fm.prm.AdminRights.CanEditMessages
+						msg.fm.prm.CanPinMessages = msg.fm.prm.AdminRights.CanPinMessages
+						msg.fm.prm.CanManageTopics = msg.fm.prm.AdminRights.CanManageTopics
+						msg.fm.prm.AdminRights = nil
 					}
 				}
 			}
@@ -383,7 +471,7 @@ func makeRequest(msg *Message) (string, error) {
 	return travers(msg)
 }
 
-func handlerMessage(msg *Message, t *types.MessageResponse) {
+func handlerMessage(msg *Message, t *MessageResponse) {
 	msg.fm.g.status = t.Ok
 	msg.fm.g.msgID = t.Result.MessageID
 	msg.fm.g.sender = t.Result.From
@@ -420,26 +508,29 @@ func handlerMessage(msg *Message, t *types.MessageResponse) {
 	msg.fm.g.poll = t.Result.Poll
 	msg.fm.g.dice = t.Result.Dice
 	if t.Result.Sticker != nil {
-		msg.fm.g.stickers = []*types.Sticker{t.Result.Sticker}
+		msg.fm.g.stickers = []*Sticker{t.Result.Sticker}
 	}
 	msg.fm.g.msg = t.Result
 }
 
-func handlerMediaGroup(msg *Message, t *types.MediaGroupResponse) {
+func handlerMediaGroup(msg *Message, t *MediaGroupResponse) {
 	msg.fm.g.status = t.Ok
 	msg.fm.g.mg.id = t.Result[0].MediaGroupID
 	msg.fm.g.sender = t.Result[0].From
 	msg.fm.g.date = t.Result[0].Date
 	msg.fm.g.chat = t.Result[0].Chat
 	if t.Result[0].ReplyToMessage != nil {
-		msg.fm.g.replyed = &get{chat: t.Result[0].ReplyToMessage.Chat, sender: t.Result[0].From,
+		g := &get{chat: t.Result[0].ReplyToMessage.Chat, sender: t.Result[0].From,
 			date: t.Result[0].ReplyToMessage.Date, msgID: t.Result[0].ReplyToMessage.MessageID,
 			msgOrigin: t.Result[0].ReplyToMessage.ForwardOrigin, photo: t.Result[0].ReplyToMessage.Photo,
 			audio: t.Result[0].ReplyToMessage.Audio, document: t.Result[0].ReplyToMessage.Document,
 			video: t.Result[0].ReplyToMessage.Video, anim: t.Result[0].ReplyToMessage.Animation,
 			voice: t.Result[0].ReplyToMessage.Voice, vdn: t.Result[0].ReplyToMessage.VideoNote,
-			paid: t.Result[0].ReplyToMessage.PaidMedia.PaidMedia[0], poll: t.Result[0].ReplyToMessage.Poll,
-			dice: t.Result[0].ReplyToMessage.Dice}
+			poll: t.Result[0].ReplyToMessage.Poll, dice: t.Result[0].ReplyToMessage.Dice}
+		if t.Result[0].ReplyToMessage.PaidMedia != nil {
+			g.paid = t.Result[0].ReplyToMessage.PaidMedia.PaidMedia[0]
+		}
+		msg.fm.g.replyed = g
 	}
 	msg.fm.g.msgs = t.Result
 	msg.fm.g.msgIDs = make([]int, len(t.Result))
@@ -462,117 +553,119 @@ func handlerMediaGroup(msg *Message, t *types.MediaGroupResponse) {
 
 func responseDecoder(msg *Message) error {
 	var err error
-	switch t := msg.fm.tgr.(type) {
-	case *types.SimpleResponse:
-		msg.fm.g.status = t.Result
-	case *types.MessageIDResponse:
-		msg.fm.g.status = t.Ok
-		msg.fm.g.msgID = t.Result.MessageID
-	case *types.MessageIDsResponse:
-		msg.fm.g.status = t.Ok
-		msg.fm.g.msgIDs = make([]int, len(t.Result))
-		for i, id := range t.Result {
-			msg.fm.g.msgIDs[i] = id.MessageID
+	if msg.fm.g != nil {
+		switch t := msg.fm.tgr.(type) {
+		case *SimpleResponse:
+			msg.fm.g.status = t.Result
+		case *MessageIDResponse:
+			msg.fm.g.status = t.Ok
+			msg.fm.g.msgID = t.Result.MessageID
+		case *MessageIDsResponse:
+			msg.fm.g.status = t.Ok
+			msg.fm.g.msgIDs = make([]int, len(t.Result))
+			for i, id := range t.Result {
+				msg.fm.g.msgIDs[i] = id.MessageID
+			}
+		case *MessageResponse:
+			handlerMessage(msg, t)
+		case *InviteLinkResponse:
+			msg.fm.g.status = t.Ok
+			msg.fm.g.invlink = t.Result
+		case *MediaGroupResponse:
+			msg.fm.g.mg = new(mediagroup)
+			handlerMediaGroup(msg, t)
+		case *UserProfilePhotosResponse:
+			msg.fm.g.status = t.Ok
+			msg.fm.g.uprph = t.Result
+		case *FileResponse:
+			msg.fm.g.status = t.Ok
+			msg.fm.g.file = t.Result
+		case *ChatFullInfoResponse:
+			msg.fm.g.status = t.Ok
+			msg.fm.g.chatinfo = t.Result
+		case *ChatMembersResponse:
+			msg.fm.g.status = t.Ok
+			msg.fm.g.members = t.Result
+		case *ChatMemberResponse:
+			msg.fm.g.status = t.Ok
+			msg.fm.g.members = make([]*ChatMember, 1)
+			msg.fm.g.members[0] = t.Result
+		case *StickersResponse:
+			msg.fm.g.status = t.Ok
+			msg.fm.g.stickers = make([]*Sticker, len(t.Result))
+			msg.fm.g.stickers = t.Result
+		case *ForumResponse:
+			msg.fm.g.status = t.Ok
+			msg.fm.g.forum = t.Result
+		case *UserBoostsResponse:
+			msg.fm.g.status = t.Ok
+			if t.Result != nil {
+				msg.fm.g.boosts = t.Result.Boosts
+			}
+		case *BusinessConResponse:
+			msg.fm.g.status = t.Ok
+			msg.fm.g.bconn = t.Result
+		case *BotCommandResponse:
+			msg.fm.g.status = t.Ok
+			msg.fm.g.botcomm = t.Result
+		case *BotNameResponse:
+			msg.fm.g.status = t.Ok
+			if t.Result != nil {
+				msg.fm.g.str = t.Result.Name
+			}
+		case *BotDescriptionResponse:
+			msg.fm.g.status = t.Ok
+			if t.Result != nil {
+				msg.fm.g.str = t.Result.Description
+			}
+		case *BotShorDescriptionResponse:
+			msg.fm.g.status = t.Ok
+			if t.Result != nil {
+				msg.fm.g.str = t.Result.ShortDescription
+			}
+		case *MenuButtonResponse:
+			msg.fm.g.status = t.Ok
+			msg.fm.g.menuButton = t.Result
+		case *AdminRightResponse:
+			msg.fm.g.status = t.Ok
+			msg.fm.g.admin = t.Result
+		case *PollResponse:
+			msg.fm.g.status = t.Ok
+			msg.fm.g.poll = t.Result
+		case *StickerSetResponse:
+			msg.fm.g.status = t.Ok
+			msg.fm.g.stickerset = t.Result
+		case *GiftsResponse:
+			msg.fm.g.status = t.Ok
+			if t.Result != nil && t.Result.G != nil {
+				msg.fm.g.gifts = t.Result.G
+			}
+		case *WepAppMsgResponse:
+			msg.fm.g.status = t.Ok
+			if t.Result != nil {
+				msg.fm.g.str = t.Result.InlineMessageID
+			}
+		case *PreparedInlineMessageResponse:
+			msg.fm.g.status = t.Ok
+			msg.fm.g.prepinlmsg = t.Result
+		case *StringResponse:
+			msg.fm.g.status = t.Ok
+			msg.fm.g.str = t.Result
+		case *IntResponse:
+			msg.fm.g.status = t.Ok
+			msg.fm.g.integer = &t.Result
+		case *StarTransactionResponse:
+			msg.fm.g.status = t.Ok
+			msg.fm.g.startrans = t.Result
+		case *GameHighScoresResponse:
+			msg.fm.g.status = t.Ok
+			msg.fm.g.score = t.Result
 		}
-	case *types.MessageResponse:
-		handlerMessage(msg, t)
-	case *types.InviteLinkResponse:
-		msg.fm.g.status = t.Ok
-		msg.fm.g.invlink = t.Result
-	case *types.MediaGroupResponse:
-		msg.fm.g.mg = new(mediagroup)
-		handlerMediaGroup(msg, t)
-	case *types.UserProfilePhotosResponse:
-		msg.fm.g.status = t.Ok
-		msg.fm.g.uprph = t.Result
-	case *types.FileResponse:
-		msg.fm.g.status = t.Ok
-		msg.fm.g.file = t.Result
-	case *types.ChatFullInfoResponse:
-		msg.fm.g.status = t.Ok
-		msg.fm.g.chatinfo = t.Result
-	case *types.ChatMembersResponse:
-		msg.fm.g.status = t.Ok
-		msg.fm.g.members = t.Result
-	case *types.ChatMemberResponse:
-		msg.fm.g.status = t.Ok
-		msg.fm.g.members = make([]*types.ChatMember, 1)
-		msg.fm.g.members[0] = t.Result
-	case *types.StickersResponse:
-		msg.fm.g.status = t.Ok
-		msg.fm.g.stickers = make([]*types.Sticker, len(t.Result))
-		msg.fm.g.stickers = t.Result
-	case *types.ForumResponse:
-		msg.fm.g.status = t.Ok
-		msg.fm.g.forum = t.Result
-	case *types.UserBoostsResponse:
-		msg.fm.g.status = t.Ok
-		if t.Result != nil {
-			msg.fm.g.boosts = t.Result.Boosts
-		}
-	case *types.BusinessConResponse:
-		msg.fm.g.status = t.Ok
-		msg.fm.g.bconn = t.Result
-	case *types.BotCommandResponse:
-		msg.fm.g.status = t.Ok
-		msg.fm.g.botcomm = t.Result
-	case *types.BotNameResponse:
-		msg.fm.g.status = t.Ok
-		if t.Result != nil {
-			msg.fm.g.str = t.Result.Name
-		}
-	case *types.BotDescriptionResponse:
-		msg.fm.g.status = t.Ok
-		if t.Result != nil {
-			msg.fm.g.str = t.Result.Description
-		}
-	case *types.BotShorDescriptionResponse:
-		msg.fm.g.status = t.Ok
-		if t.Result != nil {
-			msg.fm.g.str = t.Result.ShortDescription
-		}
-	case *types.MenuButtonResponse:
-		msg.fm.g.status = t.Ok
-		msg.fm.g.menuButton = t.Result
-	case *types.AdminRightResponse:
-		msg.fm.g.status = t.Ok
-		msg.fm.g.admin = t.Result
-	case *types.PollResponse:
-		msg.fm.g.status = t.Ok
-		msg.fm.g.poll = t.Result
-	case *types.StickerSetResponse:
-		msg.fm.g.status = t.Ok
-		msg.fm.g.stickerset = t.Result
-	case *types.GiftsResponse:
-		msg.fm.g.status = t.Ok
-		if t.Result != nil && t.Result.G != nil {
-			msg.fm.g.gifts = t.Result.G
-		}
-	case *types.WepAppMsgResponse:
-		msg.fm.g.status = t.Ok
-		if t.Result != nil {
-			msg.fm.g.str = t.Result.InlineMessageID
-		}
-	case *types.PreparedInlineMessageResponse:
-		msg.fm.g.status = t.Ok
-		msg.fm.g.prepinlmsg = t.Result
-	case *types.StringResponse:
-		msg.fm.g.status = t.Ok
-		msg.fm.g.str = t.Result
-	case *types.IntResponse:
-		msg.fm.g.status = t.Ok
-		msg.fm.g.integer = &t.Result
-	case *types.StarTransactionResponse:
-		msg.fm.g.status = t.Ok
-		msg.fm.g.startrans = t.Result
-	case *types.GameHighScoresResponse:
-		msg.fm.g.status = t.Ok
-		msg.fm.g.score = t.Result
 	}
 	return err
 }
 
-func sendRequest(msg *Message, query string) error {
+func sendRequest2(msg *Message, query, token string) error {
 	var resp *http.Response
 	var body []byte
 	var err error
@@ -582,20 +675,25 @@ func sendRequest(msg *Message, query string) error {
 	} else {
 		err = msg.fm.writer.Close()
 	}
-
-	msg.fm.g.request = fmt.Sprintf("content-type=%s\nmethod=%s\nhttp-method=%s\nbot-token=%s\n",
-		msg.fm.contentType, msg.fm.method, msg.fm.httpMethod, msg.fm.token)
+	if msg.fm.g != nil {
+		msg.fm.g.request = fmt.Sprintf("content-type=%s\nmethod=%s\nhttp-method=%s\nbot-token=%s\n",
+			msg.fm.contentType, msg.fm.method, msg.fm.httpMethod, token)
+	}
 	if msg.fm.contentType == "application/json" {
-		msg.fm.g.request = fmt.Sprintf("%s\n%s", msg.fm.g.request, msg.fm.buf.String())
+		if msg.fm.g != nil {
+			msg.fm.g.request = fmt.Sprintf("%s\n%s", msg.fm.g.request, msg.fm.buf.String())
+		}
 	} else {
-		msg.fm.g.request = fmt.Sprintf("%s\nurl=%s", msg.fm.g.request, query)
+		if msg.fm.g != nil {
+			msg.fm.g.request = fmt.Sprintf("%s\nurl=%s", msg.fm.g.request, query)
+		}
 	}
 
 	if err == nil {
 		if query != "" {
 			query = "?" + query
 		}
-		url := fmt.Sprint(types.TelegramAPI, "bot", msg.fm.token, "/", msg.fm.method, query)
+		url := fmt.Sprint(TelegramAPI, "bot", token, "/", msg.fm.method, query)
 		req, err = http.NewRequest(msg.fm.httpMethod, url, msg.fm.buf)
 		req.Header.Set("Content-Type", msg.fm.contentType)
 
@@ -608,11 +706,15 @@ func sendRequest(msg *Message, query string) error {
 				body, err = io.ReadAll(resp.Body)
 
 				if err == nil {
-					errResp := new(types.Error)
+					errResp := new(Error)
 					err = json.Unmarshal(body, errResp)
-					msg.fm.g.response = string(body)
+					if msg.fm.g != nil {
+						msg.fm.g.response = string(body)
+					}
 					if !errResp.Ok {
-						msg.fm.g.status, msg.fm.g.errorCode, msg.fm.g.errorMsg = errResp.Ok, errResp.ErrorCode, errResp.Description
+						if msg.fm.g != nil {
+							msg.fm.g.status, msg.fm.g.errorCode, msg.fm.g.errorMsg = errResp.Ok, errResp.ErrorCode, errResp.Description
+						}
 						err = code22()
 					} else if err == nil {
 						if err = json.Unmarshal(body, msg.fm.tgr); err == nil {
@@ -626,15 +728,30 @@ func sendRequest(msg *Message, query string) error {
 	return err
 }
 
-func (msg *Message) Send() error {
-	var err error
-	var query string
-
-	if query, err = makeRequest(msg); err == nil {
-		if msg.fm.tgr == nil {
-			panic("!~")
+func (bs *BasicSettings) Send(msg *Message, chatID interface{}) error {
+	var (
+		err   error
+		query string
+	)
+	switch c := chatID.(type) {
+	case int, string:
+		msg.fm.ch.ID = c
+	default:
+		err = code20()
+	}
+	if msg.fm.tgr == nil {
+		msg.fm.tgr = new(MessageResponse)
+	}
+	if msg.fm.method == "" {
+		msg.fm.method = methods.Message
+	}
+	if err == nil {
+		if query, err = makeRequest(msg); err == nil {
+			if msg.fm.tgr == nil {
+				panic("!~")
+			}
+			err = sendRequest2(msg, query, bs.Token)
 		}
-		err = sendRequest(msg, query)
 	}
 
 	return err

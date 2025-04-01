@@ -3,14 +3,13 @@ package unit
 import (
 	"testing"
 
-	"github.com/iamissahar/Fmtogram/formatter"
-	"github.com/iamissahar/Fmtogram/types"
+	fmtogram "github.com/iamissahar/Fmtogram"
 )
 
 type photoT struct {
 	name          string
 	str           string
-	array         []*types.MessageEntity
+	array         []*fmtogram.MessageEntity
 	testedFunc    interface{}
 	isExpectedErr bool
 	codeErr       string
@@ -19,42 +18,42 @@ type photoT struct {
 type phTestContainer struct {
 	name          string
 	inputStr      []string
-	inputArr      [][]*types.MessageEntity
+	inputArr      [][]*fmtogram.MessageEntity
 	isExpectedErr []bool
 	codeErr       []string
 	amount, until int
-	buildF        func(at phTestContainer, ph formatter.IPhoto, i int) *photoT
+	buildF        func(at phTestContainer, ph fmtogram.IPhoto, i int) *photoT
 }
 
-func putWritePhotoStorage(pt phTestContainer, ph formatter.IPhoto, i int) *photoT {
+func putWritePhotoStorage(pt phTestContainer, ph fmtogram.IPhoto, i int) *photoT {
 	return &photoT{pt.name, pt.inputStr[i], nil, ph.WritePhotoStorage, pt.isExpectedErr[i], pt.codeErr[i]}
 }
 
-func putWritePhotoTelegram(pt phTestContainer, ph formatter.IPhoto, i int) *photoT {
+func putWritePhotoTelegram(pt phTestContainer, ph fmtogram.IPhoto, i int) *photoT {
 	return &photoT{pt.name, pt.inputStr[i], nil, ph.WritePhotoTelegram, pt.isExpectedErr[i], pt.codeErr[i]}
 }
 
-func putWritePhotoInternet(pt phTestContainer, ph formatter.IPhoto, i int) *photoT {
+func putWritePhotoInternet(pt phTestContainer, ph fmtogram.IPhoto, i int) *photoT {
 	return &photoT{pt.name, pt.inputStr[i], nil, ph.WritePhotoInternet, pt.isExpectedErr[i], pt.codeErr[i]}
 }
 
-func putWritePhotoCaption(pt phTestContainer, ph formatter.IPhoto, i int) *photoT {
+func putWritePhotoCaption(pt phTestContainer, ph fmtogram.IPhoto, i int) *photoT {
 	return &photoT{pt.name, pt.inputStr[i], nil, ph.WriteCaption, pt.isExpectedErr[i], pt.codeErr[i]}
 }
 
-func putWritePhotoParseMode(pt phTestContainer, ph formatter.IPhoto, i int) *photoT {
+func putWritePhotoParseMode(pt phTestContainer, ph fmtogram.IPhoto, i int) *photoT {
 	return &photoT{pt.name, pt.inputStr[i], nil, ph.WriteParseMode, pt.isExpectedErr[i], pt.codeErr[i]}
 }
 
-func putWritePhotoCaptionEntities(pt phTestContainer, ph formatter.IPhoto, i int) *photoT {
+func putWritePhotoCaptionEntities(pt phTestContainer, ph fmtogram.IPhoto, i int) *photoT {
 	return &photoT{pt.name, "", pt.inputArr[i], ph.WriteCaptionEntities, pt.isExpectedErr[i], pt.codeErr[i]}
 }
 
-func putWritePhotoShowCaptionAboveMedia(pt phTestContainer, ph formatter.IPhoto, i int) *photoT {
+func putWritePhotoShowCaptionAboveMedia(pt phTestContainer, ph fmtogram.IPhoto, i int) *photoT {
 	return &photoT{pt.name, "", nil, ph.WriteShowCaptionAboveMedia, pt.isExpectedErr[i], pt.codeErr[i]}
 }
 
-func putWritePhotoHasSpoiler(pt phTestContainer, ph formatter.IPhoto, i int) *photoT {
+func putWritePhotoHasSpoiler(pt phTestContainer, ph fmtogram.IPhoto, i int) *photoT {
 	return &photoT{pt.name, "", nil, ph.WriteHasSpoiler, pt.isExpectedErr[i], pt.codeErr[i]}
 }
 
@@ -96,7 +95,7 @@ func (t *phTestContainer) writeCaption() {
 
 func (t *phTestContainer) writeParseMode() {
 	t.name = "(IPhoto).WriteParseMode"
-	t.inputStr = []string{types.HTML, types.Markdown, types.MarkdownV2, "", "something else", types.HTML, types.Markdown}
+	t.inputStr = []string{fmtogram.HTML, fmtogram.Markdown, fmtogram.MarkdownV2, "", "something else", fmtogram.HTML, fmtogram.Markdown}
 	t.isExpectedErr = []bool{false, false, false, true, true, false, true}
 	t.codeErr = []string{"", "", "", "20", "20", "", "10"}
 	t.amount, t.until = 7, 5
@@ -105,7 +104,7 @@ func (t *phTestContainer) writeParseMode() {
 
 func (t *phTestContainer) writeCaptionEntities() {
 	t.name = "(IPhoto).WriteCaptionEntities"
-	t.inputArr = [][]*types.MessageEntity{
+	t.inputArr = [][]*fmtogram.MessageEntity{
 		{{Type: "text_link", Offset: 0, Length: 7, Url: "https://youtube.com"}},
 		{},
 		{{Type: "text_link", Offset: 0, Length: 7, Url: "https://youtube.com"}, nil, nil},
@@ -156,7 +155,7 @@ func (ph *photoT) callStrF(testedFunc func(string) error, data string, t *testin
 	}
 }
 
-func (ph *photoT) callSliceF(testedFunc func([]*types.MessageEntity) error, data []*types.MessageEntity, t *testing.T) {
+func (ph *photoT) callSliceF(testedFunc func([]*fmtogram.MessageEntity) error, data []*fmtogram.MessageEntity, t *testing.T) {
 	if !ph.isExpectedErr {
 		if err := testedFunc(data); err != nil {
 			t.Fatalf(errMsg, err)
@@ -173,7 +172,7 @@ func (ph *photoT) startTest(part string, i int, t *testing.T) {
 	case func(string) error:
 		printTestLog(part, ph.name, ph.codeErr, ph.str, ph.isExpectedErr, i, t)
 		ph.callStrF(f, ph.str, t)
-	case func([]*types.MessageEntity) error:
+	case func([]*fmtogram.MessageEntity) error:
 		printTestLog(part, ph.name, ph.codeErr, ph.array, ph.isExpectedErr, i, t)
 		ph.callSliceF(f, ph.array, t)
 	case func() error:
@@ -184,16 +183,16 @@ func (ph *photoT) startTest(part string, i int, t *testing.T) {
 	}
 }
 
-func (pt *phTestContainer) createTestArrays(msg *formatter.Message) ([]UnitTest, []UnitTest) {
-	var ph formatter.IPhoto
+func (pt *phTestContainer) createTestArrays(msg *fmtogram.Message) ([]UnitTest, []UnitTest) {
+	var ph fmtogram.IPhoto
 	a, b := make([]UnitTest, pt.until), make([]UnitTest, pt.amount-pt.until)
 	for i, j := 0, 0; i < pt.amount; i++ {
 		if i < pt.until {
-			ph = msg.NewPhoto()
+			ph = fmtogram.NewPhoto()
 			a[i] = pt.buildF(*pt, ph, i)
 		} else {
 			if j%2 == 0 {
-				ph = msg.NewPhoto()
+				ph = fmtogram.NewPhoto()
 			}
 			b[j] = pt.buildF(*pt, ph, i)
 			j++
@@ -202,7 +201,7 @@ func (pt *phTestContainer) createTestArrays(msg *formatter.Message) ([]UnitTest,
 	return a, b
 }
 
-func mainPhotoLogic(msg *formatter.Message, pt phTestContainer, t *testing.T) {
+func mainPhotoLogic(msg *fmtogram.Message, pt phTestContainer, t *testing.T) {
 	photoholder, doublephoto := pt.createTestArrays(msg)
 	check(photoholder, t)
 	doubleCheck(doublephoto, t)
@@ -212,7 +211,7 @@ func TestWritePhotoStorage(t *testing.T) {
 	t.Parallel()
 	pt := new(phTestContainer)
 	pt.writePhotoStorage()
-	msg := formatter.CreateEmpltyMessage()
+	msg := fmtogram.CreateEmpltyMessage()
 	mainPhotoLogic(msg, *pt, t)
 }
 
@@ -220,7 +219,7 @@ func TestWritePhotoTelegram(t *testing.T) {
 	t.Parallel()
 	pt := new(phTestContainer)
 	pt.writePhotoTelegram()
-	msg := formatter.CreateEmpltyMessage()
+	msg := fmtogram.CreateEmpltyMessage()
 	mainPhotoLogic(msg, *pt, t)
 }
 
@@ -228,7 +227,7 @@ func TestWritePhotoInternet(t *testing.T) {
 	t.Parallel()
 	pt := new(phTestContainer)
 	pt.writePhotoInternet()
-	msg := formatter.CreateEmpltyMessage()
+	msg := fmtogram.CreateEmpltyMessage()
 	mainPhotoLogic(msg, *pt, t)
 }
 
@@ -236,7 +235,7 @@ func TestWritePhotoCaption(t *testing.T) {
 	t.Parallel()
 	pt := new(phTestContainer)
 	pt.writeCaption()
-	msg := formatter.CreateEmpltyMessage()
+	msg := fmtogram.CreateEmpltyMessage()
 	mainPhotoLogic(msg, *pt, t)
 }
 
@@ -244,7 +243,7 @@ func TestWritePhotoParseMode(t *testing.T) {
 	t.Parallel()
 	pt := new(phTestContainer)
 	pt.writeParseMode()
-	msg := formatter.CreateEmpltyMessage()
+	msg := fmtogram.CreateEmpltyMessage()
 	mainPhotoLogic(msg, *pt, t)
 }
 
@@ -252,7 +251,7 @@ func TestWritePhotoCaptionEntities(t *testing.T) {
 	t.Parallel()
 	pt := new(phTestContainer)
 	pt.writeCaptionEntities()
-	msg := formatter.CreateEmpltyMessage()
+	msg := fmtogram.CreateEmpltyMessage()
 	mainPhotoLogic(msg, *pt, t)
 }
 
@@ -260,13 +259,13 @@ func TestWritePhotoShowCaptionAboveMedia(t *testing.T) {
 	t.Parallel()
 	pt := new(phTestContainer)
 	pt.writeShowCaptionAboveMedia()
-	msg := formatter.CreateEmpltyMessage()
+	msg := fmtogram.CreateEmpltyMessage()
 	mainPhotoLogic(msg, *pt, t)
 }
 func TestWritePhotoHasSpoiler(t *testing.T) {
 	t.Parallel()
 	pt := new(phTestContainer)
 	pt.writeHasSpoiler()
-	msg := formatter.CreateEmpltyMessage()
+	msg := fmtogram.CreateEmpltyMessage()
 	mainPhotoLogic(msg, *pt, t)
 }

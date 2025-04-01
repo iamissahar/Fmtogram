@@ -3,14 +3,13 @@ package unit
 import (
 	"testing"
 
-	"github.com/iamissahar/Fmtogram/formatter"
-	"github.com/iamissahar/Fmtogram/types"
+	fmtogram "github.com/iamissahar/Fmtogram"
 )
 
 type documentT struct {
 	name          string
 	str           string
-	array         []*types.MessageEntity
+	array         []*fmtogram.MessageEntity
 	testedFunc    interface{}
 	isExpectedErr bool
 	codeErr       string
@@ -19,46 +18,46 @@ type documentT struct {
 type docTestContainer struct {
 	name          string
 	inputStr      []string
-	inputArr      [][]*types.MessageEntity
+	inputArr      [][]*fmtogram.MessageEntity
 	isExpectedErr []bool
 	codeErr       []string
 	amount, until int
-	buildF        func(doctc docTestContainer, doc formatter.IDocument, i int) *documentT
+	buildF        func(doctc docTestContainer, doc fmtogram.IDocument, i int) *documentT
 }
 
-func putWriteDocumentStorage(doctc docTestContainer, doc formatter.IDocument, i int) *documentT {
+func putWriteDocumentStorage(doctc docTestContainer, doc fmtogram.IDocument, i int) *documentT {
 	return &documentT{doctc.name, doctc.inputStr[i], nil, doc.WriteDocumentStorage, doctc.isExpectedErr[i], doctc.codeErr[i]}
 }
 
-func putWriteDocumentTelegram(doctc docTestContainer, doc formatter.IDocument, i int) *documentT {
+func putWriteDocumentTelegram(doctc docTestContainer, doc fmtogram.IDocument, i int) *documentT {
 	return &documentT{doctc.name, doctc.inputStr[i], nil, doc.WriteDocumentTelegram, doctc.isExpectedErr[i], doctc.codeErr[i]}
 }
 
-func putWriteDocumentInternet(doctc docTestContainer, doc formatter.IDocument, i int) *documentT {
+func putWriteDocumentInternet(doctc docTestContainer, doc fmtogram.IDocument, i int) *documentT {
 	return &documentT{doctc.name, doctc.inputStr[i], nil, doc.WriteDocumentInternet, doctc.isExpectedErr[i], doctc.codeErr[i]}
 }
 
-func putWriteDocumentCaption(doctc docTestContainer, doc formatter.IDocument, i int) *documentT {
+func putWriteDocumentCaption(doctc docTestContainer, doc fmtogram.IDocument, i int) *documentT {
 	return &documentT{doctc.name, doctc.inputStr[i], nil, doc.WriteCaption, doctc.isExpectedErr[i], doctc.codeErr[i]}
 }
 
-func putWriteDocumentCaptionEntities(doctc docTestContainer, doc formatter.IDocument, i int) *documentT {
+func putWriteDocumentCaptionEntities(doctc docTestContainer, doc fmtogram.IDocument, i int) *documentT {
 	return &documentT{doctc.name, "", doctc.inputArr[i], doc.WriteCaptionEntities, doctc.isExpectedErr[i], doctc.codeErr[i]}
 }
 
-func putWriteDocumentDisableContentTypeDetection(doctc docTestContainer, doc formatter.IDocument, i int) *documentT {
+func putWriteDocumentDisableContentTypeDetection(doctc docTestContainer, doc fmtogram.IDocument, i int) *documentT {
 	return &documentT{doctc.name, "", nil, doc.WriteDisableContentTypeDetection, doctc.isExpectedErr[i], doctc.codeErr[i]}
 }
 
-func putWriteDocumentParseMode(doctc docTestContainer, doc formatter.IDocument, i int) *documentT {
+func putWriteDocumentParseMode(doctc docTestContainer, doc fmtogram.IDocument, i int) *documentT {
 	return &documentT{doctc.name, doctc.inputStr[i], nil, doc.WriteParseMode, doctc.isExpectedErr[i], doctc.codeErr[i]}
 }
 
-func putWriteDocumentThumbnail(doctc docTestContainer, doc formatter.IDocument, i int) *documentT {
+func putWriteDocumentThumbnail(doctc docTestContainer, doc fmtogram.IDocument, i int) *documentT {
 	return &documentT{doctc.name, doctc.inputStr[i], nil, doc.WriteThumbnail, doctc.isExpectedErr[i], doctc.codeErr[i]}
 }
 
-func putWriteDocumentThumbnailID(doctc docTestContainer, doc formatter.IDocument, i int) *documentT {
+func putWriteDocumentThumbnailID(doctc docTestContainer, doc fmtogram.IDocument, i int) *documentT {
 	return &documentT{doctc.name, doctc.inputStr[i], nil, doc.WriteThumbnailID, doctc.isExpectedErr[i], doctc.codeErr[i]}
 }
 
@@ -100,7 +99,7 @@ func (doctc *docTestContainer) writeCaption() {
 
 func (doctc *docTestContainer) writeCaptionEntities() {
 	doctc.name = "(IDocument).WriteCaptionEntities"
-	doctc.inputArr = [][]*types.MessageEntity{
+	doctc.inputArr = [][]*fmtogram.MessageEntity{
 		{{Type: "text_link", Offset: 0, Length: 7, Url: "https://youtube.com"}},
 		{},
 		{{Type: "text_link", Offset: 0, Length: 7, Url: "https://youtube.com"}, nil, nil},
@@ -121,7 +120,7 @@ func (doctc *docTestContainer) writeDisableContentTypeDetection() {
 
 func (doctc *docTestContainer) writeParseMode() {
 	doctc.name = "(IDocument).WriteParseMode"
-	doctc.inputStr = []string{types.HTML, types.Markdown, types.MarkdownV2, "", "something else", types.HTML, types.Markdown}
+	doctc.inputStr = []string{fmtogram.HTML, fmtogram.Markdown, fmtogram.MarkdownV2, "", "something else", fmtogram.HTML, fmtogram.Markdown}
 	doctc.isExpectedErr = []bool{false, false, false, true, true, false, true}
 	doctc.codeErr = []string{"", "", "", "20", "20", "", "10"}
 	doctc.amount, doctc.until = 7, 5
@@ -158,7 +157,7 @@ func (doc *documentT) callStrF(testedF func(string) error, t *testing.T) {
 	}
 }
 
-func (doc *documentT) callSliceF(testedF func([]*types.MessageEntity) error, t *testing.T) {
+func (doc *documentT) callSliceF(testedF func([]*fmtogram.MessageEntity) error, t *testing.T) {
 	if !doc.isExpectedErr {
 		if err := testedF(doc.array); err != nil {
 			t.Fatalf(errMsg, err)
@@ -187,7 +186,7 @@ func (doc *documentT) startTest(part string, i int, t *testing.T) {
 	case func(string) error:
 		printTestLog(part, doc.name, doc.codeErr, doc.str, doc.isExpectedErr, i, t)
 		doc.callStrF(f, t)
-	case func([]*types.MessageEntity) error:
+	case func([]*fmtogram.MessageEntity) error:
 		printTestLog(part, doc.name, doc.codeErr, doc.array, doc.isExpectedErr, i, t)
 		doc.callSliceF(f, t)
 	case func() error:
@@ -198,16 +197,16 @@ func (doc *documentT) startTest(part string, i int, t *testing.T) {
 	}
 }
 
-func (doctc *docTestContainer) createTestArrays(msg *formatter.Message) ([]UnitTest, []UnitTest) {
-	var doc formatter.IDocument
+func (doctc *docTestContainer) createTestArrays(msg *fmtogram.Message) ([]UnitTest, []UnitTest) {
+	var doc fmtogram.IDocument
 	a, b := make([]UnitTest, doctc.until), make([]UnitTest, doctc.amount-doctc.until)
 	for i, j := 0, 0; i < doctc.amount; i++ {
 		if i < doctc.until {
-			doc = msg.NewDocument()
+			doc = fmtogram.NewDocument()
 			a[i] = doctc.buildF(*doctc, doc, i)
 		} else {
 			if j%2 == 0 {
-				doc = msg.NewDocument()
+				doc = fmtogram.NewDocument()
 			}
 			b[j] = doctc.buildF(*doctc, doc, i)
 			j++
@@ -216,7 +215,7 @@ func (doctc *docTestContainer) createTestArrays(msg *formatter.Message) ([]UnitT
 	return a, b
 }
 
-func mainDocumentLogic(msg *formatter.Message, doctc docTestContainer, t *testing.T) {
+func mainDocumentLogic(msg *fmtogram.Message, doctc docTestContainer, t *testing.T) {
 	documentcontainer, doublecontainer := doctc.createTestArrays(msg)
 	check(documentcontainer, t)
 	doubleCheck(doublecontainer, t)
@@ -226,7 +225,7 @@ func TestWriteDocumentStorage(t *testing.T) {
 	t.Parallel()
 	doctc := new(docTestContainer)
 	doctc.writeDocumentStorage()
-	msg := formatter.CreateEmpltyMessage()
+	msg := fmtogram.CreateEmpltyMessage()
 	mainDocumentLogic(msg, *doctc, t)
 }
 
@@ -234,7 +233,7 @@ func TestWriteDocumentTelegram(t *testing.T) {
 	t.Parallel()
 	doctc := new(docTestContainer)
 	doctc.writeDocumentTelegram()
-	msg := formatter.CreateEmpltyMessage()
+	msg := fmtogram.CreateEmpltyMessage()
 	mainDocumentLogic(msg, *doctc, t)
 }
 
@@ -242,7 +241,7 @@ func TestWriteDocumentInternet(t *testing.T) {
 	t.Parallel()
 	doctc := new(docTestContainer)
 	doctc.writeDocumentInternet()
-	msg := formatter.CreateEmpltyMessage()
+	msg := fmtogram.CreateEmpltyMessage()
 	mainDocumentLogic(msg, *doctc, t)
 }
 
@@ -250,7 +249,7 @@ func TestWriteDocumentCaption(t *testing.T) {
 	t.Parallel()
 	doctc := new(docTestContainer)
 	doctc.writeCaption()
-	msg := formatter.CreateEmpltyMessage()
+	msg := fmtogram.CreateEmpltyMessage()
 	mainDocumentLogic(msg, *doctc, t)
 }
 
@@ -258,7 +257,7 @@ func TestWriteDocumentCaptionEntities(t *testing.T) {
 	t.Parallel()
 	doctc := new(docTestContainer)
 	doctc.writeCaptionEntities()
-	msg := formatter.CreateEmpltyMessage()
+	msg := fmtogram.CreateEmpltyMessage()
 	mainDocumentLogic(msg, *doctc, t)
 }
 
@@ -266,7 +265,7 @@ func TestWriteDocumentDisableContentTypeDetection(t *testing.T) {
 	t.Parallel()
 	doctc := new(docTestContainer)
 	doctc.writeDisableContentTypeDetection()
-	msg := formatter.CreateEmpltyMessage()
+	msg := fmtogram.CreateEmpltyMessage()
 	mainDocumentLogic(msg, *doctc, t)
 }
 
@@ -274,7 +273,7 @@ func TestWriteDocumentParseMode(t *testing.T) {
 	t.Parallel()
 	doctc := new(docTestContainer)
 	doctc.writeParseMode()
-	msg := formatter.CreateEmpltyMessage()
+	msg := fmtogram.CreateEmpltyMessage()
 	mainDocumentLogic(msg, *doctc, t)
 }
 
@@ -282,7 +281,7 @@ func TestWriteDocumentThumbnail(t *testing.T) {
 	t.Parallel()
 	vdtc := new(docTestContainer)
 	vdtc.writeThumbnail()
-	msg := formatter.CreateEmpltyMessage()
+	msg := fmtogram.CreateEmpltyMessage()
 	mainDocumentLogic(msg, *vdtc, t)
 }
 
@@ -290,6 +289,6 @@ func TestWriteDocumentThumbnailID(t *testing.T) {
 	t.Parallel()
 	vdtc := new(docTestContainer)
 	vdtc.writeThumbnailID()
-	msg := formatter.CreateEmpltyMessage()
+	msg := fmtogram.CreateEmpltyMessage()
 	mainDocumentLogic(msg, *vdtc, t)
 }

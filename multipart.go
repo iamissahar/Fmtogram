@@ -1,4 +1,4 @@
-package formatter
+package fmtogram
 
 import (
 	"encoding/json"
@@ -216,4 +216,13 @@ func (rp *reply) get() ([]byte, error) {
 
 func (frp *forcereply) get() ([]byte, error) {
 	return json.Marshal(frp)
+}
+
+func (wh *webhook) certificateJob(wr *multipart.Writer) error {
+	err := writeFileToMultipart(wr, "certificate", wh.Certificate)
+	if err == nil {
+		wh.Certificate = ""
+		wh.contenttype = wr.FormDataContentType()
+	}
+	return err
 }

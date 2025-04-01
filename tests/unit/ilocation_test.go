@@ -3,7 +3,7 @@ package unit
 import (
 	"testing"
 
-	"github.com/iamissahar/Fmtogram/formatter"
+	fmtogram "github.com/iamissahar/Fmtogram"
 )
 
 type locationT struct {
@@ -24,54 +24,54 @@ type locTestContainer struct {
 	isExpectedErr []bool
 	codeErr       []string
 	amount, until int
-	buildF        func(loctc locTestContainer, loc formatter.ILocation, i int) *locationT
+	buildF        func(loctc locTestContainer, loc fmtogram.ILocation, i int) *locationT
 }
 
-func putWriteLocationLatitude(loctc locTestContainer, loc formatter.ILocation, i int) *locationT {
+func putWriteLocationLatitude(loctc locTestContainer, loc fmtogram.ILocation, i int) *locationT {
 	return &locationT{loctc.name, "", 0, loctc.inputFloat[i], loc.WriteLatitude, loctc.isExpectedErr[i], loctc.codeErr[i]}
 }
 
-func putWriteLocationLongitude(loctc locTestContainer, loc formatter.ILocation, i int) *locationT {
+func putWriteLocationLongitude(loctc locTestContainer, loc fmtogram.ILocation, i int) *locationT {
 	return &locationT{loctc.name, "", 0, loctc.inputFloat[i], loc.WriteLongitude, loctc.isExpectedErr[i], loctc.codeErr[i]}
 }
 
-func putWriteLocationHorizontalAccuracy(loctc locTestContainer, loc formatter.ILocation, i int) *locationT {
+func putWriteLocationHorizontalAccuracy(loctc locTestContainer, loc fmtogram.ILocation, i int) *locationT {
 	return &locationT{loctc.name, "", 0, loctc.inputFloat[i], loc.WriteHorizontalAccuracy, loctc.isExpectedErr[i], loctc.codeErr[i]}
 }
 
-func putWriteLocationLivePeriod(loctc locTestContainer, loc formatter.ILocation, i int) *locationT {
+func putWriteLocationLivePeriod(loctc locTestContainer, loc fmtogram.ILocation, i int) *locationT {
 	return &locationT{loctc.name, "", loctc.inputInt[i], 0, loc.WriteLivePeriod, loctc.isExpectedErr[i], loctc.codeErr[i]}
 }
 
-func putWriteLocationHeading(loctc locTestContainer, loc formatter.ILocation, i int) *locationT {
+func putWriteLocationHeading(loctc locTestContainer, loc fmtogram.ILocation, i int) *locationT {
 	return &locationT{loctc.name, "", loctc.inputInt[i], 0, loc.WriteHeading, loctc.isExpectedErr[i], loctc.codeErr[i]}
 }
 
-func putWriteLocationProximityAlertRadius(loctc locTestContainer, loc formatter.ILocation, i int) *locationT {
+func putWriteLocationProximityAlertRadius(loctc locTestContainer, loc fmtogram.ILocation, i int) *locationT {
 	return &locationT{loctc.name, "", loctc.inputInt[i], 0, loc.WriteProximityAlertRadius, loctc.isExpectedErr[i], loctc.codeErr[i]}
 }
 
-func putWriteLocationTitle(loctc locTestContainer, loc formatter.ILocation, i int) *locationT {
+func putWriteLocationTitle(loctc locTestContainer, loc fmtogram.ILocation, i int) *locationT {
 	return &locationT{loctc.name, loctc.inputStr[i], 0, 0, loc.WriteTitle, loctc.isExpectedErr[i], loctc.codeErr[i]}
 }
 
-func putWriteLocationAddress(loctc locTestContainer, loc formatter.ILocation, i int) *locationT {
+func putWriteLocationAddress(loctc locTestContainer, loc fmtogram.ILocation, i int) *locationT {
 	return &locationT{loctc.name, loctc.inputStr[i], 0, 0, loc.WriteAddress, loctc.isExpectedErr[i], loctc.codeErr[i]}
 }
 
-func putWriteLocationFoursquareID(loctc locTestContainer, loc formatter.ILocation, i int) *locationT {
+func putWriteLocationFoursquareID(loctc locTestContainer, loc fmtogram.ILocation, i int) *locationT {
 	return &locationT{loctc.name, loctc.inputStr[i], 0, 0, loc.WriteFoursquareID, loctc.isExpectedErr[i], loctc.codeErr[i]}
 }
 
-func putWriteLocationFoursquareType(loctc locTestContainer, loc formatter.ILocation, i int) *locationT {
+func putWriteLocationFoursquareType(loctc locTestContainer, loc fmtogram.ILocation, i int) *locationT {
 	return &locationT{loctc.name, loctc.inputStr[i], 0, 0, loc.WriteFoursquareType, loctc.isExpectedErr[i], loctc.codeErr[i]}
 }
 
-func putWriteLocationGooglePlaceID(loctc locTestContainer, loc formatter.ILocation, i int) *locationT {
+func putWriteLocationGooglePlaceID(loctc locTestContainer, loc fmtogram.ILocation, i int) *locationT {
 	return &locationT{loctc.name, loctc.inputStr[i], 0, 0, loc.WriteGooglePlaceID, loctc.isExpectedErr[i], loctc.codeErr[i]}
 }
 
-func putWriteLocationGooglePlaceType(loctc locTestContainer, loc formatter.ILocation, i int) *locationT {
+func putWriteLocationGooglePlaceType(loctc locTestContainer, loc fmtogram.ILocation, i int) *locationT {
 	return &locationT{loctc.name, loctc.inputStr[i], 0, 0, loc.WriteGooglePlaceType, loctc.isExpectedErr[i], loctc.codeErr[i]}
 }
 
@@ -235,16 +235,16 @@ func (loc *locationT) startTest(part string, i int, t *testing.T) {
 	}
 }
 
-func (loctc *locTestContainer) createTestArrays(msg *formatter.Message) ([]UnitTest, []UnitTest) {
-	var loc formatter.ILocation
+func (loctc *locTestContainer) createTestArrays(msg *fmtogram.Message) ([]UnitTest, []UnitTest) {
+	var loc fmtogram.ILocation
 	a, b := make([]UnitTest, loctc.until), make([]UnitTest, loctc.amount-loctc.until)
 	for i, j := 0, 0; i < loctc.amount; i++ {
 		if i < loctc.until {
-			loc = msg.NewLocation()
+			loc = fmtogram.NewLocation()
 			a[i] = loctc.buildF(*loctc, loc, i)
 		} else {
 			if j%2 == 0 {
-				loc = msg.NewLocation()
+				loc = fmtogram.NewLocation()
 			}
 			b[j] = loctc.buildF(*loctc, loc, i)
 			j++
@@ -253,7 +253,7 @@ func (loctc *locTestContainer) createTestArrays(msg *formatter.Message) ([]UnitT
 	return a, b
 }
 
-func mainLocationLogic(msg *formatter.Message, loctc locTestContainer, t *testing.T) {
+func mainLocationLogic(msg *fmtogram.Message, loctc locTestContainer, t *testing.T) {
 	locationcontainer, doublecontainer := loctc.createTestArrays(msg)
 	check(locationcontainer, t)
 	doubleCheck(doublecontainer, t)
@@ -263,7 +263,7 @@ func TestWriteLocationLatitude(t *testing.T) {
 	t.Parallel()
 	locct := new(locTestContainer)
 	locct.writeLatitude()
-	msg := formatter.CreateEmpltyMessage()
+	msg := fmtogram.CreateEmpltyMessage()
 	mainLocationLogic(msg, *locct, t)
 }
 
@@ -271,7 +271,7 @@ func TestWriteLocationLongitude(t *testing.T) {
 	t.Parallel()
 	locct := new(locTestContainer)
 	locct.writeLongitude()
-	msg := formatter.CreateEmpltyMessage()
+	msg := fmtogram.CreateEmpltyMessage()
 	mainLocationLogic(msg, *locct, t)
 }
 
@@ -279,7 +279,7 @@ func TestWriteLocationHorizontalAccuracy(t *testing.T) {
 	t.Parallel()
 	locct := new(locTestContainer)
 	locct.writeHorizontalAccuracy()
-	msg := formatter.CreateEmpltyMessage()
+	msg := fmtogram.CreateEmpltyMessage()
 	mainLocationLogic(msg, *locct, t)
 }
 
@@ -287,7 +287,7 @@ func TestWriteLocationLivePeriod(t *testing.T) {
 	t.Parallel()
 	locct := new(locTestContainer)
 	locct.writeLivePeriod()
-	msg := formatter.CreateEmpltyMessage()
+	msg := fmtogram.CreateEmpltyMessage()
 	mainLocationLogic(msg, *locct, t)
 }
 
@@ -295,7 +295,7 @@ func TestWriteLocationHeading(t *testing.T) {
 	t.Parallel()
 	locct := new(locTestContainer)
 	locct.writeHeading()
-	msg := formatter.CreateEmpltyMessage()
+	msg := fmtogram.CreateEmpltyMessage()
 	mainLocationLogic(msg, *locct, t)
 }
 
@@ -303,7 +303,7 @@ func TestWriteLocationProximityAlertRadius(t *testing.T) {
 	t.Parallel()
 	locct := new(locTestContainer)
 	locct.writeProximityAlertRadius()
-	msg := formatter.CreateEmpltyMessage()
+	msg := fmtogram.CreateEmpltyMessage()
 	mainLocationLogic(msg, *locct, t)
 }
 
@@ -311,7 +311,7 @@ func TestWriteLocationTitle(t *testing.T) {
 	t.Parallel()
 	locct := new(locTestContainer)
 	locct.writeTitle()
-	msg := formatter.CreateEmpltyMessage()
+	msg := fmtogram.CreateEmpltyMessage()
 	mainLocationLogic(msg, *locct, t)
 }
 
@@ -319,14 +319,14 @@ func TestWriteLocationAddress(t *testing.T) {
 	t.Parallel()
 	locct := new(locTestContainer)
 	locct.writeAddress()
-	msg := formatter.CreateEmpltyMessage()
+	msg := fmtogram.CreateEmpltyMessage()
 	mainLocationLogic(msg, *locct, t)
 }
 
 func TestWriteLocationFoursquareID(t *testing.T) {
 	locct := new(locTestContainer)
 	locct.writeFoursquareID()
-	msg := formatter.CreateEmpltyMessage()
+	msg := fmtogram.CreateEmpltyMessage()
 	mainLocationLogic(msg, *locct, t)
 }
 
@@ -334,7 +334,7 @@ func TestWriteLocationFoursquareType(t *testing.T) {
 	t.Parallel()
 	locct := new(locTestContainer)
 	locct.writeFoursquareType()
-	msg := formatter.CreateEmpltyMessage()
+	msg := fmtogram.CreateEmpltyMessage()
 	mainLocationLogic(msg, *locct, t)
 }
 
@@ -342,7 +342,7 @@ func TestWriteLocationGooglePlaceID(t *testing.T) {
 	t.Parallel()
 	locct := new(locTestContainer)
 	locct.writeGooglePlaceID()
-	msg := formatter.CreateEmpltyMessage()
+	msg := fmtogram.CreateEmpltyMessage()
 	mainLocationLogic(msg, *locct, t)
 }
 
@@ -350,6 +350,6 @@ func TestWriteLocationGooglePlaceType(t *testing.T) {
 	t.Parallel()
 	locct := new(locTestContainer)
 	locct.writeGooglePlaceType()
-	msg := formatter.CreateEmpltyMessage()
+	msg := fmtogram.CreateEmpltyMessage()
 	mainLocationLogic(msg, *locct, t)
 }

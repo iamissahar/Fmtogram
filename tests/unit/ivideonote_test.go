@@ -3,7 +3,7 @@ package unit
 import (
 	"testing"
 
-	"github.com/iamissahar/Fmtogram/formatter"
+	fmtogram "github.com/iamissahar/Fmtogram"
 )
 
 type videonoteT struct {
@@ -22,34 +22,34 @@ type vdnTestContainer struct {
 	isExpectedErr []bool
 	codeErr       []string
 	amount, until int
-	buildF        func(vdtc vdnTestContainer, vd formatter.IVideoNote, i int) *videonoteT
+	buildF        func(vdtc vdnTestContainer, vd fmtogram.IVideoNote, i int) *videonoteT
 }
 
-func putWriteVideoNoteStorage(vdntc vdnTestContainer, vdn formatter.IVideoNote, i int) *videonoteT {
+func putWriteVideoNoteStorage(vdntc vdnTestContainer, vdn fmtogram.IVideoNote, i int) *videonoteT {
 	return &videonoteT{vdntc.name, vdntc.inputStr[i], 0, vdn.WriteVideoNoteStorage, vdntc.isExpectedErr[i], vdntc.codeErr[i]}
 }
 
-func putWriteVideoNoteTelegram(vdntc vdnTestContainer, vdn formatter.IVideoNote, i int) *videonoteT {
+func putWriteVideoNoteTelegram(vdntc vdnTestContainer, vdn fmtogram.IVideoNote, i int) *videonoteT {
 	return &videonoteT{vdntc.name, vdntc.inputStr[i], 0, vdn.WriteVideoNoteTelegram, vdntc.isExpectedErr[i], vdntc.codeErr[i]}
 }
 
-func putWriteVideoNoteInternet(vdntc vdnTestContainer, vdn formatter.IVideoNote, i int) *videonoteT {
+func putWriteVideoNoteInternet(vdntc vdnTestContainer, vdn fmtogram.IVideoNote, i int) *videonoteT {
 	return &videonoteT{vdntc.name, vdntc.inputStr[i], 0, vdn.WriteVideoNoteInternet, vdntc.isExpectedErr[i], vdntc.codeErr[i]}
 }
 
-func putWriteVideoNoteDuration(vdntc vdnTestContainer, vdn formatter.IVideoNote, i int) *videonoteT {
+func putWriteVideoNoteDuration(vdntc vdnTestContainer, vdn fmtogram.IVideoNote, i int) *videonoteT {
 	return &videonoteT{vdntc.name, "", vdntc.inputInt[i], vdn.WriteDuration, vdntc.isExpectedErr[i], vdntc.codeErr[i]}
 }
 
-func putWriteVideoNoteLength(vdntc vdnTestContainer, vdn formatter.IVideoNote, i int) *videonoteT {
+func putWriteVideoNoteLength(vdntc vdnTestContainer, vdn fmtogram.IVideoNote, i int) *videonoteT {
 	return &videonoteT{vdntc.name, "", vdntc.inputInt[i], vdn.WriteLength, vdntc.isExpectedErr[i], vdntc.codeErr[i]}
 }
 
-func putWriteVideoNoteThumbnail(vdntc vdnTestContainer, vdn formatter.IVideoNote, i int) *videonoteT {
+func putWriteVideoNoteThumbnail(vdntc vdnTestContainer, vdn fmtogram.IVideoNote, i int) *videonoteT {
 	return &videonoteT{vdntc.name, vdntc.inputStr[i], 0, vdn.WriteThumbnail, vdntc.isExpectedErr[i], vdntc.codeErr[i]}
 }
 
-func putWriteVideoNoteThumbnailID(vdntc vdnTestContainer, vdn formatter.IVideoNote, i int) *videonoteT {
+func putWriteVideoNoteThumbnailID(vdntc vdnTestContainer, vdn fmtogram.IVideoNote, i int) *videonoteT {
 	return &videonoteT{vdntc.name, vdntc.inputStr[i], 0, vdn.WriteThumbnailID, vdntc.isExpectedErr[i], vdntc.codeErr[i]}
 }
 
@@ -153,16 +153,16 @@ func (vdn *videonoteT) startTest(part string, i int, t *testing.T) {
 	}
 }
 
-func (vdntc *vdnTestContainer) createTestArrays(msg *formatter.Message) ([]UnitTest, []UnitTest) {
-	var vdn formatter.IVideoNote
+func (vdntc *vdnTestContainer) createTestArrays(msg *fmtogram.Message) ([]UnitTest, []UnitTest) {
+	var vdn fmtogram.IVideoNote
 	a, b := make([]UnitTest, vdntc.until), make([]UnitTest, vdntc.amount-vdntc.until)
 	for i, j := 0, 0; i < vdntc.amount; i++ {
 		if i < vdntc.until {
-			vdn = msg.NewVideoNote()
+			vdn = fmtogram.NewVideoNote()
 			a[i] = vdntc.buildF(*vdntc, vdn, i)
 		} else {
 			if j%2 == 0 {
-				vdn = msg.NewVideoNote()
+				vdn = fmtogram.NewVideoNote()
 			}
 			b[j] = vdntc.buildF(*vdntc, vdn, i)
 			j++
@@ -171,7 +171,7 @@ func (vdntc *vdnTestContainer) createTestArrays(msg *formatter.Message) ([]UnitT
 	return a, b
 }
 
-func mainVideoNoteLogic(msg *formatter.Message, vdntc vdnTestContainer, t *testing.T) {
+func mainVideoNoteLogic(msg *fmtogram.Message, vdntc vdnTestContainer, t *testing.T) {
 	videonotecontainer, doublecontainer := vdntc.createTestArrays(msg)
 	check(videonotecontainer, t)
 	doubleCheck(doublecontainer, t)
@@ -181,7 +181,7 @@ func TestWriteVideoNoteStorage(t *testing.T) {
 	t.Parallel()
 	vdntc := new(vdnTestContainer)
 	vdntc.writeVideoNoteStorage()
-	msg := formatter.CreateEmpltyMessage()
+	msg := fmtogram.CreateEmpltyMessage()
 	mainVideoNoteLogic(msg, *vdntc, t)
 }
 
@@ -189,7 +189,7 @@ func TestWriteVideoNoteTelegram(t *testing.T) {
 	t.Parallel()
 	vdntc := new(vdnTestContainer)
 	vdntc.writeVideoNoteTelegram()
-	msg := formatter.CreateEmpltyMessage()
+	msg := fmtogram.CreateEmpltyMessage()
 	mainVideoNoteLogic(msg, *vdntc, t)
 }
 
@@ -197,7 +197,7 @@ func TestWriteVideoNoteInternet(t *testing.T) {
 	t.Parallel()
 	vdntc := new(vdnTestContainer)
 	vdntc.writeVideoNoteInternet()
-	msg := formatter.CreateEmpltyMessage()
+	msg := fmtogram.CreateEmpltyMessage()
 	mainVideoNoteLogic(msg, *vdntc, t)
 }
 
@@ -205,7 +205,7 @@ func TestWriteVideoNoteDuration(t *testing.T) {
 	t.Parallel()
 	vdntc := new(vdnTestContainer)
 	vdntc.writeDuration()
-	msg := formatter.CreateEmpltyMessage()
+	msg := fmtogram.CreateEmpltyMessage()
 	mainVideoNoteLogic(msg, *vdntc, t)
 }
 
@@ -213,7 +213,7 @@ func TestWriteVideoNoteLength(t *testing.T) {
 	t.Parallel()
 	vdntc := new(vdnTestContainer)
 	vdntc.writeLength()
-	msg := formatter.CreateEmpltyMessage()
+	msg := fmtogram.CreateEmpltyMessage()
 	mainVideoNoteLogic(msg, *vdntc, t)
 }
 
@@ -221,7 +221,7 @@ func TestWriteVideoNoteThumbnail(t *testing.T) {
 	t.Parallel()
 	vdntc := new(vdnTestContainer)
 	vdntc.writeThumbnail()
-	msg := formatter.CreateEmpltyMessage()
+	msg := fmtogram.CreateEmpltyMessage()
 	mainVideoNoteLogic(msg, *vdntc, t)
 }
 
@@ -229,6 +229,6 @@ func TestWriteVideoNoteThumbnailID(t *testing.T) {
 	t.Parallel()
 	vdntc := new(vdnTestContainer)
 	vdntc.writeThumbnailID()
-	msg := formatter.CreateEmpltyMessage()
+	msg := fmtogram.CreateEmpltyMessage()
 	mainVideoNoteLogic(msg, *vdntc, t)
 }

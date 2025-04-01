@@ -3,17 +3,16 @@ package unit
 import (
 	"testing"
 
-	"github.com/iamissahar/Fmtogram/formatter"
-	"github.com/iamissahar/Fmtogram/types"
+	fmtogram "github.com/iamissahar/Fmtogram"
 )
 
 type replyButtonT struct {
 	name          string
 	str           string
-	rchat         *types.KeyboardButtonRequestChat
-	rpoll         *types.KeyboardButtonPollType
-	rusers        *types.KeyboardButtonRequestUsers
-	webapp        *types.WebAppInfo
+	rchat         *fmtogram.KeyboardButtonRequestChat
+	rpoll         *fmtogram.KeyboardButtonPollType
+	rusers        *fmtogram.KeyboardButtonRequestUsers
+	webapp        *fmtogram.WebAppInfo
 	testedFunc    interface{}
 	isExpectedErr bool
 	codeErr       string
@@ -22,47 +21,47 @@ type replyButtonT struct {
 type rpbTestContainer struct {
 	name          string
 	inputStr      []string
-	inputRChat    []*types.KeyboardButtonRequestChat
-	inputRPoll    []*types.KeyboardButtonPollType
-	inputRUsers   []*types.KeyboardButtonRequestUsers
-	inputWebApp   []*types.WebAppInfo
+	inputRChat    []*fmtogram.KeyboardButtonRequestChat
+	inputRPoll    []*fmtogram.KeyboardButtonPollType
+	inputRUsers   []*fmtogram.KeyboardButtonRequestUsers
+	inputWebApp   []*fmtogram.WebAppInfo
 	isExpectedErr []bool
 	codeErr       []string
 	amount, until int
-	buildF        func(rpbtc rpbTestContainer, rpb formatter.IReplyButton, i int) *replyButtonT
+	buildF        func(rpbtc rpbTestContainer, rpb fmtogram.IReplyButton, i int) *replyButtonT
 }
 
-func putRButtonWriteRequestChat(rpbtc rpbTestContainer, rpb formatter.IReplyButton, i int) *replyButtonT {
+func putRButtonWriteRequestChat(rpbtc rpbTestContainer, rpb fmtogram.IReplyButton, i int) *replyButtonT {
 	return &replyButtonT{rpbtc.name, "", rpbtc.inputRChat[i], nil, nil, nil, rpb.WriteRequestChat, rpbtc.isExpectedErr[i], rpbtc.codeErr[i]}
 }
 
-func putRButtonWriteRequestContact(rpbtc rpbTestContainer, rpb formatter.IReplyButton, i int) *replyButtonT {
+func putRButtonWriteRequestContact(rpbtc rpbTestContainer, rpb fmtogram.IReplyButton, i int) *replyButtonT {
 	return &replyButtonT{rpbtc.name, "", nil, nil, nil, nil, rpb.WriteRequestContact, rpbtc.isExpectedErr[i], rpbtc.codeErr[i]}
 }
 
-func putRButtonWriteRequestLocation(rpbtc rpbTestContainer, rpb formatter.IReplyButton, i int) *replyButtonT {
+func putRButtonWriteRequestLocation(rpbtc rpbTestContainer, rpb fmtogram.IReplyButton, i int) *replyButtonT {
 	return &replyButtonT{rpbtc.name, "", nil, nil, nil, nil, rpb.WriteRequestLocation, rpbtc.isExpectedErr[i], rpbtc.codeErr[i]}
 }
 
-func putRButtonWriteRequestPoll(rpbtc rpbTestContainer, rpb formatter.IReplyButton, i int) *replyButtonT {
+func putRButtonWriteRequestPoll(rpbtc rpbTestContainer, rpb fmtogram.IReplyButton, i int) *replyButtonT {
 	return &replyButtonT{rpbtc.name, "", nil, rpbtc.inputRPoll[i], nil, nil, rpb.WriteRequestPoll, rpbtc.isExpectedErr[i], rpbtc.codeErr[i]}
 }
 
-func putRButtonWriteRequestUsers(rpbtc rpbTestContainer, rpb formatter.IReplyButton, i int) *replyButtonT {
+func putRButtonWriteRequestUsers(rpbtc rpbTestContainer, rpb fmtogram.IReplyButton, i int) *replyButtonT {
 	return &replyButtonT{rpbtc.name, "", nil, nil, rpbtc.inputRUsers[i], nil, rpb.WriteRequestUsers, rpbtc.isExpectedErr[i], rpbtc.codeErr[i]}
 }
 
-func putRButtonWriteString(rpbtc rpbTestContainer, rpb formatter.IReplyButton, i int) *replyButtonT {
+func putRButtonWriteString(rpbtc rpbTestContainer, rpb fmtogram.IReplyButton, i int) *replyButtonT {
 	return &replyButtonT{rpbtc.name, rpbtc.inputStr[i], nil, nil, nil, nil, rpb.WriteString, rpbtc.isExpectedErr[i], rpbtc.codeErr[i]}
 }
 
-func putRButtonWriteWebApp(rpbtc rpbTestContainer, rpb formatter.IReplyButton, i int) *replyButtonT {
+func putRButtonWriteWebApp(rpbtc rpbTestContainer, rpb fmtogram.IReplyButton, i int) *replyButtonT {
 	return &replyButtonT{rpbtc.name, "", nil, nil, nil, rpbtc.inputWebApp[i], rpb.WriteWebApp, rpbtc.isExpectedErr[i], rpbtc.codeErr[i]}
 }
 
 func (rpbtc *rpbTestContainer) writeRequestChat() {
 	rpbtc.name = "(IReplyButton).WriteRequestChat()"
-	rpbtc.inputRChat = []*types.KeyboardButtonRequestChat{{RequestID: 777, RequestTitle: true},
+	rpbtc.inputRChat = []*fmtogram.KeyboardButtonRequestChat{{RequestID: 777, RequestTitle: true},
 		nil,
 		{RequestID: 777, RequestTitle: true}, {RequestID: 777, RequestTitle: true}}
 	rpbtc.isExpectedErr = []bool{false, true, false, true}
@@ -89,7 +88,7 @@ func (rpbtc *rpbTestContainer) writeRequestLocation() {
 
 func (rpbtc *rpbTestContainer) writeRequestPoll() {
 	rpbtc.name = "(IReplyButton).WriteRequestPoll()"
-	rpbtc.inputRPoll = []*types.KeyboardButtonPollType{{Type: "alo"},
+	rpbtc.inputRPoll = []*fmtogram.KeyboardButtonPollType{{Type: "alo"},
 		nil,
 		{Type: "Bu ya"}, {Type: "nu ti"}}
 	rpbtc.isExpectedErr = []bool{false, true, false, true}
@@ -100,7 +99,7 @@ func (rpbtc *rpbTestContainer) writeRequestPoll() {
 
 func (rpbtc *rpbTestContainer) writeRequestUsers() {
 	rpbtc.name = "(IReplyButton).WriteRequestUsers()"
-	rpbtc.inputRUsers = []*types.KeyboardButtonRequestUsers{{RequestID: 12315, RequestPhoto: true},
+	rpbtc.inputRUsers = []*fmtogram.KeyboardButtonRequestUsers{{RequestID: 12315, RequestPhoto: true},
 		nil,
 		{RequestID: 12315, RequestPhoto: true}, {RequestID: 12315, RequestPhoto: true}}
 	rpbtc.isExpectedErr = []bool{false, true, false, true}
@@ -120,7 +119,7 @@ func (rpbtc *rpbTestContainer) writeString() {
 
 func (rpbtc *rpbTestContainer) writeWebApp() {
 	rpbtc.name = "(IReplyButton).WriteWebApp()"
-	rpbtc.inputWebApp = []*types.WebAppInfo{{Url: "https://youtube.com"},
+	rpbtc.inputWebApp = []*fmtogram.WebAppInfo{{Url: "https://youtube.com"},
 		nil,
 		{Url: "https://youtube.com"}, {Url: "https://youtube.com"}}
 	rpbtc.isExpectedErr = []bool{false, true, false, true}
@@ -141,7 +140,7 @@ func (rpb *replyButtonT) callStrF(f func(string) error, t *testing.T) {
 	}
 }
 
-func (rpb *replyButtonT) callRChatF(f func(*types.KeyboardButtonRequestChat) error, t *testing.T) {
+func (rpb *replyButtonT) callRChatF(f func(*fmtogram.KeyboardButtonRequestChat) error, t *testing.T) {
 	if !rpb.isExpectedErr {
 		if err := f(rpb.rchat); err != nil {
 			t.Fatalf(errMsg, err)
@@ -153,7 +152,7 @@ func (rpb *replyButtonT) callRChatF(f func(*types.KeyboardButtonRequestChat) err
 	}
 }
 
-func (rpb *replyButtonT) callRPollF(f func(*types.KeyboardButtonPollType) error, t *testing.T) {
+func (rpb *replyButtonT) callRPollF(f func(*fmtogram.KeyboardButtonPollType) error, t *testing.T) {
 	if !rpb.isExpectedErr {
 		if err := f(rpb.rpoll); err != nil {
 			t.Fatalf(errMsg, err)
@@ -165,7 +164,7 @@ func (rpb *replyButtonT) callRPollF(f func(*types.KeyboardButtonPollType) error,
 	}
 }
 
-func (rpb *replyButtonT) callRUsersF(f func(*types.KeyboardButtonRequestUsers) error, t *testing.T) {
+func (rpb *replyButtonT) callRUsersF(f func(*fmtogram.KeyboardButtonRequestUsers) error, t *testing.T) {
 	if !rpb.isExpectedErr {
 		if err := f(rpb.rusers); err != nil {
 			t.Fatalf(errMsg, err)
@@ -177,7 +176,7 @@ func (rpb *replyButtonT) callRUsersF(f func(*types.KeyboardButtonRequestUsers) e
 	}
 }
 
-func (rpb *replyButtonT) callWebAppF(f func(*types.WebAppInfo) error, t *testing.T) {
+func (rpb *replyButtonT) callWebAppF(f func(*fmtogram.WebAppInfo) error, t *testing.T) {
 	if !rpb.isExpectedErr {
 		if err := f(rpb.webapp); err != nil {
 			t.Fatalf(errMsg, err)
@@ -206,16 +205,16 @@ func (rpb *replyButtonT) startTest(part string, i int, t *testing.T) {
 	case func(string) error:
 		printTestLog(part, rpb.name, rpb.codeErr, rpb.str, rpb.isExpectedErr, i, t)
 		rpb.callStrF(f, t)
-	case func(*types.KeyboardButtonRequestChat) error:
+	case func(*fmtogram.KeyboardButtonRequestChat) error:
 		printTestLog(part, rpb.name, rpb.codeErr, rpb.rchat, rpb.isExpectedErr, i, t)
 		rpb.callRChatF(f, t)
-	case func(*types.KeyboardButtonPollType) error:
+	case func(*fmtogram.KeyboardButtonPollType) error:
 		printTestLog(part, rpb.name, rpb.codeErr, rpb.rpoll, rpb.isExpectedErr, i, t)
 		rpb.callRPollF(f, t)
-	case func(*types.KeyboardButtonRequestUsers) error:
+	case func(*fmtogram.KeyboardButtonRequestUsers) error:
 		printTestLog(part, rpb.name, rpb.codeErr, rpb.rusers, rpb.isExpectedErr, i, t)
 		rpb.callRUsersF(f, t)
-	case func(*types.WebAppInfo) error:
+	case func(*fmtogram.WebAppInfo) error:
 		printTestLog(part, rpb.name, rpb.codeErr, rpb.webapp, rpb.isExpectedErr, i, t)
 		rpb.callWebAppF(f, t)
 	case func() error:
@@ -227,12 +226,12 @@ func (rpb *replyButtonT) startTest(part string, i int, t *testing.T) {
 	}
 }
 
-func (rpbtc *rpbTestContainer) createTestArrays(msg *formatter.Message, t *testing.T) ([]UnitTest, []UnitTest) {
-	var btn formatter.IReplyButton
+func (rpbtc *rpbTestContainer) createTestArrays(msg *fmtogram.Message, t *testing.T) ([]UnitTest, []UnitTest) {
+	var btn fmtogram.IReplyButton
 	a, b := make([]UnitTest, rpbtc.until), make([]UnitTest, rpbtc.amount-rpbtc.until)
 	for i, j := 0, 0; i < rpbtc.amount; i++ {
 		if i < rpbtc.until {
-			if kb, err := msg.NewKeyboard().WriteReply(); err != nil {
+			if kb, err := fmtogram.NewKeyboard().WriteReply(); err != nil {
 				t.Fatal(err)
 			} else {
 				if err = kb.Set([]int{1, 2, 3}); err != nil {
@@ -245,7 +244,7 @@ func (rpbtc *rpbTestContainer) createTestArrays(msg *formatter.Message, t *testi
 			a[i] = rpbtc.buildF(*rpbtc, btn, i)
 		} else {
 			if j%2 == 0 {
-				if kb, err := msg.NewKeyboard().WriteReply(); err != nil {
+				if kb, err := fmtogram.NewKeyboard().WriteReply(); err != nil {
 					t.Fatal(err)
 				} else {
 					if err = kb.Set([]int{1, 2, 3}); err != nil {
@@ -263,7 +262,7 @@ func (rpbtc *rpbTestContainer) createTestArrays(msg *formatter.Message, t *testi
 	return a, b
 }
 
-func (rpbtc *rpbTestContainer) mainLogic(msg *formatter.Message, t *testing.T) {
+func (rpbtc *rpbTestContainer) mainLogic(msg *fmtogram.Message, t *testing.T) {
 	rpumentcontainer, doublecontainer := rpbtc.createTestArrays(msg, t)
 	check(rpumentcontainer, t)
 	doubleCheck(doublecontainer, t)
@@ -273,7 +272,7 @@ func TestRButtonWriteRequestChat(t *testing.T) {
 	t.Parallel()
 	rpbtc := new(rpbTestContainer)
 	rpbtc.writeRequestChat()
-	msg := formatter.CreateEmpltyMessage()
+	msg := fmtogram.CreateEmpltyMessage()
 	rpbtc.mainLogic(msg, t)
 }
 
@@ -281,7 +280,7 @@ func TestRButtonWriteRequestContact(t *testing.T) {
 	t.Parallel()
 	rpbtc := new(rpbTestContainer)
 	rpbtc.writeRequestContact()
-	msg := formatter.CreateEmpltyMessage()
+	msg := fmtogram.CreateEmpltyMessage()
 	rpbtc.mainLogic(msg, t)
 }
 
@@ -289,7 +288,7 @@ func TestRButtonWriteRequestLocation(t *testing.T) {
 	t.Parallel()
 	rpbtc := new(rpbTestContainer)
 	rpbtc.writeRequestLocation()
-	msg := formatter.CreateEmpltyMessage()
+	msg := fmtogram.CreateEmpltyMessage()
 	rpbtc.mainLogic(msg, t)
 }
 
@@ -297,7 +296,7 @@ func TestRButtonWriteRequestPoll(t *testing.T) {
 	t.Parallel()
 	rpbtc := new(rpbTestContainer)
 	rpbtc.writeRequestPoll()
-	msg := formatter.CreateEmpltyMessage()
+	msg := fmtogram.CreateEmpltyMessage()
 	rpbtc.mainLogic(msg, t)
 }
 
@@ -305,7 +304,7 @@ func TestRButtonWriteRequestUsers(t *testing.T) {
 	t.Parallel()
 	rpbtc := new(rpbTestContainer)
 	rpbtc.writeRequestUsers()
-	msg := formatter.CreateEmpltyMessage()
+	msg := fmtogram.CreateEmpltyMessage()
 	rpbtc.mainLogic(msg, t)
 }
 
@@ -313,7 +312,7 @@ func TestRButtonWriteString(t *testing.T) {
 	t.Parallel()
 	rpbtc := new(rpbTestContainer)
 	rpbtc.writeString()
-	msg := formatter.CreateEmpltyMessage()
+	msg := fmtogram.CreateEmpltyMessage()
 	rpbtc.mainLogic(msg, t)
 }
 
@@ -321,6 +320,6 @@ func TestRButtonWriteWebApp(t *testing.T) {
 	t.Parallel()
 	rpbtc := new(rpbTestContainer)
 	rpbtc.writeWebApp()
-	msg := formatter.CreateEmpltyMessage()
+	msg := fmtogram.CreateEmpltyMessage()
 	rpbtc.mainLogic(msg, t)
 }

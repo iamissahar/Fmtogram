@@ -3,7 +3,7 @@ package unit
 import (
 	"testing"
 
-	"github.com/iamissahar/Fmtogram/formatter"
+	fmtogram "github.com/iamissahar/Fmtogram"
 )
 
 type voiceT struct {
@@ -22,22 +22,22 @@ type vcTestContainer struct {
 	isExpectedErr []bool
 	codeErr       []string
 	amount, until int
-	buildF        func(vctc vcTestContainer, vc formatter.IVoice, i int) *voiceT
+	buildF        func(vctc vcTestContainer, vc fmtogram.IVoice, i int) *voiceT
 }
 
-func putWriteVoiceStorage(vctc vcTestContainer, vc formatter.IVoice, i int) *voiceT {
+func putWriteVoiceStorage(vctc vcTestContainer, vc fmtogram.IVoice, i int) *voiceT {
 	return &voiceT{vctc.name, vctc.inputStr[i], 0, vc.WriteVoiceStorage, vctc.isExpectedErr[i], vctc.codeErr[i]}
 }
 
-func putWriteVoiceTelegram(vctc vcTestContainer, vc formatter.IVoice, i int) *voiceT {
+func putWriteVoiceTelegram(vctc vcTestContainer, vc fmtogram.IVoice, i int) *voiceT {
 	return &voiceT{vctc.name, vctc.inputStr[i], 0, vc.WriteVoiceTelegram, vctc.isExpectedErr[i], vctc.codeErr[i]}
 }
 
-func putWriteVoiceInternet(vctc vcTestContainer, vc formatter.IVoice, i int) *voiceT {
+func putWriteVoiceInternet(vctc vcTestContainer, vc fmtogram.IVoice, i int) *voiceT {
 	return &voiceT{vctc.name, vctc.inputStr[i], 0, vc.WriteVoiceInternet, vctc.isExpectedErr[i], vctc.codeErr[i]}
 }
 
-func putWriteVoiceDuration(vctc vcTestContainer, vc formatter.IVoice, i int) *voiceT {
+func putWriteVoiceDuration(vctc vcTestContainer, vc fmtogram.IVoice, i int) *voiceT {
 	return &voiceT{vctc.name, "", vctc.inputInt[i], vc.WriteDuration, vctc.isExpectedErr[i], vctc.codeErr[i]}
 }
 
@@ -114,16 +114,16 @@ func (vc *voiceT) startTest(part string, i int, t *testing.T) {
 	}
 }
 
-func (vctc *vcTestContainer) createTestArrays(msg *formatter.Message) ([]UnitTest, []UnitTest) {
-	var vc formatter.IVoice
+func (vctc *vcTestContainer) createTestArrays(msg *fmtogram.Message) ([]UnitTest, []UnitTest) {
+	var vc fmtogram.IVoice
 	a, b := make([]UnitTest, vctc.until), make([]UnitTest, vctc.amount-vctc.until)
 	for i, j := 0, 0; i < vctc.amount; i++ {
 		if i < vctc.until {
-			vc = msg.NewVoice()
+			vc = fmtogram.NewVoice()
 			a[i] = vctc.buildF(*vctc, vc, i)
 		} else {
 			if j%2 == 0 {
-				vc = msg.NewVoice()
+				vc = fmtogram.NewVoice()
 			}
 			b[j] = vctc.buildF(*vctc, vc, i)
 			j++
@@ -132,7 +132,7 @@ func (vctc *vcTestContainer) createTestArrays(msg *formatter.Message) ([]UnitTes
 	return a, b
 }
 
-func mainVoiceLogic(msg *formatter.Message, antc vcTestContainer, t *testing.T) {
+func mainVoiceLogic(msg *fmtogram.Message, antc vcTestContainer, t *testing.T) {
 	animationcontainer, doublecontainer := antc.createTestArrays(msg)
 	check(animationcontainer, t)
 	doubleCheck(doublecontainer, t)
@@ -142,7 +142,7 @@ func TestWriteVoiceStorage(t *testing.T) {
 	t.Parallel()
 	antc := new(vcTestContainer)
 	antc.writeVoiceStorage()
-	msg := formatter.CreateEmpltyMessage()
+	msg := fmtogram.CreateEmpltyMessage()
 	mainVoiceLogic(msg, *antc, t)
 }
 
@@ -150,7 +150,7 @@ func TestWriteVoiceTelegram(t *testing.T) {
 	t.Parallel()
 	antc := new(vcTestContainer)
 	antc.writeVoiceTelegram()
-	msg := formatter.CreateEmpltyMessage()
+	msg := fmtogram.CreateEmpltyMessage()
 	mainVoiceLogic(msg, *antc, t)
 }
 
@@ -158,7 +158,7 @@ func TestWriteVoiceInternet(t *testing.T) {
 	t.Parallel()
 	antc := new(vcTestContainer)
 	antc.writeVoiceInternet()
-	msg := formatter.CreateEmpltyMessage()
+	msg := fmtogram.CreateEmpltyMessage()
 	mainVoiceLogic(msg, *antc, t)
 }
 
@@ -166,6 +166,6 @@ func TestWriteVoiceDuration(t *testing.T) {
 	t.Parallel()
 	antc := new(vcTestContainer)
 	antc.writeDuration()
-	msg := formatter.CreateEmpltyMessage()
+	msg := fmtogram.CreateEmpltyMessage()
 	mainVoiceLogic(msg, *antc, t)
 }

@@ -3,7 +3,7 @@ package unit
 import (
 	"testing"
 
-	"github.com/iamissahar/Fmtogram/formatter"
+	fmtogram "github.com/iamissahar/Fmtogram"
 )
 
 type contactT struct {
@@ -20,22 +20,22 @@ type conTestContainer struct {
 	isExpectedErr []bool
 	codeErr       []string
 	amount, until int
-	buildF        func(contc conTestContainer, con formatter.IContact, i int) *contactT
+	buildF        func(contc conTestContainer, con fmtogram.IContact, i int) *contactT
 }
 
-func putWriteContactPhoneNumber(contc conTestContainer, con formatter.IContact, i int) *contactT {
+func putWriteContactPhoneNumber(contc conTestContainer, con fmtogram.IContact, i int) *contactT {
 	return &contactT{contc.name, contc.inputStr[i], con.WritePhoneNumber, contc.isExpectedErr[i], contc.codeErr[i]}
 }
 
-func putWriteContactFirstName(contc conTestContainer, con formatter.IContact, i int) *contactT {
+func putWriteContactFirstName(contc conTestContainer, con fmtogram.IContact, i int) *contactT {
 	return &contactT{contc.name, contc.inputStr[i], con.WriteFirstName, contc.isExpectedErr[i], contc.codeErr[i]}
 }
 
-func putWriteContactLastName(contc conTestContainer, con formatter.IContact, i int) *contactT {
+func putWriteContactLastName(contc conTestContainer, con fmtogram.IContact, i int) *contactT {
 	return &contactT{contc.name, contc.inputStr[i], con.WriteLastName, contc.isExpectedErr[i], contc.codeErr[i]}
 }
 
-func putWriteContactVCard(contc conTestContainer, con formatter.IContact, i int) *contactT {
+func putWriteContactVCard(contc conTestContainer, con fmtogram.IContact, i int) *contactT {
 	return &contactT{contc.name, contc.inputStr[i], con.WriteVCard, contc.isExpectedErr[i], contc.codeErr[i]}
 }
 
@@ -87,16 +87,16 @@ func (con *contactT) startTest(part string, i int, t *testing.T) {
 	}
 }
 
-func (contc *conTestContainer) createTestArrays(msg *formatter.Message) ([]UnitTest, []UnitTest) {
-	var con formatter.IContact
+func (contc *conTestContainer) createTestArrays(msg *fmtogram.Message) ([]UnitTest, []UnitTest) {
+	var con fmtogram.IContact
 	a, b := make([]UnitTest, contc.until), make([]UnitTest, contc.amount-contc.until)
 	for i, j := 0, 0; i < contc.amount; i++ {
 		if i < contc.until {
-			con = msg.NewContact()
+			con = fmtogram.NewContact()
 			a[i] = contc.buildF(*contc, con, i)
 		} else {
 			if j%2 == 0 {
-				con = msg.NewContact()
+				con = fmtogram.NewContact()
 			}
 			b[j] = contc.buildF(*contc, con, i)
 			j++
@@ -105,7 +105,7 @@ func (contc *conTestContainer) createTestArrays(msg *formatter.Message) ([]UnitT
 	return a, b
 }
 
-func mainContactLogic(msg *formatter.Message, contc conTestContainer, t *testing.T) {
+func mainContactLogic(msg *fmtogram.Message, contc conTestContainer, t *testing.T) {
 	contactcontainer, doublecontainer := contc.createTestArrays(msg)
 	check(contactcontainer, t)
 	doubleCheck(doublecontainer, t)
@@ -115,7 +115,7 @@ func TestWriteContactPhoneNumber(t *testing.T) {
 	t.Parallel()
 	contc := new(conTestContainer)
 	contc.writePhoneNumber()
-	msg := formatter.CreateEmpltyMessage()
+	msg := fmtogram.CreateEmpltyMessage()
 	mainContactLogic(msg, *contc, t)
 }
 
@@ -123,7 +123,7 @@ func TestWriteContactFirstName(t *testing.T) {
 	t.Parallel()
 	contc := new(conTestContainer)
 	contc.writeFirstName()
-	msg := formatter.CreateEmpltyMessage()
+	msg := fmtogram.CreateEmpltyMessage()
 	mainContactLogic(msg, *contc, t)
 }
 
@@ -131,7 +131,7 @@ func TestWriteContactLastName(t *testing.T) {
 	t.Parallel()
 	contc := new(conTestContainer)
 	contc.writeLastName()
-	msg := formatter.CreateEmpltyMessage()
+	msg := fmtogram.CreateEmpltyMessage()
 	mainContactLogic(msg, *contc, t)
 }
 
@@ -139,6 +139,6 @@ func TestWriteContactVCard(t *testing.T) {
 	t.Parallel()
 	contc := new(conTestContainer)
 	contc.writeVCard()
-	msg := formatter.CreateEmpltyMessage()
+	msg := fmtogram.CreateEmpltyMessage()
 	mainContactLogic(msg, *contc, t)
 }
