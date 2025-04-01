@@ -2,6 +2,7 @@ package fmtogram
 
 import (
 	"fmt"
+	"runtime/debug"
 )
 
 type FME struct {
@@ -10,14 +11,14 @@ type FME struct {
 	Stack  string
 }
 
-// func (f *FME) Error() string {
-// 	f.Stack = string(debug.Stack())
-// 	return fmt.Sprintf("[ERROR:%d] message: %s\nStack: %s", f.Code, f.String, f.Stack)
-// }
-
 func (f *FME) Error() string {
-	return fmt.Sprintf("%d", f.Code)
+	f.Stack = string(debug.Stack())
+	return fmt.Sprintf("[ERROR:%d] message: %s\nStack: %s", f.Code, f.String, f.Stack)
 }
+
+// func (f *FME) Error() string {
+// 	return fmt.Sprintf("%d", f.Code)
+// }
 
 func TelegramErrors(code int, dis string) error {
 	return fmt.Errorf("[ERROR:%d] %s", code, dis)

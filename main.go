@@ -1,7 +1,6 @@
 package fmtogram
 
 import (
-	"fmt"
 	"time"
 )
 
@@ -111,9 +110,6 @@ type BasicSettings struct {
 
 func worker(tg *Telegram, bs *BasicSettings, workdone chan struct{}) {
 	for _, upd := range tg.Result {
-		fmt.Println(upd)
-		fmt.Println(bs)
-		fmt.Println(bs.StartFunc)
 		bs.StartFunc(upd, bs)
 		workdone <- struct{}{}
 	}
